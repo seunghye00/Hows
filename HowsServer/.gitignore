@@ -1,3 +1,5 @@
+.DS_Store
+
 # Spring Boot build output
 target/
 build/

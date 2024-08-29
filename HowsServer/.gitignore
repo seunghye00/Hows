@@ -1,5 +1,7 @@
 .DS_Store
 
+.metadata/
+
 # Spring Boot build output
 target/
 build/

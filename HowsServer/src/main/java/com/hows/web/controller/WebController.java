@@ -13,8 +13,7 @@ public class WebController {
 	public ResponseEntity<String> selectAll(){
 		
 		System.out.println("aaa");
-		
-		
+
 		return ResponseEntity.ok("TEst");
 	}
 }

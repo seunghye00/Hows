@@ -1,17 +1,21 @@
 import styles from './Home.module.css'
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import {Cart} from "./Cart/Cart";
+import {Community} from "./Community/Community";
+import {Products} from "./Products/Products";
+import {Mypage} from "./Mypage/Mypage";
+import {Main} from "./Main/Main";
 
 export const Home = () => {
   return (
     <div className={styles.container}>
-      Home
       <Router>
         <Routes>
-          <Route path="/" />
-          <Route path="/products" />
-          <Route path="/community" />
-          <Route path="/cart" />
-          <Route path="/mypage" />
+          <Route path="/" element={ <Main /> }/>
+          <Route path="/products" element={ <Products /> } />
+          <Route path="/community" element={ <Community /> } />
+          <Route path="/cart" element={ <Cart /> } />
+          <Route path="/mypage" element={ <Mypage /> } />
         </Routes>
       </Router>
     </div>

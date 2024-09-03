@@ -13,18 +13,16 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 @Component
 public class JwtUtil {
 
-	// 토큰이 만료되기까지 걸리는 시간 값
+		// 토큰이 만료되기까지 걸리는 시간 값
 		private long expiration = 86400; // 24시간의 초값  
 
 		private Algorithm algo;
 		private JWTVerifier verifier;
-		
 
 		public JwtUtil(@Value("${jwt.secret}") String secret) {
 			this.algo = Algorithm.HMAC256(secret); // application.properties로 이동
 			this.verifier = JWT.require(algo).build();
 		}
-		
 
 		// 사용자가 로그인 성공하면 createToken 호출하여 사용자 ID기반으로 JWT 생성하고 클라이언트에게 반환
 		public String createToken(String id) {
@@ -34,7 +32,6 @@ public class JwtUtil {
 				.withExpiresAt(new Date(System.currentTimeMillis() + (expiration * 10000 ))) // 24시간 
 				.sign(this.algo); // 최종적으로 알고리즘(HMAC256)을 사용하여 토큰에 서명
 		}
-
 		
 		public boolean isVerified(String token) {
 			try {
@@ -44,7 +41,6 @@ public class JwtUtil {
 				return false;
 			}
 		}
-		
 		
 		public DecodedJWT verify(String token) {
 			return this.verifier.verify(token); // verifier: token을 검증하기 위한 객체

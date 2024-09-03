@@ -15,6 +15,7 @@ $ npx create-react-app [project-name]
   - 공통 함수 관리
 - config
   - 설정 변수 또는 함수 만들어서 보관
+  - 설정 값은 .env파일로 보관
 - components
   - 공통 컴포넌트 관리
 - pages

@@ -15,7 +15,7 @@ export const Footer = () => {
                                         navicate('/mypage')
                                     }}
                                 >
-                                    고객센터1
+                                    고객센터
                                     <i class="bx bx-chevron-right"></i>
                                 </a>
                             </div>

@@ -37,7 +37,7 @@ export const Side = () => {
                     ],
                 },
                 {
-                    title: '블랙리스트 관리',
+                    title: '블랙리스트 관리f',
                     icon: 'bx bx-block', // 아이콘 추가
                     subMenu: [{ title: '블랙리스트 조회', path: '/' }],
                 },

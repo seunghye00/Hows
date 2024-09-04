@@ -1,22 +1,33 @@
 import './App.css'
 import { Home } from './pages/Home/Home'
+import { Admin } from './pages/Admin/Admin'
+import { Side } from './components/Side/SIde'
 import { Header } from './components/Header/Header'
 import { Footer } from './components/Footer/Footer'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { useState } from 'react'
 
 function App() {
-    // 로딩
-
+    const [session, setSession] = useState(true)
     // 로딩
 
     // if login
 
     return (
-        <div className="App">
+        <div className={session ? 'App' : 'Admin'}>
             <Router>
-                <Header />
-                <Home />
-                <Footer />
+                {session ? (
+                    <>
+                        <Header />
+                        <Home />
+                        <Footer />
+                    </>
+                ) : (
+                    <>
+                        <Side />
+                        <Admin />
+                    </>
+                )}
             </Router>
         </div>
     )

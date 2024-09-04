@@ -1,7 +1,7 @@
 import styles from './Footer.module.css'
 import { useNavigate } from 'react-router-dom'
 export const Footer = () => {
-    const navicate = useNavigate()
+    const navigate = useNavigate()
     const handleCustomerClick = () => {}
     return (
         <div className="footer">
@@ -12,7 +12,7 @@ export const Footer = () => {
                             <div className={styles.customerTit}>
                                 <a
                                     onClick={() => {
-                                        navicate('/mypage')
+                                        navigate('/mypage')
                                     }}
                                 >
                                     고객센터

@@ -1,0 +1,91 @@
+/* div {
+  border: 1px solid black;
+} */
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* background-color: #e7f3ed;  */
+}
+
+.container .loginBox {
+  display: flex;
+  flex-direction: column;
+  width: 250px;
+  height: 400px;
+  text-align: center;
+}
+
+.container .loginBox .title {
+  display: flex;
+  justify-content: center;
+  font-size: 45px;
+  padding: 0;
+  margin-bottom: 25px;
+}
+
+.container .loginBox > input {
+  width: 100%;
+  height: 40px;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  font-size: 13px;
+  padding: 10px;
+  margin-bottom: 5px;
+}
+
+.container .loginBox > button,
+.signUpBtn {
+  height: 40px;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+}
+
+.container .loginBox .loginBtn {
+  margin-top: 10px;
+  background-color: #6c9c84;
+  color: white;
+}
+.container .loginBox .loginBtn:hover {
+  background-color: #678f7b;
+}
+
+.container .loginBox .kakaoLoginBtn {
+  background-color: #f5d370;
+  color: white;
+}
+.container .loginBox .kakaoLoginBtn:hover {
+  background-color: #face4b;
+}
+
+.container .loginBox .links {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.container .loginBox .links .linkBtn {
+  border: none;
+  background: none;
+  font-size: 11.5px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  margin: 0 15px;
+}
+
+.container .loginBox .signUpBtn {
+  margin-top: 10px;
+  background-color: #afaeae;
+  color: white;
+}
+.container .loginBox .signUpBtn:hover {
+  background-color: #919191;
+}

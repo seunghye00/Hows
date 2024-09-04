@@ -1,6 +1,5 @@
 /.metadata/
 
 .DS_Store
-HowsFront/src/.env
-
 HowsFront/.env
+HowsServer/src/main/resources/*.json

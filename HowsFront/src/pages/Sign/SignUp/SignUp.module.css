@@ -1,0 +1,211 @@
+/* div {
+  border: 1px solid black;
+} */
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 0 50px;
+  /* height: 100vh; */
+  /* background-color: #e7f3ed;  */
+}
+
+.container .signUpBox {
+  display: flex;
+  flex-direction: column;
+  width: 380px;
+  height: auto;
+  text-align: center;
+}
+.container .signUpBox > h3 {
+  font-size: 25px;
+  margin-bottom: 50px;
+}
+
+/* =========[ 공통 ]======== */
+/* Box들 */
+.container .signUpBox .idBox,
+.pwBox,
+.pwBox2,
+.nameBox,
+.birthBox,
+.nicknameBox,
+.emailBox,
+.phoneBox,
+.addressBox {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+/* Box의 title */
+.container .signUpBox span:nth-child(1) {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 3px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+/* 정규표현 설명 span */
+.container .signUpBox .pwBox > span:nth-child(2),
+.idBox > span:nth-child(2),
+.nicknameBox > span:nth-child(2) {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 3px;
+  font-size: 11px;
+  margin: 3px 0;
+}
+
+/* input  */
+.container .signUpBox input {
+  width: 100%;
+  height: 100%;
+  border: 1px solid #dcdcdc;
+  border-radius: 4px;
+  font-size: 13px;
+  padding: 10px;
+}
+.container .signUpBox input:focus {
+  /* 테두리 색상 */
+  outline: 1px solid #c5c5c5;
+}
+
+/* input & button 묶음 */
+.container .signUpBox .formGrop {
+  display: flex;
+  align-items: center;
+  height: 35px;
+}
+
+/* 중복확인 Btn */
+.container .signUpBox .chkBtn {
+  flex: 1;
+  margin-left: 8px;
+  height: 100%;
+  background-color: #6c9c84;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+}
+.container .signUpBox .chkBtn:hover {
+  background-color: #678f7b;
+}
+
+/* =========[ 개별 ]======== */
+/* ID */
+.container .signUpBox .idBox .inputId {
+  flex: 5;
+}
+
+/* PW */
+
+/* 닉네임 */
+.container .signUpBox .nicknameBox .inputNickname {
+  flex: 5;
+}
+
+/* 성별 */
+.container .signUpBox .genderBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-bottom: 15px;
+}
+.container .signUpBox .genderBox label {
+  display: flex;
+  flex-direction: row;
+}
+.container .signUpBox .genderBox label input {
+  margin: 2px 0 0 8px;
+  transform: scale(1.2);
+}
+
+/* 이메일 */
+.container .signUpBox .emailBox > span:nth-child(2) {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 3px;
+  font-size: 11px;
+  margin: 3px 0;
+}
+
+/* 주소 */
+.container .signUpBox .addressBox input {
+  margin-bottom: 3px;
+}
+.container .signUpBox .addressBox .addressBtn {
+  height: 35px;
+  background-color: #6c9c84;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+  margin-top: 5px;
+}
+.container .signUpBox .addressBox .addressBtn:hover {
+  background-color: #678f7b;
+}
+
+/* 회원가입 버튼 */
+.container .signUpBox .btns {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+.container .signUpBox .btns > button {
+  width: 48%;
+  height: 35px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+}
+.container .signUpBox .btns > button:nth-child(1) {
+  background-color: #6c9c84;
+  color: white;
+}
+.container .signUpBox .btns > button:nth-child(1):hover {
+  background-color: #678f7b;
+}
+.container .signUpBox .btns > button:nth-child(2) {
+  background-color: #afaeae;
+  color: white;
+}
+.container .signUpBox .btns > button:nth-child(2):hover {
+  background-color: #919191;
+}
+
+/* 로그인 */
+.container .signUpBox .login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+}
+.container .signUpBox .login > span {
+  font-size: 13px;
+  font-weight: 400;
+}
+.container .signUpBox .login .linkBtn {
+  border: none;
+  background: none;
+  color: #678f7b;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}

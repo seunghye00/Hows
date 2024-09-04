@@ -24,6 +24,7 @@ public class CartController {
             return ResponseEntity.ok(list);
 
         } catch (Exception e){
+            e.printStackTrace();
             return null;
         }
     }

@@ -52,7 +52,6 @@ public class SecurityConfig {
 		
 	@Bean
 	protected PasswordEncoder getPasswordEncoder() {
-		return new BCryptPasswordEncoder(); 
-		// sha512 대신 사용 
+		return new BCryptPasswordEncoder(); // sha512 대신 사용
 	}
 }

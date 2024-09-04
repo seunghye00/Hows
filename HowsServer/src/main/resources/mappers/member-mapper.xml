@@ -4,5 +4,30 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="member">
- 
+
+	<!-- 회원가입 -->
+	<insert id="insert">
+		insert into member values (
+			member_seq.nextval, 
+			#{member_id}, 
+		    #{pw}, 
+		    #{name}, 
+		    #{nickname}, 
+		    #{birth}, 
+		    #{gender}, 
+		    #{phone}, 
+		    #{email}, 
+		    #{zip_code}, 
+		    #{address}, 
+		    #{detail_address}, 
+		    #{grade_code}, 
+		    #{role_code}, 
+		    sysdate,
+		    null,    
+		    'N',     
+		    ${point} 
+		);
+	</insert>
+	
+	
 </mapper>

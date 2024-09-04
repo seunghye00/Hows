@@ -1,0 +1,161 @@
+.headerWrap {
+    border-bottom: 1px solid var(--hows-gray-300);
+}
+
+.headerCont {
+    width: 100%;
+    display: flex;
+    gap: 20px;
+    color: var(--hows-gray-900);
+    position: relative;
+    z-index: 1000;
+    transition: all 0.1s ease;
+    /* 애니메이션을 위한 트랜지션 */
+}
+
+.headerCont.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--hows-white);
+    /* 배경색이 필요하다면 추가 */
+    z-index: 1000;
+    border-bottom: 1px solid var(--hows-gray-300);
+    /* 패딩을 추가해도 좋습니다 */
+}
+
+.mainNavi {
+    max-width: 1300px;
+    display: flex;
+    padding: 20px 0;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.menuBox {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.mainLogo {
+    margin-right: 30px;
+}
+
+.mainLogo a {
+    display: flex;
+    object-fit: cover;
+    max-width: 40px;
+}
+
+
+.mainLogo img {
+    width: 100%;
+    height: 100%;
+
+}
+
+.naviMenuList {
+    display: flex;
+    gap: 20px;
+}
+
+.naviMenu {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--hows-gray-800);
+}
+
+.naviMenu:hover {
+    color: var(--hows-point-color);
+}
+
+.naviMenu.active {
+    color: var(--hows-point-color);
+}
+
+.naviInfo {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.infoIcon {
+    font-size: 24px;
+}
+
+.infoIcon a:hover i {
+    color: var(--hows-point-color);
+}
+
+.infoUser a {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--hows-point-color);
+    border-radius: 100%;
+    display: flex;
+}
+
+/* 서브메뉴 */
+.subMenuWrap {
+    border-bottom: 1px solid var(--hows-gray-300);
+}
+
+.subMenuCont {
+    width: 100%;
+    display: flex;
+    gap: 20px;
+    margin: 0px auto;
+    color: var(--hows-gray-900);
+    position: relative;
+    transition: all 0.1s ease;
+    z-index: 999;
+}
+
+.subMenuCont.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: var(--hows-white);
+    /* 배경색이 필요하다면 추가 */
+    z-index: 999;
+    border-bottom: 1px solid var(--hows-gray-300);
+    /* 패딩을 추가해도 좋습니다 */
+}
+
+.subMenuBar {
+    max-width: 1300px;
+    display: flex;
+    gap: 40px;
+    width: 100%;
+    margin: auto;
+}
+
+.subMenu {
+    font-weight: 500;
+    padding: 10px 0;
+    position: relative;
+}
+
+.subMenu.active {
+    color: var(--hows-point-color);
+    font-weight: 700;
+}
+
+.subMenu:hover {
+    color: var(--hows-point-color);
+}
+
+.subMenu.active::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 100%;
+    background-color: var(--hows-point-color);
+    height: 2px;
+    bottom: 0;
+}

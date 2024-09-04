@@ -109,7 +109,8 @@ li {
   list-style: none
 }
 
-a {
+a,
+button {
   cursor: pointer;
 }
 

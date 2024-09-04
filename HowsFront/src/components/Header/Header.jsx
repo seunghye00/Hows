@@ -1,42 +1,72 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from './Header.module.css'
 import logo from '../../assets/images/logo_how.png'
+import { useNavigate } from 'react-router-dom'
 
 export const Header = () => {
-    // 메인 네비게이션과 서브메뉴의 활성화 상태를 관리
-    const [activeMenu, setActiveMenu] = useState('Main') // 메인 네비게이션
-    const [activeSubMenu, setActiveSubMenu] = useState('홈') // 서브메뉴
+    const navigate = useNavigate()
+    const [activeMenu, setActiveMenu] = useState('Main')
+    const [activeSubMenu, setActiveSubMenu] = useState('홈')
+    const [isFixed, setIsFixed] = useState(false)
+    const [showSubMenu, setShowSubMenu] = useState(true)
 
-    // 메뉴 클릭 시 활성화된 메뉴와 페이지 유형을 변경
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
-        // 'HowStory'와 'HowShop'을 클릭하면 서브메뉴를 해당 페이지 첫 번째 메뉴로 초기화
         if (menuName === 'HowStory') {
             setActiveSubMenu('홈')
+            navigate('/Community')
         } else if (menuName === 'HowShop') {
             setActiveSubMenu('홈')
+            navigate('/products')
         } else if (menuName === 'Main') {
             setActiveSubMenu('홈')
+            navigate('/')
         }
+        setShowSubMenu(true) // 서브메뉴 보이도록 설정
     }
 
-    // 서브메뉴 클릭 시 활성화된 서브메뉴만 변경
+    const handleMenuHover = () => {
+        setShowSubMenu(true)
+    }
+
+    const handleMenuLeave = () => {
+        setShowSubMenu(false)
+    }
+
     const handleSubMenuClick = subMenu => {
         setActiveSubMenu(subMenu)
     }
 
-    // 하위 메뉴 데이터 정의
     const menuData = {
         Main: ['홈', '오늘의 스토리', '추천 게시물'],
         HowStory: ['홈', '오늘의 스토리', '추천 게시물'],
         HowShop: ['홈', '특가 상품', '인기 상품'],
     }
 
+    const handleScroll = () => {
+        if (window.scrollY > 50) {
+            setIsFixed(true)
+        } else {
+            setIsFixed(false)
+        }
+    }
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll)
+        return () => {
+            window.removeEventListener('scroll', handleScroll)
+        }
+    }, [])
+
     return (
         <div className="header">
-            {/* 상단 네비게이션 */}
             <div className={styles.headerWrap}>
-                <div className={styles.headerCont}>
+                <div
+                    className={`${styles.headerCont} ${
+                        isFixed ? styles.fixed : ''
+                    }`}
+                    onMouseLeave={handleMenuLeave}
+                >
                     <div className={styles.mainNavi}>
                         <div className={styles.menuBox}>
                             <div className={styles.mainLogo}>
@@ -44,8 +74,10 @@ export const Header = () => {
                                     <img src={logo} alt="Logo" />
                                 </a>
                             </div>
-                            <div className={styles.naviMenuList}>
-                                {/* 메인 메뉴 */}
+                            <div
+                                className={styles.naviMenuList}
+                                onMouseEnter={handleMenuHover}
+                            >
                                 <div
                                     className={`${styles.naviMenu} ${
                                         activeMenu === 'Main'
@@ -79,7 +111,6 @@ export const Header = () => {
                             </div>
                         </div>
                         <div className={styles.naviInfo}>
-                            {/* 네비게이션 아이콘 */}
                             <div className={styles.infoIcon}>
                                 <a>
                                     <i className="bx bx-bookmark"></i>
@@ -106,26 +137,31 @@ export const Header = () => {
             </div>
 
             {/* 하위 메뉴 */}
-            <div className={styles.subMenuWrap}>
-                <div className={styles.subMenuCont}>
-                    <div className={`${styles.subMenuBar}`}>
-                        {/* 현재 활성화된 메뉴에 따른 하위 메뉴 렌더링 */}
-                        {menuData[activeMenu].map((subMenu, index) => (
-                            <div
-                                key={index}
-                                className={`${styles.subMenu} ${
-                                    activeSubMenu === subMenu
-                                        ? styles.active
-                                        : ''
-                                }`}
-                                onClick={() => handleSubMenuClick(subMenu)}
-                            >
-                                <a>{subMenu}</a>
-                            </div>
-                        ))}
+            {showSubMenu && (
+                <div className={styles.subMenuWrap}>
+                    <div
+                        className={`${styles.subMenuCont}  ${
+                            isFixed ? styles.fixed : ''
+                        }`}
+                    >
+                        <div className={styles.subMenuBar}>
+                            {menuData[activeMenu].map((subMenu, index) => (
+                                <div
+                                    key={index}
+                                    className={`${styles.subMenu} ${
+                                        activeSubMenu === subMenu
+                                            ? styles.active
+                                            : ''
+                                    }`}
+                                    onClick={() => handleSubMenuClick(subMenu)}
+                                >
+                                    <a>{subMenu}</a>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     )
 }

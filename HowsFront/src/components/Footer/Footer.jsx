@@ -1,6 +1,8 @@
 import styles from './Footer.module.css'
-
+import { useNavigate } from 'react-router-dom'
 export const Footer = () => {
+    const navicate = useNavigate()
+    const handleCustomerClick = () => {}
     return (
         <div className="footer">
             <div className={styles.footerWrap}>
@@ -8,7 +10,11 @@ export const Footer = () => {
                     <div className={styles.customerCont}>
                         <div className={styles.customerInfo}>
                             <div className={styles.customerTit}>
-                                <a>
+                                <a
+                                    onClick={() => {
+                                        navicate('/mypage')
+                                    }}
+                                >
                                     고객센터
                                     <i class="bx bx-chevron-right"></i>
                                 </a>

@@ -6,7 +6,6 @@ import { SubCategory } from './SubCategory/SubCategory';
 export const Product = () => {
   return (
     <div className={styles.container}>
-      Product
       <Banner/>
       <SubCategory/>
       <Item/>

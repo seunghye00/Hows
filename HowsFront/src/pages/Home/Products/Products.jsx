@@ -4,9 +4,11 @@ import { SubHeader } from './SubHeader/SubHeader';
 
 export const Products = () => {
   return (
-    <div>
-      <SubHeader/>
-      <Main/>
+    <div className={styles.container}>
+      <div>
+        <SubHeader/>
+        <Main/>
+      </div>
     </div>
   );
 }

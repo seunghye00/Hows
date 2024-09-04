@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="File">
+
+    <insert id="upload">
+        INSERT INTO
+            file
+        VALUES(
+            file_seq.nextval,
+            #{file_code},
+            #{file_oriname},
+            #{file_sysname},
+            #{parent_seq}
+        );
+    </insert>
+
+    <delete id="deleteFile">
+        DELETE FROM
+            file
+        WHERE
+            file_sysname = #{file_sysname}
+    </delete>
+
+</mapper>

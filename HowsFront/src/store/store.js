@@ -1,4 +1,4 @@
-import {create} from "zustand";
+import { create } from "zustand";
 
 /**
  *  상태관리 사용 함수 작성
@@ -9,3 +9,10 @@ import {create} from "zustand";
 export const useStore = create((set) => {
 
 })
+
+/* 유나 */
+// 회원
+// export const useMemberStore = create((set) => ({
+//     member: [],
+//     setMember: (member) => set({ member })
+// }));

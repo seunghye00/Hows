@@ -117,7 +117,11 @@ export const Header = () => {
                                 </a>
                             </div>
                             <div className={styles.infoIcon}>
-                                <a>
+                                <a
+                                    onClick={() => {
+                                        navigate('/cart')
+                                    }}
+                                >
                                     <i className="bx bx-cart"></i>
                                 </a>
                             </div>

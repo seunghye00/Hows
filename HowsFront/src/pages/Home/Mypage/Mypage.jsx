@@ -7,7 +7,6 @@ import { UserDashboard } from './UserDashboard/UserDashboard';
 export const Mypage = () => {
   return (
     <div className={styles.container}>
-      Mypage
       <Routes>
         <Route path="/" element={<Navigate to="main" replace />} />
         <Route path="main" element={<Main />} />

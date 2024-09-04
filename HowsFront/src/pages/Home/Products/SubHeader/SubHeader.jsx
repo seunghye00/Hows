@@ -8,9 +8,9 @@ export const SubHeader = () => {
     return (
         <div className={styles.container}>
             <ul className={styles.menu}>
-                <li onClick={()=>{navi('product')}}>쇼핑홈</li>
-                <li onClick={()=>{navi('category')}}>카테고리</li>
-                <li onClick={()=>{navi('best')}}>베스트</li>
+                <li onClick={()=>{navi('/products')}}>쇼핑홈</li>
+                <li onClick={()=>{navi('/products/category')}}>카테고리</li>
+                <li onClick={()=>{navi('/products/best')}}>베스트</li>
             </ul>
         </div>
     );

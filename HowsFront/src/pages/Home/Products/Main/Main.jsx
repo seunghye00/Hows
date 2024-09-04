@@ -9,7 +9,8 @@ export const Main = () => {
   return (
     <div className={styles.container}>
         <Routes>
-            <Route path='product' element={<Product/>}></Route>
+            <Route path='/' element={<Product />} />
+            <Route path='product' element={<Product />} />
             <Route path='category' element={<Category/>}></Route>
             <Route path='best' element={<Best/>}></Route>
         </Routes>

@@ -1,5 +1,5 @@
-.conteiner{width: 100%;}
-.conteiner > div {    max-width: 1300px;
+.container{width: 100%;}
+.container > div {    max-width: 1300px;
     /* display: flex; */
     padding: 20px 0;
     /* justify-content: flex-end; */

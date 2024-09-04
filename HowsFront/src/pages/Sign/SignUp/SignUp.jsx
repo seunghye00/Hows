@@ -22,7 +22,7 @@ export const SignUp = () => {
         address: "",
         detailAddress: "",
     });
-    const { members, setMembers } = useMemberStore(); // Zustand store 사용
+    // const { member, setMember } = useMemberStore(); // Zustand store 사용
     const [gender, setGender] = useState({ male: false, female: false });
 
     const handleChange = (e) => {
@@ -214,7 +214,7 @@ export const SignUp = () => {
         axios.post(`${host}/member`, formData).then(resp => {
             console.log("회원가입 : ", resp.data);
             alert('회원가입이 성공적으로 완료되었습니다.');
-            // setMembers([...members, resp.data]);
+            // setMember([...member, resp.data]);
             // navi("/");
 
         }).catch(error => {

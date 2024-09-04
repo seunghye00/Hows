@@ -2,7 +2,7 @@ import styles from './Banner.module.css'
 
 export const Banner = () => {
   return (
-    <div>
+    <div className={styles.container}>
       Banner
     </div>
   );

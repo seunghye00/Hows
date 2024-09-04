@@ -8,39 +8,21 @@ export const Header = () => {
     const [activeMenu, setActiveMenu] = useState('Main')
     const [activeSubMenu, setActiveSubMenu] = useState('홈')
     const [isFixed, setIsFixed] = useState(false)
-    const [showSubMenu, setShowSubMenu] = useState(true)
+    const [session, setSession] = useState(false)
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
         if (menuName === 'HowStory') {
-            setActiveSubMenu('홈')
             navigate('/Community')
         } else if (menuName === 'HowShop') {
-            setActiveSubMenu('홈')
             navigate('/products')
         } else if (menuName === 'Main') {
-            setActiveSubMenu('홈')
             navigate('/')
         }
-        setShowSubMenu(true) // 서브메뉴 보이도록 설정
-    }
-
-    const handleMenuHover = () => {
-        setShowSubMenu(true)
-    }
-
-    const handleMenuLeave = () => {
-        setShowSubMenu(false)
     }
 
     const handleSubMenuClick = subMenu => {
         setActiveSubMenu(subMenu)
-    }
-
-    const menuData = {
-        Main: ['홈', '오늘의 스토리', '추천 게시물'],
-        HowStory: ['홈', '오늘의 스토리', '추천 게시물'],
-        HowShop: ['홈', '특가 상품', '인기 상품'],
     }
 
     const handleScroll = () => {
@@ -65,7 +47,6 @@ export const Header = () => {
                     className={`${styles.headerCont} ${
                         isFixed ? styles.fixed : ''
                     }`}
-                    onMouseLeave={handleMenuLeave}
                 >
                     <div className={styles.mainNavi}>
                         <div className={styles.menuBox}>
@@ -74,10 +55,7 @@ export const Header = () => {
                                     <img src={logo} alt="Logo" />
                                 </a>
                             </div>
-                            <div
-                                className={styles.naviMenuList}
-                                onMouseEnter={handleMenuHover}
-                            >
+                            <div className={styles.naviMenuList}>
                                 <div
                                     className={`${styles.naviMenu} ${
                                         activeMenu === 'Main'
@@ -117,7 +95,11 @@ export const Header = () => {
                                 </a>
                             </div>
                             <div className={styles.infoIcon}>
-                                <a>
+                                <a
+                                    onClick={() => {
+                                        navigate('/cart')
+                                    }}
+                                >
                                     <i className="bx bx-cart"></i>
                                 </a>
                             </div>
@@ -126,42 +108,27 @@ export const Header = () => {
                                     <i className="bx bx-bell"></i>
                                 </a>
                             </div>
-                            <div className={styles.infoUser}>
-                                <a>
-                                    <img src="" alt="User" />
-                                </a>
+                            <div
+                                className={
+                                    session
+                                        ? `${styles.infoUser}`
+                                        : `${styles.infoIcon}`
+                                }
+                            >
+                                {session ? (
+                                    <a>
+                                        <img src="" alt="User" />
+                                    </a>
+                                ) : (
+                                    <a>
+                                        <i class="bx bxs-user-circle"></i>
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* 하위 메뉴 */}
-            {showSubMenu && (
-                <div className={styles.subMenuWrap}>
-                    <div
-                        className={`${styles.subMenuCont}  ${
-                            isFixed ? styles.fixed : ''
-                        }`}
-                    >
-                        <div className={styles.subMenuBar}>
-                            {menuData[activeMenu].map((subMenu, index) => (
-                                <div
-                                    key={index}
-                                    className={`${styles.subMenu} ${
-                                        activeSubMenu === subMenu
-                                            ? styles.active
-                                            : ''
-                                    }`}
-                                    onClick={() => handleSubMenuClick(subMenu)}
-                                >
-                                    <a>{subMenu}</a>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     )
 }

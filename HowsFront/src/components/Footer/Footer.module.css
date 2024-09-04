@@ -1,0 +1,111 @@
+.footerWrap {
+    max-width: 1300px;
+    display: flex;
+    gap: 20px;
+    margin: 0px auto;
+    color: var(--hows-gray-900);
+}
+
+.border {
+    width: 1px;
+    background-color: var(--hows-gray-100);
+}
+
+.customer {
+    width: 40%;
+}
+
+.customerCont {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.customerInfo {
+    display: flex;
+    justify-content: space-between;
+}
+
+.customerTit {
+    display: flex;
+    align-items: center;
+}
+
+.customerTit a {
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.customerTime {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.customerTimeBox {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.customerTimeBox span {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.customerDay {
+    padding-left: 10px;
+}
+
+.customerDay li {
+    font-size: 14px;
+    color: var(--hows-gray-400);
+}
+
+.customerBtn {
+    display: flex;
+    gap: 10px;
+}
+
+.customerBtn button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--hows-gray-500);
+    background-color: var(--hows-gray);
+    font-weight: 500;
+}
+
+.company {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.companyInfo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.companyTxt {
+    font-size: 14px;
+    color: var(--hows-gray-400);
+}
+
+.companyTxt span {
+    margin: 0 3px;
+}
+
+.companySns {
+    display: flex;
+    gap: 10px;
+}
+
+.sns {
+    font-size: 28px;
+}

@@ -1,38 +1,176 @@
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 900;
+  font-display: swap;
+  src: url('../src/assets/font/Pretendard-Black.woff') format('woff2'), url('../src/assets/font/Pretendard-Black.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 800;
+  font-display: swap;
+  src: url('../src/assets/font/Pretendard-ExtraBold.woff2') format('woff2'), url('../src/assets/font/Pretendard-ExtraBold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 700;
+  font-display: swap;
+  src: url('../src/assets/font/Pretendard-Bold.woff2') format('woff2'), url('../src/assets/font/Pretendard-Bold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 600;
+  font-display: swap;
+  src: url('../src/assets/font/Pretendard-SemiBold.woff2') format('woff2'), url('../src/assets/font/Pretendard-SemiBold.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 500;
+  font-display: swap;
+  src: url('../src/assets/font/Pretendard-Medium.woff2') format('woff2'), url('../src/assets/font/Pretendard-Medium.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 400;
+  font-display: swap;
+  src: url('../src/assets/font/Pretendard-Regular.woff2') format('woff2'), url('../src/assets/font/Pretendard-Regular.woff') format('woff');
+  unicode-range: U+0041-005A, U+0061-007A, U+AC00-D7A3, U+0030-0039;
+  /* 유니코드 범위
+    - U+0041-005A, U+0061-007A	// 영문 대소문자
+    - U+AC00-D7A3 // 한글
+    - U+0030-0039 // 숫자
+    */
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 200;
+  font-display: swap;
+  src: url('../src/assets/font/Pretendard-ExtraLight.woff2') format('woff2'), url('../src/assets/font/Pretendard-ExtraLight.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Pretendard';
+  font-weight: 100;
+  font-display: swap;
+  src: url('../src/assets/font/Pretendard-Thin.woff2') format('woff2'), url('../src/assets/font/Pretendard-Thin.woff') format('woff');
+}
+
 .App {
-  text-align: center;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: 'Pretendard', sans-serif;
+  letter-spacing: -0.25px;
+  box-sizing: border-box;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+form,
+fieldset,
+legend,
+textarea,
+p,
+blockquote,
+th,
+td,
+input,
+select,
+textarea,
+button {
+  margin: 0;
+  padding: 0
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+dl,
+ul,
+ol,
+menu,
+li {
+  list-style: none
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+a {
+  cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+.footer {
+  border-top: 1px solid var(--hows-gray-600);
+  padding: 40px;
+  background-color: var(--hows-gray);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+:root {
+  /* Gray scale */
+  --hows-black: #000000;
+  --hows-gray-900: #1a1a1a;
+  --hows-gray-800: #333333;
+  --hows-gray-700: #4d4d4d;
+  --hows-gray-600: #666666;
+  --hows-gray-500: #808080;
+  --hows-gray-400: #999999;
+  --hows-gray-300: #b3b3b3;
+  --hows-gray-200: #cccccc;
+  --hows-gray-100: #e6e6e6;
+  --hows-gray: #F9F9F9;
+  --hows-white: #ffffff;
+
+  /* Main Point Color Scale */
+  /* 연한 색 (#E4EABE) */
+  --hows-point-color-lightest: #E4EABE;
+  /* 연한 색 (#E4EABE 미디움 버전) */
+  --hows-point-color-lightest-medium: #B7BC84;
+  /* 연한 색 (#A3B28B의 연한 버전) */
+  --hows-point-color-light: #c0cfb1;
+  /* 연한 색 (#A3B28B의 연한 버전) */
+  --hows-point-color: #a3b28b;
+  /* 메인 포인트 컬러 */
+  --hows-point-color-dark: #8b976e;
+  /* 진한 색 (#A3B28B의 진한 버전) */
+  --hows-point-color-darker: #6D7A5C;
+  /* 더 진한 색 */
+  --hows-point-color-darkest: #5D684A;
+  /* 가장 진한 색 *
+  /* Pastel Red Scale */
+  --hows-red-light: #ff9999;
+  /* 연한 빨강 */
+  --hows-red: #ff6666;
+  /* 메인 빨강 */
+  --hows-red-dark: #ff3333;
+  /* 진한 빨강 */
+  --hows-red-darker: #cc0000;
+  /* 더 진한 빨강 */
+  --hows-red-darkest: #990000;
+  /* 가장 진한 빨강 */
+
+  /* Pastel Blue Scale */
+  --hows-blue-light: #99ccff;
+  /* 연한 파랑 */
+  --hows-blue: #66b3ff;
+  /* 메인 파랑 */
+  --hows-blue-dark: #3399ff;
+  /* 진한 파랑 */
+  --hows-blue-darker: #0066cc;
+  /* 더 진한 파랑 */
+  --hows-blue-darkest: #004c99;
+  /* 가장 진한 파랑 */
 }

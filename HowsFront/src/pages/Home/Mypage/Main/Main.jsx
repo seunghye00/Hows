@@ -2,12 +2,26 @@ import styles from "./Main.module.css";
 import { Post } from "./Post/Post";
 // import { Scrap } from "./Scrap/Scrap";
 // import { Guestbook } from "./Guestbook/Guestbook";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import img from '../../../../assets/images/마이페이지_가로배너.jpg'
 import profile from '../../../../assets/images/마이페이지_프로필사진.jpg'
 import post from '../../../../assets/images/마이페이지_게시물.jpg'
+import { UpdateInfo } from './../UpdateInfo/UpdateInfo';
+import { useEffect } from "react";
+import { api } from './../../../../config/config';
+import axios from "axios";
 
 export const Main = () => {
+
+    const navi = useNavigate()
+
+    useEffect(() => {
+        api.get(`{host}/member`).then(resp => {
+            console.log(resp.data);
+        })
+    }
+    )
+
     return (
         <div className={styles.container}>
             <div className={styles.bannerImg}>
@@ -22,8 +36,8 @@ export const Main = () => {
                         <div className={styles.top}>
                             <div className={styles.nickname}>Dobby</div>
                             <div className={styles.linkBtns}>
-                                <button className={styles.infoUpdate}>수정</button>
-                                <button className={styles.mypage}>마이페이지</button>
+                                <button className={styles.infoUpdate} onClick={() => navi('/updateInfo')}>수정</button>
+                                <button className={styles.mypage} onClick={() => navi('/userDashboard')}>마이페이지</button>
                             </div>
                         </div>
                         <div className={styles.middle}>

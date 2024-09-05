@@ -16,3 +16,12 @@ export const useStore = create((set) => {
 //     member: [],
 //     setMember: (member) => set({ member })
 // }));
+
+export const useAuthStore = create((set) => ({
+    token: null,
+    isAuth: false,
+
+    login: (token) => set({ token, isAuth: true }),
+    logout: () => set({ token: null, isAuth: false }),
+    // setIsAuth: (val) => set({ isAuth: val })
+}));

@@ -1,6 +1,7 @@
 import styles from './SignIn.module.css'
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import logo from '../../../assets/images/logo_how.png'
 
 export const SignIn = () => {
 
@@ -20,7 +21,10 @@ export const SignIn = () => {
     <div className={styles.container}>
 
       <div className={styles.loginBox}>
-        <h1 className={styles.title}>How's</h1>
+        <div className={styles.logo}>
+          <img src={logo}></img>
+          <h1 className={styles.title}>How's</h1>
+        </div>
         <input type="text" placeholder="아이디" className={styles.input} />
         <input type="password" placeholder="비밀번호" className={styles.input} />
         <button className={styles.loginBtn}>로그인</button>

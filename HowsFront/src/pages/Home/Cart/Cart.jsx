@@ -6,17 +6,21 @@ import img4 from '../../../assets/images/interior_4.jpg'
 import img5 from '../../../assets/images/interior_5.jpg'
 import img6 from '../../../assets/images/interior_6.jpg'
 import img7 from '../../../assets/images/interior_7.jpg'
+import {useNavigate} from "react-router-dom";
 
 export const Cart = () => {
+
+  const navi = useNavigate()
+
   return (
     <div className={styles.container}>
       <div className={styles.title}>
-        Cart
+        장바구니
       </div>
       <div className={styles.cartInfo}>
         <div className={styles.leftBox}>
           <p>선택된 상품 (3)</p>
-          <button>주문하기</button>
+          <button onClick={() => navi("/payment")}>주문하기</button>
         </div>
         <div className={styles.rightBox}>
           <div>

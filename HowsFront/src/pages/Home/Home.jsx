@@ -5,6 +5,7 @@ import { Community } from './Community/Community'
 import { Products } from './Products/Products'
 import { Mypage } from './Mypage/Mypage'
 import { Main } from './Main/Main'
+import {Payment} from "./Payment/Payment";
 
 export const Home = () => {
     return (
@@ -15,6 +16,7 @@ export const Home = () => {
                 <Route path="/community" element={<Community />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/mypage/*" element={<Mypage />} />
+                <Route path="/payment" element={<Payment />} />
             </Routes>
         </div>
     )

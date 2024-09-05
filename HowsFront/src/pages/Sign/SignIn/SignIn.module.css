@@ -1,45 +1,59 @@
-/* div {
-  border: 1px solid black;
-} */
+div {
+  /* border: 1px solid black; */
+}
 
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
   height: 100vh;
 }
 
 .container .loginBox {
   display: flex;
   flex-direction: column;
-  width: 250px;
-  height: 400px;
+  width: 350px;
+  height: 500px;
   text-align: center;
 }
-
-.container .loginBox .title {
+.container .loginBox .logo {
   display: flex;
   justify-content: center;
-  font-size: 45px;
-  padding: 0;
-  margin-bottom: 25px;
+  align-items: center;
+  margin-bottom: 40px;
+}
+.container .loginBox .logo > img {
+  width: 80px;
+  height: 80px;
+  margin-right: 20px;
+}
+
+.container .loginBox .logo .title {
+  display: flex;
+  justify-content: center;
+  font-size: 65px;
+  padding-top: 20px;
 }
 
 .container .loginBox > input {
-  width: 100%;
-  height: 40px;
+  height: 35px;
   border: 1px solid var(--hows-gray-200);
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 16px;
   padding: 10px;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+}
+.container .loginBox > input:focus {
+  /* 테두리 색상 */
+  outline: 1px solid var(--hows-gray-200);
 }
 
 .container .loginBox > button,
 .signUpBtn {
-  height: 40px;
+  height: 50px;
   margin-bottom: 6px;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   border-radius: 4px;
   border: none;
@@ -67,17 +81,18 @@
 .container .loginBox .links {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin: 5px 0 15px 0;
 }
 
 .container .loginBox .links .linkBtn {
   border: none;
   background: none;
-  font-size: 11.5px;
+  font-size: 14px;
   cursor: pointer;
   text-decoration: underline;
   padding: 0;
-  margin: 0 15px;
+  margin: 0 10px;
+  color: var(--hows-point-color-darker);
 }
 
 .container .loginBox .signUpBtn {

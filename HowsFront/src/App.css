@@ -72,6 +72,7 @@
 .Admin {
   display: flex;
   width: 100%;
+  height: 100vh;
   padding: 0;
   margin: 0;
   font-family: 'Pretendard', sans-serif;
@@ -195,4 +196,35 @@ button {
   /* 더 진한 파랑 */
   --hows-blue-darkest: #004c99;
   /* 가장 진한 파랑 */
+}
+
+/* 스크롤바 전체 */
+::-webkit-scrollbar {
+  width: 15px;
+  /* 스크롤바의 너비 */
+}
+
+/* 스크롤바의 트랙 */
+::-webkit-scrollbar-track {
+  background: var(--hows-point-color-lightest);
+  /* 트랙의 배경 색 */
+  border-radius: 10px;
+  /* 트랙의 모서리 둥글게 */
+}
+
+/* 스크롤바 핸들 */
+::-webkit-scrollbar-thumb {
+  background-color: var(--hows-point-color-dark);
+  /* 핸들의 색상 */
+  border-radius: 10px;
+  /* 핸들의 모서리 둥글게 */
+  border: 2px solid #f1f1f1;
+  /* 핸들 둘레의 여백 */
+}
+
+/* 스크롤바 핸들:hover */
+::-webkit-scrollbar-thumb:hover {
+  cursor: pointer;
+  background-color: var(--hows-point-color-darkest);
+  /* 마우스를 올렸을 때 핸들의 색상 */
 }

@@ -1,1 +1,48 @@
 .container{width: 100%; border: 1px solid #000;}
+.contents {
+    /* width: 325px;
+    height: 500px; */
+    display: flex; flex-wrap: wrap;
+    padding: 20px 0px;
+    /* gap: 20px; */
+}
+.item {
+    width: 305px;
+    height: 500px;
+    margin: 10px;
+}
+
+.item:hover .img > img {
+    transform: scale(1.5);
+}
+
+/* 상품 이미지 */
+.img {
+    border:1px solid #000;
+    height: 400px;
+    overflow: hidden;
+}
+.img > img {
+    object-fit: cover; width: 100%;height: 100%; transition: all ease 0.1s;
+}
+
+/* 상품 설명 */
+.title {
+    border:1px solid #000;
+    height: 100px;
+    /* background-color: red; */
+}
+
+/* 상품 설명 - 상품명 */
+.title > div{
+    height: 50px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border:1px solid #000; */
+}
+
+/* 상품 설명 - 상품 가격 */
+.title > div:last-child{
+    /* border:1px solid #000; */
+}

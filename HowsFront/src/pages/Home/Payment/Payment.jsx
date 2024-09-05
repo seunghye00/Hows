@@ -117,7 +117,16 @@ export const Payment = () => {
       </div>
       <div className={styles.paymentInfo}>
         <div className={styles.paymentWay}>
-          결제방식, 쿠폰
+
+          <div className={styles.member}>
+            <label htmlFor="">결제방식</label>
+            <input type="text" placeholder="이름을 입력하세요"/>
+          </div>
+          <div className={styles.member}>
+            <label htmlFor="">쿠폰</label>
+            <input type="text" placeholder="' - '를 제외한 전화번호를 입력하세요"/>
+          </div>
+
         </div>
         <div className={styles.paymentPrice}>
           가격

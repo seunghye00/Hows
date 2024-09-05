@@ -24,8 +24,8 @@ div {
   margin-bottom: 40px;
 }
 .container .loginBox .logo > img {
-  width: 80px;
-  height: 80px;
+  width: 90px;
+  height: 95px;
   margin-right: 20px;
 }
 
@@ -33,7 +33,8 @@ div {
   display: flex;
   justify-content: center;
   font-size: 65px;
-  padding-top: 20px;
+  padding-top: 45px;
+  color: var(--hows-point-color);
 }
 
 .container .loginBox > input {

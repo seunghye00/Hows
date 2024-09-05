@@ -29,18 +29,18 @@ export const Side = () => {
             title: '회원 관리',
             subMenu: [
                 {
-                    title: '등급 관리',
+                    title: '회원 관리',
                     icon: 'bx bx-group', // 아이콘 추가
                     subMenu: [
-                        { title: '등급 목록', path: '/' },
-                        { title: '등급 추가', path: '/' },
+                        { title: '회원 조회', path: '/member' },
+                        { title: '블랙리스트 조회', path: '/blacklist' },
                     ],
                 },
-                {
-                    title: '블랙리스트 관리',
-                    icon: 'bx bx-block', // 아이콘 추가
-                    subMenu: [{ title: '블랙리스트 조회', path: '/' }],
-                },
+                // {
+                //     title: '블랙리스트 관리',
+                //     icon: 'bx bx-block', // 아이콘 추가
+                //     subMenu: [{ title: '블랙리스트 조회', path: '/' }],
+                // },
             ],
         },
         {
@@ -49,33 +49,24 @@ export const Side = () => {
                 {
                     title: '게시글 관리',
                     icon: 'bx bx-file', // 아이콘 추가
-                    subMenu: [
-                        { title: '게시글 목록', path: '/' },
-                        { title: '게시글 작성', path: '/' },
-                    ],
+                    subMenu: [{ title: '신고 게시물 목록', path: 'board' }],
                 },
                 {
                     title: '댓글 관리',
                     icon: 'bx bx-message-rounded-dots', // 아이콘 추가
-                    subMenu: [
-                        { title: '댓글 목록', path: '/' },
-                        { title: '댓글 작성', path: '/' },
-                    ],
+                    subMenu: [{ title: '신고 댓글 목록', path: 'comment' }],
+                },
+                {
+                    title: '리뷰 관리',
+                    icon: 'bx bx-comment-edit', // 아이콘 추가
+                    subMenu: [{ title: '신고 리뷰 목록', path: 'review' }],
                 },
                 {
                     title: '공지사항 관리',
                     icon: 'bx bx-error-circle', // 아이콘 추가
                     subMenu: [
-                        { title: '공지사항 목록', path: '/' },
-                        { title: '공지사항 작성', path: '/' },
-                    ],
-                },
-                {
-                    title: 'FAQ 관리',
-                    icon: 'bx bx-help-circle', // 아이콘 추가
-                    subMenu: [
-                        { title: 'FAQ 목록', path: '/' },
-                        { title: 'FAQ 작성', path: '/' },
+                        { title: '공지사항 관리', path: 'notice' },
+                        { title: 'FAQ 관리', path: 'faq' },
                     ],
                 },
             ],

@@ -1,0 +1,6 @@
+.container{width: 100%; border: 1px solid #000;}
+.title{height: 50px;}
+.item{background-color: azure; display: flex; justify-content: space-evenly;}
+.item > div {height: 150px;width: 100px; background-color: red;}
+.item > div > div:first-child{height: 100px;}
+.item > div > div:last-child{background-color: aliceblue; height: 50px;}

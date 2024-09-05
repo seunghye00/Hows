@@ -77,6 +77,22 @@
   font-family: 'Pretendard', sans-serif;
   letter-spacing: -0.25px;
   box-sizing: border-box;
+  gap: 30px;
+}
+
+.footer {
+  border-top: 1px solid var(--hows-gray-600);
+  padding: 40px;
+  background-color: var(--hows-gray);
+}
+
+.side {
+  width: 10%;
+  padding: 30px;
+}
+
+.contAdmin {
+  width: 80%;
 }
 
 body,
@@ -124,11 +140,6 @@ button {
   cursor: pointer;
 }
 
-.footer {
-  border-top: 1px solid var(--hows-gray-600);
-  padding: 40px;
-  background-color: var(--hows-gray);
-}
 
 :root {
   /* Gray scale */

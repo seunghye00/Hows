@@ -1,7 +1,7 @@
 import './App.css'
 import { Home } from './pages/Home/Home'
 import { Admin } from './pages/Admin/Admin'
-import { Side } from './components/Side/SIde'
+import { Side } from './components/Side/Side'
 import { Header } from './components/Header/Header'
 import { Footer } from './components/Footer/Footer'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'

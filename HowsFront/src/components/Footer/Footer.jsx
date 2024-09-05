@@ -16,7 +16,7 @@ export const Footer = () => {
                                     }}
                                 >
                                     고객센터
-                                    <i class="bx bx-chevron-right"></i>
+                                    <i className="bx bx-chevron-right"></i>
                                 </a>
                             </div>
                             <div className={styles.customerBtn}>
@@ -64,16 +64,16 @@ export const Footer = () => {
                     </div>
                     <div className={styles.companySns}>
                         <div className={styles.sns}>
-                            <i class="bx bxl-youtube"></i>
+                            <i className="bx bxl-youtube"></i>
                         </div>
                         <div className={styles.sns}>
-                            <i class="bx bxl-instagram-alt"></i>
+                            <i className="bx bxl-instagram-alt"></i>
                         </div>
                         <div className={styles.sns}>
-                            <i class="bx bxl-facebook-square"></i>
+                            <i className="bx bxl-facebook-square"></i>
                         </div>
                         <div className={styles.sns}>
-                            <i class="bx bxl-github"></i>
+                            <i className="bx bxl-github"></i>
                         </div>
                     </div>
                 </div>

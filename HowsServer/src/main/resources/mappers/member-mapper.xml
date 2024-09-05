@@ -27,9 +27,19 @@
 		    default,    
 		    default, 
 		    default, 
+		    default,
 		    default    
-		);
+		)
 	</insert>
 	
+	<!-- 회원정보 가져오기 -->
+	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
+		select * from member where member_id = #{id}
+	</select>
+	
+	<!-- 마이페이지 회원정보 출력 -->
+	<select id="selectInfo" resultType="com.hows.member.dto.MemberDTO">
+		select * from member where member_id = #{member_id}
+	</select>
 	
 </mapper>

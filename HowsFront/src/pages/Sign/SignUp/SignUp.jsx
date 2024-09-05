@@ -3,8 +3,8 @@ import DaumPostcode from "react-daum-postcode";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { host } from '../config/config';
-import { useMemberStore } from '../store/store';
+import { host } from '../../../config/config';
+// import { useMemberStore } from '../store/store';
 
 export const SignUp = () => {
     const navi = useNavigate();

@@ -15,7 +15,7 @@ export const Home = () => {
             <Routes>
                 <Route path="/" element={<Main />} />
                 <Route path="/products/*" element={<Products />} />
-                <Route path="/community" element={<Community />} />
+                <Route path="/community/*" element={<Community />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/mypage/*" element={<Mypage />} />
                 <Route path="/payment" element={<Payment />} />

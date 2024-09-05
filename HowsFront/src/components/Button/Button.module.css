@@ -1,17 +1,29 @@
 .l {
-    width: 120px;
-    height: 80px;
+    padding: 20px 40px;
     font-size: 24px;
+    background-color: var(--hows-white);
+    border-radius: 8px;
+    border: 2px solid var(--hows-point-color);
+    color: var(--hows-point-color-darker);
+    font-weight: 700;
 }
 
 .m {
-    width: 90px;
-    height: 60px;
+    padding: 10px 20px;
     font-size: 20px;
+    background-color: var(--hows-white);
+    border-radius: 8px;
+    border: 2px solid var(--hows-point-color);
+    color: var(--hows-point-color-darker);
+    font-weight: 600;
 }
 
 .s {
-    width: 60px;
-    height: 40px;
+    padding: 5px 10px;
     font-size: 16px;
+    background-color: var(--hows-white);
+    border-radius: 8px;
+    border: 2px solid var(--hows-point-color);
+    color: var(--hows-point-color-darker);
+    font-weight: 500;
 }

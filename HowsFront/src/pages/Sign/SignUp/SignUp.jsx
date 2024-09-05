@@ -227,7 +227,7 @@ export const SignUp = () => {
             <div className={styles.signUpBox}>
                 <h3>회원가입</h3>
                 <div className={styles.idBox}>
-                    <span>ID</span>
+                    <span className={styles.title}>ID</span>
                     <span>
                         영어, 숫자로만 이루어진 4~12자의 ID를 입력해주세요.
                     </span>
@@ -243,7 +243,7 @@ export const SignUp = () => {
                     </div>
                 </div>
                 <div className={styles.pwBox}>
-                    <span>비밀번호</span>
+                    <span className={styles.title}>비밀번호</span>
                     <span>
                         영문, 숫자, 특수문자를 포함한 8자 이상의 비밀번호를 입력해주세요.
                     </span>
@@ -256,7 +256,7 @@ export const SignUp = () => {
                     ></input>
                 </div>
                 <div className={styles.pwBox2}>
-                    <span>비밀번호 확인</span>
+                    <span className={styles.title}>비밀번호 확인</span>
                     <input
                         type="password"
                         placeholder="비밀번호 확인"
@@ -266,7 +266,7 @@ export const SignUp = () => {
                     ></input>
                 </div>
                 <div className={styles.nameBox}>
-                    <span>이름</span>
+                    <span className={styles.title}>이름</span>
                     <input
                         type="text"
                         placeholder="이름"
@@ -276,7 +276,7 @@ export const SignUp = () => {
                     ></input>
                 </div>
                 <div className={styles.nicknameBox}>
-                    <span>닉네임</span>
+                    <span className={styles.title}>닉네임</span>
                     <span>
                         한글, 영문자, 숫자로만 이루어진 2~7자의 닉네임을 입력해주세요.
                     </span>
@@ -292,7 +292,7 @@ export const SignUp = () => {
                     </div>
                 </div>
                 <div className={styles.birthBox}>
-                    <span>생년월일</span>
+                    <span className={styles.title}>생년월일</span>
                     <input
                         type="text"
                         placeholder="YYYYMMDD"
@@ -324,7 +324,7 @@ export const SignUp = () => {
                     </label>
                 </div>
                 <div className={styles.emailBox}>
-                    <span>이메일</span>
+                    <span className={styles.title}>이메일</span>
                     <span>.com / .net / .org 형식의 이메일만 가능합니다.</span>
                     <input
                         type="text"
@@ -335,7 +335,7 @@ export const SignUp = () => {
                     ></input>
                 </div>
                 <div className={styles.phoneBox}>
-                    <span>전화번호</span>
+                    <span className={styles.title}>전화번호</span>
                     <input
                         type="text"
                         placeholder="( - ) 제외 ex) 01011112222"
@@ -345,7 +345,7 @@ export const SignUp = () => {
                     ></input>
                 </div>
                 <div className={styles.addressBox}>
-                    <span>주소</span>
+                    <span className={styles.title}>주소</span>
                     <input
                         type="text"
                         placeholder="우편번호"
@@ -386,7 +386,7 @@ export const SignUp = () => {
                 </div>
                 <div className={styles.login}>
                     <span>이미 아이디가 있으신가요? </span>
-                    <button className={styles.linkBtn} onClick={() => navi("/")}>로그인</button>
+                    <button className={styles.linkBtn} onClick={() => navi("/signIn")}>로그인</button>
                 </div>
             </div>
         </div>

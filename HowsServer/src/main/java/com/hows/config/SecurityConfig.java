@@ -41,7 +41,7 @@ public class SecurityConfig {
 		.authorizeHttpRequests(request -> request
 				// 로그인 - 모든 사용자 접근 가능
 //		        .requestMatchers(HttpMethod.POST, "/auth").permitAll()
-		        .requestMatchers("*").permitAll()
+		        .requestMatchers("/**").permitAll()
 		        // 관리자 전용 기능 - ADMIN 또는 MANAGER 접근 가능
 		        .requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
 		        // 운영자 전용 기능 - ADMIN 접근 가능

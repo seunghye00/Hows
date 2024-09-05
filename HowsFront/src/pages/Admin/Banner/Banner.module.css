@@ -36,6 +36,7 @@
 .rows {
     flex: 1;
     border-bottom: 1px solid black;
+    max-height: 125px;
     min-height: 125px;
     display: flex;
 }
@@ -48,7 +49,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .cols:first-child {

@@ -10,6 +10,7 @@ import { Comment } from './Comment/Comment'
 import { Review } from './Review/Review'
 import { Notice } from './Notice/Notice'
 import { Faq } from './Notice/Faq'
+import { Product } from './Product/Product'
 
 export const Admin = () => {
     return (
@@ -25,6 +26,7 @@ export const Admin = () => {
                         </>
                     }
                 />
+                <Route path="/product/*" element={<Product />} />
                 <Route path="/member" element={<Member />} />
                 <Route path="/blacklist" element={<Blacklist />} />
                 <Route path="/board" element={<Board />} />

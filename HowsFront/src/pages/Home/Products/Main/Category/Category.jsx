@@ -1,6 +1,8 @@
 import styles from './Category.module.css'
 import img from '../../../../../assets/images/마이페이지_프로필사진.jpg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { host } from '../../../../../config/config';
 
 export const Category = () => {
 
@@ -19,6 +21,18 @@ export const Category = () => {
   };
   // ===== 가격 버튼 클릭시 나오는 라디오 박스 토글 =====
 
+  const [categoriesList,setCategoriesList] = useState([]);
+  
+  useEffect(() => {
+    axios.get(`${host}/category`)
+      .then((resp) => {
+        console.log(JSON.stringify(resp))
+        setCategoriesList(resp.data);  
+      })
+      .catch((err) => {
+        console.error(err); 
+      });
+  }, []);  // 컴포넌트가 처음 렌더링될 때 한 번만 실행
 
 
 
@@ -28,14 +42,15 @@ export const Category = () => {
     <div className={styles.container}>
         <div className={styles.contents}>
           <div className={styles.side}>
-            <ul className={styles.list}>
-              <li>가구</li>
-              <li>가구</li>
-              <li>가구</li>
-              <li>가구</li>
-              <li>가구</li>
-              <li>가구</li>
-            </ul>
+              {
+                categoriesList.map((item,i)=>{
+                  return(
+                    <ul className={styles.list} key={i}>
+                      <li>{item.product_category_title}</li>
+                    </ul>
+                  )
+                })
+              }
           </div>
           <div className={styles.content}>
 

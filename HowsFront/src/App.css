@@ -91,6 +91,8 @@
   padding: 30px;
 }
 
+
+
 .contAdmin {
   width: 80%;
 }
@@ -120,7 +122,6 @@ blockquote,
 th,
 td,
 input,
-select,
 textarea,
 button {
   margin: 0;
@@ -138,6 +139,15 @@ li {
 a,
 button {
   cursor: pointer;
+}
+
+select {
+  padding: 5px;
+  border-radius: 6px;
+  border-color: var(--hows-point-color);
+  border-width: 2px;
+  color: var(--hows-point-color-darker);
+  font-weight: 600;
 }
 
 

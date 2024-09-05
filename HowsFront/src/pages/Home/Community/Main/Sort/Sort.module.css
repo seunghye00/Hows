@@ -1,0 +1,9 @@
+.sortWrap {
+    display: flex;
+    justify-content: space-between;
+}
+
+.sortBox {
+    display: flex;
+    gap: 10px;
+}

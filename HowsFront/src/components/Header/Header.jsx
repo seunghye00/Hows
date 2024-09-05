@@ -121,7 +121,7 @@ export const Header = () => {
                                     </a>
                                 ) : (
                                     <a>
-                                        <i class="bx bxs-user-circle"></i>
+                                        <i className="bx bxs-user-circle"></i>
                                     </a>
                                 )}
                             </div>

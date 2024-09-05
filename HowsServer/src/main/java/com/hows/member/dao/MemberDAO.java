@@ -17,4 +17,14 @@ public class MemberDAO {
 		mybatis.insert("Member.insert", dto);
 	}
 	
+	// 회원정보 가져오기
+	public MemberDTO selectById(String username) {
+		return mybatis.selectOne("Member.selectById", username);
+	}
+	
+	
+	// 마이페이지 회원정보 출력
+	public MemberDTO selectInfo() {
+		return mybatis.selectOne("Member.selectInfo");
+	}
 }

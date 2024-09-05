@@ -4,7 +4,7 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import img from "../../../../assets/images/마이페이지_가로배너.jpg";
 import profile from "../../../../assets/images/마이페이지_프로필사진.jpg";
 
-import { UpdateInfo } from "./../UpdateInfo/UpdateInfo";
+import { Update } from "./../Update/Update";
 import { useEffect } from "react";
 import { api } from "./../../../../config/config";
 import axios from "axios";
@@ -36,13 +36,13 @@ export const Main = () => {
                             <div className={styles.linkBtns}>
                                 <button
                                     className={styles.infoUpdate}
-                                    onClick={() => navi("/updateInfo")}
+                                    onClick={() => navi("/mypage/update")}
                                 >
                                     수정
                                 </button>
                                 <button
                                     className={styles.mypage}
-                                    onClick={() => navi("/userDashboard")}
+                                    onClick={() => navi("/mypage/userDashboard")}
                                 >
                                     마이페이지
                                 </button>

@@ -63,7 +63,13 @@ export const Main = () => {
                     </div>
                 </div>
                 <div className={styles.body}>
-                    <div className={styles.row}>
+                    <div className={styles.contents}>
+                        <div className={styles.feed}>
+                            <img src={post}></img>
+                        </div>
+                        <div className={styles.feed}>
+                            <img src={post}></img>
+                        </div>
                         <div className={styles.feed}>
                             <img src={post}></img>
                         </div>

@@ -33,8 +33,8 @@
 	</insert>
 	
 	<!-- 회원정보 가져오기 -->
-	<select id="selectById" resultType="com.hows.member.dto.MemberDTO">
-		select * from member where member_id = #{username}
+	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
+		select * from member where member_id = #{id}
 	</select>
 	
 	<!-- 마이페이지 회원정보 출력 -->

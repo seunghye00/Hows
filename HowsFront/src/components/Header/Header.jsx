@@ -5,25 +5,25 @@ import { useNavigate } from 'react-router-dom'
 
 export const Header = () => {
     const navigate = useNavigate()
-    const [activeMenu, setActiveMenu] = useState('Main')
+    const [activeMenu, setActiveMenu] = useState('HowShop')
     const [activeSubMenu, setActiveSubMenu] = useState('홈')
     const [isFixed, setIsFixed] = useState(false)
     const [session, setSession] = useState(false)
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
-        if (menuName === 'HowStory') {
-            navigate('/Community')
-        } else if (menuName === 'HowShop') {
+        if (menuName === 'HowShop') {
             navigate('/products')
-        } else if (menuName === 'Main') {
+        } else if (menuName === 'HowStory') {
+            navigate('/community')
+        } else if (menuName === 'HowShare') {
             navigate('/')
         }
     }
 
-    const handleSubMenuClick = subMenu => {
-        setActiveSubMenu(subMenu)
-    }
+    // const handleSubMenuClick = subMenu => {
+    //     setActiveSubMenu(subMenu)
+    // }
 
     const handleScroll = () => {
         if (window.scrollY > 50) {
@@ -58,13 +58,13 @@ export const Header = () => {
                             <div className={styles.naviMenuList}>
                                 <div
                                     className={`${styles.naviMenu} ${
-                                        activeMenu === 'Main'
+                                        activeMenu === 'HowShop'
                                             ? styles.active
                                             : ''
                                     }`}
-                                    onClick={() => handleMenuClick('Main')}
+                                    onClick={() => handleMenuClick('HowShop')}
                                 >
-                                    <a>Main</a>
+                                    <a>HowShop</a>
                                 </div>
                                 <div
                                     className={`${styles.naviMenu} ${
@@ -78,13 +78,13 @@ export const Header = () => {
                                 </div>
                                 <div
                                     className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShop'
+                                        activeMenu === 'HowShare'
                                             ? styles.active
                                             : ''
                                     }`}
-                                    onClick={() => handleMenuClick('HowShop')}
+                                    onClick={() => handleMenuClick('HowShare')}
                                 >
-                                    <a>HowShop</a>
+                                    <a>HowShare</a>
                                 </div>
                             </div>
                         </div>

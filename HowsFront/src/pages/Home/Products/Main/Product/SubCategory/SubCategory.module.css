@@ -1,6 +1,6 @@
 .container{
     width: 100%;
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
     /* background-color: red; */
     padding-bottom: 20px;
 }
@@ -15,14 +15,25 @@
     display: flex; 
     justify-content: space-evenly;
 }
-.item > div {
-    height: 150px;width: 100px;
+.categoryItem {
+    height: 150px;width: 150px;
+    cursor: pointer;
 }
-.item > div > div:first-child{
+.categoryItem > div:first-child{
     height: 100px; 
-    border: 1px solid #000;
+    /* border: 1px solid #000; */
 }
-.item > div > div:last-child{
+/* 이미지 */
+.image {
+    object-fit: contain; width: 100%; height: 100%;
+}
+/* 카테고리명 */
+.categoryItem > div:last-child{
     height: 50px; 
-    border: 1px solid #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    letter-spacing: 1px;
+    /* border: 1px solid #000; */
 }

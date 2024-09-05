@@ -4,7 +4,6 @@
 
 .container {
   width: 100%;
-  height: 100vh;
   /* background-color: darksalmon; */
   display: flex;
   flex-direction: column;
@@ -156,6 +155,7 @@
   font-size: 23px;
   font-weight: 600;
   margin-bottom: 3px;
+  cursor: pointer;
 }
 .container .mainBox .body {
   flex: 6;

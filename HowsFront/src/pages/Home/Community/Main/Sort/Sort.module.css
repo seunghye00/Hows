@@ -1,0 +1,46 @@
+.sortWrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 50px;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.sortcont {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+
+}
+
+.sortBox {
+    display: flex;
+    gap: 10px;
+}
+
+.selectedOptions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    position: absolute;
+    bottom: 0;
+}
+
+.selectedOption {
+    background-color: var(--hows-point-color-dark);
+    border-radius: 20px;
+    padding: 5px 10px;
+    display: flex;
+    align-items: center;
+    color: var(--hows-white);
+}
+
+.selectedOption button {
+    background: none;
+    border: none;
+    margin-left: 10px;
+    cursor: pointer;
+    color: var(--hows-white);
+    font-weight: bold;
+}

@@ -1,1 +1,145 @@
-.container{width: 100%; height: 2000px;border: 1px solid #000;}
+.container{
+    width: 100%; 
+    /* border: 1px solid #000; */
+}
+
+.contents {
+    display: flex;
+    flex-direction: row; 
+    height: 100%;
+}
+
+
+/* 목록 */
+.side {
+    height: 100%; flex: 2; min-width: 200px;
+    border-radius: 0 0 8px 8px;
+}
+.list {
+    /* border-radius: 0 0 10px 10px; */
+}
+.list > li{
+    height: 100px; 
+    display: flex;justify-content: center;align-items: center;
+    background-color: var(--hows-point-color-lightest);
+    border: 1px solid var(--hows-point-color-lightest);
+    transition: all ease 0.1s;
+    font-weight: bold;
+}
+.list > li:hover{
+    background-color: rgba(var(--hows-point-color-lightest), 0.8); /* 투명도를 80%로 설정 */
+}
+.list > li:last-child{
+    /* border-radius: 0 0 10px 10px; */
+}
+
+
+
+/* 상품 */
+.content {
+    height: 100%; 
+    flex: 8; 
+    min-width: 1000px;
+    border: 1px solid #000; 
+    margin-left: 100px;
+    /* background-color: red; */
+}
+
+/* 상품 - 옵션 */
+.content > div:first-child {
+    border: 1px solid #000;
+    height: 70px;
+    padding-top: 30px;
+}
+.content > div:first-child > .price {
+    height: 35px; 
+    width: 100px; 
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    /* position: relative; */
+}
+/* 가격 누르면 나오는 모달창 */
+.dropdown {
+    position: absolute; z-index: 100;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 5px;
+    padding: 10px 50px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    letter-spacing: 1px;
+}
+.dropdown label {
+    display: block;
+    margin: 10px 0;
+}
+
+
+.content > div:first-child > .option {
+    height: 35px;
+    display: flex; 
+    justify-content: space-between; 
+    align-items: last baseline;
+    /* border: 1px solid red; */
+}
+.content > div:first-child > .option > div select{
+    background-color: #f5f5f5;
+    border: none; 
+    height: 35px; 
+    border-radius: 8px;
+    width: 100px; 
+}
+
+.content > div:last-child {
+    /* width: 250px;
+    height: 500px; */
+    display: flex; flex-wrap: wrap;
+    padding: 20px 0px;
+    /* gap: 20px; */
+}
+.item {
+    width: 230px;
+    height: 400px;
+    margin: 10px;
+}
+
+.item:hover .img > img {
+    transform: scale(1.5);
+}
+
+/* 상품 이미지 */
+.img {
+    border:1px solid #000;
+    height: 300px;
+    overflow: hidden;
+}
+.img > img {
+    object-fit: cover; width: 100%;height: 100%; transition: all ease 0.1s;
+}
+
+/* 상품 설명 */
+.title {
+    border:1px solid #000;
+    height: 100px;
+    /* background-color: red; */
+}
+
+/* 상품 설명 - 상품명 */
+.title > div{
+    height: 50px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* border:1px solid #000; */
+}
+
+/* 상품 설명 - 상품 가격 */
+.title > div:last-child{
+    /* border:1px solid #000; */
+}
+
+

@@ -9,7 +9,7 @@ import { host } from '../../../config/config'
 export const SignUp = () => {
     const navi = useNavigate()
     const [formData, setFormData] = useState({
-        id: '',
+        member_id: '',
         pw: '',
         pw2: '',
         name: '',
@@ -18,9 +18,9 @@ export const SignUp = () => {
         nickname: '',
         email: '',
         phone: '',
-        zipCode: '',
+        zip_code: '',
         address: '',
-        detailAddress: '',
+        detail_address: '',
     })
     // const { member, setMember } = useMemberStore(); // Zustand store 사용
     const [gender, setGender] = useState({ male: false, female: false })
@@ -57,7 +57,7 @@ export const SignUp = () => {
                 setFormData(prev => ({
                     ...prev,
                     address: data.address,
-                    zipCode: data.zonecode,
+                    zip_code: data.zonecode,
                 }))
             },
         }).open()
@@ -69,9 +69,9 @@ export const SignUp = () => {
 
         let genderText = ''
         if (value === 'male') {
-            genderText = '남'
+            genderText = 'M'
         } else if (value === 'female') {
-            genderText = '여'
+            genderText = 'F'
         }
 
         setFormData(prev => ({
@@ -83,13 +83,13 @@ export const SignUp = () => {
     // 유효성
     const validateFormData = formData => {
         // 아이디 검사
-        if (!formData.id) {
+        if (!formData.member_id) {
             alert('아이디를 입력하세요.')
             return false
         }
         // 아이디 유효성 검사: 4~12글자, 영어, 숫자만 허용
         const idPattern = /^[a-zA-Z0-9]{4,12}$/
-        if (!idPattern.test(formData.id)) {
+        if (!idPattern.test(formData.member_id)) {
             alert('아이디는 영어, 숫자로 이루어진 4~12자를 입력해주세요.')
             return false
         }
@@ -143,11 +143,11 @@ export const SignUp = () => {
             alert('생년월일을 입력하세요.')
             return false
         }
-        const birthPattern = /^\d{4}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/
-        if (formData.birth && !birthPattern.test(formData.birth)) {
-            alert('유효한 생년월일을 입력하세요. (예: 19900101)')
-            return false
-        }
+        // const birthPattern = /^\d{4}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/
+        // if (formData.birth && !birthPattern.test(formData.birth)) {
+        //     alert('유효한 생년월일을 입력하세요. (예: 19900101)')
+        //     return false
+        // }
         // 성별 검사
         if (!formData.gender) {
             alert('성별을 선택하세요.')
@@ -177,11 +177,11 @@ export const SignUp = () => {
         }
 
         // 주소 검사
-        if (!formData.zipCode || !formData.address) {
+        if (!formData.zip_code || !formData.address) {
             alert('주소를 입력해주세요.')
             return false
         }
-        if (!formData.detailAddress) {
+        if (!formData.detail_address) {
             alert('상세주소를 입력해주세요.')
             return false
         }
@@ -213,7 +213,7 @@ export const SignUp = () => {
                 console.log('회원가입 : ', resp.data)
                 alert('회원가입이 성공적으로 완료되었습니다.')
                 // setMember([...member, resp.data]);
-                // navi("/");
+                navi("/");
             })
             .catch(error => {
                 alert('회원가입 중 오류가 발생했습니다.')
@@ -233,7 +233,7 @@ export const SignUp = () => {
                         <input
                             type="text"
                             placeholder="ID"
-                            name="id"
+                            name="member_id"
                             onChange={handleChange}
                             className={styles.inputId}
                         ></input>
@@ -308,7 +308,7 @@ export const SignUp = () => {
                             type="checkbox"
                             name="gender"
                             value="male"
-                            checked={formData.gender === '남'}
+                            checked={formData.gender === 'M'}
                             onChange={handleCheckboxChange}
                         />
                     </label>
@@ -318,7 +318,7 @@ export const SignUp = () => {
                             type="checkbox"
                             name="gender"
                             value="female"
-                            checked={formData.gender === '여'}
+                            checked={formData.gender === 'F'}
                             onChange={handleCheckboxChange}
                         />
                     </label>
@@ -349,8 +349,8 @@ export const SignUp = () => {
                     <input
                         type="text"
                         placeholder="우편번호"
-                        name="zipCode"
-                        value={formData.zipCode}
+                        name="zip_code"
+                        value={formData.zip_code}
                         onChange={handleChange}
                         // readOnly
                         required
@@ -367,8 +367,8 @@ export const SignUp = () => {
                     <input
                         type="text"
                         placeholder="상세주소"
-                        name="detailAddress"
-                        value={formData.detailAddress}
+                        name="detail_address"
+                        value={formData.detail_address}
                         onChange={handleChange}
                         required
                     />

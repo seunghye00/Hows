@@ -86,7 +86,7 @@ export const Banner = () => {
                 </div>
             </div>
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-                <h2>메인 배너 등록</h2>
+                <h2 className={styles.modalTitle}>메인 배너 등록</h2>
                 <div className={styles.imgLabel}>
                     <input
                         id="img"

@@ -21,15 +21,23 @@ public class MemberService implements UserDetailsService{
 	public void insert(MemberDTO dto) {
 		memDao.insert(dto);
 	}
+	
+	// 아이디 찾기
+//	public MemberDTO findById (String id) {
+//		return memDao.findById(id);
+//	}
+	
 
 	// 회원정보 가져오기
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		MemberDTO dto = memDao.selectById(username);
+		MemberDTO dto = memDao.findById(username);
 		
 		User user = new User(dto.getMember_id(), dto.getPw(),AuthorityUtils.createAuthorityList(dto.getRole_code()));
 		return user;
 	}
+
+	
 	
 	
 	// 마이페이지 회원정보 출력

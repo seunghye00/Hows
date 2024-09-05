@@ -6,6 +6,15 @@
   flex-direction: column;
   height: auto;
 }
+.container .countContents {
+  padding: 5px 0 10px 15px;
+  font-size: 20px;
+}
+.container .countContents > span:nth-child(1) {
+  font-weight: 600;
+  margin-right: 5px;
+}
+
 .container .contents {
   display: flex;
   flex-wrap: wrap;

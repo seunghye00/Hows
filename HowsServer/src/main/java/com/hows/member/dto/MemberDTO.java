@@ -22,6 +22,7 @@ public class MemberDTO {
 	private Timestamp signup_date;
 	private Timestamp withdrawal_date;
 	private String withdrawal_yn;
+	private String member_banner;
 	private int point;
 	private String member_avatar;
 	
@@ -33,7 +34,7 @@ public class MemberDTO {
 	public MemberDTO(int member_seq, String member_id, String pw, String name, String nickname, String birth,
 			String gender, String phone, String email, String zip_code, String address, String detail_address,
 			String grade_code, String role_code, String blacklist_reason_code, Timestamp signup_date,
-			Timestamp withdrawal_date, String withdrawal_yn, int point, String member_avatar) {
+			Timestamp withdrawal_date, String withdrawal_yn, String member_banner, int point, String member_avatar) {
 		super();
 		this.member_seq = member_seq;
 		this.member_id = member_id;
@@ -53,6 +54,7 @@ public class MemberDTO {
 		this.signup_date = signup_date;
 		this.withdrawal_date = withdrawal_date;
 		this.withdrawal_yn = withdrawal_yn;
+		this.member_banner = member_banner;
 		this.point = point;
 		this.member_avatar = member_avatar;
 	}
@@ -201,6 +203,14 @@ public class MemberDTO {
 		this.withdrawal_yn = withdrawal_yn;
 	}
 
+	public String getMember_banner() {
+		return member_banner;
+	}
+
+	public void setMember_banner(String member_banner) {
+		this.member_banner = member_banner;
+	}
+
 	public int getPoint() {
 		return point;
 	}
@@ -216,5 +226,7 @@ public class MemberDTO {
 	public void setMember_avatar(String member_avatar) {
 		this.member_avatar = member_avatar;
 	}
+
+	
 	
 }

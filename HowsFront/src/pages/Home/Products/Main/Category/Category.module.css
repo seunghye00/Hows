@@ -30,7 +30,7 @@
     background-color: rgba(var(--hows-point-color-lightest), 0.8); /* 투명도를 80%로 설정 */
 }
 .list > li:last-child{
-    border-radius: 0 0 10px 10px;
+    /* border-radius: 0 0 10px 10px; */
 }
 
 

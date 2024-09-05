@@ -1,6 +1,7 @@
 import styles from './Admin.module.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Main } from './Main/Main'
+import { Banner } from './Banner/Banner'
 import { Member } from './Member/Member'
 import { Blacklist } from './Member/Blacklist'
 import { Board } from './Board/Board'
@@ -14,6 +15,7 @@ export const Admin = () => {
         <div className={styles.container}>
             <Routes>
                 <Route path="/" element={<Main />} />
+                <Route path="/banner" element={<Banner />}></Route>
                 <Route path="/member" element={<Member />} />
                 <Route path="/blacklist" element={<Blacklist />} />
                 <Route path="/board" element={<Board />} />

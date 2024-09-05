@@ -22,7 +22,7 @@ export const Side = () => {
         {
             title: '메인 페이지',
             subMenu: [
-                { title: '배너 관리', path: '/' }, // path 추가
+                { title: '배너 관리', path: '/banner' }, // path 추가
             ],
         },
         {

@@ -5,25 +5,25 @@ import { useNavigate } from 'react-router-dom'
 
 export const Header = () => {
     const navigate = useNavigate()
-    const [activeMenu, setActiveMenu] = useState('Main')
+    const [activeMenu, setActiveMenu] = useState('HowShop')
     const [activeSubMenu, setActiveSubMenu] = useState('홈')
     const [isFixed, setIsFixed] = useState(false)
     const [session, setSession] = useState(false)
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
-        if (menuName === 'HowStory') {
-            navigate('/Community')
-        } else if (menuName === 'HowShop') {
+        if (menuName === 'HowShop') {
             navigate('/products')
-        } else if (menuName === 'Main') {
+        } else if (menuName === 'HowStory') {
+            navigate('/community')
+        } else if (menuName === 'HowShare') {
             navigate('/')
         }
     }
 
-    const handleSubMenuClick = subMenu => {
-        setActiveSubMenu(subMenu)
-    }
+    // const handleSubMenuClick = subMenu => {
+    //     setActiveSubMenu(subMenu)
+    // }
 
     const handleScroll = () => {
         if (window.scrollY > 50) {
@@ -44,9 +44,8 @@ export const Header = () => {
         <div className="header">
             <div className={styles.headerWrap}>
                 <div
-                    className={`${styles.headerCont} ${
-                        isFixed ? styles.fixed : ''
-                    }`}
+                    className={`${styles.headerCont} ${isFixed ? styles.fixed : ''
+                        }`}
                 >
                     <div className={styles.mainNavi}>
                         <div className={styles.menuBox}>
@@ -57,34 +56,31 @@ export const Header = () => {
                             </div>
                             <div className={styles.naviMenuList}>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'Main'
-                                            ? styles.active
-                                            : ''
-                                    }`}
-                                    onClick={() => handleMenuClick('Main')}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowShop'
+                                        ? styles.active
+                                        : ''
+                                        }`}
+                                    onClick={() => handleMenuClick('HowShop')}
                                 >
-                                    <a>Main</a>
+                                    <a>HowShop</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowStory'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowStory'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowStory')}
                                 >
                                     <a>HowStory</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShop'
-                                            ? styles.active
-                                            : ''
-                                    }`}
-                                    onClick={() => handleMenuClick('HowShop')}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowShare'
+                                        ? styles.active
+                                        : ''
+                                        }`}
+                                    onClick={() => handleMenuClick('HowShare')}
                                 >
-                                    <a>HowShop</a>
+                                    <a>HowShare</a>
                                 </div>
                             </div>
                         </div>
@@ -120,8 +116,8 @@ export const Header = () => {
                                         <img src="" alt="User" />
                                     </a>
                                 ) : (
-                                    <a>
-                                        <i class="bx bxs-user-circle"></i>
+                                    <a onClick={() => navigate('/signIn')}>
+                                        <i className="bx bxs-user-circle"></i>
                                     </a>
                                 )}
                             </div>

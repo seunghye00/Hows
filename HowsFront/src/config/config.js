@@ -2,4 +2,4 @@
 const { REACT_APP_BASE_URL } = process.env
 
 // API base url
-export const host = `http://192.168.1.4`
+export const host = REACT_APP_BASE_URL

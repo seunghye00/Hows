@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import styles from './Sort.module.css'
 import { host } from '../../../../../config/config' // axios를 사용하여 API 호출
 import axios from 'axios'
-import { Button } from '../../../../../components/Button/Botton'
+import { Button } from '../../../../../components/Button/Button'
 import { Search } from '../../../../../components/Search/Search'
 import { useNavigate } from 'react-router-dom'
 

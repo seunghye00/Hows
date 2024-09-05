@@ -7,7 +7,6 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  /* background-color: #e7f3ed;  */
 }
 
 .container .loginBox {
@@ -29,7 +28,7 @@
 .container .loginBox > input {
   width: 100%;
   height: 40px;
-  border: 1px solid #dcdcdc;
+  border: 1px solid var(--hows-gray-200);
   border-radius: 4px;
   font-size: 13px;
   padding: 10px;
@@ -50,16 +49,16 @@
 
 .container .loginBox .loginBtn {
   margin-top: 10px;
-  background-color: #6c9c84;
-  color: white;
+  background-color: var(--hows-point-color-dark);
+  color: var(--hows-white);
 }
 .container .loginBox .loginBtn:hover {
-  background-color: #678f7b;
+  background-color: var(--hows-point-color-darker);
 }
 
 .container .loginBox .kakaoLoginBtn {
   background-color: #f5d370;
-  color: white;
+  color: var(--hows-white);
 }
 .container .loginBox .kakaoLoginBtn:hover {
   background-color: #face4b;
@@ -83,9 +82,9 @@
 
 .container .loginBox .signUpBtn {
   margin-top: 10px;
-  background-color: #afaeae;
-  color: white;
+  background-color: var(--hows-gray-300);
+  color: var(--hows-white);
 }
 .container .loginBox .signUpBtn:hover {
-  background-color: #919191;
+  background-color: var(--hows-gray-500);
 }

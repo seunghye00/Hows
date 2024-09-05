@@ -1,0 +1,6 @@
+.container {
+    width: 100%; 
+    /* height: 2000px; */
+    padding-bottom: 5%; /* footer 와의 패딩 */
+    border: 1px solid #000;
+}

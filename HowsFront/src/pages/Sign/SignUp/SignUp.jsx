@@ -3,8 +3,8 @@ import DaumPostcode from "react-daum-postcode";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { host } from '../config/config';
-import { useMemberStore } from '../store/store';
+import { host } from '../../../config/config';
+// import { useMemberStore } from '../store/store';
 
 export const SignUp = () => {
     const navi = useNavigate();
@@ -22,7 +22,7 @@ export const SignUp = () => {
         address: "",
         detailAddress: "",
     });
-    const { members, setMembers } = useMemberStore(); // Zustand store 사용
+    // const { member, setMember } = useMemberStore(); // Zustand store 사용
     const [gender, setGender] = useState({ male: false, female: false });
 
     const handleChange = (e) => {
@@ -131,9 +131,9 @@ export const SignUp = () => {
             alert('닉네임을 입력하세요.');
             return false;
         }
-        const nicknamePattern = /^[가-힣]{2,10}$/; // ***********수정하기 
+        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/; // ***********수정하기 
         if (!nicknamePattern.test(formData.nickname)) {
-            alert('닉네임은 한글, 영문자, 숫자 포함하여 2~10자까지 입력할 수 있습니다.');
+            alert('닉네임은 한글, 영문자, 숫자 포함하여 2~7자까지 입력할 수 있습니다.');
             return false;
         }
 
@@ -214,7 +214,7 @@ export const SignUp = () => {
         axios.post(`${host}/member`, formData).then(resp => {
             console.log("회원가입 : ", resp.data);
             alert('회원가입이 성공적으로 완료되었습니다.');
-            // setMembers([...members, resp.data]);
+            // setMember([...member, resp.data]);
             // navi("/");
 
         }).catch(error => {
@@ -278,7 +278,7 @@ export const SignUp = () => {
                 <div className={styles.nicknameBox}>
                     <span>닉네임</span>
                     <span>
-                        한글, 영문자, 숫자 포함 2~10자의 닉네임을 입력해주세요.
+                        한글, 영문자, 숫자로만 이루어진 2~7자의 닉네임을 입력해주세요.
                     </span>
                     <div className={styles.formGrop}>
                         <input

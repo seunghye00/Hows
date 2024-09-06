@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import styles from './Notice.module.css'
 import { Search } from '../../../components/Search/Search'
+import { Paging } from '../../../components/Pagination/Paging'
+import { Button } from '../../../components/Button/Button'
 
 export const Notice = () => {
     const [searchResults, setSearchResults] = useState([])
@@ -13,6 +15,62 @@ export const Notice = () => {
             writer: '민바오',
             date: '2024-08-31',
             viewCount: 1,
+        },
+        {
+            id: 2,
+            title: '다른 공지사항',
+            writer: '홍길동',
+            date: '2024-09-01',
+            viewCount: 5,
+        },
+        {
+            id: 2,
+            title: '다른 공지사항',
+            writer: '홍길동',
+            date: '2024-09-01',
+            viewCount: 5,
+        },
+        {
+            id: 2,
+            title: '다른 공지사항',
+            writer: '홍길동',
+            date: '2024-09-01',
+            viewCount: 5,
+        },
+        {
+            id: 2,
+            title: '다른 공지사항',
+            writer: '홍길동',
+            date: '2024-09-01',
+            viewCount: 5,
+        },
+        {
+            id: 2,
+            title: '다른 공지사항',
+            writer: '홍길동',
+            date: '2024-09-01',
+            viewCount: 5,
+        },
+        {
+            id: 2,
+            title: '다른 공지사항',
+            writer: '홍길동',
+            date: '2024-09-01',
+            viewCount: 5,
+        },
+        {
+            id: 2,
+            title: '다른 공지사항',
+            writer: '홍길동',
+            date: '2024-09-01',
+            viewCount: 5,
+        },
+        {
+            id: 2,
+            title: '다른 공지사항',
+            writer: '홍길동',
+            date: '2024-09-01',
+            viewCount: 5,
         },
         {
             id: 2,
@@ -43,6 +101,7 @@ export const Notice = () => {
                         placeholder="제목 또는 작성자 검색"
                         onSearch={handleSearch}
                     />
+                    <Button size="s" title="등록하기" />
                 </div>
             </div>
 
@@ -71,18 +130,13 @@ export const Notice = () => {
                         </div>
                     </div>
                 ))}
-
-                <div className={styles.addNtcSection}>
-                    <button className={styles.addNtc}>등록</button>
-                </div>
+                {/* <div className={styles.addNtcSection}>
+                    <Button size="s" title="등록하기" />
+                </div> */}
             </div>
 
             <div className={styles.pagination}>
-                <i className="bx bx-chevron-left"></i>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <i className="bx bx-chevron-right"></i>
+                <Paging />
             </div>
         </div>
     )

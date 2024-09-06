@@ -7,6 +7,7 @@ import com.google.cloud.storage.Storage;
 import com.hows.File.dao.FileDAO;
 import com.hows.File.dto.FileDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,9 @@ public class FileService {
     @Autowired
     private Storage storage;
 
+    @Value("${gcp.bucket}")
+    private String bucket;
+
     public FileService(Storage storage) {
         this.storage = storage;
     }
@@ -31,7 +35,7 @@ public class FileService {
         String result = "fail";
 
         try{
-            String bucketName = "sion-attachment";
+            String bucketName = bucket;
             String oriName = file.getOriginalFilename();
             String sysName = UUID.randomUUID().toString();
 
@@ -54,7 +58,7 @@ public class FileService {
     public String deleteFile(String sysName) {
         String result = "fail";
         try {
-            String bucketName = "sion-attachment";
+            String bucketName = bucket;
             BlobId blobId = BlobId.of(bucketName, sysName);
             boolean del = storage.delete(blobId);
             if(del)  {

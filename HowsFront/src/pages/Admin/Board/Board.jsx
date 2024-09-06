@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import styles from './Board.module.css'
 import { Search } from '../../../components/Search/Search'
+import { Paging } from '../../../components/Pagination/Paging'
+import { Button } from '../../../components/Button/Button'
 
 export const Board = () => {
     const [boardReportModalOpen, setBoardReportModalOpen] = useState(false)
@@ -98,7 +100,7 @@ export const Board = () => {
                             </span>
                         </div>
                         <div className={styles.boardItem}>
-                            <button className={styles.deletebtn}>삭제</button>
+                            <Button size="s" title="삭제" />
                         </div>
                     </div>
                 ))}
@@ -122,21 +124,16 @@ export const Board = () => {
                                 </div>
                             ))}
                         </div>
-                        <button
-                            className={styles.btn}
+                        <Button
+                            size="s"
+                            title="닫기"
                             onClick={closeReportModal}
-                        >
-                            닫기
-                        </button>
+                        />
                     </div>
                 </div>
             )}
             <div className={styles.pagination}>
-                <i className="bx bx-chevron-left"></i>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <i className="bx bx-chevron-right"></i>
+                <Paging />
             </div>
         </div>
     )

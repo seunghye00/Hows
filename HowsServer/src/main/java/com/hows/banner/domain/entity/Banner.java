@@ -18,6 +18,9 @@ public class Banner {
 	private Long banner_seq;
 	
 	@Column(nullable = false)
+	private String banner_sysname;
+	
+	@Column(nullable = false)
 	private String banner_url;
 	
 	private Timestamp start_date;
@@ -28,6 +31,14 @@ public class Banner {
 
 	public Long getBanner_seq() {
 		return banner_seq;
+	}
+
+	public String getBanner_sysname() {
+		return banner_sysname;
+	}
+
+	public void setBanner_sysname(String banner_sysname) {
+		this.banner_sysname = banner_sysname;
 	}
 
 	public void setBanner_seq(Long banner_seq) {
@@ -66,9 +77,11 @@ public class Banner {
 		this.banner_order = banner_order;
 	}
 
-	public Banner(Long banner_seq, String banner_url, Timestamp start_date, Timestamp end_date, int banner_order) {
+	public Banner(Long banner_seq, String banner_sysname, String banner_url, Timestamp start_date, Timestamp end_date,
+			int banner_order) {
 		super();
 		this.banner_seq = banner_seq;
+		this.banner_sysname = banner_sysname;
 		this.banner_url = banner_url;
 		this.start_date = start_date;
 		this.end_date = end_date;

@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import styles from './Member.module.css'
 import test from '../../../assets/images/푸바오.png'
 import { Search } from '../../../components/Search/Search'
+import { Paging } from '../../../components/Pagination/Paging'
+import { Button } from '../../../components/Button/Button'
 
 export const Member = () => {
     const [Modal, setModal] = useState(false)
@@ -12,9 +14,8 @@ export const Member = () => {
     const [Grade, setGrade] = useState('브론즈')
     const [Role, setRole] = useState('회원')
     const [blacklistReason, setBlacklistReason] = useState('')
-    const [searchResults, setSearchResults] = useState([]) // 검색 결과 상태
-    const [members, setMembers] = useState([
-        // 여러 명의 회원 임시 데이터
+    const [searchResults, setSearchResults] = useState([])
+    const [members] = useState([
         {
             id: 'user1234',
             nickname: '민바오',
@@ -43,15 +44,17 @@ export const Member = () => {
         },
     ])
 
+    const [selectedFilter, setSelectedFilter] = useState('전체')
+
     const Modalopen = member => {
-        setSelectedMember(member) // 선택된 회원 데이터를 저장
+        setSelectedMember(member)
         setModal(true)
     }
 
     const Modalclose = () => {
         setModal(false)
-        setEditMode(false) // 수정 모드 종료
-        setSelectedMember(null) // 선택된 회원 데이터 초기화
+        setEditMode(false)
+        setSelectedMember(null)
     }
 
     const toggleEditMode = () => {
@@ -76,7 +79,8 @@ export const Member = () => {
     }
 
     const confirmBlacklist = () => {
-        alert(`블랙리스트로 등록되었습니다. 사유: ${blacklistReason}`)
+        alert(`블랙리스트로 등록되었습니다.`)
+        /*사유: ${blacklistReason}*/
         closeBlacklistModal()
         setModal(false)
     }
@@ -87,14 +91,45 @@ export const Member = () => {
             member =>
                 member.nickname.includes(query) || member.id.includes(query)
         )
-        setSearchResults(results) // 검색 결과 업데이트
+        setSearchResults(results)
+    }
+
+    const handleFilterClick = filter => {
+        setSelectedFilter(filter)
+        // 필터 클릭 시 처리할 로직 추가 가능 (예: 필터에 맞는 회원 검색 등)
     }
 
     return (
         <div className={styles.memberContainer}>
             <div className={styles.headerSection}>
                 <div className={styles.filter}>
-                    전체 ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅅ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ
+                    {[
+                        '전체',
+                        'ㄱ',
+                        'ㄴ',
+                        'ㄷ',
+                        'ㄹ',
+                        'ㅁ',
+                        'ㅂ',
+                        'ㅅ',
+                        'ㅇ',
+                        'ㅈ',
+                        'ㅊ',
+                        'ㅋ',
+                        'ㅌ',
+                        'ㅍ',
+                        'ㅎ',
+                    ].map((filter, index) => (
+                        <span
+                            key={index}
+                            className={`${styles.filterItem} ${
+                                selectedFilter === filter ? styles.selected : ''
+                            }`}
+                            onClick={() => handleFilterClick(filter)}
+                        >
+                            {filter}
+                        </span>
+                    ))}
                 </div>
                 <div className={styles.searchSection}>
                     <Search
@@ -222,7 +257,7 @@ export const Member = () => {
                                 />
                             </div>
 
-                            <div className={styles.infoItem}>
+                            <div className={styles.infoItem} hiiden={!editMode}>
                                 <label>등급</label>
                                 {editMode ? (
                                     <select
@@ -238,11 +273,12 @@ export const Member = () => {
                                         type="text"
                                         value={selectedMember.grade}
                                         readOnly
+                                        disabled="true"
                                     />
                                 )}
                             </div>
 
-                            <div className={styles.infoItem}>
+                            <div className={styles.infoItem} hiiden={!editMode}>
                                 <label>역할</label>
                                 {editMode ? (
                                     <select
@@ -260,6 +296,7 @@ export const Member = () => {
                                         type="text"
                                         value={selectedMember.role}
                                         readOnly
+                                        disabled="true"
                                     />
                                 )}
                             </div>
@@ -268,19 +305,29 @@ export const Member = () => {
                         <div className={styles.buttons}>
                             {editMode ? (
                                 <>
-                                    <button onClick={confirmUpdate}>
-                                        완료
-                                    </button>
-                                    <button onClick={toggleEditMode}>
-                                        취소
-                                    </button>
+                                    <Button
+                                        size="s"
+                                        title="완료"
+                                        onClick={confirmUpdate}
+                                    />
+                                    <Button
+                                        size="s"
+                                        title="취소"
+                                        onClick={toggleEditMode}
+                                    />
                                 </>
                             ) : (
                                 <>
-                                    <button onClick={toggleEditMode}>
-                                        수정
-                                    </button>
-                                    <button onClick={Modalclose}>닫기</button>
+                                    <Button
+                                        size="s"
+                                        title="수정"
+                                        onClick={toggleEditMode}
+                                    />
+                                    <Button
+                                        size="s"
+                                        title="닫기"
+                                        onClick={Modalclose}
+                                    />
                                 </>
                             )}
                         </div>
@@ -382,19 +429,23 @@ export const Member = () => {
                             </label>
                         </div>
                         <div className={styles.buttons}>
-                            <button onClick={confirmBlacklist}>등록</button>
-                            <button onClick={closeBlacklistModal}>취소</button>
+                            <Button
+                                size="s"
+                                title="등록"
+                                onClick={confirmBlacklist}
+                            />
+                            <Button
+                                size="s"
+                                title="취소"
+                                onClick={closeBlacklistModal}
+                            />
                         </div>
                     </div>
                 </div>
             )}
 
             <div className={styles.pagination}>
-                <i className="bx bx-chevron-left"></i>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <i className="bx bx-chevron-right"></i>
+                <Paging />
             </div>
         </div>
     )

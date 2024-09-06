@@ -1,4 +1,4 @@
-.commentContainer {
+.replyContainer {
     width: 100%;
     margin: 5% auto;
 }
@@ -24,13 +24,13 @@
 }
 
 /* 조회 하는 영역 */
-.commentlist {
+.replylist {
     font-size: 17px;
     max-height: 520px;
     height: 100%;
 }
 
-.commentHeader {
+.replyHeader {
     display: flex;
     background-color: #555;
     padding: 10px;
@@ -45,7 +45,7 @@
     text-align: center;
 }
 
-.commentRow {
+.replyRow {
     display: flex;
     align-items: center;
     padding: 10px;
@@ -55,7 +55,7 @@
     height: 25px;
 }
 
-.commentItem {
+.replyItem {
     flex: 1;
     text-align: center;
     display: flex;
@@ -186,7 +186,7 @@
     width: 100%;
     display: flex;
     justify-content: center;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .replortcmt textarea {
@@ -199,6 +199,10 @@
     box-sizing: border-box;
     white-space: pre-wrap;
     resize: none;
+}
+
+.chevronIcon{
+    font-size: 25px;
 }
 
 

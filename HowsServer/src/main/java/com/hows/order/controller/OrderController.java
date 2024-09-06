@@ -14,21 +14,18 @@ import java.util.List;
 @RequestMapping("/order")
 public class OrderController {
 
-    @Autowired
-    private OrderService orderServ;
+	@Autowired
+	private OrderService orderServ;
 
-    @GetMapping
-    public ResponseEntity<List<OrderDTO>> orderList() {
-        try {
-            List<OrderDTO> list = orderServ.orderList();
-            return ResponseEntity.ok(list);
+	@GetMapping
+	public ResponseEntity<List<OrderDTO>> orderList() {
+		try {
+			List<OrderDTO> list = orderServ.orderList();
+			return ResponseEntity.ok(list);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }

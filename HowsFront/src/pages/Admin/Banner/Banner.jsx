@@ -18,7 +18,6 @@ export const Banner = () => {
         bannerList()
             .then(resp => {
                 // console.log(resp.data)
-                setBanners(resp.data) // 데이터 설정
                 const beforBanners = resp.data.map(banner => ({
                     ...banner,
                     checked: false, // 초기 체크 상태

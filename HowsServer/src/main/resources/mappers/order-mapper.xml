@@ -4,10 +4,30 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="Order">
-    <select id="orderList" resultType="com.hows.order.dto.OrderDTO">
-        SELECT
-            *
-        FROM
-            order
-    </select>
+	<select id="orderList" resultType="com.hows.order.dto.OrderDTO">
+		SELECT *
+		FROM order
+	</select>
+
+	<select id="orderListByStatus" resultType="com.hows.order.dto.OrderInfoListDTO">
+		select
+		o.orders_seq, o.order_date, m.name, o.order_price, s.order_title
+		from orders o
+		join member m ON o.member_seq = m.member_seq
+		join order_status s ON o.order_code = s.order_code
+		<where>
+			<choose>
+				<when test="status == 'product'">
+					o.order_code IN ('O1', 'O2', 'O3')
+				</when>
+				<when test="status == 'delivery'">
+					o.order_code IN ('O4', 'O5', 'O6')
+				</when>
+				<otherwise>
+					s.order_title = #{status}
+				</otherwise>
+			</choose>
+		</where>
+	</select>
+
 </mapper>

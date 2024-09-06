@@ -1,11 +1,13 @@
 package com.hows.order.service;
 
-import com.hows.order.dao.OrderDAO;
-import com.hows.order.dto.OrderDTO;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.hows.order.dao.OrderDAO;
+import com.hows.order.dto.OrderDTO;
+import com.hows.order.dto.OrderInfoListDTO;
 
 @Service
 public class OrderService {
@@ -18,4 +20,8 @@ public class OrderService {
         return orderDAO.orderList();
     }
 
+    // 필터링된 주문 목록
+	public List<OrderInfoListDTO> getOrdersByStatus(String status) {
+		return orderDAO.getOrdersByStatus(status);
+	}
 }

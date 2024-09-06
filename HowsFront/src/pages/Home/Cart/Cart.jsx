@@ -4,44 +4,58 @@ import img2 from '../../../assets/images/interior_2.jpg'
 import img3 from '../../../assets/images/interior_3.jpg'
 import img4 from '../../../assets/images/interior_4.jpg'
 import {useNavigate} from "react-router-dom";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {addCommas, shippingPrice} from "../../../commons/commons";
+import {useOrderStore} from "../../../store/orderStore";
 
 export const Cart = () => {
 
   const navi = useNavigate();
 
-  /** 필요 데이터 **/
-  const [carts, setCarts] = useState([
-    {cart_seq: 1, product_seq: 1, member_seq: 1, cart_quantity: 1, cart_price: 199000, cart_date: "2024-09-05", products_thumbnail: img1, products_title: "consectetur adipisicing elit Lorem ipsum dolor sit amet, ....", product_content: "test", price: 199000, product_category_code: 1},
-    {cart_seq: 2, product_seq: 2, member_seq: 1, cart_quantity: 1, cart_price: 299000, cart_date: "2024-09-05", products_thumbnail: img2, products_title: "Lorem ipsum consectetur adipisicingdolor sit amet,  elit....", product_content: "test", price: 299000, product_category_code: 1},
-    {cart_seq: 3, product_seq: 3, member_seq: 1, cart_quantity: 1, cart_price: 219000, cart_date: "2024-09-05", products_thumbnail: img3, products_title: "sit amet, consecteturLorem ipsum dolor  adipisicing elit....", product_content: "test", price: 219000, product_category_code: 1},
-    {cart_seq: 4, product_seq: 4, member_seq: 1, cart_quantity: 1, cart_price: 87000, cart_date: "2024-09-05", products_thumbnail: img4, products_title: "adipisicing elit Lorem ipsum dolor sit amet, consectetur ....", product_content: "test", price: 87000, product_category_code: 1}
-  ]);
+  const { setOrderProducts, setOrderPrice } = useOrderStore();
 
-  const [checkData, setCheckData] = useState([]);
+  // 장바구니 목록 원본 데이터
+  const [carts, setCarts] = useState([]);
 
-  /** 상품 총액 **/
+  // 장바구니 체크 데이터
+  const [checkCart, setCheckCart] = useState([]);
+
+  // 전체 선택, 해제
+  const [allChecked, setAllChecked] = useState(true);
+
+  // 선택된 상품의 총 개수, 가격
+  const [total, setTotal] = useState({count: 0, price: 0});
+
+  /** 상품 총 개수, 가격 **/
   const totalPrice = () => {
     let price = 0;
-    carts.forEach(item =>{
-      price += item.cart_price;
+    let count = 0;
+    checkCart.forEach(item =>{
+      if(item.checked) {
+        price += item.cart_price;
+        count++;
+      }
     });
-    return price;
+    setTotal(prev => ({ count, price }));
   }
 
-  /** 배송비 **/
-  const shippingPrice = (price) => {
-    return price >= 50000 ? 0 :3000;
-  }
-
-  /** 금액에 (,)를 추가하는 함수 **/
-  const addCommas = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  /** 상품 체크 **/
+  const handleCheck = (e) => {
+    const {name, checked} = e.target;
+    if(name === "all") {
+      setCheckCart(prev => {
+        return prev.map(item => ({ ...item, checked}));
+      });
+    } else {
+      setCheckCart(prev => {
+        return prev.map(item => item.cart_seq === Number(name) ? { ...item, checked } : item );
+      });
+    }
   }
 
   /** 수량 추가 ( 수량, 가격 ) **/
   const handleCount = (seq, symbol) => {
-    setCarts(prev => {
+    setCheckCart(prev => {
       return prev.map(item => {
         if(item.cart_seq === seq) {
           let newQuantity = item.cart_quantity;
@@ -55,8 +69,7 @@ export const Cart = () => {
             newQuantity = newQuantity === 1 ? newQuantity : newQuantity - 1;
           }
 
-          /** 변경된 수량과 카트에 담긴 가격을 DB에 저장 **/
-          // item 저장하면 됨
+          // (서버) 변경된 수량과 카트에 담긴 가격을 DB에 저장 로직 필요
           return { ...item, cart_quantity: newQuantity, cart_price: newPrice };
         }
         return item;
@@ -64,25 +77,59 @@ export const Cart = () => {
     });
   }
 
-  /** 해당 상품 구입 **/
-  const handleBuy = (seq) => {
-    console.log(`${seq} 상품 구입할거임`);
-    // 해당상품을 결제로 넘기는 로직 필요 (배열 형태)
+  /** 선택 및 개별 상품 구입 **/
+  const handleOrder = (seq) => {
+    let data = [];
+    if(Array.isArray(seq)) {
+      data = seq;
+    } else {
+      checkCart.forEach(item => {
+        if (item.checked) data.push(item.cart_seq);
+      });
+    }
+
+    let dataArr = checkCart.filter(item => {
+       return data.includes(item.cart_seq);
+    });
+
+    let order = [];
+    dataArr.forEach(item => {
+      const dataSet = {
+        product_seq: item.product_seq,
+        product_title: item.products_title,
+        product_image: item.products_thumbnail,
+        product_quantity: item.cart_quantity,
+        product_total_price: item.cart_price,
+      };
+      order.push(dataSet);
+    });
+    setOrderPrice(total.price);
+    setOrderProducts(order);
+    sessionStorage.setItem("howsOrder", JSON.stringify(order));
+    sessionStorage.setItem("howsPrice", total.price);
 
     navi("/payment");
   }
 
-  /** 상품 삭제 **/
+  /** 선택 및 개별 상품 삭제 **/
   const handleDelete = (seq) => {
+    let data = [];
+    if(Array.isArray(seq)) {
+      data = seq;
+    } else {
+      checkCart.forEach(item =>{
+        if(item.checked) data.push(item.cart_seq);
+      });
+    }
     if(window.confirm("상품을 장바구니에서 삭제하시겠습니까?")){
-      setCarts(prev => {
+      setCheckCart(prev => {
         let arr = prev;
-        seq.forEach(item => {
-          arr = arr.filter(data => {
+        data.forEach(seq => {
+          arr = arr.filter(item => {
             if(item.cart_seq === seq){
-              // 카트에서 데이터 지우는 함수
+              // (서버) 카트에서 데이터 지우는 함수
             }
-            return data.cart_seq !== item;
+            return item.cart_seq !== seq;
           });
         });
         return arr;
@@ -90,11 +137,33 @@ export const Cart = () => {
     }
   }
 
-  /** 상품 주문 **/
-  const handleOrder = () => {
-    // 선택된 상품들 결제로 넘기는 로직 필요
-    navi("/payment");
-  }
+  useEffect(() => {
+    setCheckCart(carts);
+  }, [carts]);
+
+  /** 전체선택 **/
+  useEffect(() => {
+    const isAllChecked = checkCart.every(item => item.checked);
+    setAllChecked(isAllChecked);
+    totalPrice();
+  }, [checkCart]);
+  
+  /** 페이지 로드 **/
+  useEffect(() => {
+    // 서버에서 받아올 실제 사용 데이터 ( 표본 )
+    const arr = [
+      {cart_seq: 1, product_seq: 1, member_seq: 1, cart_quantity: 1, cart_price: 199000, cart_date: "2024-09-05", products_thumbnail: img1, products_title: "consectetur adipisicing elit Lorem ipsum dolor sit amet, ....", product_content: "test", price: 199000, product_category_code: 1},
+      {cart_seq: 2, product_seq: 2, member_seq: 1, cart_quantity: 1, cart_price: 299000, cart_date: "2024-09-05", products_thumbnail: img2, products_title: "Lorem ipsum consectetur adipisicingdolor sit amet,  elit....", product_content: "test", price: 299000, product_category_code: 1},
+      {cart_seq: 3, product_seq: 3, member_seq: 1, cart_quantity: 1, cart_price: 219000, cart_date: "2024-09-05", products_thumbnail: img3, products_title: "sit amet, consecteturLorem ipsum dolor  adipisicing elit....", product_content: "test", price: 219000, product_category_code: 1},
+      {cart_seq: 4, product_seq: 4, member_seq: 1, cart_quantity: 1, cart_price: 87000, cart_date: "2024-09-05", products_thumbnail: img4, products_title: "adipisicing elit Lorem ipsum dolor sit amet, consectetur ....", product_content: "test", price: 87000, product_category_code: 1}
+    ]
+
+    // 실제 데이터 + 체크 확인
+    const arrData = arr.map(item => ({ ...item, checked: true }));
+    setCarts(arrData);
+    setCheckCart(arrData);
+    totalPrice();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -103,7 +172,7 @@ export const Cart = () => {
       </div>
       <div className={styles.cartInfo}>
         <div className={styles.leftBox}>
-          <p>선택된 상품 ({carts.length})</p>
+          <p>선택된 상품 ({total.count})</p>
           <button onClick={handleOrder}>주문하기</button>
         </div>
         <div className={styles.rightBox}>
@@ -113,24 +182,24 @@ export const Cart = () => {
             <p>주문 금액 : </p>
           </div>
           <div>
-            <p>{ addCommas(totalPrice()) }원</p>
-            <p>{ addCommas(shippingPrice(totalPrice())) }원</p>
-            <p>{ addCommas(totalPrice() + shippingPrice(totalPrice())) }원</p>
+            <p>{ addCommas(total.price) }원</p>
+            <p>{ addCommas(shippingPrice(total.price)) }원</p>
+            <p>{ addCommas(total.price + shippingPrice(total.price)) }원</p>
           </div>
 
         </div>
       </div>
       <div className={styles.itemForm}>
         <div className={styles.btnBox}>
-          <input type="checkbox"/>
+          <input type="checkbox" name="all" onChange={handleCheck} checked={allChecked}/>
           <button onClick={handleDelete}>선택 삭제</button>
         </div>
         <div className={styles.items}>
           {
-            carts.map(item => {
+            checkCart.map(item => {
               return (
                 <div className={styles.item} key={item.cart_seq}>
-                  <input type="checkbox" />
+                  <input type="checkbox" name={item.cart_seq} onChange={handleCheck} checked={item.checked}/>
                   <div className={styles.itemImage}>
                     <img src={item.products_thumbnail} alt="상품이미지"/>
                   </div>
@@ -145,7 +214,7 @@ export const Cart = () => {
                   </div>
                   <div className={styles.itemPrice}>
                     <p>{addCommas(item.cart_price)}원</p>
-                    <button onClick={() => handleBuy(item.cart_seq)}>구입</button>
+                    <button onClick={() => handleOrder([item.cart_seq])}>구입</button>
                     <button onClick={() => handleDelete([item.cart_seq])}>삭제</button>
                   </div>
                 </div>

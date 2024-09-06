@@ -42,4 +42,19 @@
 		select * from member where member_id = #{member_id}
 	</select>
 	
+	<!-- 비밀번호 변경 시 기존 비밀번호 확인 -->
+	<select id="getPasswordById" resultType="string">
+		select pw from member where member_id = #{member_id}
+	</select>
+	
+	<!-- 비밀번호 변경 -->
+	<update id="updatePw">
+		update member set pw = #{pw} where member_id = #{member_id}
+	</update>
+	
+	
+	
+	
+	
+	
 </mapper>

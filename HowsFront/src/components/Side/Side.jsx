@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import styles from './Side.module.css'
 import logo from '../../assets/images/logo_how.png'
-import { useNavigate } from 'react-router-dom' // useNavigate 임포트
+import { useNavigate, Link } from 'react-router-dom' // useNavigate 임포트
 
 export const Side = () => {
     const navigate = useNavigate() // useNavigate 사용
@@ -22,7 +22,7 @@ export const Side = () => {
         {
             title: '메인 페이지',
             subMenu: [
-                { title: '배너 관리', path: '/banner' }, // path 추가
+                { title: '배너 관리', path: '/admin/banner' }, // path 추가
             ],
         },
         {
@@ -80,25 +80,31 @@ export const Side = () => {
                 {
                     title: '목록 관리',
                     icon: 'bx bx-list-ul', // 아이콘 추가
-                    path: '/product/list', // 경로 추가
+                    subMenu: [
+                        {
+                            title: '상품 목록 조회',
+                            path: '/admin/product/viewList',
+                        },
+                        {
+                            title: '상품 정보 수정',
+                            path: '/admin/product/modifyList',
+                        },
+                    ],
                 },
                 {
                     title: '주문 관리',
                     icon: 'bx bx-cart', // 아이콘 추가
-                    path: '/product/order', // 경로 추가
+                    path: '/admin/product/order', // 경로 추가
                 },
                 {
                     title: '배송 관리',
                     icon: 'bx bxs-truck', // 아이콘 추가
-                    path: '/product/delivery', // 경로 추가
+                    path: '/admin/product/delivery', // 경로 추가
                 },
                 {
                     title: '반품 관리',
                     icon: 'bx bx-undo', // 아이콘 추가
-                    subMenu: [
-                        { title: '반품 목록 조회', path: '/product/return' },
-                        { title: '반품 처리', path: '/product/return' },
-                    ],
+                    path: '/admin/product/return', // 경로 추가
                 },
             ],
         },
@@ -108,10 +114,12 @@ export const Side = () => {
         <div className="side">
             <div className={styles.sideWrap}>
                 {/* 로고 부분 */}
-                <div className={styles.logoBox}>
-                    <img src={logo} alt="Logo" />
-                    <p className={styles.logotit}>How's</p>
-                </div>
+                <Link to="/admin/">
+                    <div className={styles.logoBox}>
+                        <img src={logo} alt="Logo" />
+                        <p className={styles.logotit}>How's</p>
+                    </div>
+                </Link>
 
                 {/* 관리 리스트 */}
                 <div className={styles.adminListCont}>

@@ -1,6 +1,6 @@
 .replyContainer {
     flex: 9 1;
-    border: 1px solid black;
+
 }
 
 .headerSection {
@@ -26,8 +26,7 @@
 /* 조회 하는 영역 */
 .replylist {
     font-size: 17px;
-    max-height: 520px;
-    height: 100%;
+    height: 85%;
 }
 
 .replyHeader {
@@ -36,8 +35,10 @@
     padding: 10px;
     font-weight: bold;
     border: 1px solid #ddd;
-    color: white;
-    height: 25px;
+    color: var(--hows-white);
+    height: 35px;
+    justify-content: center;
+    align-items: center;
 }
 
 .headerItem {
@@ -50,9 +51,8 @@
     align-items: center;
     padding: 10px;
     border: 1px solid #ddd;
-    background-color: #f9f9f9;
     /* cursor: pointer; */
-    height: 25px;
+    height: 35px;
 }
 
 .replyItem {
@@ -66,7 +66,7 @@
 .deletebtn {
     padding: 10px 20px;
     background-color: #555;
-    color: white;
+    color: var(--hows-white);
     border: none;
     cursor: pointer;
     border-radius: 5px;
@@ -79,29 +79,6 @@
 }
 
 .span{
-    cursor: pointer;
-}
-
-/* 페이지네비 */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 93%;
-    left: 55%;
-}
-
-.pagination button {
-    padding: 5px 10px;
-    margin: 0 5px;
-    cursor: pointer;
-}
-
-.pagination i {
-    display: flex;
-    align-items: center;
-    font-size: 20px;
     cursor: pointer;
 }
 
@@ -120,12 +97,12 @@
 }
 
 .modalContent {
-    background-color: white;
+    background-color: var(--hows-white);
     padding: 20px;
     border-radius: 10px;
     width: 25%;
     text-align: center;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--hows-point-color);
 }
 
 .modalContent h3 {
@@ -136,7 +113,8 @@
     display: table;
     width: 100%;
     margin-bottom: 15px;
-    table-layout: fixed; /* 각 셀의 너비를 고정 */
+    table-layout: fixed;
+    border: 2px solid var(--hows-point-color);
 }
 
 .tableHeader, .tableRow {
@@ -153,17 +131,13 @@
 .tableHeader {
     font-weight: bold;
     background-color: #555;
-    color: white;
-}
-
-.tableRow div {
-    background-color: #f9f9f9;
+    color: var(--hows-white);
 }
 
 .reportcount {
     cursor: pointer;
-    background-color: black;
-    color: white;
+    background-color: var(--hows-red-dark);
+    color: var(--hows-white);
     width: 30px;
     height: 30px;
     display: flex;
@@ -174,7 +148,7 @@
 
 .btn {
     background-color: #555;
-    color: white;
+    color: var(--hows-white);
     cursor: pointer;
     border-radius: 5px;
     width: 70px;
@@ -199,10 +173,35 @@
     box-sizing: border-box;
     white-space: pre-wrap;
     resize: none;
+    border: 2px solid var(--hows-point-color);
 }
 
 .chevronIcon{
-    font-size: 25px;
+    font-size: 30px;
+    color: var(--hows-point-color);
+}
+
+/* 페이지네비 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 85%;
+    left: 53%;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.pagination i {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
 }
 
 

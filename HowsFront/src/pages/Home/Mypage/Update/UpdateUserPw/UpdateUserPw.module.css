@@ -27,9 +27,28 @@
   margin-bottom: 25px;
 }
 .container .updatePw .currentPw {
-  margin-bottom: 40px;
+  margin-bottom: 0px;
 }
 
+/* 비밀번호 일치, 불일치 확인 */
+.container .updatePw .currentPw > div,
+.newPw > div,
+.newPw2 > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.container .updatePw .status > i {
+  color: var(--hows-blue-dark);
+  font-size: 30px;
+}
+.container .updatePw .status .discord {
+  color: var(--hows-red-dark);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* title */
 .container .updatePw .title {
   display: flex;
   justify-content: flex-start;
@@ -55,13 +74,15 @@
 }
 
 /* 회원가입 버튼 */
-.container .updatePw .okBtn {
+.container .updatePw .okBtn,
+.isCurrentPwBtn {
   display: flex;
   justify-content: center;
   margin: 10px 0;
   height: auto;
 }
-.container .updatePw .okBtn > button {
+.container .updatePw .okBtn > button,
+.isCurrentPwBtn > button {
   width: 48%;
   height: 50px;
   font-size: 14px;
@@ -78,5 +99,14 @@
 }
 
 .container .updatePw .okBtn > button:hover {
+  background-color: var(--hows-point-color-darker);
+}
+
+/* 비밀번호 확인 버튼 */
+.isCurrentPwBtn {
+  margin-bottom: 50px;
+  transition-duration: 0.4s;
+}
+.isCurrentPwBtn > button:hover {
   background-color: var(--hows-point-color-darker);
 }

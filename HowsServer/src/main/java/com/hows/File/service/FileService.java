@@ -26,7 +26,6 @@ public class FileService {
     @Value("${gcp.bucket}")
     private String bucket;
 
-
     public FileService(Storage storage) {
         this.storage = storage;
     }

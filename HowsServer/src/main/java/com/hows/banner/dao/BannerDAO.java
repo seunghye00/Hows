@@ -10,4 +10,8 @@ public class BannerDAO {
 	@Autowired
 	private SqlSession mybatis;
 
+	public void deleteBySysName(String sysName) {
+		mybatis.delete("Banner.delete", sysName);
+	}
+
 }

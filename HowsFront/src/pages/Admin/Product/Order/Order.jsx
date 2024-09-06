@@ -11,9 +11,10 @@ export const Order = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedOrder, setSelectedOrder] = useState(null)
     const [selectAll, setSelectAll] = useState(false)
+    const [status, setStatus] = useState('product')
 
     useEffect(() => {
-        orderList('product')
+        orderList(status)
             .then(resp => {
                 // console.log(resp.data)
                 const beforOrders = resp.data.map(order => ({
@@ -25,13 +26,18 @@ export const Order = () => {
             .catch(error => {
                 console.log('데이터 가져오기 실패: ' + error) // 오류 처리
             })
-    }, [])
+    }, [status])
 
-    // 배송 시작 버튼 클릭
-    const handleChangeStatus = () => {
-        console.log('배송 시작')
+    // 주문 상태별 목록 조회
+    const handleChangeStatus = e => {
+        const choice = e.target.getAttribute('data-lable')
+        setStatus(choice)
     }
 
+    // 배송 시작 버튼 클릭
+    const handleStartDelivery = () => {
+        console.log('배송 시작')
+    }
     /*
     // 모달창 닫기 버튼 클릭
     const handleCloseModal = () => {
@@ -118,17 +124,25 @@ export const Order = () => {
             <div className={styles.btns}>
                 <Button
                     size={'s'}
-                    onClick={handleChangeStatus}
+                    onClick={handleStartDelivery}
                     title={'배송 시작'}
                 />
                 <Button size={'s'} onClick={handleDeleteOrder} title={'삭제'} />
             </div>
             <div className={styles.container}>
                 <div className={styles.category}>
-                    <span>전체</span>
-                    <span>입금 대기</span>
-                    <span>결제 완료</span>
-                    <span>배송 준비</span>
+                    <span onClick={handleChangeStatus} data-lable="product">
+                        전체
+                    </span>
+                    <span onClick={handleChangeStatus} data-lable="O1">
+                        입금 대기
+                    </span>
+                    <span onClick={handleChangeStatus} data-lable="O2">
+                        결제 완료
+                    </span>
+                    <span onClick={handleChangeStatus} data-lable="O3">
+                        배송 준비
+                    </span>
                 </div>
                 <div className={styles.table}>
                     <div className={styles.header}>
@@ -145,33 +159,41 @@ export const Order = () => {
                         <div className={styles.cols}>주문 금액</div>
                         <div className={styles.cols}>주문 상태</div>
                     </div>
-                    <div className="listBox">
-                        {orders.map((order, i) => (
-                            <div key={i} className={styles.rows}>
-                                <div className={styles.cols}>
-                                    <input
-                                        type="checkbox"
-                                        checked={order.checked || false}
-                                        onChange={() =>
-                                            handleCheckboxChange(
-                                                order.orders_seq
-                                            )
-                                        }
-                                    />
-                                </div>
-                                <div className={styles.cols}>
-                                    {order.order_date}
-                                </div>
-                                <div className={styles.cols}>상품명</div>
-                                <div className={styles.cols}>{order.name}</div>
-                                <div className={styles.cols}>
-                                    {order.order_price}
-                                </div>
-                                <div className={styles.cols}>
-                                    {order.order_title}
-                                </div>
+                    <div className={styles.listBox}>
+                        {orders.length === 0 ? (
+                            <div className={styles.empty}>
+                                데이터가 없습니다
                             </div>
-                        ))}
+                        ) : (
+                            orders.map((order, i) => (
+                                <div key={i} className={styles.rows}>
+                                    <div className={styles.cols}>
+                                        <input
+                                            type="checkbox"
+                                            checked={order.checked || false}
+                                            onChange={() =>
+                                                handleCheckboxChange(
+                                                    order.orders_seq
+                                                )
+                                            }
+                                        />
+                                    </div>
+                                    <div className={styles.cols}>
+                                        {order.order_date}
+                                    </div>
+                                    <div className={styles.cols}>상품명</div>
+                                    <div className={styles.cols}>
+                                        {order.name}
+                                    </div>
+                                    <div className={styles.cols}>
+                                        {order.order_price}
+                                    </div>
+                                    <div className={styles.cols}>
+                                        {order.order_title}
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

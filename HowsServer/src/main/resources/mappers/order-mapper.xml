@@ -6,7 +6,7 @@
 <mapper namespace="Order">
 	<select id="orderList" resultType="com.hows.order.dto.OrderDTO">
 		SELECT *
-		FROM order
+		FROM orders
 	</select>
 
 	<select id="orderListByStatus" resultType="com.hows.order.dto.OrderInfoListDTO">

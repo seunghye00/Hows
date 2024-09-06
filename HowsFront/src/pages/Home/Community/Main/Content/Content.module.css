@@ -1,12 +1,16 @@
 .contentWrap {
     display: flex;
-    gap: 25px;
-    flex-wrap: wrap;
 }
 
 .contentCont {
-    max-width: 300px;
-    width: 100%;
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin: 25px 0;
+}
+
+.contentCon {
+    width: calc((100% / 4) - 25px);
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -36,6 +40,11 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.profileNickname {
+    font-size: 16px;
+    font-weight: 700;
 }
 
 .mainContent {
@@ -108,4 +117,10 @@
     font-weight: 500;
     word-break: break-all;
     word-wrap: break-word;
+    overflow: hidden;
+    word-break: break-word;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }

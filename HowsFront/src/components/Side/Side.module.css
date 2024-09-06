@@ -5,13 +5,13 @@
  .sideWrap {
      display: flex;
      flex-direction: column;
-     gap: 30px;
+     gap: 26px;
  }
 
  .logoBox {
      display: flex;
-     align-items: center;
-     justify-content: space-between;
+     align-items: baseline;
+     justify-content: space-around;
  }
 
  .logoBox img {
@@ -19,7 +19,7 @@
  }
 
  .logotit {
-     font-size: 28px;
+     font-size: 34px;
      font-weight: 700;
      color: var(--hows-point-color);
  }
@@ -41,6 +41,7 @@
      display: flex;
      flex-direction: column;
      gap: 10px;
+     cursor: default;
  }
 
  .listFl {

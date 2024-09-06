@@ -1,0 +1,29 @@
+.l {
+    padding: 20px 40px;
+    font-size: 24px;
+    background-color: var(--hows-white);
+    border-radius: 8px;
+    border: 2px solid var(--hows-point-color);
+    color: var(--hows-point-color-darker);
+    font-weight: 700;
+}
+
+.m {
+    padding: 10px 20px;
+    font-size: 20px;
+    background-color: var(--hows-white);
+    border-radius: 8px;
+    border: 2px solid var(--hows-point-color);
+    color: var(--hows-point-color-darker);
+    font-weight: 600;
+}
+
+.s {
+    padding: 5px 10px;
+    font-size: 16px;
+    background-color: var(--hows-white);
+    border-radius: 8px;
+    border: 2px solid var(--hows-point-color);
+    color: var(--hows-point-color-darker);
+    font-weight: 500;
+}

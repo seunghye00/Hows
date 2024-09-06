@@ -1,3 +1,17 @@
-.container {border: 1px solid #000;width: 100%;height: 50px;}
-.menu {display: flex; height: 100%;}
-.menu > li {cursor: pointer;padding: 0 10px; line-height: 50px;}
+.container {
+    /* border: 1px solid #000; */
+    width: 100%;
+    height: 50px;
+}
+.menu {
+    display: flex; 
+    height: 100%;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 20px;
+}
+.menu > li {
+    cursor: pointer;
+    padding: 0 10px; 
+    line-height: 50px;
+}

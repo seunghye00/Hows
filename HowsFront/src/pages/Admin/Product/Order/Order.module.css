@@ -1,0 +1,8 @@
+.container {
+    flex: 9;
+    border: 1px solid black;
+    border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}

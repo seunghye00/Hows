@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.hows.common.util.JwtUtil;
+import com.hows.member.service.MemberService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -22,6 +23,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
 	@Autowired
 	private JwtUtil jwt;
+	@Autowired
+	private MemberService memServ;
 	
 	private String extractToken(HttpServletRequest request) {
 		String auth = request.getHeader("Authorization");
@@ -40,10 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		if(token != null && jwt.isVerified(token)) {
 		
 		String id = jwt.getSubject(token);
-//		UserDetails member = mserv.loadUserByUsername(id); 
+		UserDetails member = memServ.loadUserByUsername(id); 
 		
-//		Authentication auth = new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
-//		SecurityContextHolder.getContext().setAuthentication(auth);
+		Authentication auth = new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
+		SecurityContextHolder.getContext().setAuthentication(auth);
 		
 		}
 		filterChain.doFilter(request, response);

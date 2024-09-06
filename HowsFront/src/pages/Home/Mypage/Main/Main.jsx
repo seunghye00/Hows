@@ -1,13 +1,25 @@
 import styles from "./Main.module.css";
 import { Post } from "./Post/Post";
-// import { Scrap } from "./Scrap/Scrap";
-// import { Guestbook } from "./Guestbook/Guestbook";
-import { Routes, Route, Navigate } from "react-router-dom";
-import img from '../../../../assets/images/마이페이지_가로배너.jpg'
-import profile from '../../../../assets/images/마이페이지_프로필사진.jpg'
-import post from '../../../../assets/images/마이페이지_게시물.jpg'
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import img from "../../../../assets/images/마이페이지_가로배너.jpg";
+import profile from "../../../../assets/images/마이페이지_프로필사진.jpg";
+
+import { Update } from "./../Update/Update";
+import { useEffect } from "react";
+import { api } from "./../../../../config/config";
+import axios from "axios";
+import { Scrap } from "./Scrap/Scrap";
+import { Guestbook } from "./Guestbook/Guestbook";
 
 export const Main = () => {
+    const navi = useNavigate();
+
+    useEffect(() => {
+        api.get(`/member`).then((resp) => {
+            console.log(resp.data);
+        });
+    });
+
     return (
         <div className={styles.container}>
             <div className={styles.bannerImg}>
@@ -22,8 +34,18 @@ export const Main = () => {
                         <div className={styles.top}>
                             <div className={styles.nickname}>Dobby</div>
                             <div className={styles.linkBtns}>
-                                <button className={styles.infoUpdate}>수정</button>
-                                <button className={styles.mypage}>마이페이지</button>
+                                <button
+                                    className={styles.infoUpdate}
+                                    onClick={() => navi("/mypage/update")}
+                                >
+                                    수정
+                                </button>
+                                <button
+                                    className={styles.mypage}
+                                    onClick={() => navi("/mypage/userDashboard")}
+                                >
+                                    마이페이지
+                                </button>
                             </div>
                         </div>
                         <div className={styles.middle}>
@@ -43,45 +65,39 @@ export const Main = () => {
                     </div>
                 </div>
                 <div className={styles.menus}>
-                    <div className={styles.menu}>
+                    <div className={styles.menu} onClick={() => navi("./post")}>
                         <div>
-                            <i className='bx bx-grid'></i>
+                            <i className="bx bx-grid"></i>
                             <span>게시물</span>
                         </div>
                     </div>
-                    <div className={styles.menu}>
+                    <div className={styles.menu} onClick={() => navi("./scrap")}>
                         <div>
-                            <i className='bx bx-bookmark'></i>
+                            <i className="bx bx-bookmark"></i>
                             <span>스크랩</span>
                         </div>
                     </div>
-                    <div className={styles.menu}>
+                    <div className={styles.menu} onClick={() => navi("./guestbook")}>
                         <div>
-                            <i className='bx bx-message-dots'></i>
+                            <i className="bx bx-message-dots"></i>
                             <span>집들이</span>
                         </div>
                     </div>
+
                 </div>
+
+                {/* 바뀌는 부분 */}
                 <div className={styles.body}>
-                    <div className={styles.row}>
-                        <div className={styles.feed}>
-                            <img src={post}></img>
-                        </div>
-                        <div className={styles.feed}>
-                            <img src={post}></img>
-                        </div>
-                        <div className={styles.feed}>
-                            <img src={post}></img>
-                        </div>
-                    </div>
+                    <Routes>
+                        <Route path="/" element={<Navigate to="post" replace />} />
+                        <Route path="post" element={<Post />} />
+                        <Route path="scrap" element={<Scrap />} />
+                        <Route path="guestbook" element={<Guestbook />} />
+                    </Routes>
+
                 </div>
             </div>
-            {/* <Routes> */}
-            {/* <Route path="/" element={<Navigate to="post" replace />} /> */}
-            {/* <Route path="post" element={<Post />} /> */}
-            {/* <Route path="scrap" element={<Scrap />} /> */}
-            {/* <Route path="guestbook" element={<Guestbook />} /> */}
-            {/* </Routes> */}
+
         </div>
     );
 };

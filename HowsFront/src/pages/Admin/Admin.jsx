@@ -7,6 +7,7 @@ import { Member } from './Member/Member'
 import { Blacklist } from './Member/Blacklist'
 import { Board } from './Board/Board'
 import { Comment } from './Comment/Comment'
+import { Reply } from './Reply/Reply'
 import { Review } from './Review/Review'
 import { Notice } from './Notice/Notice'
 import { Faq } from './Notice/Faq'
@@ -31,6 +32,7 @@ export const Admin = () => {
                 <Route path="/blacklist" element={<Blacklist />} />
                 <Route path="/board" element={<Board />} />
                 <Route path="/comment" element={<Comment />} />
+                <Route path="/reply" element={<Reply />} />
                 <Route path="/review" element={<Review />} />
                 <Route path="/notice" element={<Notice />} />
                 <Route path="/faq" element={<Faq />} />

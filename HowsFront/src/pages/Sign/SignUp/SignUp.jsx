@@ -206,7 +206,7 @@ export const SignUp = () => {
             return
         }
 
-        // // 유효성 검사를 통과하면 서버에 데이터 전송
+        // 유효성 검사를 통과하면 서버에 데이터 전송
         axios
             .post(`${host}/member`, formData)
             .then(resp => {

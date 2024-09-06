@@ -4,6 +4,7 @@
     /* 요소들을 가로로 배치하고 간격을 줌 */
     align-items: center;
     /* 아이템을 수직으로 가운데 정렬 */
+    margin-bottom: 30px;
 }
 
 .CategoryItem {

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import styles from './Comment.module.css'
 import { Search } from '../../../components/Search/Search'
+import { Paging } from '../../../components/Pagination/Paging'
+import { Button } from '../../../components/Button/Button'
 
 export const Comment = () => {
     const [commentReportModalOpen, setCommentReportModalOpen] = useState(false)
@@ -112,7 +114,7 @@ export const Comment = () => {
                             </span>
                         </div>
                         <div className={styles.commentItem}>
-                            <button className={styles.deletebtn}>삭제</button>
+                            <Button size="s" title="삭제" />
                         </div>
                     </div>
                 ))}
@@ -133,9 +135,7 @@ export const Comment = () => {
                         ) : (
                             <p>댓글이 없습니다.</p>
                         )}
-                        <button className={styles.btn} onClick={closeModals}>
-                            닫기
-                        </button>
+                        <Button size="s" title="닫기" onClick={closeModals} />
                     </div>
                 </div>
             )}
@@ -156,19 +156,13 @@ export const Comment = () => {
                                 <div>2024-09-05</div>
                             </div>
                         </div>
-                        <button className={styles.btn} onClick={closeModals}>
-                            닫기
-                        </button>
+                        <Button size="s" title="닫기" onClick={closeModals} />
                     </div>
                 </div>
             )}
 
             <div className={styles.pagination}>
-                <i className="bx bx-chevron-left"></i>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <i className="bx bx-chevron-right"></i>
+                <Paging />
             </div>
         </div>
     )

@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import styles from './Blacklist.module.css'
 import { Search } from '../../../components/Search/Search'
+import { Paging } from '../../../components/Pagination/Paging'
+import { Button } from '../../../components/Button/Button'
 
 export const Blacklist = () => {
     const [blacklistMembers, setBlacklistMembers] = useState([
@@ -19,6 +21,7 @@ export const Blacklist = () => {
     ])
 
     const [searchResults, setSearchResults] = useState([])
+    const [selectedFilter, setSelectedFilter] = useState('전체')
 
     // 블랙리스트 해제 함수
     const removeFromBlacklist = id => {
@@ -35,6 +38,11 @@ export const Blacklist = () => {
         setSearchResults(results)
     }
 
+    const handleFilterClick = filter => {
+        setSelectedFilter(filter)
+        // 필터 클릭 시 처리할 로직 추가 가능 (예: 필터에 맞는 회원 검색 등)
+    }
+
     // 검색 결과가 있으면 그 결과를, 없으면 전체 리스트를 보여줌
     const displayMembers =
         searchResults.length > 0 ? searchResults : blacklistMembers
@@ -43,7 +51,33 @@ export const Blacklist = () => {
         <div className={styles.memberContainer}>
             <div className={styles.headerSection}>
                 <div className={styles.filter}>
-                    전체 ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅅ ㅇ ㅈ ㅊ ㅋ ㅌ ㅍ ㅎ
+                    {[
+                        '전체',
+                        'ㄱ',
+                        'ㄴ',
+                        'ㄷ',
+                        'ㄹ',
+                        'ㅁ',
+                        'ㅂ',
+                        'ㅅ',
+                        'ㅇ',
+                        'ㅈ',
+                        'ㅊ',
+                        'ㅋ',
+                        'ㅌ',
+                        'ㅍ',
+                        'ㅎ',
+                    ].map((filter, index) => (
+                        <span
+                            key={index}
+                            className={`${styles.filterItem} ${
+                                selectedFilter === filter ? styles.selected : ''
+                            }`}
+                            onClick={() => handleFilterClick(filter)}
+                        >
+                            {filter}
+                        </span>
+                    ))}
                 </div>
                 <div className={styles.searchSection}>
                     <Search
@@ -76,14 +110,13 @@ export const Blacklist = () => {
                                 {member.date}
                             </div>
                             <div className={styles.memberItem}>
-                                <button
-                                    className={styles.deletebtn}
+                                <Button
+                                    size="s"
+                                    title="해제"
                                     onClick={() =>
                                         removeFromBlacklist(member.id)
                                     }
-                                >
-                                    해제
-                                </button>
+                                />
                             </div>
                         </div>
                     ))
@@ -93,11 +126,7 @@ export const Blacklist = () => {
             </div>
 
             <div className={styles.pagination}>
-                <i className="bx bx-chevron-left"></i>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <i className="bx bx-chevron-right"></i>
+                <Paging />
             </div>
         </div>
     )

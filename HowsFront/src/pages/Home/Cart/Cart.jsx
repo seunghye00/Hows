@@ -5,7 +5,7 @@ import img3 from '../../../assets/images/interior_3.jpg'
 import img4 from '../../../assets/images/interior_4.jpg'
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {addCommas} from "../../../commons/commons";
+import {addCommas, shippingPrice} from "../../../commons/commons";
 import {useOrderStore} from "../../../store/orderStore";
 
 export const Cart = () => {
@@ -37,11 +37,6 @@ export const Cart = () => {
       }
     });
     setTotal(prev => ({ count, price }));
-  }
-
-  /** 배송비 **/
-  const shippingPrice = (price) => {
-    return price >= 50000 ? 0 :3000;
   }
 
   /** 상품 체크 **/
@@ -111,6 +106,7 @@ export const Cart = () => {
     setOrderPrice(total.price);
     setOrderProducts(order);
     sessionStorage.setItem("howsOrder", JSON.stringify(order));
+    sessionStorage.setItem("howsPrice", total.price);
 
     navi("/payment");
   }

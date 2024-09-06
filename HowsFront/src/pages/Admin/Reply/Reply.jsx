@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import styles from './Reply.module.css'
 import { GoTriangleDown } from 'react-icons/go'
 import { Search } from '../../../components/Search/Search'
+import { Paging } from '../../../components/Pagination/Paging'
+import { Button } from '../../../components/Button/Button'
 
 export const Reply = () => {
     const [commentReportModalOpen, setCommentReportModalOpen] = useState(false)
@@ -16,13 +18,14 @@ export const Reply = () => {
             id: 1,
             parentComment: {
                 commenter: '김철수',
-                content: '이것은 부모 댓글입니다.',
+                content: '이것은 게시판.',
                 date: '2024-08-25',
+                boardTitle: '첫 번째 게시판 제목',
             },
             replyCommenter: '민바오',
             date: '2024-08-31',
             reportCount: 1,
-            content: '이것은 신고당한 대댓글~ 이랍니다~~',
+            content: '이것은 대댓글입니다.',
         },
         {
             id: 2,
@@ -30,11 +33,12 @@ export const Reply = () => {
                 commenter: '이영희',
                 content: '다른 부모 댓글입니다.',
                 date: '2024-08-26',
+                boardTitle: '두 번째 게시판 제목',
             },
             replyCommenter: '홍길동',
             date: '2024-08-30',
             reportCount: 2,
-            content: '또 다른 신고당한 대댓글~',
+            content: '이것은 또 다른 대댓글입니다.',
         },
     ]
 
@@ -76,7 +80,7 @@ export const Reply = () => {
                 <div className={styles.searchSection}>
                     {/* Search 컴포넌트로 대체 */}
                     <Search
-                        placeholder="댓글 또는 작성자 검색"
+                        placeholder="제목 또는 작성자 검색"
                         onSearch={handleSearch}
                     />
                 </div>
@@ -85,7 +89,7 @@ export const Reply = () => {
             <div className={styles.replylist}>
                 <div className={styles.replyHeader}>
                     <div className={styles.headerItem}>NO</div>
-                    <div className={styles.headerItem}>내용</div>
+                    <div className={styles.headerItem}>제목</div>
                     <div className={styles.headerItem}>작성자</div>
                     <div className={styles.headerItem}>작성날짜</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>
@@ -99,7 +103,9 @@ export const Reply = () => {
                             className={styles.replyItem}
                             onClick={() => openSpecificReplyModal(reply.id)}
                         >
-                            <span className={styles.span}>{reply.content}</span>
+                            <span className={styles.span}>
+                                {reply.parentComment.boardTitle}
+                            </span>
                         </div>
                         <div className={styles.replyItem}>
                             {reply.replyCommenter}
@@ -115,7 +121,7 @@ export const Reply = () => {
                             </span>
                         </div>
                         <div className={styles.replyItem}>
-                            <button className={styles.deletebtn}>삭제</button>
+                            <Button size="s" title="삭제" />
                         </div>
                     </div>
                 ))}
@@ -125,7 +131,7 @@ export const Reply = () => {
             {specificCommentModalOpen && selectedReply && (
                 <div className={styles.reportModal}>
                     <div className={styles.modalContent}>
-                        <h3>신고된 댓글 상세조회</h3>
+                        <h3>신고된 대댓글 상세조회</h3>
                         <div className={styles.replortcmt}>
                             {/* 부모 댓글 표시 */}
                             <textarea
@@ -146,9 +152,7 @@ export const Reply = () => {
                                 placeholder="대댓글"
                             />
                         </div>
-                        <button className={styles.btn} onClick={closeModals}>
-                            닫기
-                        </button>
+                        <Button size="s" title="닫기" onClick={closeModals} />
                     </div>
                 </div>
             )}
@@ -170,19 +174,13 @@ export const Reply = () => {
                                 <div>2024-09-05</div>
                             </div>
                         </div>
-                        <button className={styles.btn} onClick={closeModals}>
-                            닫기
-                        </button>
+                        <Button size="s" title="닫기" onClick={closeModals} />
                     </div>
                 </div>
             )}
 
             <div className={styles.pagination}>
-                <i className="bx bx-chevron-left"></i>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <i className="bx bx-chevron-right"></i>
+                <Paging />
             </div>
         </div>
     )

@@ -27,7 +27,7 @@
   margin-bottom: 25px;
 }
 .container .updatePw .currentPw {
-  margin-bottom: 40px;
+  margin-bottom: 0px;
 }
 
 .container .updatePw .title {
@@ -45,7 +45,7 @@
   height: 25px;
   border: 1px solid var(--hows-gray-200);
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
   padding: 10px;
   margin-top: 8px;
 }
@@ -55,13 +55,15 @@
 }
 
 /* 회원가입 버튼 */
-.container .updatePw .okBtn {
+.container .updatePw .okBtn,
+.isCurrentPwBtn {
   display: flex;
   justify-content: center;
   margin: 10px 0;
   height: auto;
 }
-.container .updatePw .okBtn > button {
+.container .updatePw .okBtn > button,
+.isCurrentPwBtn > button {
   width: 48%;
   height: 50px;
   font-size: 14px;
@@ -78,5 +80,14 @@
 }
 
 .container .updatePw .okBtn > button:hover {
+  background-color: var(--hows-point-color-darker);
+}
+
+/* 비밀번호 확인 버튼 */
+.isCurrentPwBtn {
+  margin-bottom: 50px;
+  transition-duration: 0.4s;
+}
+.isCurrentPwBtn > button:hover {
   background-color: var(--hows-point-color-darker);
 }

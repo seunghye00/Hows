@@ -238,3 +238,8 @@ select {
   background-color: var(--hows-point-color-darkest);
   /* 마우스를 올렸을 때 핸들의 색상 */
 }
+
+/* 페이지네이션 */
+.swiper-pagination-bullet-active {
+  background: var(--hows-point-color-darkest) !important;
+}

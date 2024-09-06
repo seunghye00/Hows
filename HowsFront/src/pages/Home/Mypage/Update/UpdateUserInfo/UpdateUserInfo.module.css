@@ -54,12 +54,30 @@
   color: var(--hows-point-color-darker);
 }
 
+/* ========= 정보 ========= */
+/* Box들 공통 */
 .container .updateInfo .idBox,
-.nameBox {
+.nameBox,
+.birthBox,
+.nicknameBox,
+.emailBox,
+.phoneBox,
+.addressBox,
+.signupDateBox {
   display: flex;
   flex-direction: column;
   margin-bottom: 25px;
 }
+/* 정규표현 설명 span */
+.container .updateInfo .nicknameBox > span:nth-child(2),
+.emailBox > span:nth-child(2) {
+  display: flex;
+  justify-content: flex-start;
+  padding-left: 3px;
+  font-size: 16px;
+  /* margin-bottom: 10px; */
+}
+/* title 공통 */
 .container .updateInfo .title {
   display: flex;
   justify-content: flex-start;
@@ -69,15 +87,144 @@
   font-weight: 700;
   margin-bottom: 3px;
 }
+/* input 공통 */
 .container .updateInfo input {
   height: 25px;
   border: 1px solid var(--hows-gray-200);
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
   padding: 10px;
   margin-top: 8px;
 }
 .container .updateInfo input:focus {
   /* 테두리 색상 */
   outline: 1px solid var(--hows-gray-200);
+}
+input[type="text"]:disabled {
+  background: var(--hows-gray-100);
+}
+
+/* input & button 묶음 */
+.container .updateInfo .formGrop {
+  display: flex;
+  align-items: center;
+}
+/* 중복확인 Btn */
+.container .updateInfo .chkBtn {
+  flex: 1;
+  margin: 8px 0 0 8px;
+  height: 46px;
+  background-color: var(--hows-point-color-dark);
+  color: var(--hows-white);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+}
+.container .updateInfo .chkBtn:hover {
+  background-color: var(--hows-point-color-darker);
+}
+
+/* ========== 개별 ========= */
+/* 생년월일 및 성별 */
+.container .updateInfo .birthBox > div {
+  display: flex;
+  align-items: center;
+}
+.container .updateInfo .birthBox .inputBirth {
+  width: 60%;
+  margin-right: 15px;
+}
+.container .updateInfo .genderBox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 40%;
+}
+.container .updateInfo .genderBox label {
+  display: flex;
+  flex-direction: row;
+  font-size: 20px;
+}
+.container .updateInfo .genderBox label input {
+  margin: 2px 0 0 8px;
+  transform: scale(1.2);
+}
+
+/* 닉네임 */
+.container .updateInfo .nicknameBox .inputNickname {
+  flex: 4;
+}
+
+/* 주소 */
+.container .updateInfo .addressBox input {
+  margin-bottom: 3px;
+}
+.container .updateInfo .addressBox .addressBtn {
+  height: 35px;
+  background-color: var(--hows-point-color-dark);
+  color: var(--hows-white);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+  margin-top: 5px;
+  height: 50px;
+}
+.container .updateInfo .addressBox .addressBtn:hover {
+  background-color: var(--hows-point-color-darker);
+}
+
+/* 탈퇴하기 */
+.container .updateInfo .signout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0 20px;
+}
+.container .updateInfo .signout .linkBtn {
+  border: none;
+  background: none;
+  color: var(--hows-point-color-dark);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  margin-left: 8px;
+}
+
+/* 수정완료 버튼 */
+.container .updateInfo .btns {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+.container .updateInfo .btns > button {
+  width: 48%;
+  height: 35px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+  height: 50px;
+}
+.container .updateInfo .btns > button:nth-child(1) {
+  background-color: var(--hows-point-color-dark);
+  color: var(--hows-white);
+}
+.container .updateInfo .btns > button:nth-child(1):hover {
+  background-color: var(--hows-point-color-darker);
+}
+.container .updateInfo .btns > button:nth-child(2) {
+  background-color: var(--hows-gray-300);
+  color: var(--hows-white);
+}
+.container .updateInfo .btns > button:nth-child(2):hover {
+  background-color: var(--hows-gray-500);
 }

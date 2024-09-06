@@ -29,19 +29,17 @@ export const SignIn = () => {
 
 
     axios.post(`${host}/auth`, user).then(resp => {
-
       const token = resp.data;
-      console.log("토큰 : ", token)
-
       sessionStorage.setItem("token", token);
       login(token);
 
       alert("로그인 성공!")
       navi("/");
 
+    }).catch(error => {
+      alert('로그인에 실패하였습니다.')
     })
   }
-
 
   return (
     <div className={styles.container}>

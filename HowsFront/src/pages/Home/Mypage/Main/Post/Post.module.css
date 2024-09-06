@@ -28,6 +28,8 @@
   height: 328px;
   margin: 2.5px;
   position: relative;
+  object-fit: cover;
+  overflow: hidden;
 }
 .container .contents .feed > img {
   height: 100%;

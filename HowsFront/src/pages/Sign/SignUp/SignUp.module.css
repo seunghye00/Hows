@@ -6,7 +6,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 30px 0 50px;
+  padding: 30px 0 60px;
   height: 100%;
   /* background-color: #e7f3ed;  */
 }
@@ -14,7 +14,7 @@
 .container .signUpBox {
   display: flex;
   flex-direction: column;
-  width: 380px;
+  width: 430px;
   height: auto;
   text-align: center;
 }
@@ -45,7 +45,7 @@
   justify-content: flex-start;
   align-items: center;
   padding-left: 3px;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
   margin-bottom: 3px;
 }
@@ -58,7 +58,7 @@
   display: flex;
   justify-content: flex-start;
   padding-left: 3px;
-  font-size: 14px;
+  font-size: 16px;
   /* margin-bottom: 10px; */
 }
 
@@ -68,9 +68,10 @@
   /* height: 100%; */
   border: 1px solid var(--hows-gray-200);
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 16px;
   padding: 10px;
   margin-top: 8px;
+  height: 25px;
 }
 .container .signUpBox input:focus {
   /* 테두리 색상 */
@@ -87,10 +88,10 @@
 .container .signUpBox .chkBtn {
   flex: 1;
   margin: 8px 0 0 8px;
-  height: 37px;
+  height: 46px;
   background-color: var(--hows-point-color-dark);
   color: var(--hows-white);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   border-radius: 4px;
   border: none;
@@ -127,11 +128,12 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  margin-bottom: 25px;
+  margin-bottom: 30px;
 }
 .container .signUpBox .genderBox label {
   display: flex;
   flex-direction: row;
+  font-size: 20px;
 }
 .container .signUpBox .genderBox label input {
   margin: 2px 0 0 8px;
@@ -146,13 +148,14 @@
   height: 35px;
   background-color: var(--hows-point-color-dark);
   color: var(--hows-white);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   border-radius: 4px;
   border: none;
   cursor: pointer;
   transition-duration: 0.4s;
   margin-top: 5px;
+  height: 50px;
 }
 .container .signUpBox .addressBox .addressBtn:hover {
   background-color: var(--hows-point-color-darker);
@@ -167,12 +170,13 @@
 .container .signUpBox .btns > button {
   width: 48%;
   height: 35px;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   border-radius: 4px;
   border: none;
   cursor: pointer;
   transition-duration: 0.4s;
+  height: 50px;
 }
 .container .signUpBox .btns > button:nth-child(1) {
   background-color: var(--hows-point-color-dark);
@@ -194,17 +198,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
+  margin-top: 20px;
 }
 .container .signUpBox .login > span {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 400;
 }
 .container .signUpBox .login .linkBtn {
   border: none;
   background: none;
   color: var(--hows-point-color-dark);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   text-decoration: underline;

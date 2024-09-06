@@ -13,6 +13,7 @@
     width: 305px;
     height: 500px;
     margin: 10px;
+    cursor: pointer;
 }
 
 .item:hover .img > img {

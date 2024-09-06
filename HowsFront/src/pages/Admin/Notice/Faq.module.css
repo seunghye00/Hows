@@ -1,0 +1,100 @@
+/* FAQ 컨테이너 스타일 */
+.faqContainer {
+    flex: 9 1;
+    border: 1px solid black;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.faqList {
+    margin-top: 10px;
+}
+
+.faq {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid white;
+    border-radius: 10px;
+    background-color: #2c3e50;
+    color: white;
+    position: relative;
+}
+
+.faqTitleContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* FAQ 제목 */
+.faqTitle {
+    font-size: 18px;
+    cursor: text;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 5px;
+    min-width: 100px;
+    word-break: break-word;
+}
+
+/* FAQ 내용 */
+.faqContent {
+    margin: 10px 0;
+    font-size: 18px;
+    display: none;
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+/* 지우면 토글 효과가 사라지네..?*/
+.faq.active .faqContent {
+    display: block;
+}
+
+.faqToggle, .faqDelete {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 18px;
+}
+
+/* 추가 버튼 */
+.addfaqSection {
+    position: fixed;
+    top: 10%;
+    right: 30px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.addfaq {
+    background-color: #555;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    position: fixed;
+    top: 10%;
+}
+
+/* 수정, 삭제, 저장, 취소 버튼 */
+.faqActionButtons {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.saveBtn, .cancelBtn, .editBtn, .deleteBtn {
+    background-color: #555;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 10px
+}

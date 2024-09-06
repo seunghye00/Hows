@@ -1,5 +1,7 @@
 package com.hows.member.service;
 
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -37,14 +39,22 @@ public class MemberService implements UserDetailsService{
 		return user;
 	}
 
-	
-	
-	
+
 	// 마이페이지 회원정보 출력
 //	public MemberDTO selectInfo(String loginId) {
 //		return memDao.selectInfo(loginId);
 //	}
 
+	
+	// 비밀번호 변경시 기존 비밀번호 확인
+	public String getPasswordById(HashMap<String, String> map) {
+		return memDao.getPasswordById(map);
+	}
+	
+	// 비밀번호 변경
+	public int updatePw(HashMap<String, String> map) {
+		return memDao.updatePw(map);
+	}
 
 
 	

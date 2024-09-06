@@ -105,8 +105,7 @@ export const SignUp = () => {
             return false
         }
         // 비밀번호 유효성 검사: 최소 8자 이상, 영문자, 숫자, 특수문자 포함
-        const pwPattern =
-            /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+        const pwPattern = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
         if (!pwPattern.test(formData.pw)) {
             alert(
                 '비밀번호는 최소 8자 이상이어야 하며, 영문자, 숫자, 특수문자를 포함해야 합니다.'

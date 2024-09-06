@@ -28,7 +28,7 @@ public class BannerService {
 	private BannerMapper bannMap;
 	
 	@Autowired
-	private BannerDAO bannDao;
+	private BannerDAO bannDAO;
 	
 	@Autowired
 	private Storage storage;
@@ -72,7 +72,7 @@ public class BannerService {
 				BlobId blobId = BlobId.of(bucket, sysName);
 				// 파일 삭제
 		        boolean result1 = storage.delete(blobId);
-		        bannDao.deleteBySysName(sysName);
+		        bannDAO.deleteBySysName(sysName);
 			}
 			
 		} catch (Exception e) {

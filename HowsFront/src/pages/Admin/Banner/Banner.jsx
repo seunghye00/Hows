@@ -18,7 +18,6 @@ export const Banner = () => {
         bannerList()
             .then(resp => {
                 // console.log(resp.data)
-                setBanners(resp.data) // 데이터 설정
                 const beforBanners = resp.data.map(banner => ({
                     ...banner,
                     checked: false, // 초기 체크 상태
@@ -208,34 +207,38 @@ export const Banner = () => {
                     <div className={styles.cols}>등록 기간</div>
                 </div>
                 <div className={styles.list}>
-                    {banners.map((banner, i) => (
-                        <div key={i} className={styles.rows}>
-                            <div className={styles.cols}>
-                                <input
-                                    type="checkbox"
-                                    checked={banner.checked || false}
-                                    onChange={() =>
-                                        handleCheckboxChange(
-                                            banner.banner_sysname
-                                        )
-                                    }
-                                />
+                    {banners.length === 0 ? (
+                        <div className={styles.empty}>데이터가 없습니다</div>
+                    ) : (
+                        banners.map((banner, i) => (
+                            <div key={i} className={styles.rows}>
+                                <div className={styles.cols}>
+                                    <input
+                                        type="checkbox"
+                                        checked={banner.checked || false}
+                                        onChange={() =>
+                                            handleCheckboxChange(
+                                                banner.banner_sysname
+                                            )
+                                        }
+                                    />
+                                </div>
+                                <div className={styles.cols}>
+                                    {banner.banner_order}
+                                </div>
+                                <div className={styles.cols}>
+                                    <img
+                                        src={banner.banner_url}
+                                        alt="배너 이미지"
+                                    />
+                                </div>
+                                <div className={styles.cols}>
+                                    {formatDate(banner.start_date)} ~{' '}
+                                    {formatDate(banner.end_date)}
+                                </div>
                             </div>
-                            <div className={styles.cols}>
-                                {banner.banner_order}
-                            </div>
-                            <div className={styles.cols}>
-                                <img
-                                    src={banner.banner_url}
-                                    alt="배너 이미지"
-                                />
-                            </div>
-                            <div className={styles.cols}>
-                                {formatDate(banner.start_date)} ~{' '}
-                                {formatDate(banner.end_date)}
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>

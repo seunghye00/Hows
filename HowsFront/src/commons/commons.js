@@ -26,3 +26,8 @@ export const formatDate = dateString => {
 export const addCommas = (price) => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
+
+/** 배송비 **/
+export const shippingPrice = (price) => {
+    return price >= 50000 ? 0 :3000;
+}

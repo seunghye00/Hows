@@ -9,6 +9,10 @@ export const Community = () => {
             <Routes>
                 <Route path="/" element={<Main />} />
                 <Route path="/post/*" element={<Post />} />
+                <Route
+                    path="/postId/*"
+                    element={<Post postId="true" isEditMode="true" />}
+                />
             </Routes>
         </div>
     )

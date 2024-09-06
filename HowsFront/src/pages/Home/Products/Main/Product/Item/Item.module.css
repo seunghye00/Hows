@@ -1,6 +1,11 @@
 .container{
-    width: 100%;
+    /* width: 100%; */
     /* border: 1px solid #000; */
+
+    max-width: 1300px;
+    padding: 20px 0;
+    width: 100%;
+    margin: 0 auto;
 }
 .contents {
     /* width: 325px;
@@ -8,6 +13,12 @@
     display: flex; flex-wrap: wrap;
     padding: 20px 0px;
     /* gap: 20px; */
+    /* border: 1px solid #000; */
+}
+/* 오늘의 추천 상품 */
+.titleItem {
+    font-weight: bold;
+    padding: 10px 10px 0;
 }
 .item {
     width: 305px;
@@ -22,7 +33,6 @@
 
 /* 상품 이미지 */
 .img {
-    /* border:1px solid #000; */
     height: 400px;
     overflow: hidden;
     border-radius: 8px 8px 0 0;
@@ -36,7 +46,6 @@
     border:1px solid var(--hows-gray-200);
     border-radius: 0 0 8px 8px;
     height: 100px;
-    /* background-color: red; */
 }
 
 /* 상품 설명 - 상품명 */
@@ -45,10 +54,13 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    /* border:1px solid #000; */
 }
 
 /* 상품 설명 - 상품 가격 */
 .title > div:last-child{
     /* border:1px solid #000; */
 }
+
+
+/* 무한 스크롤 이미지 배치 */
+.itemBox {display: flex;}

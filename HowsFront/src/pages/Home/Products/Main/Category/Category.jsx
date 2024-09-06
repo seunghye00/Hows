@@ -5,6 +5,8 @@ import axios from 'axios';
 import { host } from '../../../../../config/config';
 
 export const Category = () => {
+  // 카테고리명 상태 
+  const [categoriesList,setCategoriesList] = useState([]);
 
   // ===== 가격 버튼 클릭시 나오는 라디오 박스 토글 =====
   const [isOpen, setIsOpen] = useState(false);
@@ -21,22 +23,18 @@ export const Category = () => {
   };
   // ===== 가격 버튼 클릭시 나오는 라디오 박스 토글 =====
 
-  const [categoriesList,setCategoriesList] = useState([]);
   
+
   useEffect(() => {
     axios.get(`${host}/category`)
       .then((resp) => {
-        console.log(JSON.stringify(resp))
+        // console.log(JSON.stringify(resp))
         setCategoriesList(resp.data);  
       })
       .catch((err) => {
         console.error(err); 
       });
   }, []);  // 컴포넌트가 처음 렌더링될 때 한 번만 실행
-
-
-
-
 
   return (
     <div className={styles.container}>

@@ -7,10 +7,12 @@ import { Search } from '../../../../../components/Search/Search'
 import { useNavigate } from 'react-router-dom'
 
 export const Sort = () => {
+    console.log(`${host}`)
     const [housingTypes, setHousingTypes] = useState([])
     const [spaceTypes, setSpaceTypes] = useState([])
     const [areaSizes, setAreaSizes] = useState([])
     const [colors, setColors] = useState([])
+    const [selectedSort, setSelectedSort] = useState('') // 정렬 상태
     const navigate = useNavigate() // 페이지 전환을 위한 훅
 
     // 선택된 옵션 상태
@@ -59,12 +61,25 @@ export const Sort = () => {
         if (optionType === 'space') setSelectedSpaceType('')
         if (optionType === 'area') setSelectedAreaSize('')
         if (optionType === 'color') setSelectedColor('')
+        if (optionType === 'sort') setSelectedSort('') // 정렬 필터 해제
     }
 
     return (
         <div className={styles.sortWrap}>
             <div className={styles.sortcont}>
                 <div className={styles.sortBox}>
+                    {/* 인기순/조회수순 선택 */}
+                    <select
+                        name="sortType"
+                        value={selectedSort}
+                        onChange={e => setSelectedSort(e.target.value)}
+                        className={styles.sortSelect}
+                    >
+                        <option value="">정렬</option>
+                        <option value="default">최신순</option>
+                        <option value="popular">인기순</option>
+                        <option value="views">조회수순</option>
+                    </select>
                     {/* 주거 형태 선택 */}
                     <select
                         name="housingType"
@@ -136,6 +151,19 @@ export const Sort = () => {
 
                 {/* 선택한 필터들 표시 */}
                 <div className={styles.selectedOptions}>
+                    {/* 정렬 필터 표시 */}
+                    {selectedSort && selectedSort !== 'default' && (
+                        <div className={styles.selectedOption}>
+                            {selectedSort === 'popular' && '인기순'}
+                            {selectedSort === 'views' && '조회수순'}
+                            <button
+                                onClick={() => removeSelectedOption('sort')}
+                            >
+                                X
+                            </button>
+                        </div>
+                    )}
+
                     {selectedHousingType && (
                         <div className={styles.selectedOption}>
                             {
@@ -193,7 +221,7 @@ export const Sort = () => {
                             <button
                                 onClick={() => removeSelectedOption('color')}
                             >
-                                <i className="bx bx-x"></i>
+                                X
                             </button>
                         </div>
                     )}

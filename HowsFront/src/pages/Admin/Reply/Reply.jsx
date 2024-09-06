@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import styles from './Reply.module.css'
 import { GoTriangleDown } from 'react-icons/go'
+import { Search } from '../../../components/Search/Search'
 
 export const Reply = () => {
     const [commentReportModalOpen, setCommentReportModalOpen] = useState(false)
     const [specificCommentModalOpen, setSpecificCommentModalOpen] =
         useState(false)
     const [selectedReply, setSelectedReply] = useState(null)
+    const [searchResults, setSearchResults] = useState([])
 
-    // 신고당한 댓글 임시 데이터
+    // 신고당한 대댓글 임시 데이터
     const reportedComments = [
         {
             id: 1,
@@ -36,14 +38,14 @@ export const Reply = () => {
         },
     ]
 
-    // 첫 번째 모달: 특정 대댓글 조회
+    // 특정 대댓글 조회 모달 열기
     const openSpecificReplyModal = id => {
         const reply = reportedComments.find(rpl => rpl.id === id)
         setSelectedReply(reply)
         setSpecificCommentModalOpen(true)
     }
 
-    // 두 번째 모달: 신고 내역 모달
+    // 신고 내역 모달 열기
     const openReportModal = () => {
         setCommentReportModalOpen(true)
     }
@@ -54,33 +56,43 @@ export const Reply = () => {
         setSpecificCommentModalOpen(false)
     }
 
+    // 검색 기능 구현
+    const handleSearch = query => {
+        const results = reportedComments.filter(
+            comment =>
+                comment.replyCommenter.includes(query) ||
+                comment.content.includes(query)
+        )
+        setSearchResults(results)
+    }
+
+    // 검색 결과가 있으면 그 결과를, 없으면 전체 리스트를 보여줌
+    const displayComments =
+        searchResults.length > 0 ? searchResults : reportedComments
+
     return (
         <div className={styles.replyContainer}>
             <div className={styles.headerSection}>
-                <h2>Reply</h2>
-            </div>
-            <div className={styles.headerSection}>
                 <div className={styles.searchSection}>
-                    <select>
-                        <option>제목</option>
-                        <option>작성자</option>
-                    </select>
-                    <input type="text" placeholder="검색" />
-                    <button>검색</button>
+                    {/* Search 컴포넌트로 대체 */}
+                    <Search
+                        placeholder="댓글 또는 작성자 검색"
+                        onSearch={handleSearch}
+                    />
                 </div>
             </div>
 
             <div className={styles.replylist}>
                 <div className={styles.replyHeader}>
                     <div className={styles.headerItem}>NO</div>
-                    <div className={styles.headerItem}>제목</div>
+                    <div className={styles.headerItem}>내용</div>
                     <div className={styles.headerItem}>작성자</div>
                     <div className={styles.headerItem}>작성날짜</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                {reportedComments.map((reply, index) => (
+                {displayComments.map((reply, index) => (
                     <div className={styles.replyRow} key={reply.id}>
                         <div className={styles.replyItem}>{index + 1}</div>
                         <div
@@ -157,11 +169,6 @@ export const Reply = () => {
                                 <div>과도한 욕설</div>
                                 <div>2024-09-05</div>
                             </div>
-                            <div className={styles.tableRow}>
-                                <div>서갈</div>
-                                <div>과도한 욕설</div>
-                                <div>2024-09-05</div>
-                            </div>
                         </div>
                         <button className={styles.btn} onClick={closeModals}>
                             닫기
@@ -180,3 +187,5 @@ export const Reply = () => {
         </div>
     )
 }
+
+export default Reply

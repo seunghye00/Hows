@@ -6,7 +6,7 @@ export const SubHeader = () => {
 
     const navi = useNavigate();
 
-    //로컬스토리지에서 activeMenu 값을 가져오거나 없으면 '쇼핑홈' 으로  초기화 
+    //로컬스토리지에서 activeMenu 값을 가져오거나 없으면 '쇼핑홈' 으로  초기화
     const [activeMenu, setActiveMenu] = useState(()=> localStorage.getItem('activeMenu' || '쇼핑홈'));
 
     const handleMenuClick = menuName => {

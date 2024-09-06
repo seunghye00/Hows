@@ -6,10 +6,13 @@ import img4 from '../../../assets/images/interior_4.jpg'
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {addCommas} from "../../../commons/commons";
+import {useOrderStore} from "../../../store/orderStore";
 
 export const Cart = () => {
 
   const navi = useNavigate();
+
+  const { setOrderProducts, setOrderPrice } = useOrderStore();
 
   // 장바구니 목록 원본 데이터
   const [carts, setCarts] = useState([]);
@@ -90,7 +93,25 @@ export const Cart = () => {
       });
     }
 
-    // (전역 상태) 선택된 상품들 결제로 넘기는 로직 필요
+    let dataArr = checkCart.filter(item => {
+       return data.includes(item.cart_seq);
+    });
+
+    let order = [];
+    dataArr.forEach(item => {
+      const dataSet = {
+        product_seq: item.product_seq,
+        product_title: item.products_title,
+        product_image: item.products_thumbnail,
+        product_quantity: item.cart_quantity,
+        product_total_price: item.cart_price,
+      };
+      order.push(dataSet);
+    });
+    setOrderPrice(total.price);
+    setOrderProducts(order);
+    sessionStorage.setItem("howsOrder", JSON.stringify(order));
+
     navi("/payment");
   }
 

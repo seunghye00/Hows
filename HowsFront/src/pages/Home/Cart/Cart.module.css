@@ -22,12 +22,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 85%;
-    max-width: 1300px;
-    height: 80px;
+    width: 80%;
+    max-width: 1240px;
+    height: 100px;
     border-top: 1px solid var(--hows-gray-300);
     border-bottom: 1px solid var(--hows-gray-300);
-    padding: 10px;
+    padding: 20px 10px;
 }
 
 .cartInfo > .leftBox {
@@ -54,18 +54,18 @@
 
 .cartInfo > .rightBox {
     display: flex;
-    gap: 8px;
+    gap: 12px;
 }
 
 .cartInfo > .rightBox > div > p {
     font-size: 16px;
-    margin: 5px 0;
+    margin: 12px 0;
 }
 
 .cartInfo > .rightBox > div > p:nth-child(3) {
     font-size: 20px;
     font-weight: 800;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
 .cartInfo > .rightBox > div {
@@ -158,7 +158,7 @@
 }
 
 .itemForm > .items > .item > .itemPrice {
-    width: 20%;
+    width: 25%;
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -170,6 +170,7 @@
 .itemForm > .items > .item > .itemPrice > p {
     font-size: 18px;
     font-weight: 900;
+    padding: 10px 0;
 }
 
 .itemForm > .items > .item > .itemPrice > button {

@@ -101,6 +101,7 @@ export const Notice = () => {
                         placeholder="제목 또는 작성자 검색"
                         onSearch={handleSearch}
                     />
+                    <Button size="s" title="등록하기" />
                 </div>
             </div>
 
@@ -129,10 +130,9 @@ export const Notice = () => {
                         </div>
                     </div>
                 ))}
-
-                <div className={styles.addNtcSection}>
+                {/* <div className={styles.addNtcSection}>
                     <Button size="s" title="등록하기" />
-                </div>
+                </div> */}
             </div>
 
             <div className={styles.pagination}>

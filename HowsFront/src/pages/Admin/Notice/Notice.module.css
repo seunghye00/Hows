@@ -9,7 +9,7 @@
 /* 검색창! */
 .searchSection {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
 }
 
 .searchSection select,
@@ -25,7 +25,8 @@
 /* 조회 하는 영역 */
 .noticelist {
     font-size: 17px;
-    height: 85%;
+    height: 625px;
+    /* border: 1px solid var(--hows-point-color); */
 }
 
 .noticeHeader {
@@ -93,13 +94,13 @@
 }
 
 /* 등록 버튼 */
-.addNtcSection {
+/* .addNtcSection {
     display: flex;
     justify-content: flex-end;
     position: fixed;
     top: 86%;
     right: 30px;
-}
+} */
 
 /* 페이지네비 */
 .pagination {

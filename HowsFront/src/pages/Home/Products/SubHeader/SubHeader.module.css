@@ -2,6 +2,11 @@
     /* border: 1px solid #000; */
     width: 100%;
     height: 50px;
+
+    max-width: 1300px;
+    padding: 20px 0;
+    width: 100%;
+    margin: 0 auto;
 }
 .menu {
     display: flex; 
@@ -14,4 +19,13 @@
     cursor: pointer;
     padding: 0 10px; 
     line-height: 50px;
+}
+
+/* 현재 클릭된 메뉴 색상 이벤트 */
+.naviMenu:hover {
+    color: var(--hows-point-color);
+}
+
+.naviMenu.active {
+    color: var(--hows-point-color);
 }

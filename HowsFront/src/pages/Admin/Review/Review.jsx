@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import styles from './Review.module.css'
 import test from '../../../assets/images/푸바오.png'
 import { Search } from '../../../components/Search/Search'
+import { Paging } from '../../../components/Pagination/Paging'
+import { Button } from '../../../components/Button/Button'
 
 export const Review = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
@@ -18,6 +20,70 @@ export const Review = () => {
             date: '2024-08-31',
             reportCount: 1,
             text: '이것은 신고당한 리뷰입니다. 매우 불쾌한 리뷰였어요.',
+        },
+        {
+            id: 2,
+            productTitle: '다른 상품!',
+            reviewer: '홍길동',
+            date: '2024-09-01',
+            reportCount: 2,
+            text: '이 리뷰도 신고당했습니다.',
+        },
+        {
+            id: 2,
+            productTitle: '다른 상품!',
+            reviewer: '홍길동',
+            date: '2024-09-01',
+            reportCount: 2,
+            text: '이 리뷰도 신고당했습니다.',
+        },
+        {
+            id: 2,
+            productTitle: '다른 상품!',
+            reviewer: '홍길동',
+            date: '2024-09-01',
+            reportCount: 2,
+            text: '이 리뷰도 신고당했습니다.',
+        },
+        {
+            id: 2,
+            productTitle: '다른 상품!',
+            reviewer: '홍길동',
+            date: '2024-09-01',
+            reportCount: 2,
+            text: '이 리뷰도 신고당했습니다.',
+        },
+        {
+            id: 2,
+            productTitle: '다른 상품!',
+            reviewer: '홍길동',
+            date: '2024-09-01',
+            reportCount: 2,
+            text: '이 리뷰도 신고당했습니다.',
+        },
+        {
+            id: 2,
+            productTitle: '다른 상품!',
+            reviewer: '홍길동',
+            date: '2024-09-01',
+            reportCount: 2,
+            text: '이 리뷰도 신고당했습니다.',
+        },
+        {
+            id: 2,
+            productTitle: '다른 상품!',
+            reviewer: '홍길동',
+            date: '2024-09-01',
+            reportCount: 2,
+            text: '이 리뷰도 신고당했습니다.',
+        },
+        {
+            id: 2,
+            productTitle: '다른 상품!',
+            reviewer: '홍길동',
+            date: '2024-09-01',
+            reportCount: 2,
+            text: '이 리뷰도 신고당했습니다.',
         },
         {
             id: 2,
@@ -117,18 +183,10 @@ export const Review = () => {
                             </span>
                         </div>
                         <div className={styles.reviewItem}>
-                            <button className={styles.deletebtn}>삭제</button>
+                            <Button size="s" title="삭제" />
                         </div>
                     </div>
                 ))}
-            </div>
-
-            <div className={styles.pagination}>
-                <i className="bx bx-chevron-left"></i>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <i className="bx bx-chevron-right"></i>
             </div>
 
             {/* 리뷰 모달창 */}
@@ -140,12 +198,11 @@ export const Review = () => {
                             <img src={test} alt="리뷰 이미지" />
                             <div>{selectedReview.text}</div>
                         </div>
-                        <button
-                            className={styles.btn}
+                        <Button
+                            size="s"
+                            title="닫기"
                             onClick={closeReviewModal}
-                        >
-                            닫기
-                        </button>
+                        />
                     </div>
                 </div>
             )}
@@ -167,15 +224,17 @@ export const Review = () => {
                                 <div>{reportData.date}</div>
                             </div>
                         </div>
-                        <button
-                            className={styles.btn}
+                        <Button
+                            size="s"
+                            title="닫기"
                             onClick={closeReportModal}
-                        >
-                            닫기
-                        </button>
+                        />
                     </div>
                 </div>
             )}
+            <div className={styles.pagination}>
+                <Paging />
+            </div>
         </div>
     )
 }

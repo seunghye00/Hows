@@ -1,5 +1,7 @@
 package com.hows.member.dao;
 
+import java.util.HashMap;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,9 +27,20 @@ public class MemberDAO {
 		return mybatis.selectOne("Member.findById", id);
 	}
 	
-	
 	// 마이페이지 회원정보 출력
 	public MemberDTO selectInfo() {
 		return mybatis.selectOne("Member.selectInfo");
 	}
+	
+	// 비밀번호 변경시 기존 비밀번호 확인
+	public String getPasswordById(HashMap<String, String> map) {
+	    return mybatis.selectOne("Member.getPasswordById", map);
+	}
+
+	// 비밀번호 변경
+	public int updatePw(HashMap<String, String> map) {
+		return mybatis.update("Member.updatePw", map);
+	}
+	
+	
 }

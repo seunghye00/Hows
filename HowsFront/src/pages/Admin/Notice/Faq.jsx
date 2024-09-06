@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { FaChevronDown, FaTimes } from 'react-icons/fa'
 import styles from './Faq.module.css'
+import { Button } from '../../../components/Button/Button'
 
 const Faq = () => {
     const [faqList, setFaqList] = useState([]) // FAQ 리스트
@@ -117,37 +118,33 @@ const Faq = () => {
                                     <div className={styles.faqActionButtons}>
                                         {editIndex === index ? (
                                             <>
-                                                <button
-                                                    className={styles.saveBtn}
+                                                <Button
+                                                    size="s"
+                                                    title="저장"
                                                     onClick={saveEditMode}
-                                                >
-                                                    저장
-                                                </button>
-                                                <button
-                                                    className={styles.cancelBtn}
+                                                />
+                                                <Button
+                                                    size="s"
+                                                    title="취소"
                                                     onClick={cancelEditMode}
-                                                >
-                                                    취소
-                                                </button>
+                                                />
                                             </>
                                         ) : (
                                             <>
-                                                <button
-                                                    className={styles.editBtn}
+                                                <Button
+                                                    size="s"
+                                                    title="수정"
                                                     onClick={() =>
                                                         enterEditMode(index)
                                                     }
-                                                >
-                                                    수정
-                                                </button>
-                                                <button
-                                                    className={styles.deleteBtn}
+                                                />
+                                                <Button
+                                                    size="s"
+                                                    title="삭제"
                                                     onClick={() =>
                                                         deleteFaqItem(index)
                                                     }
-                                                >
-                                                    삭제
-                                                </button>
+                                                />
                                             </>
                                         )}
                                     </div>
@@ -161,23 +158,15 @@ const Faq = () => {
             <div className={styles.addfaqSection}>
                 {isAdd ? (
                     <>
-                        <button
-                            className={styles.saveBtn}
+                        <Button
+                            size="s"
+                            title="등록"
                             onClick={handleRegister}
-                        >
-                            등록
-                        </button>
-                        <button
-                            className={styles.cancelBtn}
-                            onClick={handleCancel}
-                        >
-                            취소
-                        </button>
+                        />
+                        <Button size="s" title="취소" onClick={handleCancel} />
                     </>
                 ) : (
-                    <button className={styles.addfaq} onClick={addFaqItem}>
-                        추가
-                    </button>
+                    <Button size="s" title="추가" onClick={addFaqItem} />
                 )}
             </div>
         </div>

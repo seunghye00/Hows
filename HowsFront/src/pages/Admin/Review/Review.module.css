@@ -1,6 +1,6 @@
 .reviewContainer {
     flex: 9 1;
-    border: 1px solid black;
+
 }
 
 .headerSection {
@@ -26,8 +26,7 @@
 /* 조회 하는 영역 */
 .reviewlist {
     font-size: 17px;
-    max-height: 520px;
-    height: 100%;
+    height: 85%;
 }
 
 .reviewHeader {
@@ -36,8 +35,10 @@
     padding: 10px;
     font-weight: bold;
     border: 1px solid #ddd;
-    color: white;
-    height: 25px;
+    color: var(--hows-white);
+    height: 35px;
+    justify-content: center;
+    align-items: center;
 }
 
 .headerItem {
@@ -50,9 +51,9 @@
     align-items: center;
     padding: 10px;
     border: 1px solid #ddd;
-    background-color: #f9f9f9;
+    background-color: var(--hows-gray);
     /* cursor: pointer; */
-    height: 25px;
+    height: 35px;
 }
 
 .reviewItem {
@@ -66,7 +67,7 @@
 .deletebtn {
     padding: 10px 20px;
     background-color: #555;
-    color: white;
+    color: var(--hows-white);
     border: none;
     cursor: pointer;
     border-radius: 5px;
@@ -88,8 +89,8 @@
     justify-content: center;
     align-items: center;
     position: fixed;
-    top: 93%;
-    left: 55%;
+    top: 85%;
+    left: 53%;
 }
 
 .pagination button {
@@ -120,12 +121,12 @@
 }
 
 .modalContent {
-    background-color: white;
+    background-color: var(--hows-white);
     padding: 20px;
     border-radius: 10px;
     width: 25%;
     text-align: center;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--hows-point-color);
 }
 
 .modalContent h3 {
@@ -136,7 +137,8 @@
     display: table;
     width: 100%;
     margin-bottom: 15px;
-    table-layout: fixed; /* 각 셀의 너비를 고정 */
+    table-layout: fixed;
+    border: 2px solid var(--hows-point-color);
 }
 
 .tableHeader, .tableRow {
@@ -153,17 +155,13 @@
 .tableHeader {
     font-weight: bold;
     background-color: #555;
-    color: white;
-}
-
-.tableRow div {
-    background-color: #f9f9f9;
+    color: var(--hows-white);
 }
 
 .reportcount {
     cursor: pointer;
-    background-color: black;
-    color: white;
+    background-color: var(--hows-red-dark);
+    color: var(--hows-white);
     width: 30px;
     height: 30px;
     display: flex;
@@ -174,7 +172,7 @@
 
 .btn {
     background-color: #555;
-    color: white;
+    color: var(--hows-white);
     cursor: pointer;
     border-radius: 5px;
     width: 70px;

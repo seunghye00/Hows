@@ -1,13 +1,24 @@
 .container {
-    height: 100%;
+    flex: 9;
     border: 1px solid black;
     border-radius: 15px;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+.btns {
+    position: absolute;
+    display: flex;
+    gap: 10px;
+    right: 30px;
+    top: 82px;
 }
 
 .header {
     border-bottom: 1px solid black;
-    height: 10%;
     display: flex;
+    flex: 0.5;
 }
 
 .header .cols:last-child {
@@ -15,28 +26,26 @@
 }
 
 .list {
-    height: 90%;
+    flex: 9.5;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    max-height: 675px;
 }
 
 .rows {
     flex: 1;
     border-bottom: 1px solid black;
-    min-height: 155px;
+    max-height: 125px;
+    min-height: 125px;
     display: flex;
-}
-
-.rows:last-child {
-    border-bottom: unset;
 }
 
 .cols {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 16px;
 }
 
 .cols:first-child {
@@ -52,9 +61,48 @@
 }
 
 .cols:nth-child(3) img {
-    width: 700px;
+    width: 60%;
 }
 
 .cols:last-child {
     flex: 2;
+}
+
+.modalTitle h2 {
+    text-align: center;
+}
+
+.imgLabel {
+    height: 100px;
+    border: 1px solid black;
+    margin: 10px 0;
+}
+
+.imgLabel label {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.imgLabel label i {
+    font-size: 40px;
+}
+
+.fileInput {
+    display: none;
+}
+
+.preview {
+    width: 100%;
+    height: 100%;
+}
+
+.modalBtns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 }

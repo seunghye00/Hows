@@ -1,19 +1,17 @@
 .container {
+    /* border: 1px solid #000; */
     width: 100%;
     height: 50px;
-    border: 1px solid #000;
 }
-
 .menu {
     display: flex; 
     height: 100%;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 20px;
 }
-
 .menu > li {
     cursor: pointer;
-    line-height: 50px; 
-    font-size: 20px; 
-    font-weight: bold; 
-    letter-spacing: 1px;
     padding: 0 10px; 
+    line-height: 50px;
 }

@@ -4,10 +4,10 @@
 
 .container {
   width: 100%;
-  /* background-color: darksalmon; */
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* background-color: darksalmon; */
 }
 .container .bannerImg {
   /* flex: 1; */
@@ -26,21 +26,23 @@
 .container .mainBox {
   flex: 10;
   width: 100%;
-  max-width: 1300px;
+  max-width: 1000px;
   height: auto;
   display: flex;
   flex-direction: column;
 }
 .container .mainBox .header {
   /* flex: 4; */
-  height: 270px;
+  height: 200px;
   display: flex;
   margin-bottom: 80px;
   /* background-color: aliceblue; */
 }
 .container .mainBox .header .profile {
-  flex: 1;
-  padding: 0px 70px;
+  /* flex: 1; */
+  height: 200px;
+  width: 200px;
+  margin-right: 50px;
 }
 .container .mainBox .header .profile > img {
   width: 100%;
@@ -58,13 +60,13 @@
   flex: 2;
   display: flex;
   align-items: center;
-  padding-right: 50px;
+  padding-right: 20px;
 }
 .container .mainBox .header .userInfo .top .nickname {
   flex: 5;
-  font-size: 60px;
+  font-size: 50px;
   font-weight: 600;
-  padding-top: 40px;
+  padding-top: 20px;
 }
 .container .mainBox .header .userInfo .top .linkBtns {
   flex: 2.5;
@@ -87,21 +89,19 @@
   flex: 1.3;
   display: flex;
   align-items: center;
-  padding-right: 420px;
-  /* font-size: 25px; */
+  padding-right: 290px;
 }
 .container .mainBox .header .userInfo .middle .id {
   font-size: 20px;
   margin-right: 50px;
 }
 .container .mainBox .header .userInfo .middle > div {
-  margin-right: 10px;
+  margin-right: 5px;
   flex: 1;
 }
 .container .mainBox .header .userInfo .middle > div > span {
-  font-size: 25px;
+  font-size: 24px;
 }
-
 .container .mainBox .header .userInfo .middle .followText {
   margin-right: 8px;
 }
@@ -114,28 +114,28 @@
   flex: 1.5;
 }
 .container .mainBox .header .userInfo .bottom .followBtn {
-  width: 180px;
-  height: 60px;
-  font-size: 22px;
+  width: 150px;
+  height: 55px;
+  font-size: 24px;
   font-weight: 600;
   border-radius: 10px;
   border: none;
   background-color: var(--hows-point-color);
   color: var(--hows-white);
   transition-duration: 0.3s;
-  margin: 15px 0 0 5px;
+  margin: 10px 0 0 5px;
 }
 .container .mainBox .header .userInfo .bottom .followBtn:hover {
   background-color: var(--hows-point-color-dark);
 }
 
+/* 하단 게시물 부분 */
 .container .mainBox .menus {
   /* flex: 1; */
   height: 70px;
   display: flex;
   padding: 10px 120px;
   border-top: 1px solid var(--hows-gray-200);
-
   /* background-color: burlywood; */
 }
 .container .mainBox .menus .menu {
@@ -149,36 +149,18 @@
 }
 .container .mainBox .menus .menu > div > i {
   margin-right: 13px;
-  font-size: 25px;
+  font-size: 24px;
 }
 .container .mainBox .menus .menu > div > span {
-  font-size: 23px;
+  font-size: 24px;
   font-weight: 600;
-  margin-bottom: 3px;
   cursor: pointer;
 }
+/* =========================== */
+
 .container .mainBox .body {
   flex: 6;
   display: flex;
   flex-direction: column;
   height: auto;
-  /* background-color: cornflowerblue; */
-}
-.container .mainBox .body .row {
-  height: 430px;
-  display: flex;
-  /* background-color: cornflowerblue; */
-}
-.container .mainBox .body .row .feed {
-  flex: 1;
-  height: 100%;
-  width: 430px;
-  padding: 3px;
-  box-sizing: border-box;
-}
-.container .mainBox .body .row .feed > img {
-  width: 100%;
-  height: 100%;
-  border-radius: 5px;
-  object-fit: cover;
 }

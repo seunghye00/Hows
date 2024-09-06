@@ -1,0 +1,83 @@
+/* div {
+  border: 1px solid black;
+} */
+
+.container {
+  /* background-color: aliceblue; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 80px 0;
+}
+
+.container .updateInfo {
+  display: flex;
+  flex-direction: column;
+  width: 500px;
+}
+.container .updateInfo .profileBox {
+  width: 100%;
+  margin-bottom: 35px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.container .updateInfo .profileBox .img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  width: 150px;
+  border: 2px solid var(--hows-point-color-darker);
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: var(--hows-gray-100); /* 이미지 로드 전 배경색 */
+  margin-bottom: 15px;
+}
+.container .updateInfo .profileBox .img > img {
+  width: 100%;
+  height: 100%;
+}
+
+.container .updateInfo .profileBox .profileBtns {
+  display: flex;
+  justify-content: center;
+}
+.container .updateInfo .profileBox .profileBtns > button {
+  border: none;
+  background: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  margin: 0 10px;
+  color: var(--hows-point-color-darker);
+}
+
+.container .updateInfo .idBox,
+.nameBox {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 25px;
+}
+.container .updateInfo .title {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-left: 3px;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.container .updateInfo input {
+  height: 25px;
+  border: 1px solid var(--hows-gray-200);
+  border-radius: 4px;
+  font-size: 14px;
+  padding: 10px;
+  margin-top: 8px;
+}
+.container .updateInfo input:focus {
+  /* 테두리 색상 */
+  outline: 1px solid var(--hows-gray-200);
+}

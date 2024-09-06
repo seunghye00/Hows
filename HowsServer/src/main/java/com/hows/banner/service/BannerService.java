@@ -23,4 +23,9 @@ public class BannerService {
 		List<Banner> list = bannRepo.findAll();
 		return bannMap.toDTOList(list);
 	}
+
+	public void insert(BannerDTO dto) {
+		Banner banner = bannMap.toEntity(dto);
+		bannRepo.save(banner);
+	}
 }

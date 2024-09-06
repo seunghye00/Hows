@@ -119,9 +119,9 @@ export const Banner = () => {
     }
 
     // 개별 체크박스 변경 핸들러
-    const handleCheckboxChange = banner_seq => {
+    const handleCheckboxChange = banner_sysname => {
         const updatedBanners = banners.map(banner =>
-            banner.banner_seq === banner_seq
+            banner.banner_sysname === banner_sysname
                 ? { ...banner, checked: !banner.checked }
                 : banner
         )
@@ -157,7 +157,9 @@ export const Banner = () => {
         }).then(result => {
             if (result.isConfirmed) {
                 // 배너 삭제 요청
-                deleteBanners(selectedBanners.map(banner => banner.banner_seq))
+                deleteBanners(
+                    selectedBanners.map(banner => banner.banner_sysname)
+                )
                     .then(() => {
                         Swal.fire({
                             title: '삭제 완료',
@@ -213,7 +215,9 @@ export const Banner = () => {
                                     type="checkbox"
                                     checked={banner.checked || false}
                                     onChange={() =>
-                                        handleCheckboxChange(banner.banner_seq)
+                                        handleCheckboxChange(
+                                            banner.banner_sysname
+                                        )
                                     }
                                 />
                             </div>

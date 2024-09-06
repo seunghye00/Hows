@@ -28,9 +28,6 @@ public class BannerController {
 
 	@Autowired
 	private BannerService bannServ;
-	
-    @Autowired
-    private Storage storage;
 
 	@GetMapping
 	public ResponseEntity<List<BannerDTO>> getAllBanners() throws Exception {
@@ -40,35 +37,20 @@ public class BannerController {
 
 	@PostMapping
 	public ResponseEntity<String> addBanner(MultipartFile file) throws Exception {
-		
-		try {
-			String bucketName = "sion-attachment";
-			String sysName = UUID.randomUUID().toString();
-			String contentType = file.getContentType();
-
-			// 업로드 하기 위한 정보 객체 생성
-			BlobId bolbId = BlobId.of(bucketName, sysName);
-			BlobInfo blobInfo = BlobInfo.newBuilder(bolbId).setContentType(contentType).build();
-			// 실제 GCS에 업로드 하는 코드
-			Blob blob = storage.create(blobInfo, file.getBytes());
-			if (blob == null) {
-				return ResponseEntity.badRequest().body("GCS 오류");
-			}
-				String result = "https://storage.google.com/" + bucketName + "/" + sysName;
-				bannServ.insert(new BannerDTO(0L, result, null, null, 0));
-
+		if (bannServ.addBanner(file)) {
 			return ResponseEntity.ok("success");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().body("Failed to upload");
 		}
+		return ResponseEntity.badRequest().body("fail");
+
 	}
-	
+
 	@DeleteMapping
-	public ResponseEntity<String> deleteBanner(@RequestParam String seqs) throws Exception {
-		String[] bannerSeqs = seqs.split(","); // seqs를 배열로 변환
-	    System.out.println(Arrays.toString(bannerSeqs));
-	    return ResponseEntity.ok("success");
+	public ResponseEntity<String> deleteBanner(@RequestParam String sysNames) throws Exception {
+		String[] bannerNames = sysNames.split(","); // seqs를 배열로 변환
+		if(bannServ.deleteBanner(bannerNames)) {
+			return ResponseEntity.ok("success");
+		}
+		return ResponseEntity.badRequest().body("fail");
 	}
 
 	@ExceptionHandler(Exception.class)

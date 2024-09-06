@@ -16,9 +16,9 @@ export const Admin = () => {
     return (
         <div className={styles.container}>
             <Routes>
-                <Route path="/" element={<Main />} />
+                <Route path="/admin" element={<Main />} />
                 <Route
-                    path="/banner"
+                    path="/admin/banner"
                     element={
                         <>
                             <Title title={'배너 관리'} />
@@ -26,7 +26,7 @@ export const Admin = () => {
                         </>
                     }
                 />
-                <Route path="/product/*" element={<Product />} />
+                <Route path="/admin/product/*" element={<Product />} />
                 <Route path="/member" element={<Member />} />
                 <Route path="/blacklist" element={<Blacklist />} />
                 <Route path="/board" element={<Board />} />

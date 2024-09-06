@@ -5,6 +5,7 @@ import img1 from '../../../../../assets/images/꼬래.png'
 import img2 from '../../../../../assets/images/마이페이지_프로필사진.jpg'
 import img3 from '../../../../../assets/images/kappa.png'
 import { Button } from '../../../../../components/Button/Button'
+import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination } from 'swiper/modules'
 import 'swiper/css'
@@ -250,6 +251,7 @@ export const Content = () => {
                     </div>
                 ))}
             </InfiniteScroll>
+            <ScrollTop />
         </div>
     )
 }

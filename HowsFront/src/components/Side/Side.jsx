@@ -32,8 +32,8 @@ export const Side = () => {
                     title: '회원 관리',
                     icon: 'bx bx-group', // 아이콘 추가
                     subMenu: [
-                        { title: '회원 조회', path: '/member' },
-                        { title: '블랙리스트 조회', path: '/blacklist' },
+                        { title: '회원 목록', path: '/member' },
+                        { title: '블랙리스트 목록', path: '/blacklist' },
                     ],
                 },
                 // {
@@ -54,7 +54,10 @@ export const Side = () => {
                 {
                     title: '댓글 관리',
                     icon: 'bx bx-message-rounded-dots', // 아이콘 추가
-                    subMenu: [{ title: '신고 댓글 목록', path: 'comment' }],
+                    subMenu: [
+                        { title: '신고 댓글 목록', path: 'comment' },
+                        { title: '신고 대댓글 목록', path: 'reply' },
+                    ],
                 },
                 {
                     title: '리뷰 관리',

@@ -1,4 +1,4 @@
-.reviewContainer {
+.replyContainer {
     flex: 9 1;
     border: 1px solid black;
 }
@@ -24,13 +24,13 @@
 }
 
 /* 조회 하는 영역 */
-.reviewlist {
+.replylist {
     font-size: 17px;
     max-height: 520px;
     height: 100%;
 }
 
-.reviewHeader {
+.replyHeader {
     display: flex;
     background-color: #555;
     padding: 10px;
@@ -45,7 +45,7 @@
     text-align: center;
 }
 
-.reviewRow {
+.replyRow {
     display: flex;
     align-items: center;
     padding: 10px;
@@ -55,7 +55,7 @@
     height: 25px;
 }
 
-.reviewItem {
+.replyItem {
     flex: 1;
     text-align: center;
     display: flex;
@@ -106,7 +106,7 @@
 }
 
 /* 신고 모달창 */
-.reportModal, .reviewModal {
+.reportModal {
     position: fixed;
     top: 0;
     left: 0;
@@ -182,22 +182,27 @@
     font-weight: bold;
 }
 
-.reviewDetail {
+.replortcmt {
+    width: 100%;
     display: flex;
-    align-items: center;
-    gap: 20px;
+    justify-content: center;
+    margin-bottom: 10px;
 }
 
-.reviewDetail img {
-    width: 150px;
-    height: 150px;
-    border: 1px solid #ddd;
-}
-
-.reviewDetail div {
-    flex: 1;
-    text-align: left;
+.replortcmt textarea {
+    width: 80%;
+    min-height: 150px;
+    padding: 10px;
     font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    resize: none;
+}
+
+.chevronIcon{
+    font-size: 25px;
 }
 
 

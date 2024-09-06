@@ -1,0 +1,28 @@
+.scrollToTop {
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    z-index: 1000;
+}
+
+.scrollBtn {
+    background-color: var(--hows-point-color-light);
+    /* 버튼 배경 색상 */
+    border: none;
+    border-radius: 50%;
+    color: white;
+    padding: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+}
+
+.scrollBtn:hover {
+    background-color: var(--hows-point-color);
+    /* 마우스 올렸을 때 색상 */
+}
+
+.scrollBtn:focus {
+    outline: none;
+    /* 클릭 시 outline 제거 */
+}

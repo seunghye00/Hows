@@ -26,8 +26,6 @@ export const SignIn = () => {
   }
 
   const handleLoginBtn = () => {
-
-
     axios.post(`${host}/auth`, user).then(resp => {
       const token = resp.data;
       sessionStorage.setItem("token", token);

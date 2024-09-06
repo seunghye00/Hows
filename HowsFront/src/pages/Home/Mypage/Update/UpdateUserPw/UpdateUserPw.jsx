@@ -1,3 +1,4 @@
+import { updatePw } from "../../../../../api/member";
 import { api } from "../../../../../config/config";
 import styles from "./UpdateUserPw.module.css"
 import { useState } from 'react';
@@ -73,7 +74,7 @@ export const UpdateUserPw = () => {
     };
 
     // 비밀번호 변경 처리
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
 
         // 유효성 검사, 비밀번호 일치 확인
@@ -88,7 +89,7 @@ export const UpdateUserPw = () => {
         }
 
         // 서버로 새 비밀번호 전송
-        api.put(`/member/updatePw`, { pw: newPw }).then(resp => {
+        updatePw(newPw).then(resp => {
             if (resp.data > 0) {
                 alert('비밀번호가 성공적으로 변경되었습니다.');
                 navi("/mypage/main");

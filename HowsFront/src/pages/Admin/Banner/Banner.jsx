@@ -264,15 +264,15 @@ export const Banner = () => {
                     </label>
                 </div>
                 <div className={styles.selectInfo}>
-                    <div className={styles.selectDate}>
+                    <div className={styles.choiceDate}>
                         <div>시작일</div>
                         <input type="datetime-local" name="" id="" />
                     </div>
-                    <div className={styles.selectDate}>
+                    <div className={styles.choiceDate}>
                         <div>종료일</div>
                         <input type="datetime-local" name="" id="" />
                     </div>
-                    <div className={styles.selectOrder}>
+                    <div className={styles.choiceOrder}>
                         <div>순서</div>
                         <input
                             type="number"

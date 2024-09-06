@@ -1,17 +1,32 @@
 import styles from './Payment.module.css'
-import img1 from "../../../assets/images/interior_1.jpg";
 import Postcode from "react-daum-postcode";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
+import {useOrderStore} from "../../../store/orderStore";
+import {addCommas} from "../../../commons/commons";
 
 export const Payment = () => {
 
+  const { orderPrice, orderProducts, setOrderProducts } = useOrderStore();
+
+  // Daum PostCode
   const [postcode, setPostcode] = useState(false);
 
   /** postcode data set **/
   const completeHandler = (data) => {
     console.log("data ==== ", data);
   }
-  
+
+  /** 새로고침 시 세션에서 order list 가져옴 **/
+  useEffect(() => {
+    if(orderProducts.length <= 0){
+      const data = sessionStorage.getItem("howsOrder");
+      if(data !== null){
+        const order = JSON.parse(data);
+        setOrderProducts(order);
+      }
+    }
+  }, []);
+
   return (
     <div className={styles.container}>
       <div className={styles.title}>
@@ -22,59 +37,25 @@ export const Payment = () => {
       </div>
       <div className={styles.orderInfo}>
         <div className={styles.items}>
-
-          <div className={styles.item}>
-            <div className={styles.itemImage}>
-              <img src={img1} alt="상품이미지"/>
-            </div>
-            <div className={styles.itemInfo}>
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit....</p>
-              <div className={styles.itemCount}>
-                <span>수량 : 1</span>
-                <span>76,000원</span>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.item}>
-            <div className={styles.itemImage}>
-              <img src={img1} alt="상품이미지"/>
-            </div>
-            <div className={styles.itemInfo}>
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit....</p>
-              <div className={styles.itemCount}>
-                <span>수량 : 1</span>
-                <span>76,000원</span>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.item}>
-            <div className={styles.itemImage}>
-              <img src={img1} alt="상품이미지"/>
-            </div>
-            <div className={styles.itemInfo}>
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit....</p>
-              <div className={styles.itemCount}>
-                <span>수량 : 1</span>
-                <span>76,000원</span>
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.item}>
-            <div className={styles.itemImage}>
-              <img src={img1} alt="상품이미지"/>
-            </div>
-            <div className={styles.itemInfo}>
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit....</p>
-              <div className={styles.itemCount}>
-                <span>수량 : 1</span>
-                <span>76,000원</span>
-              </div>
-            </div>
-          </div>
-
+          {
+            orderProducts.length > 0 &&
+            orderProducts.map(item => {
+              return (
+                <div className={styles.item}>
+                  <div className={styles.itemImage}>
+                    <img src={item.product_image} alt="상품이미지"/>
+                  </div>
+                  <div className={styles.itemInfo}>
+                    <p>{item.product_title}</p>
+                    <div className={styles.itemCount}>
+                      <span>수량 : {item.product_quantity}</span>
+                      <span>{addCommas(item.product_total_price)}원</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          }
         </div>
         <div className={styles.shipping}>
           <div className={styles.addressCheck}>

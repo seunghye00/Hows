@@ -9,7 +9,7 @@ export const UpdateUserPw = () => {
     const [currentPw, setCurrentPw] = useState('');
     const [newPw, setNewPw] = useState('');
     const [newPw2, setNewPw2] = useState('');
-    const [isPasswordValid, setIsPasswordValid] = useState(true);
+    const [isPasswordValid, setIsPasswordValid] = useState(null);
     const [checkResult, setCheckResult] = useState(true);
     const [isCurrentPwValid, setIsCurrentPwValid] = useState(null); // 현재 비밀번호 확인 결과
     const [showNewPwFields, setShowNewPwFields] = useState(false); // 새 비밀번호 입력 필드 표시 여부
@@ -31,7 +31,7 @@ export const UpdateUserPw = () => {
         setCurrentPw(e.target.value);
     };
 
-    // 비밀번호 존재 여부 확인
+    // 현재 비밀번호 확인
     const handleIsCurrentPw = () => {
         api.post(`/member/checkPw`, { pw: currentPw }).then(resp => {
             // 비밀번호가 일치하면 true, 그렇지 않으면 false로 상태 업데이트
@@ -67,13 +67,10 @@ export const UpdateUserPw = () => {
             if (newPw2 === "") return ""; // 기본 CSS 적용
             return newPw === newPw2 ? "var(--hows-blue-dark)" : "var(--hows-red-dark)";
         } else if (type === "currentPw") {
+            // if (currentPw === "") return ""; // 기본 CSS 적용
             return currentPwValid === null ? "" : currentPwValid ? "var(--hows-blue-dark)" : "var(--hows-red-dark)";
         }
     };
-
-
-
-
 
     // 비밀번호 변경 처리
     const handleSubmit = async (e) => {
@@ -81,7 +78,10 @@ export const UpdateUserPw = () => {
 
         // 유효성 검사, 비밀번호 일치 확인
         if (!isCurrentPwValid) return;
-        if (!checkResult) return;
+        if (!checkResult) {
+            alert('새 비밀번호와 일치하지 않습니다.')
+            return;
+        }
         if (!isPasswordValid) {
             alert('비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.');
             return;
@@ -130,10 +130,10 @@ export const UpdateUserPw = () => {
                             <div>
                                 <span className={styles.title}>새 비밀번호</span>
                                 <div className={styles.status}>
-                                    {isPasswordValid ? (
-                                        <i className='bx bx-check' style={{ color: "var(--hows-blue-dark)" }}></i>
+                                    {newPw === "" ? null : isPasswordValid ? (
+                                        <i className='bx bx-check'></i>
                                     ) : (
-                                        <span className={styles.discord} style={{ color: "var(--hows-red-dark)" }}>X</span>
+                                        <span className={styles.discord}>X</span>
                                     )}
                                 </div>
                             </div>
@@ -150,10 +150,10 @@ export const UpdateUserPw = () => {
                             <div>
                                 <span className={styles.title}>새 비밀번호 확인</span>
                                 <div className={styles.status}>
-                                    {newPw === newPw2 ? (
-                                        <i className='bx bx-check' style={{ color: "var(--hows-blue-dark)" }}></i>
+                                    {newPw2 === "" ? null : newPw === newPw2 ? (
+                                        <i className='bx bx-check'></i>
                                     ) : (
-                                        <span className={styles.discord} style={{ color: "var(--hows-red-dark)" }}>X</span>
+                                        <span className={styles.discord}>X</span>
                                     )}
                                 </div>
                             </div>

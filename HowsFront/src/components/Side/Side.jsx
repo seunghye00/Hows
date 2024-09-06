@@ -80,7 +80,16 @@ export const Side = () => {
                 {
                     title: '목록 관리',
                     icon: 'bx bx-list-ul', // 아이콘 추가
-                    path: '/admin/product/list', // 경로 추가
+                    subMenu: [
+                        {
+                            title: '상품 목록 조회',
+                            path: '/admin/product/viewList',
+                        },
+                        {
+                            title: '상품 정보 수정',
+                            path: '/admin/product/modifyList',
+                        },
+                    ],
                 },
                 {
                     title: '주문 관리',
@@ -95,13 +104,7 @@ export const Side = () => {
                 {
                     title: '반품 관리',
                     icon: 'bx bx-undo', // 아이콘 추가
-                    subMenu: [
-                        {
-                            title: '반품 목록 조회',
-                            path: '/admin/product/return',
-                        },
-                        { title: '반품 처리', path: '/admin/product/return' },
-                    ],
+                    path: '/admin/product/return', // 경로 추가
                 },
             ],
         },

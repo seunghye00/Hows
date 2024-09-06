@@ -51,7 +51,6 @@
     align-items: center;
     padding: 10px;
     border: 1px solid #ddd;
-    background-color: var(--hows-gray);
     /* cursor: pointer; */
     height: 35px;
 }
@@ -80,29 +79,6 @@
 }
 
 .span{
-    cursor: pointer;
-}
-
-/* 페이지네비 */
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: fixed;
-    top: 85%;
-    left: 53%;
-}
-
-.pagination button {
-    padding: 5px 10px;
-    margin: 0 5px;
-    cursor: pointer;
-}
-
-.pagination i {
-    display: flex;
-    align-items: center;
-    font-size: 20px;
     cursor: pointer;
 }
 
@@ -198,6 +174,28 @@
     font-size: 16px;
 }
 
+/* 페이지네비 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 85%;
+    left: 53%;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.pagination i {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+}
 
 
 

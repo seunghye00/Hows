@@ -41,7 +41,6 @@ public class BannerController {
 			return ResponseEntity.ok("success");
 		}
 		return ResponseEntity.badRequest().body("fail");
-
 	}
 
 	@DeleteMapping

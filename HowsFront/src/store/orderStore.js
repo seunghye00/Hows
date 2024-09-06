@@ -1,7 +1,6 @@
 import { create } from "zustand";
 
 export const useOrderStore = create((set) => ({
-
   orderProductsDefault: {
     product_seq: 0,
     product_title: "",
@@ -9,6 +8,7 @@ export const useOrderStore = create((set) => ({
     product_quantity: 0,
     product_total_price: 0,
   },
+
   orderProducts: [],
   setOrderProducts : data => set({ orderProducts : data }),
 

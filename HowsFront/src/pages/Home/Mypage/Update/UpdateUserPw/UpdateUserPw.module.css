@@ -30,6 +30,25 @@
   margin-bottom: 0px;
 }
 
+/* 비밀번호 일치, 불일치 확인 */
+.container .updatePw .currentPw > div,
+.newPw > div,
+.newPw2 > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.container .updatePw .status > i {
+  color: var(--hows-blue-dark);
+  font-size: 30px;
+}
+.container .updatePw .status .discord {
+  color: var(--hows-red-dark);
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* title */
 .container .updatePw .title {
   display: flex;
   justify-content: flex-start;

@@ -12,9 +12,8 @@
 .container .bannerImg {
   /* flex: 1; */
   width: 100%;
-  max-width: 1300px;
-  height: 230px;
-  margin-bottom: 60px;
+  height: 260px;
+  margin-bottom: 70px;
   cursor: pointer;
 }
 

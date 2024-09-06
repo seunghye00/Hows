@@ -1,0 +1,59 @@
+/* 검색창! */
+.searchSection {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.searchSection select,
+.searchSection input {
+  padding: 5px;
+  margin-right: 5px;
+}
+
+.searchSection button {
+  padding: 5px 10px;
+}
+
+/* 조회 하는 영역 */
+.boardlist {
+  font-size: 17px;
+  height: 85%;
+}
+
+.boardHeader {
+  display: flex;
+  background-color: var(--hows-point-color-dark);
+  padding: 10px;
+  font-weight: bold;
+  border: 1px solid var(--hows-gray-100);
+  color: var(--hows-white);
+  height: 35px;
+  justify-content: center;
+  align-items: center;
+}
+
+.headerItem {
+  flex: 1;
+  text-align: center;
+}
+
+.boardRow {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--hows-gray-100);
+  /* cursor: pointer; */
+  height: 35px;
+}
+
+.boardItem {
+  flex: 1;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.span {
+  cursor: pointer;
+}

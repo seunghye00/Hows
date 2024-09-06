@@ -2,13 +2,16 @@ import React, { useState, useEffect } from 'react'
 import styles from './Header.module.css'
 import logo from '../../assets/images/logo_how.png'
 import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from './../../store/store';
+import profile from "../../assets/images/마이페이지_프로필사진.jpg"
 
 export const Header = () => {
     const navigate = useNavigate()
     const [activeMenu, setActiveMenu] = useState('HowShop')
     const [activeSubMenu, setActiveSubMenu] = useState('홈')
     const [isFixed, setIsFixed] = useState(false)
-    const [session, setSession] = useState(false)
+    // const [session, setSession] = useState(false)
+    const { isAuth } = useAuthStore()
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
@@ -106,20 +109,24 @@ export const Header = () => {
                             </div>
                             <div
                                 className={
-                                    session
+                                    // session
+                                    isAuth
                                         ? `${styles.infoUser}`
                                         : `${styles.infoIcon}`
                                 }
                             >
-                                {session ? (
-                                    <a>
-                                        <img src="" alt="User" />
-                                    </a>
-                                ) : (
-                                    <a onClick={() => navigate('/signIn')}>
-                                        <i className="bx bxs-user-circle"></i>
-                                    </a>
-                                )}
+                                {
+                                    // session
+                                    isAuth
+                                        ? (
+                                            <a>
+                                                <img src={profile} alt="User" onClick={() => navigate("/mypage")} />
+                                            </a>
+                                        ) : (
+                                            <a onClick={() => navigate('/signIn')}>
+                                                <i className="bx bxs-user-circle"></i>
+                                            </a>
+                                        )}
                             </div>
                         </div>
                     </div>

@@ -15,6 +15,7 @@
   max-width: 1300px;
   height: 230px;
   margin-bottom: 60px;
+  cursor: pointer;
 }
 
 .bannerImg img {

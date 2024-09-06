@@ -5,6 +5,7 @@ import img3 from '../../../assets/images/interior_3.jpg'
 import img4 from '../../../assets/images/interior_4.jpg'
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
+import {addCommas} from "../../../commons/commons";
 
 export const Cart = () => {
 
@@ -40,11 +41,6 @@ export const Cart = () => {
     return price >= 50000 ? 0 :3000;
   }
 
-  /** 금액에 (,)를 추가하는 함수 **/
-  const addCommas = (price) => {
-    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  }
-  
   /** 상품 체크 **/
   const handleCheck = (e) => {
     const {name, checked} = e.target;

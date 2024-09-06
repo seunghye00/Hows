@@ -1,12 +1,16 @@
 .contentWrap {
     display: flex;
-    gap: 25px;
-    flex-wrap: wrap;
 }
 
 .contentCont {
-    max-width: 300px;
-    width: 100%;
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin: 25px 0;
+}
+
+.contentCon {
+    width: calc((100% / 4) - 25px);
     display: flex;
     flex-direction: column;
     gap: 15px;

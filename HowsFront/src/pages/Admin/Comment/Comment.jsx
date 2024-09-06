@@ -1,11 +1,13 @@
 import React, { useState } from 'react'
 import styles from './Comment.module.css'
+import { Search } from '../../../components/Search/Search'
 
 export const Comment = () => {
     const [commentReportModalOpen, setCommentReportModalOpen] = useState(false)
     const [specificCommentModalOpen, setSpecificCommentModalOpen] =
         useState(false)
     const [selectedComment, setSelectedComment] = useState(null)
+    const [searchResults, setSearchResults] = useState([])
 
     // 신고당한 댓글 임시 데이터
     const reportedComments = [
@@ -47,19 +49,29 @@ export const Comment = () => {
         setSpecificCommentModalOpen(false)
     }
 
+    // 검색 기능 구현
+    const handleSearch = query => {
+        const results = reportedComments.filter(
+            comment =>
+                comment.boardTitle.includes(query) ||
+                comment.commenter.includes(query)
+        )
+        setSearchResults(results)
+    }
+
+    // 검색 결과가 있으면 그 결과를, 없으면 전체 리스트를 보여줌
+    const displayComments =
+        searchResults.length > 0 ? searchResults : reportedComments
+
     return (
         <div className={styles.commentContainer}>
             <div className={styles.headerSection}>
-                <h2>Comment</h2>
-            </div>
-            <div className={styles.headerSection}>
                 <div className={styles.searchSection}>
-                    <select>
-                        <option>제목</option>
-                        <option>작성자</option>
-                    </select>
-                    <input type="text" placeholder="검색" />
-                    <button>검색</button>
+                    {/* 기존 검색 UI를 Search 컴포넌트로 대체 */}
+                    <Search
+                        placeholder="제목 또는 작성자 검색"
+                        onSearch={handleSearch}
+                    />
                 </div>
             </div>
 
@@ -67,35 +79,43 @@ export const Comment = () => {
                 <div className={styles.commentHeader}>
                     <div className={styles.headerItem}>NO</div>
                     <div className={styles.headerItem}>제목</div>
-                    <div className={styles.headerItem}>댓글 작성자</div>
+                    <div className={styles.headerItem}>작성자</div>
                     <div className={styles.headerItem}>작성날짜</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                <div className={styles.commentRow}>
-                    <div className={styles.commentItem}>1</div>
-                    <div
-                        className={styles.commentItem}
-                        onClick={() =>
-                            openSpecificCommentModal('이것은 게시판!')
-                        }
-                    >
-                        <span className={styles.span}>이것은 게시판!</span>
-                    </div>
-                    <div className={styles.commentItem}>민바오</div>
-                    <div className={styles.commentItem}>2024-08-31</div>
+                {displayComments.map((comment, index) => (
+                    <div className={styles.commentRow} key={index}>
+                        <div className={styles.commentItem}>{comment.id}</div>
+                        <div
+                            className={styles.commentItem}
+                            onClick={() =>
+                                openSpecificCommentModal(comment.boardTitle)
+                            }
+                        >
+                            <span className={styles.span}>
+                                {comment.boardTitle}
+                            </span>
+                        </div>
+                        <div className={styles.commentItem}>
+                            {comment.commenter}
+                        </div>
+                        <div className={styles.commentItem}>{comment.date}</div>
 
-                    <div
-                        className={styles.commentItem}
-                        onClick={openReportModal}
-                    >
-                        <span className={styles.reportcount}>1</span>
+                        <div
+                            className={styles.commentItem}
+                            onClick={openReportModal}
+                        >
+                            <span className={styles.reportcount}>
+                                {comment.reportCount}
+                            </span>
+                        </div>
+                        <div className={styles.commentItem}>
+                            <button className={styles.deletebtn}>삭제</button>
+                        </div>
                     </div>
-                    <div className={styles.commentItem}>
-                        <button className={styles.deletebtn}>삭제</button>
-                    </div>
-                </div>
+                ))}
             </div>
 
             {specificCommentModalOpen && (
@@ -142,6 +162,7 @@ export const Comment = () => {
                     </div>
                 </div>
             )}
+
             <div className={styles.pagination}>
                 <i className="bx bx-chevron-left"></i>
                 <button>1</button>
@@ -152,3 +173,5 @@ export const Comment = () => {
         </div>
     )
 }
+
+export default Comment

@@ -69,10 +69,6 @@ const Faq = () => {
 
     return (
         <div className={styles.faqContainer}>
-            <div className={styles.headerSection}>
-                <h2>FAQ</h2>
-            </div>
-
             {/* FAQ 리스트 */}
             <div className={styles.faqList}>
                 {faqList.map((faq, index) => (

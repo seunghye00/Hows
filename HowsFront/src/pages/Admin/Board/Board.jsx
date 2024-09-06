@@ -1,15 +1,42 @@
 import React, { useState } from 'react'
 import styles from './Board.module.css'
+import { Search } from '../../../components/Search/Search'
 
 export const Board = () => {
     const [boardReportModalOpen, setBoardReportModalOpen] = useState(false)
+    const [searchResults, setSearchResults] = useState([]) // 검색 결과 상태
 
-    // 신고 내역 임시 데이터
-    const reportData = {
-        reporter: '서갈',
-        reason: '과도한 욕설',
-        date: '2024-09-05',
-    }
+    // 신고 내역 임시 데이터 (배열로 변환하여 확장 가능)
+    const reportData = [
+        {
+            reporter: '서갈',
+            reason: '과도한 욕설',
+            date: '2024-09-05',
+        },
+        {
+            reporter: '홍길동',
+            reason: '스팸 및 광고',
+            date: '2024-09-01',
+        },
+    ]
+
+    // 게시글 목록 임시 데이터
+    const boardData = [
+        {
+            no: 1,
+            title: '이것은 게시판!',
+            writer: '민바오',
+            date: '2024-08-31',
+            reportCount: 1,
+        },
+        {
+            no: 2,
+            title: '두 번째 게시글',
+            writer: '홍길동',
+            date: '2024-09-01',
+            reportCount: 2,
+        },
+    ]
 
     // 신고 모달 열기
     const selectreport = () => {
@@ -21,19 +48,25 @@ export const Board = () => {
         setBoardReportModalOpen(false)
     }
 
+    // 검색 기능 구현
+    const handleSearch = query => {
+        const results = boardData.filter(
+            post => post.title.includes(query) || post.writer.includes(query)
+        )
+        setSearchResults(results) // 검색 결과 업데이트
+    }
+
+    // 검색 결과가 있으면 그 결과를, 없으면 전체 리스트를 보여줌
+    const displayBoard = searchResults.length > 0 ? searchResults : boardData
+
     return (
         <div className={styles.boardContainer}>
             <div className={styles.headerSection}>
-                <h2>Board</h2>
-            </div>
-            <div className={styles.headerSection}>
                 <div className={styles.searchSection}>
-                    <select>
-                        <option>제목</option>
-                        <option>작성자</option>
-                    </select>
-                    <input type="text" placeholder="검색" />
-                    <button>검색</button>
+                    <Search
+                        placeholder="제목 또는 작성자 검색"
+                        onSearch={handleSearch}
+                    />
                 </div>
             </div>
 
@@ -47,31 +80,29 @@ export const Board = () => {
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                <div className={styles.boardRow}>
-                    <div className={styles.boardItem}>1</div>
-                    <div className={styles.boardItem}>
-                        <span className={styles.span}>이것은 게시판!</span>
-                    </div>
-                    <div className={styles.boardItem}>민바오</div>
-                    <div className={styles.boardItem}>2024-08-31</div>
+                {displayBoard.map((post, index) => (
+                    <div className={styles.boardRow} key={index}>
+                        <div className={styles.boardItem}>{post.no}</div>
+                        <div className={styles.boardItem}>
+                            <span className={styles.span}>{post.title}</span>
+                        </div>
+                        <div className={styles.boardItem}>{post.writer}</div>
+                        <div className={styles.boardItem}>{post.date}</div>
 
-                    <div className={styles.boardItem} onClick={selectreport}>
-                        <span className={styles.reportcount}>1</span>
+                        <div
+                            className={styles.boardItem}
+                            onClick={selectreport}
+                        >
+                            <span className={styles.reportcount}>
+                                {post.reportCount}
+                            </span>
+                        </div>
+                        <div className={styles.boardItem}>
+                            <button className={styles.deletebtn}>삭제</button>
+                        </div>
                     </div>
-                    <div className={styles.boardItem}>
-                        <button className={styles.deletebtn}>삭제</button>
-                    </div>
-                </div>
+                ))}
             </div>
-
-            <div className={styles.pagination}>
-                <i className="bx bx-chevron-left"></i>
-                <button>1</button>
-                <button>2</button>
-                <button>3</button>
-                <i className="bx bx-chevron-right"></i>
-            </div>
-
             {/* 신고 모달창 */}
             {boardReportModalOpen && (
                 <div className={styles.reportModal}>
@@ -83,11 +114,13 @@ export const Board = () => {
                                 <div>신고 사유</div>
                                 <div>신고 날짜</div>
                             </div>
-                            <div className={styles.tableRow}>
-                                <div>{reportData.reporter}</div>
-                                <div>{reportData.reason}</div>
-                                <div>{reportData.date}</div>
-                            </div>
+                            {reportData.map((report, index) => (
+                                <div className={styles.tableRow} key={index}>
+                                    <div>{report.reporter}</div>
+                                    <div>{report.reason}</div>
+                                    <div>{report.date}</div>
+                                </div>
+                            ))}
                         </div>
                         <button
                             className={styles.btn}
@@ -98,6 +131,15 @@ export const Board = () => {
                     </div>
                 </div>
             )}
+            <div className={styles.pagination}>
+                <i className="bx bx-chevron-left"></i>
+                <button>1</button>
+                <button>2</button>
+                <button>3</button>
+                <i className="bx bx-chevron-right"></i>
+            </div>
         </div>
     )
 }
+
+export default Board

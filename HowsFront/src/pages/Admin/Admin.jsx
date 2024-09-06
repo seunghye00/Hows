@@ -10,7 +10,7 @@ import { Comment } from './Comment/Comment'
 import { Reply } from './Reply/Reply'
 import { Review } from './Review/Review'
 import { Notice } from './Notice/Notice'
-import { Faq } from './Notice/Faq'
+import Faq from './Notice/Faq'
 import { Product } from './Product/Product'
 
 export const Admin = () => {
@@ -28,14 +28,78 @@ export const Admin = () => {
                     }
                 />
                 <Route path="/product/*" element={<Product />} />
-                <Route path="/member" element={<Member />} />
-                <Route path="/blacklist" element={<Blacklist />} />
-                <Route path="/board" element={<Board />} />
-                <Route path="/comment" element={<Comment />} />
-                <Route path="/reply" element={<Reply />} />
-                <Route path="/review" element={<Review />} />
-                <Route path="/notice" element={<Notice />} />
-                <Route path="/faq" element={<Faq />} />
+                <Route
+                    path="/member"
+                    element={
+                        <>
+                            <Title title={'회원 관리'} />
+                            <Member />
+                        </>
+                    }
+                />
+                <Route
+                    path="/blacklist"
+                    element={
+                        <>
+                            <Title title={'블랙리스트 관리'} />
+                            <Blacklist />
+                        </>
+                    }
+                />
+                <Route
+                    path="/board"
+                    element={
+                        <>
+                            <Title title={'게시판 관리'} />
+                            <Board />
+                        </>
+                    }
+                />
+                <Route
+                    path="/comment"
+                    element={
+                        <>
+                            <Title title={'댓글 관리'} />
+                            <Comment />
+                        </>
+                    }
+                />
+                <Route
+                    path="/reply"
+                    element={
+                        <>
+                            <Title title={'대댓글 관리'} />
+                            <Reply />
+                        </>
+                    }
+                />
+                <Route
+                    path="/review"
+                    element={
+                        <>
+                            <Title title={'리뷰 관리'} />
+                            <Review />
+                        </>
+                    }
+                />
+                <Route
+                    path="/notice"
+                    element={
+                        <>
+                            <Title title={'공지사항 관리'} />
+                            <Notice />
+                        </>
+                    }
+                />
+                <Route
+                    path="/faq"
+                    element={
+                        <>
+                            <Title title={'FAQ 관리'} />
+                            <Faq />
+                        </>
+                    }
+                />
             </Routes>
         </div>
     )

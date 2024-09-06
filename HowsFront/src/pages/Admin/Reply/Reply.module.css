@@ -1,6 +1,6 @@
 .replyContainer {
-    width: 100%;
-    margin: 5% auto;
+    flex: 9 1;
+    border: 1px solid black;
 }
 
 .headerSection {
@@ -88,8 +88,8 @@
     justify-content: center;
     align-items: center;
     position: fixed;
-    top: 79%;
-    left: 53%;
+    top: 93%;
+    left: 55%;
 }
 
 .pagination button {

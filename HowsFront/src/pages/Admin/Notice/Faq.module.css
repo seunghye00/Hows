@@ -1,8 +1,9 @@
 /* FAQ 컨테이너 스타일 */
 .faqContainer {
-    width: 100%;
-    margin: 5% auto;
-    position: relative;
+    flex: 9 1;
+    border: 1px solid black;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .faqList {
@@ -63,7 +64,7 @@
 /* 추가 버튼 */
 .addfaqSection {
     position: fixed;
-    top: 11%;
+    top: 10%;
     right: 30px;
     display: flex;
     justify-content: flex-end;
@@ -78,10 +79,10 @@
     cursor: pointer;
     font-weight: bold;
     position: fixed;
-    top: 11%;
+    top: 10%;
 }
 
-/* 수정, 삭제,  저장, 취소 버튼 */
+/* 수정, 삭제, 저장, 취소 버튼 */
 .faqActionButtons {
     display: flex;
     justify-content: flex-end;

@@ -4,7 +4,7 @@ import { BuyList } from "./BuyList/BuyList";
 import { Review } from './Review/Review';
 import { Delivery } from './Delivery/Delivery';
 import { Coupon } from './Coupon/Coupon';
-import { Qna } from './Qna/Qna';
+// import { Qna } from './Qna/Qna';
 
 export const UserDashboard = () => {
     const navi = useNavigate();
@@ -49,14 +49,14 @@ export const UserDashboard = () => {
                         보유쿠폰
                     </span>
                 </div>
-                <div className={styles.qna}>
+                {/* <div className={styles.qna}>
                     <span
                         onClick={() => navi("qna")}
                         className={location.pathname.includes("qna") ? styles.active : ""}
                     >
                         문의내역
                     </span>
-                </div>
+                </div> */}
             </div>
             <div className={styles.body}>
                 <Routes>
@@ -65,7 +65,7 @@ export const UserDashboard = () => {
                     <Route path="review/*" element={<Review />} />
                     <Route path="relivery/*" element={<Delivery />} />
                     <Route path="coupon/*" element={<Coupon />} />
-                    <Route path="qna/*" element={<Qna />} />
+                    {/* <Route path="qna/*" element={<Qna />} /> */}
                 </Routes>
             </div>
         </div>

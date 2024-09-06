@@ -68,7 +68,7 @@
     flex: 2;
 }
 
-.modalTitle h2 {
+.modalTitle {
     text-align: center;
 }
 
@@ -86,10 +86,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.imgLabel label i {
-    font-size: 40px;
 }
 
 .fileInput {

@@ -1,6 +1,6 @@
 .scrollToTop {
     position: fixed;
-    bottom: 40px;
+    bottom: 150px;
     right: 40px;
     z-index: 1000;
 }
@@ -12,14 +12,22 @@
     border-radius: 50%;
     color: white;
     padding: 15px;
-    font-size: 24px;
     cursor: pointer;
     transition: opacity 0.3s ease;
+    position: relative;
 }
 
 .scrollBtn:hover {
     background-color: var(--hows-point-color);
     /* 마우스 올렸을 때 색상 */
+}
+
+.scrollBtn::before {
+    content: "";
+    display: block;
+    background: url(../../assets/images/scrolltop.png) center no-repeat;
+    width: 24px;
+    height: 24px;
 }
 
 .scrollBtn:focus {

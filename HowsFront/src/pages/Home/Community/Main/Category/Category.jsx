@@ -31,21 +31,24 @@ export const Category = () => {
     }
 
     return (
-        <div className={styles.CategoryWrap}>
-            {categories.map(category => (
-                <div
-                    key={category.id}
-                    className={styles.CategoryItem}
-                    onClick={() => handleCategoryClick(category)} // 클릭 이벤트 추가
-                >
-                    <img
-                        src={category.imageUrl}
-                        alt={category.name}
-                        className={styles.CategoryImage}
-                    />
-                    <p>{category.name}</p>
-                </div>
-            ))}
+        <div className={styles.categoryWrap}>
+            <div className={styles.categoryTit}>카테고리</div>
+            <div className={styles.categoryCont}>
+                {categories.map(category => (
+                    <div
+                        key={category.id}
+                        className={styles.categoryItem}
+                        onClick={() => handleCategoryClick(category)} // 클릭 이벤트 추가
+                    >
+                        <img
+                            src={category.imageUrl}
+                            alt={category.name}
+                            className={styles.categoryImage}
+                        />
+                        <p>{category.name}</p>
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }

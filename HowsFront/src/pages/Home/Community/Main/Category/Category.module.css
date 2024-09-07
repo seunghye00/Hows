@@ -1,20 +1,31 @@
-.CategoryWrap {
+.categoryWrap {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.categoryTit {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.categoryCont {
+    display: flex;
+    justify-content: space-evenly;
     /* 요소들을 가로로 배치하고 간격을 줌 */
     align-items: center;
     /* 아이템을 수직으로 가운데 정렬 */
     margin-bottom: 30px;
 }
 
-.CategoryItem {
+.categoryItem {
     text-align: center;
     /* 텍스트를 가운데 정렬 */
     margin: 0 10px;
     /* 아이템 간의 간격 */
 }
 
-.CategoryImage {
+.categoryImage {
     width: 80px;
     /* 이미지 너비 */
     height: 80px;
@@ -28,7 +39,7 @@
     border: 2px solid var(--hows-gray-500);
 }
 
-.CategoryItem p {
+.categoryItem p {
     font-size: 14px;
     color: #333;
 }

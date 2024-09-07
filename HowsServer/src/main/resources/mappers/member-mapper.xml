@@ -67,7 +67,9 @@
 	<select id="detailmember"
 		resultType="com.hows.member.dto.MemberDTO">
 		SELECT
+		m.member_seq,
 		m.member_id,
+		m.name,
 		m.nickname,
 		m.phone,
 		m.email,
@@ -79,9 +81,8 @@
 		g.grade_title AS grade_code,
 		r.role_title AS role_code
 		FROM member m
-		LEFT JOIN grade g ON m.grade_code = g.grade_code
-		LEFT JOIN role r ON
-		m.role_code = r.role_code
+		JOIN grade g ON m.grade_code = g.grade_code
+		JOIN role r ON m.role_code = r.role_code
 		WHERE m.member_id = #{member_id}
 	</select>
 
@@ -123,8 +124,10 @@
 	<!-- 블랙리스트 등록 (관리자) -->
 	<update id="addBlacklist">
 		UPDATE member
-		SET role_code = 'R3', blacklist_reason_code = #{blacklist_reason_code}
-		WHERE member_id = #{member_id}
+		SET role_code = 'R3',
+		blacklist_reason_code = #{blacklist_reason_code}
+		WHERE member_id =
+		#{member_id}
 	</update>
 
 </mapper>

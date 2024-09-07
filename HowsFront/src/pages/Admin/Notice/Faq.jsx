@@ -1,13 +1,24 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { FaChevronDown, FaTimes } from 'react-icons/fa'
 import styles from './Faq.module.css'
 import { Button } from '../../../components/Button/Button'
+import { selectAllFaq, insertFaq, modifyFaq, deleteFaq } from '../../../api/faq'
 
 const Faq = () => {
     const [faqList, setFaqList] = useState([]) // FAQ 리스트
     const [expandedFaqIndex, setExpandedFaqIndex] = useState(null) // 펼쳐진 FAQ 인덱스
     const [isAdd, setIsAdd] = useState(false) // 추가 모드 상태
     const [editIndex, setEditIndex] = useState(null) // 수정 모드 인덱스
+
+    useEffect(() => {
+        // 서버에서 FAQ 목록 가져오기
+        selectAllFaq()
+            .then(response => {
+                console.log(response.data)
+                setFaqList(response.data)
+            })
+            .catch(error => console.error('FAQ 목록 조회 실패:', error))
+    }, [])
 
     // FAQ 항목 토글
     const toggleFaq = index => {
@@ -24,26 +35,30 @@ const Faq = () => {
         }
     }
 
-    // FAQ 삭제
-    const deleteFaqItem = index => {
-        const updatedFaqList = faqList.filter((_, i) => i !== index)
-        setFaqList(updatedFaqList)
-    }
-
     // FAQ 추가
     const addFaqItem = () => {
-        const newFaq = { title: '제목', content: '답변 :' }
-        const updatedFaqList = [...faqList, newFaq]
-        setFaqList(updatedFaqList)
+        const newFaq = { faq_title: '제목', faq_contents: '답변 :' }
+        setFaqList([...faqList, newFaq])
         setIsAdd(true)
-        setEditIndex(updatedFaqList.length - 1)
+        setEditIndex(faqList.length)
     }
 
     // FAQ 등록
     const handleRegister = () => {
-        setIsAdd(false)
-        setEditIndex(null)
-        setExpandedFaqIndex(null)
+        const newFaq = faqList[editIndex]
+
+        insertFaq(newFaq)
+            .then(response => {
+                setFaqList(
+                    faqList.map((faq, i) =>
+                        i === editIndex ? response.data : faq
+                    )
+                )
+                setIsAdd(false)
+                setEditIndex(null)
+                setExpandedFaqIndex(null)
+            })
+            .catch(error => console.error('FAQ 등록 실패:', error))
     }
 
     // FAQ 취소
@@ -58,14 +73,32 @@ const Faq = () => {
         setEditIndex(index)
     }
 
+    // 수정 모드 저장
+    const saveEditMode = () => {
+        const updatedFaq = faqList[editIndex]
+
+        modifyFaq(updatedFaq.faq_seq, updatedFaq)
+            .then(() => {
+                setEditIndex(null)
+            })
+            .catch(error => console.error('FAQ 수정 실패:', error))
+    }
+
     // 수정 모드 취소
     const cancelEditMode = () => {
         setEditIndex(null)
     }
 
-    // 수정 모드 저장
-    const saveEditMode = () => {
-        setEditIndex(null)
+    // FAQ 삭제
+    const deleteFaqItem = index => {
+        const faq_seq = faqList[index].faq_seq
+
+        deleteFaq(faq_seq)
+            .then(() => {
+                const updatedFaqList = faqList.filter((_, i) => i !== index)
+                setFaqList(updatedFaqList)
+            })
+            .catch(error => console.error('FAQ 삭제 실패:', error))
     }
 
     return (
@@ -80,16 +113,22 @@ const Faq = () => {
                         }`}
                     >
                         <div className={styles.faqTitleContainer}>
-                            <div
-                                className={styles.faqTitle}
-                                contentEditable={editIndex === index}
-                                suppressContentEditableWarning={true}
-                                onBlur={e =>
-                                    handleInputChange(e, index, 'title')
-                                }
-                            >
-                                {faq.title}
-                            </div>
+                            {editIndex === index ? (
+                                <div
+                                    className={styles.faqTitle}
+                                    contentEditable
+                                    suppressContentEditableWarning={true}
+                                    onBlur={e =>
+                                        handleInputChange(e, index, 'faq_title')
+                                    }
+                                >
+                                    {faq.faq_title}
+                                </div>
+                            ) : (
+                                <div className={styles.faqTitle}>
+                                    {faq.faq_title || '제목 없음'}
+                                </div>
+                            )}
                             <button
                                 className={styles.faqToggle}
                                 onClick={() => toggleFaq(index)}
@@ -103,16 +142,26 @@ const Faq = () => {
                         </div>
                         {expandedFaqIndex === index && (
                             <div className={styles.faqText}>
-                                <div
-                                    className={styles.faqContent}
-                                    contentEditable={editIndex === index}
-                                    suppressContentEditableWarning={true}
-                                    onBlur={e =>
-                                        handleInputChange(e, index, 'content')
-                                    }
-                                >
-                                    {faq.content}
-                                </div>
+                                {editIndex === index ? (
+                                    <div
+                                        className={styles.faqContent}
+                                        contentEditable
+                                        suppressContentEditableWarning={true}
+                                        onBlur={e =>
+                                            handleInputChange(
+                                                e,
+                                                index,
+                                                'faq_contents'
+                                            )
+                                        }
+                                    >
+                                        {faq.faq_contents}
+                                    </div>
+                                ) : (
+                                    <div className={styles.faqContent}>
+                                        {faq.faq_contents || '내용 없음'}
+                                    </div>
+                                )}
 
                                 {!isAdd && (
                                     <div className={styles.faqActionButtons}>

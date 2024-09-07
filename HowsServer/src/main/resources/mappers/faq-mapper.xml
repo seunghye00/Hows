@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Faq">
+
+	<!-- FAQ 등록 -->
+	<insert id="insertFaq" parameterType="com.hows.faq.dto.FaqDTO">
+		INSERT INTO faq (faq_seq,
+		faq_title, faq_contents)
+		VALUES (faq_seq.nextval, #{faq_title},
+		#{faq_contents})
+	</insert>
+
+	<!-- FAQ 조회 -->
+	<select id="selectAll" resultType="com.hows.faq.dto.FaqDTO">
+		select * from faq
+	</select>
+
+	<!-- FAQ 수정 -->
+	<update id="updateFaq" parameterType="com.hows.faq.dto.FaqDTO">
+		UPDATE faq
+		SET faq_title =
+		#{faq_title}, faq_contents = #{faq_contents}, notice_code
+		=
+		#{notice_code}
+		WHERE faq_seq = #{faq_seq}
+	</update>
+
+	<!-- FAQ 삭제 -->
+	<delete id="deleteFaq" parameterType="int">
+		DELETE FROM faq WHERE
+		faq_seq = #{faq_seq}
+	</delete>
+
+</mapper>

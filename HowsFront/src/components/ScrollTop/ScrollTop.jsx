@@ -6,7 +6,7 @@ export const ScrollTop = () => {
 
     // 스크롤 이벤트를 통해 버튼 보이기/숨기기 처리
     const toggleVisibility = () => {
-        if (window.pageYOffset > 300) {
+        if (window.scrollY > 100) {
             setIsVisible(true)
         } else {
             setIsVisible(false)
@@ -34,9 +34,10 @@ export const ScrollTop = () => {
     return (
         <div className={styles.scrollToTop}>
             {isVisible && (
-                <button onClick={scrollToTop} className={styles.scrollBtn}>
-                    ↑
-                </button>
+                <button
+                    onClick={scrollToTop}
+                    className={styles.scrollBtn}
+                ></button>
             )}
         </div>
     )

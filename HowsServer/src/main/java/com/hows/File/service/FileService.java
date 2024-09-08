@@ -6,9 +6,9 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.hows.File.dao.FileDAO;
 import com.hows.File.dto.FileDTO;
+import com.hows.common.GCSFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,6 +23,9 @@ public class FileService {
     @Autowired
     private Storage storage;
 
+    @Autowired
+    private GCSFile gcsFile;
+
     @Value("${gcp.bucket}")
     private String bucket;
 
@@ -31,20 +34,29 @@ public class FileService {
     }
 
     /** 파일 업로드 **/
-    public String upload(MultipartFile file, String code, int parentSeq) {
+    public String upload(MultipartFile file, int parentSeq) {
         String result = "fail";
-
         try{
-            String bucketName = bucket;
             String oriName = file.getOriginalFilename();
             String sysName = UUID.randomUUID().toString();
 
-            int value = fileDAO.upload(new FileDTO(0, code, oriName, sysName, parentSeq));
-            if(value > 0) {
-                BlobId blobId = BlobId.of(bucketName, sysName);
-                BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-                Blob blob = storage.create(blobInfo, file.getBytes());
-                if (blob != null) result = "https://storage.google.com/" + bucketName + "/" + sysName;
+            // F1: 프로필(멤버), F2: 커뮤니티, F3: 상품, F4: 리뷰, F5: 배너
+            // 각자 컨트롤러에 맞는 code 고정하고 사용
+            String code = "F1";
+
+            // 1. 이미지 gcs 서버에 업로드
+            result = gcsFile.addFileGcs(file, sysName, code);
+            
+            // 2. 이미지 업로드 성공
+            if(!result.equals("fail")) {
+                
+                // 3. 이미지 File 테이블에 저장
+                int value = fileDAO.upload(new FileDTO(0, code, oriName, sysName, parentSeq));
+                
+                // 4. 태이블에 저장 실패 시 gcs 서버에서 이미지 삭제
+                if(value <= 0) {
+                    gcsFile.deleteFileGcs(sysName);
+                }
             }
 
         } catch (Exception e) {
@@ -58,13 +70,7 @@ public class FileService {
     public String deleteFile(String sysName) {
         String result = "fail";
         try {
-            String bucketName = bucket;
-            BlobId blobId = BlobId.of(bucketName, sysName);
-            boolean del = storage.delete(blobId);
-            if(del)  {
-                fileDAO.deleteFile(sysName);
-                result = "ok";
-            }
+            result = gcsFile.deleteFileGcs(sysName);
 
         } catch (Exception e) {
             e.printStackTrace();

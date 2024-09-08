@@ -83,6 +83,7 @@ export const Cart = () => {
     if(Array.isArray(seq)) {
       data = seq;
     } else {
+      if(total.count === 0) return alert("선택된 상품 없음");
       checkCart.forEach(item => {
         if (item.checked) data.push(item.cart_seq);
       });
@@ -93,6 +94,7 @@ export const Cart = () => {
     });
 
     let order = [];
+    let orderPrice = 0;
     dataArr.forEach(item => {
       const dataSet = {
         product_seq: item.product_seq,
@@ -101,13 +103,13 @@ export const Cart = () => {
         product_quantity: item.cart_quantity,
         product_total_price: item.cart_price,
       };
+      orderPrice += item.cart_price;
       order.push(dataSet);
     });
-    setOrderPrice(total.price);
+    setOrderPrice(orderPrice);
     setOrderProducts(order);
     sessionStorage.setItem("howsOrder", JSON.stringify(order));
-    sessionStorage.setItem("howsPrice", total.price);
-
+    sessionStorage.setItem("howsPrice", orderPrice);
     navi("/payment");
   }
 

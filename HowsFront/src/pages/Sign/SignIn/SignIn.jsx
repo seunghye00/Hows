@@ -7,6 +7,7 @@ import { api } from '../../../config/config';
 import { jwtDecode } from 'jwt-decode';
 import { useAuthStore } from './../../../store/store';
 import { host } from './../../../config/config';
+import { FindId } from './FindId/FindId';
 
 
 export const SignIn = () => {
@@ -14,6 +15,7 @@ export const SignIn = () => {
   const navi = useNavigate();
   const [user, setUser] = useState({ member_id: '', pw: '' });
   const { login } = useAuthStore();
+  const [page, setPage] = useState('login'); // main으로 해야하나
 
 
   const handleInputLogin = (e) => {
@@ -39,6 +41,15 @@ export const SignIn = () => {
     })
   }
 
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  if (page === 'findId') {
+    return <FindId onBack={() => handlePageChange('login')} />;
+  }
+
+
   return (
     <div className={styles.container}>
 
@@ -50,17 +61,14 @@ export const SignIn = () => {
         <input type="text" name='member_id' onChange={handleInputLogin} placeholder="아이디" className={styles.input} />
         <input type="password" name='pw' onChange={handleInputLogin} placeholder="비밀번호" className={styles.input} />
         <button className={styles.loginBtn} onClick={handleLoginBtn}>로그인</button>
-        <button className={styles.kakaoLoginBtn}>카카오톡으로 로그인</button>
+        {/* <button className={styles.kakaoLoginBtn}>카카오톡으로 로그인</button> */}
         <div className={styles.links}>
-          <button className={styles.linkBtn}>아이디 찾기</button>
-          <button className={styles.linkBtn}>비밀번호 찾기</button>
+          <button onClick={() => handlePageChange('findId')} className={styles.linkBtn}>아이디 찾기</button>
+          <button onClick={() => handlePageChange('findPw')} className={styles.linkBtn}>비밀번호 찾기</button>
         </div>
         <button className={styles.signUpBtn} onClick={() => navi("/signUp")}>
           회원가입
         </button>
-
-        {/* 임시 경로 */}
-        <span onClick={() => navi("/mypage/main")}>마이페이지</span>
       </div>
     </div>
   );

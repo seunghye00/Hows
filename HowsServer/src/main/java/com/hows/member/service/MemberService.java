@@ -2,6 +2,7 @@ package com.hows.member.service;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -40,6 +41,11 @@ public class MemberService implements UserDetailsService {
 
 		User user = new User(dto.getMember_id(), dto.getPw(), AuthorityUtils.createAuthorityList(dto.getRole_code()));
 		return user;
+	}
+	
+	// 아이디 찾기
+	public String findId(Map<String, String> map) {
+		return memDao.findId(map);
 	}
 
 	// 마이페이지 회원정보 출력

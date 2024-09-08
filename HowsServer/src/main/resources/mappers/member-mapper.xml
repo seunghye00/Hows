@@ -37,6 +37,12 @@
 		select * from member where
 		member_id = #{id}
 	</select>
+	
+	<!-- 아이디 찾기 -->
+	<select id="findId" resultType="String">
+		select member_id from member where name = #{name} and email = #{email} 
+	
+	</select>
 
 	<!-- 마이페이지 회원정보 출력 -->
 	<select id="selectInfo"

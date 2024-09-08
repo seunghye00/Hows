@@ -46,7 +46,7 @@ export const Content = () => {
                 isBookmarked: false,
             },
             {
-                id: page * 1,
+                id: page * 2,
                 user: 'MoonStar⭐',
                 profileImg: img1,
                 images: [img1, img1, img1],
@@ -57,7 +57,7 @@ export const Content = () => {
                 isBookmarked: false,
             },
             {
-                id: page * 1,
+                id: page * 3,
                 user: 'Moon🌕',
                 profileImg: img2,
                 images: [img2, img2, img1],
@@ -68,7 +68,7 @@ export const Content = () => {
                 isBookmarked: false,
             },
             {
-                id: page * 1,
+                id: page * 4,
                 user: 'BaekMin🍺',
                 profileImg: img3,
                 images: [img3, img2, img1],

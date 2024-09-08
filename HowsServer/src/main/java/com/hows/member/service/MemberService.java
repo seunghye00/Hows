@@ -29,11 +29,25 @@ public class MemberService implements UserDetailsService {
 		memDao.insert(dto);
 	}
 
-	// 아이디 찾기
-//	public MemberDTO findById (String id) {
-//		return memDao.findById(id);
-//	}
+	// 중복확인 - ID
+	public boolean checkId(String member_id) {
+		return memDao.checkId(member_id);
+	}
+	
+	// 중복확인 - 닉네임
+	public boolean checkNickname(String nickname) {
+		return memDao.checkNickname(nickname);
+	}
 
+	// 중복확인 - 이메일
+	public boolean checkEmail(String email) {
+		return memDao.checkEmail(email);
+	}
+	
+	
+	
+	
+	
 	// 회원정보 가져오기
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -46,6 +60,11 @@ public class MemberService implements UserDetailsService {
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
 		return memDao.findId(map);
+	}
+	
+	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
+	public Boolean verifyUser(Map<String, String> map) {
+		return memDao.verifyUser(map);
 	}
 
 	// 마이페이지 회원정보 출력

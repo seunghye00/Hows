@@ -10,26 +10,28 @@
   height: 100vh;
 }
 
-.container .findIdBox {
+.container .findPwBox,
+.isVerify,
+.changePwBox {
   display: flex;
   flex-direction: column;
   width: 350px;
   height: 500px;
   text-align: center;
 }
-.container .findIdBox .logo {
+.container .logo {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 40px;
 }
-.container .findIdBox .logo > img {
+.container .logo > img {
   width: 90px;
   height: 95px;
   margin-right: 20px;
 }
 
-.container .findIdBox .logo .title {
+.container .logo .title {
   display: flex;
   justify-content: center;
   font-size: 65px;
@@ -37,7 +39,7 @@
   color: var(--hows-point-color);
 }
 
-.container .findIdBox > input {
+.container input {
   height: 35px;
   border: 1px solid var(--hows-gray-200);
   border-radius: 4px;
@@ -45,12 +47,12 @@
   padding: 10px;
   margin-bottom: 8px;
 }
-.container .findIdBox > input:focus {
+.container input:focus {
   /* 테두리 색상 */
   outline: 1px solid var(--hows-gray-200);
 }
 
-.container .findIdBox > button {
+.container button {
   height: 50px;
   margin-bottom: 6px;
   font-size: 16px;
@@ -61,21 +63,21 @@
   transition-duration: 0.4s;
 }
 
-.container .findIdBox .findBtn {
+.container .btn {
   margin-top: 10px;
   background-color: var(--hows-point-color-dark);
   color: var(--hows-white);
 }
-.container .findIdBox .findBtn:hover {
+.container .btn:hover {
   background-color: var(--hows-point-color-darker);
 }
 
-.container .findIdBox .backBtn {
+.container .backBtn {
   margin-top: 5px;
   background-color: var(--hows-gray-200);
   color: var(--hows-white);
 }
-.container .findIdBox .backBtn:hover {
+.container .backBtn:hover {
   background-color: var(--hows-gray-300);
 }
 

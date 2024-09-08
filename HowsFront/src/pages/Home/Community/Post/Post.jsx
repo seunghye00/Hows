@@ -7,7 +7,7 @@ import Swal from 'sweetalert2'
 import { useDropzone } from 'react-dropzone'
 import { Modal } from '../../../../components/Modal/Modal'
 import axios from 'axios'
-import { host } from '../../../../config/config' // axios를 사용하여 API 호출
+import { host } from '../../../../config/config'
 
 // 이미지 순서 변경을 위한 타입
 const ItemType = 'IMAGE'
@@ -18,15 +18,15 @@ export const Post = () => {
     const [isModalOpen, setIsModalOpen] = useState(false) // 상품 태그 모달
     const [isEditingTags, setIsEditingTags] = useState(false) // 태그 편집 상태
     const [selectedImageIndex, setSelectedImageIndex] = useState(0) // 태그 모달을 연 이미지의 인덱스
-    const [selectedTagIndex, setSelectedTagIndex] = useState(null) // 선택한 태그 인덱스
+    const [tagPosition, setTagPosition] = useState({}) // 태그 위치 저장
     const [searchTerm, setSearchTerm] = useState('') // 검색어
     const [searchResults, setSearchResults] = useState([
         { id: 1, name: 'Hows 스테인리스 철제 프레임 데스크' },
         { id: 2, name: 'Hows 철제 프레임 의자' },
         { id: 3, name: 'Hows 나무 책상' },
     ]) // 임시 상품 태그 데이터
-    const [tagPositions, setTagPositions] = useState([]) // 태그 위치를 저장할 배열
-
+    // 기존 state와 함수 유지
+    const [postContent, setPostContent] = useState('') // 글 내용
     const MAX_IMAGE_SIZE_BYTES = 1024 * 1024 * 2
     const MAX_IMAGES = 5
     const validExtensions = ['jpg', 'jpeg', 'png', 'gif']
@@ -38,6 +38,13 @@ export const Post = () => {
     const [selectedHousingType, setSelectedHousingType] = useState('')
     const [selectedSpaceType, setSelectedSpaceType] = useState('')
     const [selectedAreaSize, setSelectedAreaSize] = useState('')
+
+    // 좌표를 퍼센트로 변환하는 함수
+    const convertToPercent = (x, y, imgWidth, imgHeight) => {
+        const leftPercent = (x / imgWidth) * 100
+        const topPercent = (y / imgHeight) * 100
+        return { left: leftPercent, top: topPercent }
+    }
 
     // 이미지 드롭존 설정
     const { getRootProps, getInputProps } = useDropzone({
@@ -133,26 +140,34 @@ export const Post = () => {
 
     // 상품 태그 추가 핸들러
     const handleAddTag = product => {
-        if (
-            isEditingTags &&
-            selectedImageIndex !== null &&
-            images[selectedImageIndex]
-        ) {
-            const updatedImages = [...images]
-            updatedImages[selectedImageIndex].tags.push(product)
-            setImages(updatedImages)
-            Swal.fire({
-                icon: 'success',
-                title: '상품 태그 추가 완료',
-                text: `${product.name}이(가) 태그로 추가되었습니다.`,
-            })
-            setIsModalOpen(false) // 태그 추가 후 모달 닫기
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: '이미지 선택 오류',
-                text: '태그를 추가할 이미지를 먼저 선택해주세요.',
-            })
+        const updatedImages = [...images]
+        updatedImages[selectedImageIndex].tags.push({
+            product,
+            position: tagPosition,
+        })
+        setImages(updatedImages)
+        Swal.fire({
+            icon: 'success',
+            title: '상품 태그 추가 완료',
+            text: `${product.name}이(가) 태그로 추가되었습니다.`,
+        })
+        setIsModalOpen(false) // 태그 추가 후 모달 닫기
+    }
+
+    // 태그 위치 지정 후 상품 태그 모달 열기
+    const handleThumbnailClick = e => {
+        if (isEditingTags && selectedImageIndex !== null) {
+            const rect = e.target.getBoundingClientRect()
+            const x = e.clientX - rect.left
+            const y = e.clientY - rect.top
+            const imgWidth = rect.width
+            const imgHeight = rect.height
+
+            const { left, top } = convertToPercent(x, y, imgWidth, imgHeight)
+
+            setTagPosition({ left, top })
+            console.log(`태그 추가됨, 위치: Left: ${left}%, Top: ${top}%`) // 콘솔에 위치값 출력
+            setIsModalOpen(true) // 상품 태그 선택 모달 열기
         }
     }
 
@@ -161,32 +176,42 @@ export const Post = () => {
         setIsEditingTags(false)
     }
 
-    // 태그 위치 추가 (좌표 찍히게 설정)
-    const handleImageClick = e => {
-        if (isEditingTags && selectedImageIndex !== null) {
-            const rect = e.target.getBoundingClientRect()
-            const x = e.clientX - rect.left // 이미지 기준 좌표
-            const y = e.clientY - rect.top
-
-            const updatedImages = [...images]
-            updatedImages[selectedImageIndex].positions.push({ x, y }) // 이미지별 태그 위치 저장
-            setImages(updatedImages)
-            setSelectedTagIndex(
-                updatedImages[selectedImageIndex].positions.length - 1
-            ) // 추가된 태그 인덱스 설정
-
-            // 콘솔에 찍히도록 설정
-            console.log(`태그 추가됨, 위치: X:${x}, Y:${y}`)
-        }
+    // 태그 삭제 처리
+    const handleDeleteTag = (tagIndex, productName) => {
+        Swal.fire({
+            title: `태그 삭제: ${productName}`,
+            text: '태그를 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                const updatedImages = [...images]
+                updatedImages[selectedImageIndex].tags.splice(tagIndex, 1)
+                setImages(updatedImages)
+                Swal.fire('태그가 삭제되었습니다.', '', 'success')
+            }
+        })
     }
 
-    // 태그 삭제 처리
-    const handleDeleteTag = index => {
-        const updatedImages = [...images]
-        updatedImages[selectedImageIndex].positions.splice(index, 1)
-        updatedImages[selectedImageIndex].tags.splice(index, 1)
-        setImages(updatedImages)
-        Swal.fire('태그가 삭제되었습니다.', '', 'success')
+    // 태그를 이미지 위에 표시하는 컴포넌트
+    const renderTagMarkers = () => {
+        return images[selectedImageIndex]?.tags.map((tag, i) => (
+            <div
+                key={i}
+                className={styles.tagMarker}
+                style={{
+                    position: 'absolute',
+                    left: `${tag.position.left}%`,
+                    top: `${tag.position.top}%`,
+                    margin: '-9px 0 0 -9px',
+                }}
+                onClick={() => handleDeleteTag(i, tag.product.name)} // 상품명도 함께 표시
+            >
+                <i className="bx bx-plus"></i>
+            </div>
+        ))
     }
 
     // 이미지 렌더링 컴포넌트
@@ -232,38 +257,8 @@ export const Post = () => {
                     <img
                         src={image.src}
                         alt={`preview ${index}`}
-                        onClick={e => {
-                            if (isEditingTags) {
-                                handleImageClick(e) // 태그 추가 위치 지정 후 모달 열기
-                            } else {
-                                handleSetThumbnail(image.src, index)
-                            }
-                        }}
+                        onClick={() => handleSetThumbnail(image.src, index)} // 썸네일 변경
                     />
-                    {image.positions.map((pos, i) => (
-                        <div
-                            key={i}
-                            className={styles.tagMarker}
-                            style={{ left: pos.x, top: pos.y }}
-                            onClick={() => {
-                                setSelectedTagIndex(i)
-                                Swal.fire({
-                                    title: '태그 삭제',
-                                    text: '태그를 삭제하시겠습니까?',
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonText: '삭제',
-                                    cancelButtonText: '취소',
-                                }).then(result => {
-                                    if (result.isConfirmed) {
-                                        handleDeleteTag(i)
-                                    }
-                                })
-                            }}
-                        >
-                            <i className="bx bx-plus"></i>
-                        </div>
-                    ))}
                 </div>
                 <button
                     className={styles.deleteButton}
@@ -297,6 +292,45 @@ export const Post = () => {
         }
         fetchData()
     }, [])
+    // 게시글 작성 완료 처리 핸들러
+    const handleSubmitPost = async () => {
+        // 서버에 보낼 데이터를 수집합니다.
+        const postData = {
+            housingType: selectedHousingType, // 선택된 주거 형태
+            spaceType: selectedSpaceType, // 선택된 공간 타입
+            areaSize: selectedAreaSize, // 선택된 평수
+            images: images.map(image => ({
+                src: image.src,
+                tags: image.tags,
+            })), // 이미지와 태그 배열
+            content: postContent, // 작성한 글 내용
+        }
+
+        try {
+            // 서버에 POST 요청
+            const response = await axios.post(`${host}/posts`, postData)
+            if (response.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '게시글 작성 완료',
+                    text: '게시글이 성공적으로 작성되었습니다.',
+                })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: '작성 실패',
+                    text: '게시글 작성 중 문제가 발생했습니다.',
+                })
+            }
+        } catch (error) {
+            console.error('게시글 작성 오류:', error)
+            Swal.fire({
+                icon: 'error',
+                title: '작성 실패',
+                text: '서버와의 통신 중 오류가 발생했습니다.',
+            })
+        }
+    }
 
     return (
         <DndProvider backend={HTML5Backend}>
@@ -353,8 +387,9 @@ export const Post = () => {
                                     src={thumbnail}
                                     alt="썸네일"
                                     className={styles.thumbnailPreview}
-                                    onClick={e => handleImageClick(e)}
+                                    onClick={handleThumbnailClick} // 태그 추가는 썸네일에서만
                                 />
+                                {renderTagMarkers()} {/* 태그 마커 표시 */}
                                 <div className={styles.thumbnailControls}>
                                     <Button
                                         size="s"
@@ -478,40 +513,45 @@ export const Post = () => {
                         <textarea
                             className={styles.txtWriteBox}
                             placeholder="내용을 입력해주세요"
+                            value={postContent}
+                            onChange={e => setPostContent(e.target.value)} // 글 내용 업데이트
                         ></textarea>
 
-                        <Modal
-                            isOpen={isModalOpen}
-                            onClose={() => setIsModalOpen(false)}
-                        >
-                            <div className={styles.tagSearch}>
-                                <input
-                                    type="text"
-                                    placeholder="상품명, 브랜드를 검색"
-                                    value={searchTerm}
-                                    onChange={e =>
-                                        setSearchTerm(e.target.value)
-                                    }
-                                />
-                                <button onClick={handleSearch}>검색</button>
-                                {searchResults.map(product => (
-                                    <div
-                                        key={product.id}
-                                        className={styles.searchResultItem}
-                                    >
-                                        <span>{product.name}</span>
-                                        <Button
-                                            size="s"
-                                            title="선택"
-                                            onClick={() =>
-                                                handleAddTag(product)
-                                            }
-                                        />
-                                    </div>
-                                ))}
-                            </div>
-                        </Modal>
+                        {/* 작성 완료 버튼 */}
+                        <Button
+                            size="s"
+                            title="작성 완료"
+                            onClick={handleSubmitPost} // 버튼 클릭 시 호출할 함수
+                            className={styles.submitButton}
+                        />
                     </div>
+                    <Modal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                    >
+                        <div className={styles.tagSearch}>
+                            <input
+                                type="text"
+                                placeholder="상품명, 브랜드를 검색"
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                            />
+                            <button onClick={handleSearch}>검색</button>
+                            {searchResults.map(product => (
+                                <div
+                                    key={product.id}
+                                    className={styles.searchResultItem}
+                                >
+                                    <span>{product.name}</span>
+                                    <Button
+                                        size="s"
+                                        title="선택"
+                                        onClick={() => handleAddTag(product)}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </Modal>
                 </div>
             </div>
         </DndProvider>

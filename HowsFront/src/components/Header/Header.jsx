@@ -11,7 +11,8 @@ export const Header = () => {
     const [activeSubMenu, setActiveSubMenu] = useState('홈')
     const [isFixed, setIsFixed] = useState(false)
     // const [session, setSession] = useState(false)
-    const { isAuth } = useAuthStore()
+    const { isAuth, login, logout, setIsAuth } = useAuthStore()
+    const [profileMenu, setProfileMenu] = useState(false);  // 상태 변수명 변경
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
@@ -36,12 +37,38 @@ export const Header = () => {
         }
     }
 
+    const handleProfileClick = () => {
+        setProfileMenu((prev) => !prev);
+    };
+    const handleItemClick = () => {
+        setProfileMenu(false);
+    };
+
+    const handleLogout = () => {
+        const confirmLogout = window.confirm("정말 로그아웃을 하시겠습니까?");
+        if (confirmLogout) {
+            logout();
+            sessionStorage.removeItem("token");
+            setIsAuth(false);
+            navigate('/');
+        }
+    };
+
     useEffect(() => {
+        // 세션스토리지에서 토큰 확인
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            login(token);  // 토큰이 있으면 로그인
+        } else {
+            logout(); // 토큰이 없으면 로그아웃
+            setIsAuth(false);
+        }
+
         window.addEventListener('scroll', handleScroll)
         return () => {
             window.removeEventListener('scroll', handleScroll)
         }
-    }, [])
+    }, [login, logout, setIsAuth])
 
     return (
         <div className="header">
@@ -119,9 +146,35 @@ export const Header = () => {
                                     // session
                                     isAuth
                                         ? (
-                                            <a>
-                                                <img src={profile} alt="User" onClick={() => navigate("/mypage")} />
-                                            </a>
+                                            <div className={styles.infoUser}>
+                                                <img
+                                                    src={profile}
+                                                    alt="User"
+                                                    onClick={handleProfileClick}
+                                                />
+                                                {profileMenu && (
+                                                    <div className={styles.profileMenu}>
+                                                        <div
+                                                            className={styles.profileMenuItem}
+                                                            onClick={() => {
+                                                                navigate('/mypage');
+                                                                handleItemClick();
+                                                            }}
+                                                        >
+                                                            마이페이지
+                                                        </div>
+                                                        <div
+                                                            className={styles.profileMenuItem}
+                                                            onClick={() => {
+                                                                handleLogout();
+                                                                handleItemClick();
+                                                            }}
+                                                        >
+                                                            로그아웃
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         ) : (
                                             <a onClick={() => navigate('/signIn')}>
                                                 <i className="bx bxs-user-circle"></i>

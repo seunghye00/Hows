@@ -2,6 +2,7 @@ package com.hows.member.dao;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,12 @@ public class MemberDAO {
 	public void insert(MemberDTO dto) {
 		mybatis.insert("Member.insert", dto);
 	}
-
+	
+	// 아이디 찾기
+	public String findId(Map<String, String> map) {
+		return mybatis.selectOne("Member.findId", map);
+	}
+	
 	// 아이디로 회원 불러오기
 
 	// 회원정보 가져오기

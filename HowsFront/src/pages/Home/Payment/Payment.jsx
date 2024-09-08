@@ -1,5 +1,4 @@
 import styles from './Payment.module.css'
-import Postcode from "react-daum-postcode";
 import React, {useEffect, useState} from "react";
 import {useOrderStore} from "../../../store/orderStore";
 import {addCommas, shippingPrice} from "../../../commons/commons";
@@ -18,13 +17,10 @@ export const Payment = () => {
   const [coupon, setCoupon] = useState([]);
 
   // 가격 정보
-  const [paymentPrice, setPaymentPrice] = useState({ price: 0, coupon: 0, point: 0, shipping: 0, total: 0 });
+  const [paymentPrice, setPaymentPrice] = useState({ price: orderPrice, coupon: 0, point: 0, shipping: 0, total: 0 });
   
   // 필수 동의 항목
   const [consent, setConsent] = useState({category1: false, category2: false});
-  
-  // 결제 버튼 disabled
-  const [paymentBtn, setPaymentBtn] = useState(false);
 
   // 주문 데이터
   const [data, setData] = useState({
@@ -78,7 +74,7 @@ export const Payment = () => {
         setOrderPrice(parseInt(price));
 
         setPaymentPrice(prev => ({
-          ... prev, price, shipping: shippingPrice(price), total: price-shippingPrice(price)
+          ... prev, price: parseInt(price), shipping: shippingPrice(parseInt(price)), total: price-shippingPrice(price)
         }));
       }
     }
@@ -132,20 +128,12 @@ export const Payment = () => {
         total: eval(result)
       }
     });
-    
+
   }, [data.coupon]);
 
   useEffect(() => {
     setPaymentPrice(prev => ({ ...prev, point: data.point, total: prev.price - prev.coupon - shippingPrice(prev.price)}));
   }, [data.point])
-
-  useEffect(() => {
-    if(consent.category1 && consent.category2) {
-      setPaymentBtn(true);
-    } else {
-      setPaymentBtn(false);
-    }
-  }, [consent]);
 
   return (
     <div className={styles.container}>
@@ -197,7 +185,7 @@ export const Payment = () => {
             <input type="text" placeholder="주소" value={data.address} readOnly/>
           </div>
           <div className={styles.address}>
-            <input type="text" name="detail_address" value={data.detail_address} placeholder="상세 주소를 입력하세요"/>
+            <input type="text" name="detail_address" value={data.detail_address || ""} placeholder="상세 주소를 입력하세요" onChange={handleData}/>
           </div>
           <div className={styles.member}>
             <label htmlFor="">　　이름　</label>
@@ -241,7 +229,7 @@ export const Payment = () => {
           <div className={styles.payment}>
             <p>Point</p>
             <div>
-              <input type="text" value={member.point-data.point || 0}/>
+              <input type="text" value={member.point-data.point || 0} readOnly/>
               <span>p 보유</span>
               <input type="text" name="point" onChange={handleData} value={data.point || 0}/>
               <span>p 사용</span>

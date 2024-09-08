@@ -54,6 +54,9 @@ export const Sort = () => {
     const handleWritePage = () => {
         navigate('/community/post') // '/post' 페이지로 이동
     }
+    const handleModifyPage = () => {
+        navigate('/community/modify') // '/post' 페이지로 이동
+    }
 
     // 선택 해제 함수
     const removeSelectedOption = optionType => {
@@ -232,6 +235,7 @@ export const Sort = () => {
                 </div>
             </div>
             <Button size="s" title={'글쓰기'} onClick={handleWritePage} />
+            <Button size="s" title={'수정'} onClick={handleModifyPage} />
         </div>
     )
 }

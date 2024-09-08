@@ -1,7 +1,6 @@
 .memberContainer {
     flex: 9 1;
     box-sizing: border-box;
-    border: 1px solid black;
 }
 
 .headerSection {
@@ -100,7 +99,7 @@ height: 85%;
 
 .modalContent {
     width: 55%;
-    height: 65%;
+    height: 70%;
     background-color: var(--hows-white);
     padding: 20px;
     border-radius: 10px;
@@ -161,7 +160,7 @@ height: 85%;
     justify-content: center;
     gap: 20px;
     position: fixed;
-    top: 79%;
+    top: 82%;
     left: 47%;
 }
 

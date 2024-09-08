@@ -28,7 +28,7 @@ public class GCSFile {
             BlobId blobId = BlobId.of(bucket, sysName);
             BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
             Blob blob = storage.create(blobInfo, file.getBytes());
-            if(blob != null) return "https://storage.google.com/" + bucket + "/" + type + "/" + sysName;
+            if(blob != null) return "https://storage.cloud.google.com/" + bucket + "/" + type + "/" + sysName;
             return "fail";
 
         } catch (Exception e) {

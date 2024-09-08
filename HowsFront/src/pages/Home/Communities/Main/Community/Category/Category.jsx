@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
 import styles from './Category.module.css'
-import img from '../../../../../assets/images/마이페이지_프로필사진.jpg'
-import img1 from '../../../../../assets/images/꼬래.png'
-import img2 from '../../../../../assets/images/cry.jpg'
+import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
+import img1 from '../../../../../../assets/images/꼬래.png'
+import img2 from '../../../../../../assets/images/cry.jpg'
 import { useNavigate } from 'react-router-dom'
 
 export const Category = () => {

@@ -1,13 +1,16 @@
-import styles from './Main.module.css'
 import { Sort } from './Sort/Sort'
 import { Category } from './Category/Category'
 import { Content } from './Content/Content'
-export const Main = () => {
+import styles from './Community.module.css'
+import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
+
+export const Community = () => {
     return (
-        <div className={styles.communityWrap}>
+        <div>
             <Sort />
             <Category />
             <Content />
+            <ScrollTop />
         </div>
     )
 }

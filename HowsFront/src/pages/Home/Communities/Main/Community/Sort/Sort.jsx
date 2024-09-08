@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import styles from './Sort.module.css'
-import { host } from '../../../../../config/config' // axios를 사용하여 API 호출
+import { host } from '../../../../../../config/config' // axios를 사용하여 API 호출
 import axios from 'axios'
-import { Button } from '../../../../../components/Button/Button'
-import { Search } from '../../../../../components/Search/Search'
+import { Button } from '../../../../../../components/Button/Button'
+import { Search } from '../../../../../../components/Search/Search'
 import { useNavigate } from 'react-router-dom'
 
 export const Sort = () => {
@@ -52,10 +52,7 @@ export const Sort = () => {
 
     // 글쓰기 버튼 클릭 시 페이지 이동 함수
     const handleWritePage = () => {
-        navigate('/community/post') // '/post' 페이지로 이동
-    }
-    const handleModifyPage = () => {
-        navigate('/community/modify') // '/post' 페이지로 이동
+        navigate('/communities/post') // '/post' 페이지로 이동
     }
 
     // 선택 해제 함수
@@ -235,7 +232,6 @@ export const Sort = () => {
                 </div>
             </div>
             <Button size="s" title={'글쓰기'} onClick={handleWritePage} />
-            <Button size="s" title={'수정'} onClick={handleModifyPage} />
         </div>
     )
 }

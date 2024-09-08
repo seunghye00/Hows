@@ -1,6 +1,7 @@
 import styles from './Community.module.css'
 import { Main } from './Main/Main'
 import { Post } from './Post/Post'
+import { Modify } from './Modify/Modify'
 import { Route, Routes } from 'react-router-dom'
 
 export const Community = () => {
@@ -9,10 +10,7 @@ export const Community = () => {
             <Routes>
                 <Route path="/" element={<Main />} />
                 <Route path="/post/*" element={<Post />} />
-                <Route
-                    path="/postId/*"
-                    element={<Post postId="true" isEditMode="true" />}
-                />
+                <Route path="/modify/*" element={<Modify postId="1234" />} />
             </Routes>
         </div>
     )

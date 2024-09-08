@@ -102,6 +102,14 @@
   background-color: var(--hows-point-color-darker);
 }
 
+/* 에러, 안내문구 */
+.container .signUpBox .valid,
+.error {
+  display: flex;
+  justify-content: flex-start;
+  margin-left: 5px;
+}
+
 /* =========[ 개별 ]======== */
 /* ID */
 .container .signUpBox .idBox .inputId {

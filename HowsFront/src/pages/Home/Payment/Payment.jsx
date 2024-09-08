@@ -210,9 +210,9 @@ export const Payment = () => {
             <p>Point</p>
             <div>
               <input type="text" value={member.point-data.point || 0}/>
-              <span>보유</span>
+              <span>p 보유</span>
               <input type="text" name="point" onChange={handleData} value={data.point || 0}/>
-              <span>사용</span>
+              <span>p 사용</span>
             </div>
           </div>
         </div>

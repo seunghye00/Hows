@@ -1,0 +1,70 @@
+.productTagContainer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+}
+
+.productTagSwiper {
+    width: 100%;
+    position: relative;
+}
+
+.productTagBox {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 110px;
+    width: 110px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 14px;
+    border: 1px solid var(--hows-point-color-darkest);
+    overflow: hidden;
+}
+
+.productTagBox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 커스텀 네비게이션 버튼 스타일 */
+.swiperButtonPrev,
+.swiperButtonNext {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--hows-point-color-darkest);
+}
+
+.swiperButtonPrev {
+    left: 0px;
+    /* 왼쪽 버튼 위치 조정 */
+}
+
+.swiperButtonNext {
+    right: 0;
+    /* 오른쪽 버튼 위치 조정 */
+}
+
+.swiperButtonPrev:hover,
+.swiperButtonNext:hover {
+    background-color: var(--hows-gray);
+}
+
+/* 비활성화 상태의 네비게이션 버튼 숨기기 */
+:global(.swiper-button-disabled) {
+    display: none !important;
+}

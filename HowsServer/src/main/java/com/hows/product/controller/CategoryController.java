@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,9 +22,16 @@ public class CategoryController {
 	
 	
 	@GetMapping
-	public ResponseEntity<List<CategoryDTO>> categoryList (){
+	public ResponseEntity<List<CategoryDTO>> categoryList () throws Exception{ 
 		List<CategoryDTO> list = categoryServ.categoryList();
 		return ResponseEntity.ok(list);
 	} 
+	
+	
+	@ExceptionHandler(Exception.class)
+	public String exceptionHandler(Exception e) {
+		e.printStackTrace();
+		return "redirect:/error";
+	}
 	
 }

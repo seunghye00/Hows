@@ -1,7 +1,8 @@
 import styles from './Item.module.css'
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import InfiniteScroll from 'react-infinite-scroll-component'
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { ScrollTop } from '../../../../../../components/ScrollTop/ScrollTop';
 
 import img1 from '../../../../../../assets/images/interior_1.jpg';
 import img2 from '../../../../../../assets/images/interior_2.jpg';
@@ -118,6 +119,7 @@ export const Item = () => {
           ))
         }
       </InfiniteScroll>
+      <ScrollTop />
       </div>
   </div>
   );

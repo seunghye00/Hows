@@ -65,6 +65,17 @@ public class AuthController {
 		return ResponseEntity.ok(foundId);
 	}
 	
+	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
+	@PostMapping("/verifyUser")
+	public ResponseEntity<Boolean> verifyUser(@RequestParam String member_id, @RequestParam String email){
+		
+		Map<String, String> map = new HashMap<>();
+		map.put("member_id", member_id);
+		map.put("email", email);
+		
+		Boolean result = memServ.verifyUser(map);
+		return ResponseEntity.ok(result);
+	}
 	
 	
 	

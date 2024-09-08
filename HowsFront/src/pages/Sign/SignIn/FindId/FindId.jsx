@@ -22,11 +22,12 @@ export const FindId = ({ onBack }) => {
     return (
         <div className={styles.container}>
 
-            <div className={styles.idFindBox}>
+            <div className={styles.findIdBox}>
                 <div className={styles.logo}>
                     <img src={logo}></img>
                     <h1 className={styles.title}>How's</h1>
                 </div>
+                <span className={styles.subTitle}>아이디 찾기</span>
                 <input type="text" name='name' value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" />
                 <input type="text" name='email' value={email} onChange={(e) => setEmail(e.target.value)} placeholder="이메일" />
                 <button className={styles.findBtn} onClick={handleFindBtn}>아이디 찾기</button>

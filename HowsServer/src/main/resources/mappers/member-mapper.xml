@@ -32,6 +32,24 @@
 		)
 	</insert>
 
+	<!-- 중복확인 - ID -->
+	<select id="checkId" resultType="Integer">
+		select count(*) from member where member_id = #{member_id}
+	</select>
+	
+	<!-- 중복확인 - 닉네임 -->
+	<select id="checkNickname" resultType="Integer">
+		select count(*) from member where nickname = #{nickname}
+	</select>
+	
+	<!-- 중복확인 - 이메일 -->
+	<select id="checkEmail" resultType="Integer">
+		select count(*) from member where email = #{email}
+	</select>
+
+
+
+
 	<!-- 회원정보 가져오기 -->
 	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
 		select * from member where
@@ -41,8 +59,13 @@
 	<!-- 아이디 찾기 -->
 	<select id="findId" resultType="String">
 		select member_id from member where name = #{name} and email = #{email} 
-	
 	</select>
+
+	<!-- 비밀번호 찾기 - 아이디, 이메일 존재여부 검증 -->
+	<select id="verifyUser" resultType="Integer">
+		select count(*) from member where member_id = #{member_id} and email = #{email} 
+	</select>
+
 
 	<!-- 마이페이지 회원정보 출력 -->
 	<select id="selectInfo"
@@ -62,7 +85,7 @@
 		#{member_id}
 	</update>
 
-	<!-- 관리자 -->
+	<!-- ===========================================[ 관리자 ] -->
 	<!-- 전체 회원조회 (관리자) -->
 	<select id="selectAll"
 		resultType="com.hows.member.dto.MemberDTO">

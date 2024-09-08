@@ -5,7 +5,7 @@ import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
 import {
     selectAll,
-    detailmember,
+    detailMember,
     updateGrade,
     updateRole,
     getAllBlacklistReasons,
@@ -19,7 +19,7 @@ export const Member = () => {
     const [Modal, setModal] = useState(false)
     const [editMode, setEditMode] = useState(false)
     const [blacklistModal, setBlacklistModal] = useState(false)
-    const [selectedMember, setSelectedMember] = useState(null)
+    const [selectedMember, setSelectedMember] = useState('')
     const [blacklistReasons, setBlacklistReasons] = useState([])
     const [Grade, setGrade] = useState('')
     const [Role, setRole] = useState('')
@@ -57,8 +57,9 @@ export const Member = () => {
 
     // 모달 열기 및 회원 상세 조회 API 호출
     const Modalopen = member_id => {
-        detailmember(member_id)
+        detailMember(member_id)
             .then(resp => {
+                console.log(resp.data) // 서버로부터 받는 데이터를 확인
                 setSelectedMember(resp.data)
                 setModal(true)
                 setGrade(resp.data.grade_code || '') // grade_code가 없을 경우 빈 문자열 설정
@@ -175,7 +176,7 @@ export const Member = () => {
                         <div
                             className={styles.memberRow}
                             key={index}
-                            onClick={() => Modalopen(member.member_id)} // 클릭 시 상세 조회
+                            onClick={() => Modalopen(member.member_id)}
                         >
                             <div className={styles.memberItem}>
                                 {member.nickname}
@@ -205,189 +206,203 @@ export const Member = () => {
             </div>
 
             {/* 상세 모달 */}
-            {Modal &&
-                selectedMember &&
-                selectedMember.grade_code && ( // 추가된 조건
-                    <div className={styles.modal}>
-                        <div className={styles.modalContent}>
-                            <h2>{selectedMember.member_id} 님의 회원정보</h2>
-                            <div className={styles.profile}>
-                                <img
-                                    src={
-                                        selectedMember.profileImageUrl ||
-                                        '/default.png'
-                                    }
-                                    alt="프로필 이미지"
+            {Modal && selectedMember && selectedMember.grade_code && (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <div className={styles.profile}>
+                            <img
+                                src={
+                                    selectedMember.profileImageUrl ||
+                                    '/default.png'
+                                }
+                                alt="프로필 이미지"
+                            />
+                        </div>
+                        <div className={styles.info}>
+                            <div className={styles.infoItem}>
+                                <label>ID</label>
+                                <input
+                                    type="text"
+                                    value={selectedMember.id}
+                                    readOnly
+                                    disabled
                                 />
                             </div>
-                            <div className={styles.info}>
-                                <div className={styles.infoItem}>
-                                    <label>닉네임</label>
-                                    <input
-                                        type="text"
-                                        value={selectedMember.nickname}
-                                        readOnly
-                                        disabled
-                                    />
-                                </div>
-                                <div className={styles.infoItem}>
-                                    <label>생년월일</label>
-                                    <input
-                                        type="text"
-                                        value={selectedMember.birth}
-                                        readOnly
-                                        disabled
-                                    />
-                                </div>
-                                <div className={styles.infoItem}>
-                                    <label>전화번호</label>
-                                    <input
-                                        type="text"
-                                        value={selectedMember.phone}
-                                        readOnly
-                                        disabled
-                                    />
-                                </div>
-                                <div className={styles.infoItem}>
-                                    <label>이메일</label>
-                                    <input
-                                        type="text"
-                                        value={selectedMember.email}
-                                        readOnly
-                                        disabled
-                                    />
-                                </div>
-                                <div className={styles.infoItem}>
-                                    <label>주소</label>
-                                    <input
-                                        type="text"
-                                        value={selectedMember.address}
-                                        readOnly
-                                        disabled
-                                    />
-                                </div>
-                                <div className={styles.infoItem}>
-                                    <label>상세주소</label>
-                                    <input
-                                        type="text"
-                                        value={selectedMember.detail_address}
-                                        readOnly
-                                        disabled
-                                    />
-                                </div>
-                                <div className={styles.infoItem}>
-                                    <label>가입날짜</label>
-                                    <input
-                                        type="text"
-                                        value={selectedMember.signup_date}
-                                        readOnly
-                                        disabled
-                                    />
-                                </div>
-                                <div className={styles.infoItem}>
-                                    <label>탈퇴날짜</label>
+                            <div className={styles.infoItem}>
+                                <label>이름</label>
+                                <input
+                                    type="text"
+                                    value={selectedMember.name}
+                                    readOnly
+                                    disabled
+                                />
+                            </div>
+                            <div className={styles.infoItem}>
+                                <label>닉네임</label>
+                                <input
+                                    type="text"
+                                    value={selectedMember.nickname}
+                                    readOnly
+                                    disabled
+                                />
+                            </div>
+                            <div className={styles.infoItem}>
+                                <label>생년월일</label>
+                                <input
+                                    type="text"
+                                    value={selectedMember.birth}
+                                    readOnly
+                                    disabled
+                                />
+                            </div>
+                            <div className={styles.infoItem}>
+                                <label>전화번호</label>
+                                <input
+                                    type="text"
+                                    value={selectedMember.phone}
+                                    readOnly
+                                    disabled
+                                />
+                            </div>
+                            <div className={styles.infoItem}>
+                                <label>이메일</label>
+                                <input
+                                    type="text"
+                                    value={selectedMember.email}
+                                    readOnly
+                                    disabled
+                                />
+                            </div>
+                            <div className={styles.infoItem}>
+                                <label>주소</label>
+                                <input
+                                    type="text"
+                                    value={selectedMember.address}
+                                    readOnly
+                                    disabled
+                                />
+                            </div>
+                            <div className={styles.infoItem}>
+                                <label>상세주소</label>
+                                <input
+                                    type="text"
+                                    value={selectedMember.detail_address}
+                                    readOnly
+                                    disabled
+                                />
+                            </div>
+                            <div className={styles.infoItem}>
+                                <label>가입날짜</label>
+                                <input
+                                    type="text"
+                                    value={selectedMember.signup_date}
+                                    readOnly
+                                    disabled
+                                />
+                            </div>
+                            <div className={styles.infoItem}>
+                                <label>탈퇴날짜</label>
+                                <input
+                                    type="text"
+                                    value={
+                                        selectedMember.withdrawal_date || ' '
+                                    }
+                                    readOnly
+                                    disabled
+                                />
+                            </div>
+
+                            <div className={styles.infoItem}>
+                                <label>등급</label>
+                                {editMode ? (
+                                    <select
+                                        value={Grade || ''} // 빈 문자열로 처리
+                                        onChange={e => setGrade(e.target.value)}
+                                    >
+                                        {grades.map(grade => (
+                                            <option
+                                                key={grade.grade_code}
+                                                value={grade.grade_code}
+                                            >
+                                                {grade.grade_title}
+                                            </option>
+                                        ))}
+                                    </select>
+                                ) : (
                                     <input
                                         type="text"
                                         value={
-                                            selectedMember.withdrawal_date ||
-                                            ' '
-                                        }
+                                            selectedMember?.grade_code ||
+                                            '등급 없음'
+                                        } // grade_code가 없을 경우 '등급 없음'
                                         readOnly
                                         disabled
                                     />
-                                </div>
-
-                                <div className={styles.infoItem}>
-                                    <label>등급</label>
-                                    {editMode ? (
-                                        <select
-                                            value={Grade}
-                                            onChange={e =>
-                                                setGrade(e.target.value)
-                                            }
-                                        >
-                                            {grades.map(grade => (
-                                                <option
-                                                    key={grade.grade_code}
-                                                    value={grade.grade_code}
-                                                >
-                                                    {grade.grade_title}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input
-                                            type="text"
-                                            value={selectedMember.grade_code}
-                                            readOnly
-                                            disabled
-                                        />
-                                    )}
-                                </div>
-                                <div className={styles.infoItem}>
-                                    <label>역할</label>
-                                    {editMode ? (
-                                        <select
-                                            value={Role}
-                                            onChange={e => {
-                                                setRole(e.target.value)
-                                                if (e.target.value === 'R3') {
-                                                    openBlacklistModal()
-                                                }
-                                            }}
-                                        >
-                                            {roles.map(role => (
-                                                <option
-                                                    key={role.role_code}
-                                                    value={role.role_code}
-                                                >
-                                                    {role.role_title}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input
-                                            type="text"
-                                            value={selectedMember.role_code}
-                                            readOnly
-                                            disabled
-                                        />
-                                    )}
-                                </div>
+                                )}
                             </div>
 
-                            <div className={styles.buttons}>
+                            <div className={styles.infoItem}>
+                                <label>역할</label>
                                 {editMode ? (
-                                    <>
-                                        <Button
-                                            size="s"
-                                            title="완료"
-                                            onClick={confirmUpdate}
-                                        />
-                                        <Button
-                                            size="s"
-                                            title="취소"
-                                            onClick={toggleEditMode}
-                                        />
-                                    </>
+                                    <select
+                                        value={Role || ''} // Role이 없을 경우 빈 문자열로 설정
+                                        onChange={e => setRole(e.target.value)}
+                                    >
+                                        {roles.map(role => (
+                                            <option
+                                                key={role.role_code}
+                                                value={role.role_code}
+                                            >
+                                                {role.role_title}
+                                            </option>
+                                        ))}
+                                    </select>
                                 ) : (
-                                    <>
-                                        <Button
-                                            size="s"
-                                            title="수정"
-                                            onClick={toggleEditMode}
-                                        />
-                                        <Button
-                                            size="s"
-                                            title="닫기"
-                                            onClick={Modalclose}
-                                        />
-                                    </>
+                                    <input
+                                        type="text"
+                                        value={
+                                            selectedMember?.role_code ||
+                                            '역할 없음'
+                                        } // role_code가 없을 경우 '역할 없음'
+                                        readOnly
+                                        disabled
+                                    />
                                 )}
                             </div>
                         </div>
+
+                        <div className={styles.buttons}>
+                            {editMode ? (
+                                <>
+                                    <Button
+                                        size="s"
+                                        title="완료"
+                                        onClick={confirmUpdate}
+                                    />
+                                    <Button
+                                        size="s"
+                                        title="취소"
+                                        onClick={toggleEditMode}
+                                    />
+                                </>
+                            ) : (
+                                <>
+                                    <Button
+                                        size="s"
+                                        title="수정"
+                                        onClick={toggleEditMode}
+                                    />
+                                    <Button
+                                        size="s"
+                                        title="닫기"
+                                        onClick={Modalclose}
+                                    />
+                                </>
+                            )}
+                        </div>
                     </div>
-                )}
+                </div>
+            )}
 
             {/* 블랙리스트 모달 */}
             {blacklistModal && (

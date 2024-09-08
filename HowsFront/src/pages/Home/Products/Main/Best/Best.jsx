@@ -1,5 +1,6 @@
 import styles from './Best.module.css'
 import img from '../../../../../assets/images/마이페이지_프로필사진.jpg'
+import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop';
 
 export const Best = () => {
   return (
@@ -65,6 +66,7 @@ export const Best = () => {
             </div>
           </div>
         </div>
+        <ScrollTop />
     </div>
   );
 }

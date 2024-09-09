@@ -6,12 +6,15 @@ import java.util.Map;
 
 import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.hows.blacklistreason.dto.BlacklistReasonDTO;
 import com.hows.grade.dto.GradeDTO;
@@ -34,7 +37,7 @@ public class MemberService implements UserDetailsService {
 	public boolean checkId(String member_id) {
 		return memDao.checkId(member_id);
 	}
-	
+
 	// 중복확인 - 닉네임
 	public boolean checkNickname(String nickname) {
 		return memDao.checkNickname(nickname);
@@ -65,21 +68,27 @@ public class MemberService implements UserDetailsService {
 				dto.getMember_seq()
 		);
 	}
-	
+
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
 		return memDao.findId(map);
 	}
-	
+
 	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
 	public Boolean verifyUser(Map<String, String> map) {
 		return memDao.verifyUser(map);
 	}
 
 	// 마이페이지 회원정보 출력
-//	public MemberDTO selectInfo(String loginId) {
-//		return memDao.selectInfo(loginId);
-//	}
+	public MemberDTO selectInfo(String member_id) {
+		return memDao.selectInfo(member_id);
+	}
+
+	// 회원정보 수정
+	public int updateInfo(MemberDTO dto) {
+		return memDao.updateInfo(dto);
+	}
+
 
 	// 비밀번호 변경시 기존 비밀번호 확인
 	public String getPasswordById(HashMap<String, String> map) {
@@ -91,6 +100,13 @@ public class MemberService implements UserDetailsService {
 		return memDao.updatePw(map);
 	}
 
+	// 회원탈퇴
+	public int deleteUser(String member_id){
+		return memDao.deleteUser(member_id);
+	}
+
+
+	//========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	public List<MemberDTO> selectAll() {
 		return memDao.selectAll();
@@ -112,21 +128,13 @@ public class MemberService implements UserDetailsService {
 	}
 
 	// 등급 업데이트 (관리자)
-	public int updateGrade(String memberId, String newGradeCode) {
-		HashMap<String, String> map = new HashMap<>();
-		map.put("member_id", memberId);
-		map.put("grade_code", newGradeCode);
-
-		return memDao.updateGrade(map);
+	public int updateGrade(String member_id, String grade_code) {
+	    return memDao.updateGrade(member_id, grade_code);
 	}
 
 	// 역할 업데이트 (관리자)
-	public int updateRole(String memberId, String newRoleCode) {
-		HashMap<String, String> map = new HashMap<>();
-		map.put("member_id", memberId);
-		map.put("role_code", newRoleCode);
-
-		return memDao.updateRole(map);
+	public int updateRole(String member_id, String role_code) {
+		return memDao.updateRole(member_id, role_code);
 	}
 
 	// 전체 블랙리스트 사유 가져오기 (관리자)
@@ -135,12 +143,8 @@ public class MemberService implements UserDetailsService {
 	}
 
 	// 블랙리스트 등록 (관리자)
-	public int addBlacklist(String memberId, String reasonCode) {
-		HashMap<String, String> map = new HashMap<>();
-		map.put("member_id", memberId);
-		map.put("blacklist_reason_code", reasonCode);
-
-		return memDao.addBlacklist(map);
+	public int addBlacklist(String member_id, String blacklist_reason_code) {
+		return memDao.addBlacklist(member_id, blacklist_reason_code);
 	}
 
 	// 블랙리스트 조회 (관리자)

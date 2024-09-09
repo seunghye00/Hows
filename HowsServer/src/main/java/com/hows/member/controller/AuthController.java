@@ -8,8 +8,8 @@ import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hows.common.util.JwtUtil;
 import com.hows.member.dto.MemberDTO;
+import com.hows.member.dto.SignInResponseDTO;
 import com.hows.member.service.MemberService;
 
 @RestController
@@ -33,24 +34,26 @@ public class AuthController {
 	
 	// 로그인
 	@PostMapping
-	public ResponseEntity<String> login(@RequestBody MemberDTO dto){
+	public ResponseEntity<SignInResponseDTO> login(@RequestBody MemberDTO dto){
 
 		System.out.println("id : " + dto.getMember_id() + " / pw : " + dto.getPw());
 
 	    // 사용자 존재 여부 확인
 		CustomUserDetails existingUser = memServ.loadUserByUsername(dto.getMember_id());
 	    if (existingUser == null) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("존재하지 않는 사용자입니다.");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	    }
 	    
 	    // 비밀번호 검증
 	    if (!pwEncoder.matches(dto.getPw(), existingUser.getPassword())) {
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호가 일치하지 않습니다.");
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	    }
 
 	    // 로그인 성공 시 토큰 생성
 	    String token = jwt.createToken(existingUser.getUsername(), existingUser.getMemberSeq());
-		return ResponseEntity.ok(token);
+	    String member_id = existingUser.getUsername();
+        int member_seq = existingUser.getMemberSeq();
+		return ResponseEntity.ok(new SignInResponseDTO(token, member_id,member_seq));
 	}
 	
 	// 아이디 찾기
@@ -98,7 +101,11 @@ public class AuthController {
 	    }
 	}
 	
-	
+	@ExceptionHandler(Exception.class)
+	   public ResponseEntity<String> exceptionHandler(Exception e) {
+	      e.printStackTrace();
+	      return ResponseEntity.badRequest().body("fail");
+	   }
 	
 	
 	

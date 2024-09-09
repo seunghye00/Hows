@@ -22,8 +22,6 @@ export const SubCategory = () => {
         axios
             .get(`${host}/category`)
             .then(resp => {
-                console.log("111"+JSON.stringify(resp))
-                console.log("222"+resp.data)
                 setCategoriesList(resp.data)
             })
             .catch(err => {

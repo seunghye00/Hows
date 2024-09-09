@@ -183,13 +183,19 @@ export const Detail = () => {
                     <h3>신고 사유를 선택해주세요</h3>
                     <ul className={styles.reportlist}>
                         <li>
-                            <input type="checkbox" /> 도배 및 중복 게시물
+                            <label>
+                                <input type="checkbox" /> 도배 및 중복 게시물
+                            </label>
                         </li>
                         <li>
-                            <input type="checkbox" /> 폭력적인 게시물
+                            <label>
+                                <input type="checkbox" /> 폭력적인 게시물
+                            </label>
                         </li>
                         <li>
-                            <input type="checkbox" /> 불쾌한 내용
+                            <label>
+                                <input type="checkbox" /> 불쾌한 내용
+                            </label>
                         </li>
                     </ul>
                     <Button

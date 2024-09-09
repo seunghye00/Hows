@@ -1,22 +1,21 @@
 import { useNavigate } from 'react-router-dom';
 import styles from './SubHeader.module.css'
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export const SubHeader = () => {
 
     const navi = useNavigate();
 
     //로컬스토리지에서 activeMenu 값을 가져오거나 없으면 '쇼핑홈' 으로  초기화
-    const [activeMenu, setActiveMenu] = useState(()=> {
-        localStorage.getItem('activeMenu' || '쇼핑홈')
-    });
+    const [activeMenu, setActiveMenu] = useState('쇼핑홈')
+    
     
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName);
 
         // 클릭할 때마다 로컬스토리지에 저장 
-        localStorage.setItem('activeMenu', menuName);
+        // localStorage.setItem('activeMenu', menuName);
 
         if (menuName === '쇼핑홈') {
             navi('/products')
@@ -26,16 +25,6 @@ export const SubHeader = () => {
             navi('/products/best')
         }
     }
-    useEffect(() => {
-        // 로컬 스토리지에 저장된 값이 없을 때 기본 경로인 '쇼핑홈'으로 리다이렉트
-        const storedMenu = localStorage.getItem('activeMenu') || '쇼핑홈';
-        setActiveMenu(storedMenu);
-        
-        // 만약 저장된 값이 없으면 '쇼핑홈'으로 이동
-        if (!localStorage.getItem('activeMenu')) {
-            navi('/products');  // 쇼핑홈 경로로 이동
-        }
-    }, [navi]);
 
 
     return (

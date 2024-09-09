@@ -7,17 +7,32 @@
 
 /* 상품정보,리뷰,배송 및 환불 버튼 */
 .buttons {
-    background-color: var(--hows-point-color-lightest-medium);
+    /* background-color: var(--hows-point-color-lightest-medium); */
+    background-color: #f5f5f5;
+    border-radius: 8px;
     height: 50px;
 }
 .buttons > button {
-    background-color: var(--hows-point-color-lightest-medium);
     height: 50px; 
     width: 33.333%;
-    color: white;
     border: none;
-    border-radius: 5px; 
+    /* border-radius: 5px;  */
     font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 20px;
+    border-bottom: 2px solid transparent; /* 기본 상태에서 border-bottom을 투명으로 설정 */
+}
+.buttons > button:focus, 
+.buttons > button:active {
+    background-color: var(--hows-point-color-lightest-medium); /* 클릭 시 border-bottom을 검정색으로 설정 */
+    outline: none; /* 기본 포커스 아웃라인 제거 */
+}
+.buttons > button:first-child {
+    border-radius: 8px 0 0 8px;
+}
+.buttons > button:last-child {
+    border-radius: 0 8px 8px 0;
 }
 
 /* 정보 */

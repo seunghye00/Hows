@@ -18,7 +18,6 @@ detail_address varchar2(255) not null,
 grade_code char(2) default 'G3' not null,
 role_code char(2) default 'R2' not null,
 blacklist_reason_code char(2) default null,
-blacklist_date timestamp default null,
 signup_date timestamp default sysdate,
 withdrawal_date timestamp default null,
 withdrawal_yn char(1) default 'N',
@@ -94,6 +93,19 @@ space_type_code char(2) not null,
 area_size_code char(2) not null,
 color_code char(2) not null,
 member_id varchar2(20) not null
+);
+
+create table board_image (
+    board_image_seq number primary key,       -- 이미지 시퀀스    
+    board_seq number not null,                  -- 게시글과 연결되는 id
+    image_url varchar2(500) not null,  -- 이미지 경로
+    image_order number not null,                -- 이미지 순서
+);
+
+create table image_tag (
+    board_tag_seq number primary key,         -- 태그 id
+    board_image_seq number not null,                   -- 이미지와 연결되는 id
+    product_id varchar2(20) not null,  -- 상품 id (연결된 상품의 id)
 );
 
 create sequence board_seq

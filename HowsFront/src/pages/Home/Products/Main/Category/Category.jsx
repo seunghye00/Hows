@@ -3,10 +3,11 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { host } from '../../../../../config/config';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop';
 import { addCommas } from '../../../../../commons/commons';
+import { useLocation } from 'react-router-dom';
 
 
 // 데이터를 4개씩 묶는 함수
@@ -20,6 +21,7 @@ const chunkArray = (array, size) => {
 
 export const Category = () => {
   const navi = useNavigate();
+  const {product_category_code} = useParams();
 
   const [categoriesList,setCategoriesList] = useState([]); //카테고리 상태
   const [data, setData] = useState([]); //상품 List 상태
@@ -31,7 +33,13 @@ export const Category = () => {
   const [hasMore, setHasMore] = useState(true) // [무한 스크롤] 더 불러올 데이터가 있는지 여부
   const [page, setPage] = useState(1) // [무한 스크롤] 현재 페이지
 
+  const location = useLocation(); // 현재 URL의 정보를 가져옴(subCategory)
+  const queryParams = new URLSearchParams(location.search); //URL의 쿼리 문자열을 분석하여 쿼리 파라미터를 추출할 수 있는 URLSearchParams 객체 생성
+  const categoryCode = queryParams.get('code'); // 쿼리 파라미터에서 'code'이름의 값을 가져옴
+  // console.log("code : " + categoryCode);
   
+
+
   // 무한 스크롤로 데이터 추가 로드
   const loadMoreData = async () => {
     const nextPage = page + 1
@@ -73,9 +81,13 @@ export const Category = () => {
   useEffect(() => {
     axios.get(`${host}/category`).then((resp) => {
       
-      // console.log(JSON.stringify(resp))
       setCategoriesList(resp.data);
-      handleMenuClick('P1');
+
+      // 가구만 출력하거나, null 이 아니면 넘어온 카테고리 코드에 해당하는 카테고리 출력
+      if (categoryCode == null)
+        handleMenuClick('P1');
+      else
+        handleMenuClick(categoryCode);
       
     }).catch((err) => {console.error(err);});
   }, []);  // 컴포넌트가 처음 렌더링될 때 한 번만 실행
@@ -91,6 +103,9 @@ export const Category = () => {
     }).catch((err) => {console.error(err); });
   }
   
+  useEffect(()=>{
+    handleMenuClick(product_category_code);
+  },[product_category_code]);
 
 
   // [옵션] 선택 해제 함수

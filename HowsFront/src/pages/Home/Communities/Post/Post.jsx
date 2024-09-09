@@ -292,14 +292,17 @@ export const Post = () => {
                 const housingTypesResponse = await axios.get(
                     `${host}/option/housing-types`
                 )
+                setHousingTypes(housingTypesResponse.data)
+                console.log(housingTypesResponse.data)
+
                 const spaceTypesResponse = await axios.get(
                     `${host}/option/space-types`
                 )
+                setSpaceTypes(spaceTypesResponse.data)
+
                 const areaSizesResponse = await axios.get(
                     `${host}/option/area-sizes`
                 )
-                setHousingTypes(housingTypesResponse.data)
-                setSpaceTypes(spaceTypesResponse.data)
                 setAreaSizes(areaSizesResponse.data)
             } catch (error) {
                 console.error(error)
@@ -307,28 +310,41 @@ export const Post = () => {
         }
         fetchData()
     }, [])
+
     // 게시글 작성 완료 처리 핸들러
     const handleSubmitPost = async () => {
-        // 서버에 보낼 데이터를 수집합니다.
-        const postData = {
-            housingType: selectedHousingType, // 선택된 주거 형태
-            spaceType: selectedSpaceType, // 선택된 공간 타입
-            areaSize: selectedAreaSize, // 선택된 평수
-            images: images.map(image => ({
-                src: image.src,
-                tags: image.tags,
-            })), // 이미지와 태그 배열
-            content: postContent, // 작성한 글 내용
-        }
-
         try {
-            // 서버에 POST 요청
-            const response = await axios.post(`${host}/posts`, postData)
+            // 1. 게시글 정보를 먼저 전송
+            const postData = {
+                housing_type_code: selectedHousingType, // 선택된 주거 형태 코드
+                space_type_code: selectedSpaceType, // 선택된 공간 타입 코드
+                area_size_code: selectedAreaSize, // 선택된 평수 코드
+                board_contents: postContent, // 작성한 글 내용
+                member_id: 'qwer1234',
+            }
+
+            const response = await axios.post(`${host}/community`, postData)
+            console.log(images)
             if (response.status === 200) {
+                const { board_seq } = response.data // 게시글 번호 받아오기
+
+                // 2. 이미지 및 태그 정보 전송
+                await Promise.all(
+                    images.map((image, index) => {
+                        const imageData = {
+                            board_seq: board_seq, // 받아온 게시글 번호
+                            image_url: image.src, // 이미지 URL 또는 base64
+                            image_order: index + 1, // 이미지 순서
+                            tags: image.tags, // 해당 이미지에 대한 태그 정보
+                        }
+                        return axios.post(`${host}/community/images`, imageData)
+                    })
+                )
+
                 Swal.fire({
                     icon: 'success',
                     title: '게시글 작성 완료',
-                    text: '게시글이 성공적으로 작성되었습니다.',
+                    text: '게시글과 이미지가 성공적으로 작성되었습니다.',
                 })
             } else {
                 Swal.fire({
@@ -553,7 +569,7 @@ export const Post = () => {
                             <div className={styles.productList}>
                                 {searchResults.map(product => (
                                     <div
-                                        key={product.id}
+                                        key={product.product_seq}
                                         className={styles.searchResultItem}
                                     >
                                         <div className={styles.productImg}>

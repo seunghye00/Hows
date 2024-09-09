@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Community">
+    <insert id="insertWrite" parameterType="com.hows.community.dto.CommunityDTO">
+		insert into board values(board_seq.nextval, #{board_contents}, 
+		default, default, #{housing_type_code}, #{space_type_code}, #{area_size_code}, default, #{member_id})
+	</insert>
+	<select id="selectBoardSeq" resultType="int">
+    	select board_seq.currval from dual
+	</select>
+</mapper>

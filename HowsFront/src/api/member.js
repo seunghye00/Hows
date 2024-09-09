@@ -48,8 +48,11 @@ export const getAllBlacklistReasons = () => {
 }
 
 // 블랙리스트 등록
-export const addBlacklist = ({ member_id, reason }) => {
-    return axios.post(`${baseUrl}/addBlacklist`, { member_id, reason })
+export const addBlacklist = ({ member_id, blacklist_reason_code }) => {
+    return axios.post(`${baseUrl}/addBlacklist`, {
+        member_id,
+        blacklist_reason_code,
+    })
 }
 
 // 블랙리스트 조회

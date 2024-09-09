@@ -136,8 +136,12 @@ public class MemberDAO {
 	}
 
 	// 블랙리스트 등록 (관리자)
-	public int addBlacklist(HashMap<String, String> map) {
-		return mybatis.update("Member.addBlacklist", map);
+	public int addBlacklist(String member_id , String blacklist_reason_code) {
+		HashMap<String, String> params = new HashMap<>();
+	    params.put("member_id", member_id);
+	    params.put("blacklist_reason_code", blacklist_reason_code);
+	    
+		return mybatis.update("Member.addBlacklist",params);
 	}
 
 	// 블랙리스트 조회 (관리자)

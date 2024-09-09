@@ -130,12 +130,8 @@ public class MemberService implements UserDetailsService {
 	}
 
 	// 블랙리스트 등록 (관리자)
-	public int addBlacklist(String memberId, String reasonCode) {
-		HashMap<String, String> map = new HashMap<>();
-		map.put("member_id", memberId);
-		map.put("blacklist_reason_code", reasonCode);
-
-		return memDao.addBlacklist(map);
+	public int addBlacklist(String member_id, String blacklist_reason_code) {
+		return memDao.addBlacklist(member_id, blacklist_reason_code);
 	}
 
 	// 블랙리스트 조회 (관리자)

@@ -196,13 +196,17 @@ public class MemberController {
 	// 블랙리스트 등록 (관리자)
 	@PostMapping("/addBlacklist")
 	public ResponseEntity<Integer> addBlacklist(@RequestBody Map<String, String> request) {
-		String memberId = request.get("member_id");
-		String reasonCode = request.get("blacklist_reason_code");
+	    String memberId = request.get("member_id");
+	    String reasonCode = request.get("blacklist_reason_code");
+	    
+	    // 로그 출력으로 데이터 확인
+	    System.out.println("Received member_id: " + memberId);
+	    System.out.println("Received blacklist_reason_code: " + reasonCode);
 
-		// 역할을 블랙리스트로 변환하고, 블랙리스트 사유 코드 업데이트
-		int result = memServ.addBlacklist(memberId, reasonCode);
-		return ResponseEntity.ok(result);
+	    int result = memServ.addBlacklist(memberId, reasonCode);
+	    return ResponseEntity.ok(result);
 	}
+	
 
 	// 블랙리스트 조회 (관리자)
 	@GetMapping("/blacklist")

@@ -170,7 +170,10 @@ export const Member = () => {
         const memberId = selectedMember.member_id
 
         // 블랙리스트 사유 등록 및 역할 업데이트
-        addBlacklist({ member_id: memberId, reason: blacklistReason })
+        addBlacklist({
+            member_id: memberId,
+            blacklist_reason_code: blacklistReason,
+        })
             .then(() => updateRole({ member_id: memberId, role_code: 'R3' }))
             .then(() => {
                 alert('블랙리스트로 등록되었습니다.')

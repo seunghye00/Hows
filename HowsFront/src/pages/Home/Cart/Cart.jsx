@@ -103,8 +103,8 @@ export const Cart = () => {
     dataArr.forEach(item => {
       const dataSet = {
         product_seq: item.product_seq,
-        product_title: item.products_title,
-        product_image: item.products_thumbnail,
+        product_title: item.product_title,
+        product_image: item.product_thumbnail,
         product_quantity: item.cart_quantity,
         product_total_price: item.cart_price,
       };
@@ -158,19 +158,24 @@ export const Cart = () => {
   /** 페이지 로드 **/
   useEffect(() => {
     // 서버에서 받아올 실제 사용 데이터 ( 표본 )
-    // const arr = [
-    //   {cart_seq: 1, product_seq: 1, member_seq: 1, cart_quantity: 1, cart_price: 199000, cart_date: "2024-09-05", product_thumbnail: img1, product_title: "consectetur adipisicing elit Lorem ipsum dolor sit amet, ....", product_contents: "test", price: 199000, product_category_code: 1},
-    //   {cart_seq: 2, product_seq: 2, member_seq: 1, cart_quantity: 1, cart_price: 299000, cart_date: "2024-09-05", product_thumbnail: img2, product_title: "Lorem ipsum consectetur adipisicingdolor sit amet,  elit....", product_contents: "test", price: 299000, product_category_code: 1},
-    //   {cart_seq: 3, product_seq: 3, member_seq: 1, cart_quantity: 1, cart_price: 219000, cart_date: "2024-09-05", product_thumbnail: img3, product_title: "sit amet, consecteturLorem ipsum dolor  adipisicing elit....", product_contents: "test", price: 219000, product_category_code: 1},
-    //   {cart_seq: 4, product_seq: 4, member_seq: 1, cart_quantity: 1, cart_price: 87000, cart_date: "2024-09-05", product_thumbnail: img4, product_title: "adipisicing elit Lorem ipsum dolor sit amet, consectetur ....", product_contents: "test", price: 87000, product_category_code: 1}
-    // ]
+    const arr = [
+      {cart_seq: 1, product_seq: 1, member_seq: 1, cart_quantity: 1, cart_price: 199000, cart_date: "2024-09-05", product_thumbnail: img1, product_title: "consectetur adipisicing elit Lorem ipsum dolor sit amet, ....", product_contents: "test", price: 199000, product_category_code: 1},
+      {cart_seq: 2, product_seq: 2, member_seq: 1, cart_quantity: 1, cart_price: 299000, cart_date: "2024-09-05", product_thumbnail: img2, product_title: "Lorem ipsum consectetur adipisicingdolor sit amet,  elit....", product_contents: "test", price: 299000, product_category_code: 1},
+      {cart_seq: 3, product_seq: 3, member_seq: 1, cart_quantity: 1, cart_price: 219000, cart_date: "2024-09-05", product_thumbnail: img3, product_title: "sit amet, consecteturLorem ipsum dolor  adipisicing elit....", product_contents: "test", price: 219000, product_category_code: 1},
+      {cart_seq: 4, product_seq: 4, member_seq: 1, cart_quantity: 1, cart_price: 87000, cart_date: "2024-09-05", product_thumbnail: img4, product_title: "adipisicing elit Lorem ipsum dolor sit amet, consectetur ....", product_contents: "test", price: 87000, product_category_code: 1}
+    ]
+    const newArr = arr.map(item => ({ ...item, checked: true }));
+    setCarts(newArr);
+    setCheckCart(newArr);
+    totalPrice();
 
-    cartList().then(res => {
-      const arr = res.data.map(item => ({ ...item, checked: true }));
-      setCarts(arr);
-      setCheckCart(arr);
-      totalPrice();
-    });
+
+    // cartList().then(res => {
+    //   const arr = res.data.map(item => ({ ...item, checked: true }));
+    //   setCarts(arr);
+    //   setCheckCart(arr);
+    //   totalPrice();
+    // });
 
   }, []);
 
@@ -210,10 +215,10 @@ export const Cart = () => {
                 <div className={styles.item} key={item.cart_seq}>
                   <input type="checkbox" name={item.cart_seq} onChange={handleCheck} checked={item.checked}/>
                   <div className={styles.itemImage}>
-                    <img src={item.products_thumbnail} alt="상품이미지"/>
+                    <img src={item.product_thumbnail} alt="상품이미지"/>
                   </div>
                   <div className={styles.itemInfo}>
-                    <p>{item.products_title}</p>
+                    <p>{item.product_title}</p>
                     <div className={styles.itemCount}>
                       <span> 수량 : </span>
                       <button onClick={() => handleCount(item.cart_seq, "-")}>-</button>

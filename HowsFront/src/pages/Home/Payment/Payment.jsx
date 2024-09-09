@@ -1,5 +1,4 @@
 import styles from './Payment.module.css'
-import Postcode from "react-daum-postcode";
 import React, {useEffect, useState} from "react";
 import {useOrderStore} from "../../../store/orderStore";
 import {addCommas, shippingPrice} from "../../../commons/commons";
@@ -17,8 +16,11 @@ export const Payment = () => {
   // Coupon 목록
   const [coupon, setCoupon] = useState([]);
 
-  // 쿠폰 적용 가격
-  const [discountPrice, setDiscountPrice] = useState(0);
+  // 가격 정보
+  const [paymentPrice, setPaymentPrice] = useState({ price: orderPrice, coupon: 0, point: 0, shipping: 0, total: 0 });
+  
+  // 필수 동의 항목
+  const [consent, setConsent] = useState({category1: false, category2: false});
 
   // 주문 데이터
   const [data, setData] = useState({
@@ -38,13 +40,18 @@ export const Payment = () => {
     console.log("data ==== ", data);
   }
 
+  /** 동의 항목 체크 **/
+  const handleCheck = (e) => {
+    const {name, checked} = e.target;
+    setConsent(prev => ({ ...prev, [name]: checked }));
+  }
+
   /** 주문 정보 ( 이름, 전화번호, 주소, 결제방식, 쿠폰, 포인트 ) **/
   const handleData = (e) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
     if(name === "point") {
-      if(value <= member.point) {
-        setData(prev => ({ ...prev, point : parseInt(value) }));
-      }
+      if(value === "") value = 0;
+      if(value <= member.point) setData(prev => ({ ...prev, point: parseInt(value) }));
     } else {
       setData(prev => ({ ...prev, [name]: value }));
     }
@@ -59,12 +66,16 @@ export const Payment = () => {
   /** 새로고침 시 세션에서 order list 가져옴 **/
   useEffect(() => {
     if(orderProducts.length <= 0){
-      const data = sessionStorage.getItem("howsOrder");
+      const item = sessionStorage.getItem("howsOrder");
       const price = sessionStorage.getItem("howsPrice");
       if(data !== null){
-        const order = JSON.parse(data);
+        const order = JSON.parse(item);
         setOrderProducts(order);
         setOrderPrice(parseInt(price));
+
+        setPaymentPrice(prev => ({
+          ... prev, price: parseInt(price), shipping: shippingPrice(parseInt(price)), total: price-shippingPrice(price)
+        }));
       }
     }
 
@@ -101,7 +112,6 @@ export const Payment = () => {
       },
     ]
     setCoupon(couponData);
-    setDiscountPrice(orderPrice);
   }, []);
 
   /** 쿠폰 선택시 할인 가격 계산 **/
@@ -111,9 +121,19 @@ export const Payment = () => {
       if(parseInt(item.coupon_seq) === parseInt(data.coupon)) discount = item.coupon_discount;
     });
     const result = `${orderPrice.toString()}${discount}`;
-    setDiscountPrice(eval(result));
-    
+    setPaymentPrice(prev => {
+      return {
+        ...prev,
+        coupon: paymentPrice.price-eval(result),
+        total: eval(result)
+      }
+    });
+
   }, [data.coupon]);
+
+  useEffect(() => {
+    setPaymentPrice(prev => ({ ...prev, point: data.point, total: prev.price - prev.coupon - shippingPrice(prev.price)}));
+  }, [data.point])
 
   return (
     <div className={styles.container}>
@@ -165,7 +185,7 @@ export const Payment = () => {
             <input type="text" placeholder="주소" value={data.address} readOnly/>
           </div>
           <div className={styles.address}>
-            <input type="text" name="detail_address" value={data.detail_address} placeholder="상세 주소를 입력하세요"/>
+            <input type="text" name="detail_address" value={data.detail_address || ""} placeholder="상세 주소를 입력하세요" onChange={handleData}/>
           </div>
           <div className={styles.member}>
             <label htmlFor="">　　이름　</label>
@@ -209,21 +229,41 @@ export const Payment = () => {
           <div className={styles.payment}>
             <p>Point</p>
             <div>
-              <input type="text" value={member.point-data.point || 0}/>
-              <span>보유</span>
+              <input type="text" value={member.point-data.point || 0} readOnly/>
+              <span>p 보유</span>
               <input type="text" name="point" onChange={handleData} value={data.point || 0}/>
-              <span>사용</span>
+              <span>p 사용</span>
             </div>
           </div>
         </div>
 
         {/* 가격 */}
         <div className={styles.paymentPrice}>
-          <p>가격 : {addCommas(orderPrice)} 원</p>
-          <p>쿠폰 할인가 : {addCommas(orderPrice-discountPrice)} 원</p>
-          <p>사용 포인트 : {data.point || 0} P</p>
-          <p>배송비 : {addCommas(shippingPrice(orderPrice))}원</p>
-          <p>총 결제 금액 : {addCommas(discountPrice - shippingPrice(orderPrice) - data.point)}원</p>
+          <div className={styles.priceInfo}>
+            <div>
+              <p>가격 : </p>
+              <p>쿠폰 할인가 : </p>
+              <p>사용 포인트 : </p>
+              <p>배송비 : </p>
+              <p>총 결제 금액 : </p>
+            </div>
+            <div>
+              <p>{addCommas(paymentPrice.price)} 원</p>
+              <p>{addCommas(paymentPrice.coupon)} 원</p>
+              <p>{paymentPrice.point || 0} P</p>
+              <p>{addCommas(paymentPrice.shipping)} 원</p>
+              <p>{addCommas(paymentPrice.total - paymentPrice.point)} 원</p>
+            </div>
+          </div>
+
+          <div className={styles.consent}>
+            <input name="category1" checked={consent.category1} type="checkbox" onChange={handleCheck}/> <label>(필수) 결제에
+            동의</label>
+          </div>
+          <div className={styles.consent}>
+          <input name="category2" checked={consent.category2} type="checkbox" onChange={handleCheck}/> <label>(필수) 결제에
+            동의</label>
+          </div>
           <button>결제하기</button>
         </div>
 

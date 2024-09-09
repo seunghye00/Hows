@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { host } from '../../../../../config/config'
 import { api } from "../../../../../config/config";
+import { format } from "date-fns";
+import { useAuthStore } from "../../../../../store/store";
 
 export const UpdateUserInfo = () => {
 
@@ -23,14 +25,73 @@ export const UpdateUserInfo = () => {
         address: '',
         detail_address: '',
     })
+    const [user, setUser] = useState([]);
+    const [nicknameErrorMessage, setNicknameErrorMessage] = useState('');
+    const [nicknameAvailable, setNicknameAvailable] = useState(null);
+    const [checkNicknameStatus, setCheckNicknameStatus] = useState('');
+    const [nicknameChecked, setNicknameChecked] = useState(false); // 중복확인 상태 검사
+    const { setIsAuth } = useAuthStore();
 
-    const handleChange = e => {
-        const { name, value } = e.target
+    useEffect(() => {
+        // 회원정보 가져오기
+        api.get(`/member/selectInfo`).then((resp) => {
+            setUser(resp.data);
+        });
+    }, []);
+
+    useEffect(() => {
+        // user 데이터가 있을 경우, formData 초기화
+        if (user) {
+            setFormData({
+                member_id: user.member_id,
+                pw: '',
+                pw2: '',
+                name: user.name,
+                birth: user.birth,
+                gender: user.gender,
+                nickname: user.nickname,
+                email: user.email,
+                phone: user.phone,
+                zip_code: user.zip_code,
+                address: user.address,
+                detail_address: user.detail_address,
+            });
+        }
+    }, [user]);
+
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value,
-        }))
+            [name]: value
+        }));
+    };
+
+    // 닉네임 중복확인 핸들러
+    const handleCheckNickname = () => {
+        // 닉네임 유효성 검사
+        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/;
+        if (!nicknamePattern.test(formData.nickname)) {
+            alert('닉네임은 한글, 영문자, 숫자로 이루어진 2~7자를 입력해주세요.');
+            setNicknameErrorMessage('다시 입력해주세요');
+            setNicknameAvailable(null);
+            return;
+        } else {
+            setNicknameErrorMessage(''); // 오류 메시지 초기화
+        }
+
+        // 중복확인 요청
+        api.post(`/member/checkNickname`, { nickname: formData.nickname })
+            .then(resp => {
+                console.log("nickname : ", resp.data);
+                setNicknameAvailable(resp.data);
+                setNicknameChecked(!resp.data);
+                setCheckNicknameStatus(resp.data ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
+            });
     }
+
+
 
     useEffect(() => {
         // 다음 주소 API 스크립트 로드
@@ -62,22 +123,6 @@ export const UpdateUserInfo = () => {
         }).open()
     }
 
-    // 체크박스 상태 변경 핸들러
-    const handleCheckboxChange = event => {
-        const value = event.target.value
-
-        let genderText = ''
-        if (value === 'male') {
-            genderText = 'M'
-        } else if (value === 'female') {
-            genderText = 'F'
-        }
-
-        setFormData(prev => ({
-            ...prev,
-            gender: genderText,
-        }))
-    }
 
     // 유효성
     const validateFormData = formData => {
@@ -86,7 +131,7 @@ export const UpdateUserInfo = () => {
             alert('닉네임을 입력하세요.')
             return false
         }
-        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/ // ***********수정하기
+        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/
         if (!nicknamePattern.test(formData.nickname)) {
             alert(
                 '닉네임은 한글, 영문자, 숫자 포함하여 2~7자까지 입력할 수 있습니다.'
@@ -134,28 +179,46 @@ export const UpdateUserInfo = () => {
     // 정보수정 완료 버튼
     const handleSubmit = e => {
         e.preventDefault(); // 기본 폼 제출 방지
-        // if (validateFormData(formData)) {
-        //     console.log("폼 데이터가 유효합니다:", formData);
-        // }
-
-        //===============================
         // 유효성 검사 실행
         if (!validateFormData(formData)) {
-            // 유효성 검사를 통과하지 못하면 더 이상 진행하지 않음
             return
         }
 
         // 유효성 검사를 통과하면 서버에 데이터 전송
-        // api.post(`${host}/member`, formData).then(resp => {
-        //     console.log('정보수정 : ', resp.data)
-        //     alert('회원정보가 성공적으로 수정되었습니다.')
-        //     // setMember([...member, resp.data]);
-        //     navi("/mypage/main");
+        api.post(`${host}/member`, formData).then(resp => {
+            console.log('정보수정 : ', resp.data)
+            // alert('회원정보가 성공적으로 수정되었습니다.')
+            // navi("/mypage/main");
 
-        // }).catch(error => {
-        //     alert('회원정보수정 중 오류가 발생했습니다.')
-        // })
+        }).catch(error => {
+            alert('회원정보수정 중 오류가 발생했습니다.')
+        })
     }
+
+    const handleDelete = () => {
+        const confirmDelete = window.confirm("정말 탈퇴하시겠습니까?");
+        if (confirmDelete) {
+            api.delete(`/member/deleteUser/${user.member_id}`).then(resp => {
+                if (resp.data > 0) {
+                    alert("성공적으로 탈퇴되었습니다.");
+                    sessionStorage.removeItem('token'); // 토큰 삭제
+                    setIsAuth(false); // 인증 상태 업데이트
+                    navi("/")
+                } else {
+                    console.log("탈퇴 중 오류 발생: ", resp.data);
+                }
+            }).catch(error => {
+                console.error("탈퇴 중 오류 발생: ", error);
+            });
+        }
+    };
+
+
+
+    const signup_date = new Date(user.signup_date);
+    const signup_currentDate = !isNaN(signup_date)
+        ? format(signup_date, "yyyy-MM-dd")
+        : "Invalid Date";
 
     return (
         <div className={styles.container}>
@@ -173,7 +236,7 @@ export const UpdateUserInfo = () => {
                     <span className={styles.title}>ID</span>
                     <input
                         type="text"
-                        placeholder="dobby_66"
+                        value={formData.member_id}
                         name="member_id"
                         className={styles.inputId}
                         disabled
@@ -183,7 +246,7 @@ export const UpdateUserInfo = () => {
                     <span className={styles.title}>이름</span>
                     <input
                         type="text"
-                        placeholder="홍길동"
+                        value={formData.name}
                         name="name"
                         className={styles.inputName}
                         disabled
@@ -194,7 +257,7 @@ export const UpdateUserInfo = () => {
                     <div>
                         <input
                             type="text"
-                            placeholder="19990101"
+                            value={formData.birth}
                             name="birth"
                             className={styles.inputBirth}
                             disabled
@@ -207,7 +270,7 @@ export const UpdateUserInfo = () => {
                                     name="gender"
                                     value="male"
                                     checked={formData.gender === 'M'}
-                                    onChange={handleCheckboxChange}
+                                    disabled
                                 />
                             </label>
                             <label>
@@ -217,7 +280,7 @@ export const UpdateUserInfo = () => {
                                     name="gender"
                                     value="female"
                                     checked={formData.gender === 'F'}
-                                    onChange={handleCheckboxChange}
+                                    disabled
                                 />
                             </label>
                         </div>
@@ -232,20 +295,27 @@ export const UpdateUserInfo = () => {
                     <div className={styles.formGrop}>
                         <input
                             type="text"
-                            placeholder="닉네임"
+                            value={formData.nickname}
                             name="nickname"
                             onChange={handleChange}
                             className={styles.inputNickname}
-                        ></input>
-                        <button className={styles.chkBtn}>중복확인</button>
+                        />
+                        <button className={styles.chkBtn} onClick={handleCheckNickname}>중복확인</button>
                     </div>
+                    {nicknameErrorMessage && <p style={{ color: 'red' }} className={styles.error}>{nicknameErrorMessage}</p>} {/* 정규표현식 오류 메시지 */}
+                    {nicknameAvailable === false && (
+                        <p style={{ color: 'green' }} className={styles.valid}>사용 가능한 닉네임입니다.</p>
+                    )}
+                    {nicknameAvailable === true && (
+                        <p style={{ color: 'red' }} className={styles.valid}>이미 사용 중인 닉네임입니다.</p>
+                    )}
                 </div>
                 <div className={styles.emailBox}>
                     <span className={styles.title}>이메일</span>
                     <span>.com / .net / .org 형식의 이메일만 가능합니다.</span>
                     <input
                         type="text"
-                        placeholder="이메일"
+                        value={formData.email}
                         name="email"
                         onChange={handleChange}
                         className={styles.inputEmail}
@@ -255,7 +325,7 @@ export const UpdateUserInfo = () => {
                     <span className={styles.title}>전화번호</span>
                     <input
                         type="text"
-                        placeholder="( - ) 제외 ex) 01011112222"
+                        value={formData.phone}
                         name="phone"
                         onChange={handleChange}
                         className={styles.inputPhone}
@@ -265,27 +335,24 @@ export const UpdateUserInfo = () => {
                     <span className={styles.title}>주소</span>
                     <input
                         type="text"
-                        placeholder="우편번호"
-                        name="zip_code"
                         value={formData.zip_code}
+                        name="zip_code"
                         onChange={handleChange}
                         // readOnly
                         required
                     />
                     <input
                         type="text"
-                        placeholder="주소"
-                        name="address"
                         value={formData.address}
+                        name="address"
                         onChange={handleChange}
                         // readOnly
                         required
                     />
                     <input
                         type="text"
-                        placeholder="상세주소"
-                        name="detail_address"
                         value={formData.detail_address}
+                        name="detail_address"
                         onChange={handleChange}
                         required
                     />
@@ -301,19 +368,20 @@ export const UpdateUserInfo = () => {
                     <span className={styles.title}>가입일자</span>
                     <input
                         type="text"
-                        placeholder="2024. 09. 01."
+                        value={signup_currentDate}
                         name="name"
                         disabled
                     ></input>
                 </div>
                 <div className={styles.signout}>
-                    <button className={styles.linkBtn}>탈퇴하기</button>
+                    <button className={styles.linkBtn} onClick={handleDelete}>탈퇴하기</button>
                 </div>
                 <div className={styles.btns}>
                     <button onClick={handleSubmit}>완료</button>
-                    <button>취소</button>
+                    <button onClick={() => navi("/mypage/main")}>취소</button>
                 </div>
             </div>
-        </div>
+        </div >
     )
+
 }

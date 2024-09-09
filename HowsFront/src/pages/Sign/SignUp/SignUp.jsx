@@ -23,7 +23,16 @@ export const SignUp = () => {
         detail_address: '',
     })
     // const { member, setMember } = useMemberStore(); // Zustand store 사용
-    const [gender, setGender] = useState({ male: false, female: false })
+    const [idAvailable, setIdAvailable] = useState(null);
+    const [nicknameAvailable, setNicknameAvailable] = useState(null);
+    const [emailAvailable, setEmailAvailable] = useState(null);
+    const [checkIdStatus, setCheckIdStatus] = useState('');
+    const [checkNicknameStatus, setCheckNicknameStatus] = useState('');
+    const [checkEmailStatus, setCheckEmailStatus] = useState('');
+    const [idErrorMessage, setIdErrorMessage] = useState('');
+    const [nicknameErrorMessage, setNicknameErrorMessage] = useState('');
+    const [idChecked, setIdChecked] = useState(false); // 중복확인 상태 검사
+    const [nicknameChecked, setNicknameChecked] = useState(false); // 중복확인 상태 검사
 
     const handleChange = e => {
         const { name, value } = e.target
@@ -31,6 +40,59 @@ export const SignUp = () => {
             ...prev,
             [name]: value,
         }))
+
+        // input창 변경 시
+        if (name === 'member_id') {
+            setIdChecked(false);
+        } else if (name === 'nickname') {
+            setNicknameChecked(false);
+        }
+    }
+
+    // 중복확인 버튼 핸들러
+    const handleCheckId = () => {
+        // ID 유효성 검사
+        const idPattern = /^[a-zA-Z0-9]{4,12}$/;
+        if (!idPattern.test(formData.member_id)) {
+            alert('아이디는 영어, 숫자로 이루어진 4~12자를 입력해주세요.');
+            setIdErrorMessage('다시 입력해주세요');
+            setIdAvailable(null);
+            return;
+        } else {
+            setIdErrorMessage(''); // 오류 메시지 초기화
+        }
+
+        // 중복확인 요청
+        axios.post(`${host}/member/checkId`, { member_id: formData.member_id })
+            .then(resp => {
+                console.log("id : ", resp.data);
+                setIdAvailable(resp.data);
+                setIdChecked(!resp.data);
+                setCheckIdStatus(resp.data ? "이미 사용 중인 ID입니다." : "사용 가능한 ID입니다.");
+            });
+    }
+
+    // 닉네임 중복확인 핸들러
+    const handleCheckNickname = () => {
+        // 닉네임 유효성 검사
+        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/;
+        if (!nicknamePattern.test(formData.nickname)) {
+            alert('닉네임은 한글, 영문자, 숫자로 이루어진 2~7자를 입력해주세요.');
+            setNicknameErrorMessage('다시 입력해주세요');
+            setNicknameAvailable(null);
+            return;
+        } else {
+            setNicknameErrorMessage(''); // 오류 메시지 초기화
+        }
+
+        // 중복확인 요청
+        axios.post(`${host}/member/checkNickname`, { nickname: formData.nickname })
+            .then(resp => {
+                console.log("nickname : ", resp.data);
+                setNicknameAvailable(resp.data);
+                setNicknameChecked(!resp.data);
+                setCheckNicknameStatus(resp.data ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
+            });
     }
 
     useEffect(() => {
@@ -41,7 +103,7 @@ export const SignUp = () => {
         script.async = true
         script.onload = () => {
             // 스크립트가 로드되면 Postcode 사용 가능
-            console.log('다음 주소 API가 로드되었습니다.')
+            // console.log('다음 주소 API가 로드되었습니다.')
         }
         document.head.appendChild(script)
 
@@ -129,7 +191,7 @@ export const SignUp = () => {
             alert('닉네임을 입력하세요.')
             return false
         }
-        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/ // ***********수정하기
+        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/
         if (!nicknamePattern.test(formData.nickname)) {
             alert(
                 '닉네임은 한글, 영문자, 숫자 포함하여 2~7자까지 입력할 수 있습니다.'
@@ -142,11 +204,11 @@ export const SignUp = () => {
             alert('생년월일을 입력하세요.')
             return false
         }
-        // const birthPattern = /^\d{4}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/
-        // if (formData.birth && !birthPattern.test(formData.birth)) {
-        //     alert('유효한 생년월일을 입력하세요. (예: 19900101)')
-        //     return false
-        // }
+        const birthPattern = /^\d{4}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/
+        if (formData.birth && !birthPattern.test(formData.birth)) {
+            alert('유효한 생년월일을 입력하세요. (예: 19900101)')
+            return false
+        }
         // 성별 검사
         if (!formData.gender) {
             alert('성별을 선택하세요.')
@@ -191,18 +253,34 @@ export const SignUp = () => {
 
     // 회원가입 버튼
     const handleSubmit = e => {
-        // e.preventDefault(); // 기본 폼 제출 방지
-        // if (validateFormData(formData)) {
-        //     console.log("폼 데이터가 유효합니다:", formData);
-        // }
-
-        //===============================
         e.preventDefault()
 
         // 유효성 검사 실행
         if (!validateFormData(formData)) {
-            // 유효성 검사를 통과하지 못하면 더 이상 진행하지 않음
-            return
+            return;
+        }
+
+        // 중복 확인 상태 체크
+        if (idAvailable === null) {
+            alert('아이디 중복 확인을 해주세요.');
+            return;
+        }
+        if (nicknameAvailable === null) {
+            alert('닉네임 중복 확인을 해주세요.');
+            return;
+        }
+        // if (emailAvailable === null) {
+        //     alert('이메일 중복 확인을 해주세요.');
+        //     return;
+        // }
+
+        if (!idChecked) {
+            alert("아이디 중복 확인을 해주세요.");
+            return;
+        }
+        if (!nicknameChecked) {
+            alert("닉네임 중복 확인을 해주세요.");
+            return;
         }
 
         // 유효성 검사를 통과하면 서버에 데이터 전송
@@ -211,7 +289,6 @@ export const SignUp = () => {
             .then(resp => {
                 console.log('회원가입 : ', resp.data)
                 alert('회원가입이 성공적으로 완료되었습니다.')
-                // setMember([...member, resp.data]);
                 navi("/");
             })
             .catch(error => {
@@ -236,8 +313,15 @@ export const SignUp = () => {
                             onChange={handleChange}
                             className={styles.inputId}
                         ></input>
-                        <button className={styles.chkBtn}>중복확인</button>
+                        <button className={styles.chkBtn} onClick={handleCheckId}>중복확인</button>
                     </div>
+                    {idErrorMessage && <p style={{ color: 'red' }} className={styles.error}>{idErrorMessage}</p>} {/* 정규표현식 오류 메시지 */}
+                    {idAvailable === false && (
+                        <p style={{ color: 'green' }} className={styles.valid}>사용 가능한 ID입니다.</p>
+                    )}
+                    {idAvailable === true && (
+                        <p style={{ color: 'red' }} className={styles.valid}>이미 사용 중인 ID입니다.</p>
+                    )}
                 </div>
                 <div className={styles.pwBox}>
                     <span className={styles.title}>비밀번호</span>
@@ -287,8 +371,15 @@ export const SignUp = () => {
                             onChange={handleChange}
                             className={styles.inputNickname}
                         ></input>
-                        <button className={styles.chkBtn}>중복확인</button>
+                        <button className={styles.chkBtn} onClick={handleCheckNickname}>중복확인</button>
                     </div>
+                    {nicknameErrorMessage && <p style={{ color: 'red' }} className={styles.error}>{nicknameErrorMessage}</p>} {/* 정규표현식 오류 메시지 */}
+                    {nicknameAvailable === false && (
+                        <p style={{ color: 'green' }} className={styles.valid}>사용 가능한 닉네임입니다.</p>
+                    )}
+                    {nicknameAvailable === true && (
+                        <p style={{ color: 'red' }} className={styles.valid}>이미 사용 중인 닉네임입니다.</p>
+                    )}
                 </div>
                 <div className={styles.birthBox}>
                     <span className={styles.title}>생년월일</span>
@@ -333,6 +424,12 @@ export const SignUp = () => {
                         className={styles.inputEmail}
                     ></input>
                 </div>
+                {emailAvailable === false && (
+                    <p style={{ color: 'green' }} className={styles.valid}>사용 가능한 이메일입니다.</p>
+                )}
+                {emailAvailable === true && (
+                    <p style={{ color: 'red' }} className={styles.valid}>이미 사용 중인 이메일입니다.</p>
+                )}
                 <div className={styles.phoneBox}>
                     <span className={styles.title}>전화번호</span>
                     <input

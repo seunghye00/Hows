@@ -1,0 +1,89 @@
+/* div {
+  border: 1px solid black;
+} */
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+}
+
+.container .findIdBox {
+  display: flex;
+  flex-direction: column;
+  width: 350px;
+  height: 500px;
+  text-align: center;
+}
+.container .findIdBox .logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 40px;
+}
+.container .findIdBox .logo > img {
+  width: 90px;
+  height: 95px;
+  margin-right: 20px;
+}
+
+.container .findIdBox .logo .title {
+  display: flex;
+  justify-content: center;
+  font-size: 65px;
+  padding-top: 45px;
+  color: var(--hows-point-color);
+}
+
+.container .findIdBox > input {
+  height: 35px;
+  border: 1px solid var(--hows-gray-200);
+  border-radius: 4px;
+  font-size: 16px;
+  padding: 10px;
+  margin-bottom: 8px;
+}
+.container .findIdBox > input:focus {
+  /* 테두리 색상 */
+  outline: 1px solid var(--hows-gray-200);
+}
+
+.container .findIdBox > button {
+  height: 50px;
+  margin-bottom: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+}
+
+.container .findIdBox .findBtn {
+  margin-top: 10px;
+  background-color: var(--hows-point-color-dark);
+  color: var(--hows-white);
+}
+.container .findIdBox .findBtn:hover {
+  background-color: var(--hows-point-color-darker);
+}
+
+.container .findIdBox .backBtn {
+  margin-top: 5px;
+  background-color: var(--hows-gray-200);
+  color: var(--hows-white);
+}
+.container .findIdBox .backBtn:hover {
+  background-color: var(--hows-gray-300);
+}
+
+/* subTitle */
+.container .subTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--hows-point-color-darkest);
+  margin-top: -20px;
+  margin-bottom: 30px;
+}

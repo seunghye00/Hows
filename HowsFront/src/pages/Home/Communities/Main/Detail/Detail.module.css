@@ -1,0 +1,137 @@
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.imageSection {
+    margin: 20px 0;
+}
+
+.productTagSection {
+    margin-top: 20px;
+}
+
+/* Detail.module.css */
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    /* 페이지 가운데 정렬 */
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.imageSection,
+.productTagSection {
+    margin-bottom: 30px;
+    /* 이미지 섹션과 태그 섹션 사이 간격 */
+}
+
+.postActions {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    justify-content: space-between;
+    color: var(--hows-gray-600);
+    margin-bottom: 20px;
+}
+
+.likesViewBook {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.subMitLink {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mainContent {
+    font-weight: 500;
+    margin-bottom: 20px;
+    word-break: keep-all;
+    word-wrap: break-word;
+}
+
+.commentInput {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.commentInput input {
+    width: calc(100% - 60px);
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--hows-gray-600);
+}
+
+.writerProfile {
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.writerProfile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.userName {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.comment {
+    display: flex;
+    gap: 20px;
+}
+
+.replyImg {
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.replyImg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.replyInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.commentActions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 14px;
+    color: var(--hows-gray-600);
+}
+
+.reportModal {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 400px;
+}
+
+.reportModal h3 {
+    text-align: center;
+}
+
+.reportlist {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}

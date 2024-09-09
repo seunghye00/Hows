@@ -8,53 +8,195 @@
 	<!-- 회원가입 -->
 	<insert id="insert">
 		insert into member values (
-			member_seq.nextval, 
-			#{member_id}, 
-		    #{pw}, 
-		    #{name}, 
-		    #{nickname}, 
-		    #{birth}, 
-		    #{gender}, 
-		    #{phone}, 
-		    #{email}, 
-		    #{zip_code}, 
-		    #{address}, 
-		    #{detail_address}, 
-		    default, 
-		    default, 
-		    default,
-		    default,
-		    default,    
-		    default, 
-		    default, 
-		    default,
-		    default    
+		member_seq.nextval,
+		#{member_id},
+		#{pw},
+		#{name},
+		#{nickname},
+		#{birth},
+		#{gender},
+		#{phone},
+		#{email},
+		#{zip_code},
+		#{address},
+		#{detail_address},
+		default,
+		default,
+		default,
+		default,
+		default,
+		default,
+		default,
+		default,
+		default
 		)
 	</insert>
-	
-	<!-- 회원정보 가져오기 -->
-	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
-		select * from member where member_id = #{id}
+
+	<!-- 중복확인 - ID -->
+	<select id="checkId" resultType="Integer">
+		select count(*) from member where member_id = #{member_id}
 	</select>
 	
+	<!-- 중복확인 - 닉네임 -->
+	<select id="checkNickname" resultType="Integer">
+		select count(*) from member where nickname = #{nickname}
+	</select>
+	
+	<!-- 중복확인 - 이메일 -->
+	<select id="checkEmail" resultType="Integer">
+		select count(*) from member where email = #{email}
+	</select>
+
+	<!-- [로그인]비밀번호 찾기 - 비밀번호 변경 -->
+	<update id="changePw">
+		update member set pw = #{pw} where member_id = #{member_id} and email = #{email}
+	</update>
+
+
+	<!-- 회원정보 가져오기 -->
+	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
+		select * from member where
+		member_id = #{id}
+	</select>
+	
+	<!-- 아이디 찾기 -->
+	<select id="findId" resultType="String">
+		select member_id from member where name = #{name} and email = #{email} 
+	</select>
+
+	<!-- 비밀번호 찾기 - 아이디, 이메일 존재여부 검증 -->
+	<select id="verifyUser" resultType="Integer">
+		select count(*) from member where member_id = #{member_id} and email = #{email} 
+	</select>
+
+
 	<!-- 마이페이지 회원정보 출력 -->
 	<select id="selectInfo" resultType="com.hows.member.dto.MemberDTO">
 		select * from member where member_id = #{member_id}
 	</select>
-	
+
 	<!-- 비밀번호 변경 시 기존 비밀번호 확인 -->
 	<select id="getPasswordById" resultType="string">
-		select pw from member where member_id = #{member_id}
+		select pw from member
+		where member_id = #{member_id}
 	</select>
-	
+
 	<!-- 비밀번호 변경 -->
 	<update id="updatePw">
-		update member set pw = #{pw} where member_id = #{member_id}
+		update member set pw = #{pw} where member_id =
+		#{member_id}
 	</update>
 	
-	
-	
-	
-	
-	
+	<!-- 회원탈퇴 -->
+	<delete id="deleteUser">
+		delete from member where member_id = #{member_id}
+	</delete>
+
+
+	<!-- ===========================================[ 관리자 ] -->
+	<!-- 전체 회원조회 (관리자) -->
+	<select id="selectAll"
+		resultType="com.hows.member.dto.MemberDTO">
+		select * from member
+	</select>
+
+	<!-- 회원 상세조회 (관리자) -->
+	<select id="detailmember"
+		resultType="com.hows.member.dto.MemberDTO">
+		SELECT
+		m.member_seq,
+		m.member_id,
+		m.name,
+		m.nickname,
+		m.phone,
+		m.email,
+		m.address,
+		m.detail_address,
+		m.birth,
+		m.signup_date,
+		m.withdrawal_date,
+		g.grade_title AS grade_code,
+		r.role_title AS
+		role_code
+		FROM member m
+		JOIN grade g ON m.grade_code = g.grade_code
+		JOIN
+		role r ON m.role_code = r.role_code
+		WHERE m.member_id = #{member_id}
+	</select>
+
+	<!-- 모든 등급 정보 가져오기 (관리자) -->
+	<select id="AllGrades" resultType="com.hows.grade.dto.GradeDTO">
+		SELECT grade_code, grade_title
+		FROM grade
+	</select>
+
+	<!-- 모든 역할 정보 가져오기 (관리자) -->
+	<select id="AllRoles" resultType="com.hows.role.dto.RoleDTO">
+		SELECT role_code, role_title
+		FROM role
+	</select>
+
+	<!-- 등급 업데이트 (관리자) -->
+	<update id="updateGrade">
+		UPDATE member
+		SET grade_code = #{grade_code}
+		WHERE
+		member_id = #{member_id}
+	</update>
+
+	<!-- 역할 업데이트 (관리자) -->
+	<update id="updateRole">
+		UPDATE member
+		SET role_code = #{role_code}
+		WHERE
+		member_id = #{member_id}
+	</update>
+
+	<!-- 전체 블랙리스트 사유 가져오기 (관리자) -->
+	<select id="getAllBlacklistReason"
+		resultType="com.hows.blacklistreason.dto.BlacklistReasonDTO">
+		SELECT blacklist_reason_code, blacklist_reason_description
+		FROM blacklist_reason
+	</select>
+
+	<!-- 블랙리스트 등록 (관리자) -->
+	<update id="addBlacklist">
+		UPDATE member
+		SET role_code = 'R3',
+		blacklist_reason_code = #{blacklist_reason_code}
+		WHERE member_id =
+		#{member_id}
+	</update>
+
+	<!-- 블랙리스트 조회 (관리자) -->
+	<select id="selectBlacklist"
+		resultType="com.hows.member.dto.MemberDTO">
+		SELECT
+		m.member_id,
+		m.name,
+		br.blacklist_reason_description AS
+		blacklist_reason_code,
+		m.blacklist_date
+		FROM
+		member m
+		JOIN
+		blacklist_reason br
+		ON
+		m.blacklist_reason_code =
+		br.blacklist_reason_code
+		WHERE
+		m.role_code = 'R3'
+	</select>
+
+	<!-- 블랙리스트 수정 (관리자) -->
+	<update id="modifyBlacklist">
+		UPDATE member
+		SET role_code = 'R2',
+		blacklist_reason_code = '',
+		blacklist_date = null
+		WHERE member_id = #{member_id}
+	</update>
+
+
 </mapper>

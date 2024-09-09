@@ -1,11 +1,12 @@
 package com.hows.banner.controller;
 
-import java.util.Arrays;
+import java.sql.Timestamp;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hows.File.service.FileService;
 import com.hows.banner.dto.BannerDTO;
 import com.hows.banner.service.BannerService;
+import com.hows.common.DateFormat;
 
 @RestController
 @RequestMapping("/banner")
@@ -28,7 +29,10 @@ public class BannerController {
 
 	@Autowired
 	private BannerService bannServ;
-
+	
+	@Autowired
+	private FileService fileServ;
+	
 	@GetMapping
 	public ResponseEntity<List<BannerDTO>> getAllBanners() throws Exception {
 		List<BannerDTO> list = bannServ.getAllBanners();
@@ -36,25 +40,56 @@ public class BannerController {
 	}
 
 	@PostMapping
-	public ResponseEntity<String> addBanner(MultipartFile file) throws Exception {
-		if (bannServ.addBanner(file)) {
+	public ResponseEntity<String> addBanner(@RequestParam("file") MultipartFile file, String startDate, String endDate, int banner_order) throws Exception {
+		
+		// 문자열을 날짜 형식으로 변환
+		Timestamp start_date = DateFormat.convertToTimestamp(startDate);
+		Timestamp end_date = DateFormat.convertToTimestamp(endDate);
+		
+		// 파일을 서버와 DB에 저장하고 반환받은 파일 정보에 대한 JSON 문자열
+		String bannerInfo = fileServ.upload(file, 0, "F5");
+		
+		// 문자열을 Map으로 변환
+		Map<String, Object> map = new ObjectMapper().readValue(bannerInfo, new TypeReference<Map<String, Object>>() {});
+		int file_seq = (int) map.get("file_seq");
+		String sysName = (String) map.get("sysName");
+		String banner_url = (String) map.get("banner_url");
+
+		BannerDTO dto = new BannerDTO(0, file_seq, banner_url, start_date, end_date, banner_order);
+		
+		if (bannServ.addBanner(dto)) {
 			return ResponseEntity.ok("success");
+		} else {
+			// banner에 대한 정보를 DB에 저장하는데 실패했을 경우 file 관련 정보 삭제
+			fileServ.deleteFile(sysName, "F5");
+			return ResponseEntity.badRequest().body("fail");
 		}
-		return ResponseEntity.badRequest().body("fail");
 	}
 
 	@DeleteMapping
-	public ResponseEntity<String> deleteBanner(@RequestParam String sysNames) throws Exception {
-		String[] bannerNames = sysNames.split(","); // seqs를 배열로 변환
-		if(bannServ.deleteBanner(bannerNames)) {
-			return ResponseEntity.ok("success");
+	@Transactional
+	public ResponseEntity<String> deleteBanner(@RequestParam String seqs) throws Exception {
+		String[] bannerSeqs = seqs.split(","); // seqs를 배열로 변환
+		for(String bannerSeq : bannerSeqs) {
+			try {
+				int banner_seq = Integer.parseInt(bannerSeq);
+                String sysName = fileServ.getSysName(banner_seq);
+                String result = fileServ.deleteFile(sysName, "F5");
+                if (result.equals("fail")) {
+                    throw new RuntimeException("파일 삭제 실패: " + sysName);
+                }
+                bannServ.deleteBanner(banner_seq);
+            } catch (Exception e) {
+                // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+                throw new RuntimeException("배너 삭제 실패", e);
+            }
 		}
-		return ResponseEntity.badRequest().body("fail");
+		return ResponseEntity.ok("success");
 	}
 
 	@ExceptionHandler(Exception.class)
-	public String exceptionHandler(Exception e) {
+	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();
-		return "redirect:/error";
+		return ResponseEntity.badRequest().body("fail");
 	}
 }

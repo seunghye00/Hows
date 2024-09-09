@@ -6,22 +6,32 @@
 <mapper namespace="File">
 
     <insert id="upload">
+    	<selectKey keyProperty="file_seq" resultType="int" order="AFTER">
+        	select file_seq.currval from dual
+   	 	</selectKey>
         INSERT INTO
-            file
+            files
         VALUES(
             file_seq.nextval,
-            #{file_code},
             #{file_oriname},
             #{file_sysname},
-            #{parent_seq}
-        );
+            #{parent_seq},
+            #{file_code}
+        )
     </insert>
 
     <delete id="deleteFile">
         DELETE FROM
-            file
+            files
         WHERE
             file_sysname = #{file_sysname}
     </delete>
+    
+    <select id="getSysName" resultType="String">
+        select file_sysname 
+        from files f 
+        join banner b on f.file_seq = b.file_seq
+        where b.banner_seq = #{bannerSeq}
+    </select>
 
 </mapper>

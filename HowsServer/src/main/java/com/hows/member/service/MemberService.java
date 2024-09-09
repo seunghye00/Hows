@@ -44,8 +44,10 @@ public class MemberService implements UserDetailsService {
 		return memDao.checkEmail(email);
 	}
 	
-	
-	
+	// [로그인]비밀번호 찾기 - 비밀번호 변경
+	public int changePw(Map<String, String> map) {
+		return memDao.changePw(map);
+	}
 	
 	
 	// 회원정보 가져오기
@@ -134,4 +136,13 @@ public class MemberService implements UserDetailsService {
 		return memDao.addBlacklist(map);
 	}
 
+	// 블랙리스트 조회 (관리자)
+	public List<MemberDTO> selectBlacklist() {
+		return memDao.selectBlacklist();
+	}
+
+	// 블랙리스트 수정 (관리자)
+	public int modifyBlacklist(String member_id) {
+		return memDao.modifyBlacklist(member_id);
+	}
 }

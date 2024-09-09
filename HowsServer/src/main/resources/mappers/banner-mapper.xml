@@ -6,6 +6,14 @@
 <mapper namespace="Banner">
 
 	<delete id="delete">
-		delete from banner where banner_sysname = #{sysname}
+		delete from banner where banner_seq = #{banner_seq}
 	</delete>
+	
+	<select id="selectAll" resultType="com.hows.banner.dto.BannerDTO">
+		select * from banner
+	</select>
+	
+	<insert id="insert">
+		insert into banner values (banner_seq.nextval, #{file_seq}, #{banner_url}, #{start_date}, #{end_date}, #{banner_order})
+	</insert>
 </mapper>

@@ -195,4 +195,19 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
+	// 블랙리스트 조회 (관리자)
+	@GetMapping("/blacklist")
+	public ResponseEntity<List<MemberDTO>> selectBlacklist() {
+		List<MemberDTO> blacklist = memServ.selectBlacklist();
+		return ResponseEntity.ok(blacklist);
+	}
+
+	// 블랙리스트 수정 (관리자)
+	@PutMapping("/modifyBlacklist")
+	public ResponseEntity<Integer> modifyBlacklist(@RequestBody Map<String, String> request) {
+		String memberId = request.get("member_id");
+		int result = memServ.modifyBlacklist(memberId);
+		return ResponseEntity.ok(result);
+	}
+
 }

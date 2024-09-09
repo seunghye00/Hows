@@ -248,3 +248,8 @@ select {
 .swiper-button-next {
   color: var(--hows-point-color-darkest) !important;
 }
+
+/* SweetAlert2 모달의 z-index 조정 */
+.swal2-container {
+  z-index: 9999;
+}

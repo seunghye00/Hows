@@ -3,22 +3,22 @@ package com.hows.banner.dto;
 import java.sql.Timestamp;
 
 public class BannerDTO {
-	private Long banner_seq;
-	private Long file_seq;
+	private int banner_seq;
+	private int file_seq;
 	private String banner_url;
 	private Timestamp start_date;
 	private Timestamp end_date;
 	private int banner_order;
-	public Long getBanner_seq() {
+	public int getBanner_seq() {
 		return banner_seq;
 	}
-	public void setBanner_seq(Long banner_seq) {
+	public void setBanner_seq(int banner_seq) {
 		this.banner_seq = banner_seq;
 	}
-	public Long getFile_seq() {
+	public int getFile_seq() {
 		return file_seq;
 	}
-	public void setFile_seq(Long file_seq) {
+	public void setFile_seq(int file_seq) {
 		this.file_seq = file_seq;
 	}
 	public String getBanner_url() {
@@ -45,7 +45,7 @@ public class BannerDTO {
 	public void setBanner_order(int banner_order) {
 		this.banner_order = banner_order;
 	}
-	public BannerDTO(Long banner_seq, Long file_seq, String banner_url, Timestamp start_date, Timestamp end_date,
+	public BannerDTO(int banner_seq, int file_seq, String banner_url, Timestamp start_date, Timestamp end_date,
 			int banner_order) {
 		super();
 		this.banner_seq = banner_seq;

@@ -10,8 +10,8 @@ import Swal from 'sweetalert2'
 export const Banner = () => {
     const [banners, setBanners] = useState([])
     const [banner, setBanner] = useState({
-        start_date: '',
-        end_date: '',
+        startDate: '',
+        endDate: '',
         banner_order: 0,
     })
     const [isModalOpen, setIsModalOpen] = useState(false)
@@ -95,9 +95,8 @@ export const Banner = () => {
 
         const formData = new FormData()
         formData.append('file', selectedFile)
-        // 각 속성을 개별적으로 추가
-        formData.append('start_date', banner.start_date)
-        formData.append('end_date', banner.end_date)
+        formData.append('startDate', banner.startDate)
+        formData.append('endDate', banner.endDate)
         formData.append('banner_order', banner.banner_order)
 
         addBanner(formData)
@@ -243,7 +242,9 @@ export const Banner = () => {
                                     />
                                 </div>
                                 <div className={styles.cols}>
-                                    {banner.banner_order}
+                                    {banner.banner_order === 0
+                                        ? '미정'
+                                        : banner.banner_order}
                                 </div>
                                 <div className={styles.cols}>
                                     <img
@@ -287,7 +288,7 @@ export const Banner = () => {
                         <div>시작일</div>
                         <input
                             type="datetime-local"
-                            name="start_date"
+                            name="startDate"
                             id=""
                             onChange={handleChangeBanner}
                         />
@@ -296,7 +297,7 @@ export const Banner = () => {
                         <div>종료일</div>
                         <input
                             type="datetime-local"
-                            name="end_date"
+                            name="endDate"
                             id=""
                             onChange={handleChangeBanner}
                         />

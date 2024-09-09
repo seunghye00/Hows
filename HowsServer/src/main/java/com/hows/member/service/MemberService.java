@@ -109,4 +109,13 @@ public class MemberService implements UserDetailsService {
 		return memDao.addBlacklist(map);
 	}
 
+	// 블랙리스트 조회 (관리자)
+	public List<MemberDTO> selectBlacklist() {
+		return memDao.selectBlacklist();
+	}
+
+	// 블랙리스트 수정 (관리자)
+	public int modifyBlacklist(String member_id) {
+		return memDao.modifyBlacklist(member_id);
+	}
 }

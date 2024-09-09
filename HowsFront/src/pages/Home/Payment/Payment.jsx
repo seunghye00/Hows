@@ -2,10 +2,12 @@ import styles from './Payment.module.css'
 import React, {useEffect, useState} from "react";
 import {useOrderStore} from "../../../store/orderStore";
 import {addCommas, shippingPrice} from "../../../commons/commons";
+import {requestPaymentEvent} from "../../../api/payment";
+import { v4 as uuidv4 } from 'uuid';
 
 export const Payment = () => {
 
-  const { orderPrice, setOrderPrice, orderProducts, setOrderProducts } = useOrderStore();
+  const { orderPrice, setOrderPrice, orderProducts, setOrderProducts, setPaymentInfo } = useOrderStore();
 
   // Daum PostCode
   const [postcode, setPostcode] = useState(false);
@@ -61,6 +63,23 @@ export const Payment = () => {
   const handleWay = (e) => {
     let { name } = e.target;
     setData(prev => ({ ...prev, way: name }));
+  }
+
+  /** 결제 이벤트 **/
+  const handlePayment = async () => {
+    const paymentId = `how-${uuidv4()}`
+    const orderName = "나이키 와플 트레이너 2 SD";
+    const totalAmount = paymentPrice.total - paymentPrice.point;
+    const payMethod = "CARD";
+    const customer = {
+      fullName: "노시온",
+      phoneNumber: "01051224519",
+      email: "vmfpsel@gmail.com"
+    }
+    const param = { paymentId, orderName, totalAmount, payMethod, customer };
+    setPaymentInfo({ orderName, totalAmount });
+    const result = await requestPaymentEvent(param);
+
   }
 
   /** 새로고침 시 세션에서 order list 가져옴 **/
@@ -264,7 +283,7 @@ export const Payment = () => {
           <input name="category2" checked={consent.category2} type="checkbox" onChange={handleCheck}/> <label>(필수) 결제에
             동의</label>
           </div>
-          <button>결제하기</button>
+          <button onClick={handlePayment}>결제하기</button>
         </div>
 
       </div>

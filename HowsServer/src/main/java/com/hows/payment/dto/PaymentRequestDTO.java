@@ -2,7 +2,10 @@ package com.hows.payment.dto;
 
 public class PaymentRequestDTO {
     private String paymentId;
-    private int totalPrice;
+    private String transactionType;
+    private String txId;
+    private String orderName;
+    private int totalAmount;
 
     public String getPaymentId() {
         return paymentId;
@@ -12,18 +15,46 @@ public class PaymentRequestDTO {
         this.paymentId = paymentId;
     }
 
-    public int getTotalPrice() {
-        return totalPrice;
+    public String getTransactionType() {
+        return transactionType;
     }
 
-    public void setTotalPrice(int totalPrice) {
-        this.totalPrice = totalPrice;
+    public void setTransactionType(String transactionType) {
+        this.transactionType = transactionType;
     }
 
-    public PaymentRequestDTO() {}
+    public String getTxId() {
+        return txId;
+    }
 
-    public PaymentRequestDTO(String paymentId, int totalPrice) {
+    public void setTxId(String txId) {
+        this.txId = txId;
+    }
+
+    public String getOrderName() {
+        return orderName;
+    }
+
+    public void setOrderName(String orderName) {
+        this.orderName = orderName;
+    }
+
+    public int getTotalAmount() {
+        return totalAmount;
+    }
+
+    public void setTotalAmount(int totalAmount) {
+        this.totalAmount = totalAmount;
+    }
+
+    public PaymentRequestDTO() {
+    }
+
+    public PaymentRequestDTO(String paymentId, String transactionType, String txId, String orderName, int totalAmount) {
         this.paymentId = paymentId;
-        this.totalPrice = totalPrice;
+        this.transactionType = transactionType;
+        this.txId = txId;
+        this.orderName = orderName;
+        this.totalAmount = totalAmount;
     }
 }

@@ -21,7 +21,6 @@ public class OptionController {
 	
 	@GetMapping("/housing-types")
     public List<HousingTypeDTO> getHousingTypes() {
-		System.out.println("요청확인");
         return optionServ.getHousingTypes();
     }
 	
@@ -35,7 +34,7 @@ public class OptionController {
         return optionServ.getColors();
     }
     
-    @GetMapping("/area-size")
+    @GetMapping("/area-sizes")
     public List<AreaSizeDTO> getAreaSize() {
         return optionServ.getAreaSize();
     }

@@ -113,7 +113,9 @@ nocache;
 create table board_tag (
     board_tag_seq number primary key,       
     board_image_seq number not null,              
-    product_seq varchar2(20) not null
+    product_seq number not null,
+    left_position NUMBER not null,
+    top_position NUMBER not null
 )
 
 create sequence board_tag_seq

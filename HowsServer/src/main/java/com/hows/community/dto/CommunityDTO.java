@@ -1,6 +1,9 @@
 package com.hows.community.dto;
 
 import java.sql.Timestamp;
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 public class CommunityDTO {
 	private int board_seq;
@@ -12,7 +15,8 @@ public class CommunityDTO {
 	private String space_type_code;
 	private String color_code;
 	private String member_id;
-
+    //private List<TagDTO> tags; // 태그 정보
+    
 	public CommunityDTO(int board_seq, String board_title, String board_contents, Timestamp board_wirte_date,
 			int view_count, String housing_type_code, String space_type_code, String color_code, String member_id) {
 		super();
@@ -62,6 +66,8 @@ public class CommunityDTO {
 	public void setBoard_wirte_date(Timestamp board_wirte_date) {
 		this.board_wirte_date = board_wirte_date;
 	}
+
+
 
 	public int getView_count() {
 		return view_count;

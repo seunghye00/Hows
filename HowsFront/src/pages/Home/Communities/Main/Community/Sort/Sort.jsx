@@ -36,7 +36,7 @@ export const Sort = () => {
                 setSpaceTypes(spaceTypesResponse.data)
 
                 const areaSizesResponse = await axios.get(
-                    `${host}/option/area-size`
+                    `${host}/option/area-sizes`
                 )
                 setAreaSizes(areaSizesResponse.data)
 

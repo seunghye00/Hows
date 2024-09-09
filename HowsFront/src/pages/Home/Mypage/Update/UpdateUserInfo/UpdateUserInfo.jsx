@@ -66,6 +66,10 @@ export const UpdateUserInfo = () => {
             ...prev,
             [name]: value
         }));
+
+        if (name === 'nickname') {
+            setNicknameChecked(false);
+        }
     };
 
     // 닉네임 중복확인 핸들러
@@ -184,12 +188,17 @@ export const UpdateUserInfo = () => {
             return
         }
 
-        // 유효성 검사를 통과하면 서버에 데이터 전송
-        api.post(`${host}/member`, formData).then(resp => {
-            console.log('정보수정 : ', resp.data)
-            // alert('회원정보가 성공적으로 수정되었습니다.')
-            // navi("/mypage/main");
+        if (!nicknameChecked) {
+            alert("닉네임 중복 확인을 해주세요.");
+            return;
+        }
 
+        // 유효성 검사를 통과하면 서버에 데이터 전송
+        api.put(`/member/updateInfo`, formData).then(resp => {
+            if (resp.data > 0) {
+                alert('회원정보가 성공적으로 수정되었습니다.')
+                navi("/mypage/main");
+            }
         }).catch(error => {
             alert('회원정보수정 중 오류가 발생했습니다.')
         })

@@ -71,6 +71,11 @@ public class MemberDAO {
 	public MemberDTO selectInfo(String member_id) {
 		return mybatis.selectOne("Member.selectInfo", member_id);
 	}
+	
+	// 회원정보 수정
+	public int updateInfo(MemberDTO dto) {
+		return mybatis.update("Member.updateInfo", dto);
+	}
 
 	// 비밀번호 변경시 기존 비밀번호 확인
 	public String getPasswordById(HashMap<String, String> map) {

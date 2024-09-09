@@ -18,7 +18,6 @@ detail_address varchar2(255) not null,
 grade_code char(2) default 'G3' not null,
 role_code char(2) default 'R2' not null,
 blacklist_reason_code char(2) default null,
-blacklist_date timestamp default null,
 signup_date timestamp default sysdate,
 withdrawal_date timestamp default null,
 withdrawal_yn char(1) default 'N',
@@ -95,6 +94,33 @@ area_size_code char(2) not null,
 color_code char(2) not null,
 member_id varchar2(20) not null
 );
+
+-- 게시판 이미지
+create table board_image (
+    board_image_seq number primary key,          
+    board_seq number not null,                 
+    image_url varchar2(500) not null,    
+    image_order number not null          
+);
+
+create sequence board_image_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
+
+-- 게시판 이미지 상품 태그
+create table board_tag (
+    board_tag_seq number primary key,       
+    board_image_seq number not null,              
+    product_seq varchar2(20) not null
+)
+
+create sequence board_tag_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
 
 create sequence board_seq
 start with 1
@@ -662,8 +688,10 @@ SELECT * FROM role;
 SELECT * FROM follow;
 SELECT * FROM blacklist_reason;
 
--- 게시판 관련 - 14개
+-- 게시판 관련 - 16개
 SELECT * FROM board;
+SELECT * FROM board_image;
+SELECT * FROM board_tag;
 SELECT * FROM housing_type;
 SELECT * FROM space_type;
 SELECT * FROM area_size;

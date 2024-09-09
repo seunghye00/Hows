@@ -95,8 +95,12 @@ export const Banner = () => {
 
         const formData = new FormData()
         formData.append('file', selectedFile)
+        // 각 속성을 개별적으로 추가
+        formData.append('start_date', banner.start_date)
+        formData.append('end_date', banner.end_date)
+        formData.append('banner_order', banner.banner_order)
 
-        addBanner(formData, banner)
+        addBanner(formData)
             .then(resp => {
                 console.log('업로드 성공 :', resp.data)
                 bannerList().then(resp => {

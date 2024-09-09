@@ -9,12 +9,12 @@ export const bannerList = () => {
 }
 
 // 배너 추가 요청 함수
-export const addBanner = (formData, banner) => {
+export const addBanner = formData => {
     // FormData 내용 확인
     for (let [key, value] of formData.entries()) {
         console.log(key, value)
     }
-    return axios.post(`${baseUrl}`, formData, banner)
+    return axios.post(`${baseUrl}`, formData)
 }
 
 // 배너 삭제 요청 함수

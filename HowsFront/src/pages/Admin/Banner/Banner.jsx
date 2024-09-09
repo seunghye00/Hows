@@ -9,6 +9,11 @@ import Swal from 'sweetalert2'
 
 export const Banner = () => {
     const [banners, setBanners] = useState([])
+    const [banner, setBanner] = useState({
+        start_date: '',
+        end_date: '',
+        banner_order: 0,
+    })
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedFile, setSelectedFile] = useState(null)
     const [preview, setPreview] = useState('')
@@ -17,7 +22,7 @@ export const Banner = () => {
     useEffect(() => {
         bannerList()
             .then(resp => {
-                // console.log(resp.data)
+                console.log(resp.data)
                 const beforBanners = resp.data.map(banner => ({
                     ...banner,
                     checked: false, // 초기 체크 상태
@@ -61,7 +66,19 @@ export const Banner = () => {
             // 이미지 파일일 경우 미리보기 URL 생성
             const objectUrl = URL.createObjectURL(file)
             setPreview(objectUrl)
+
+            // 컴포넌트 언마운트 시 URL 해제
+            return () => URL.revokeObjectURL(objectUrl)
         }
+    }
+
+    const handleChangeBanner = e => {
+        const { name, value } = e.target
+        console.log(name, value)
+        setBanner(prev => ({
+            ...prev,
+            [name]: value,
+        }))
     }
 
     const handleUpload = () => {
@@ -79,7 +96,7 @@ export const Banner = () => {
         const formData = new FormData()
         formData.append('file', selectedFile)
 
-        addBanner(formData)
+        addBanner(formData, banner)
             .then(resp => {
                 console.log('업로드 성공 :', resp.data)
                 bannerList().then(resp => {
@@ -118,9 +135,9 @@ export const Banner = () => {
     }
 
     // 개별 체크박스 변경 핸들러
-    const handleCheckboxChange = banner_sysname => {
+    const handleCheckboxChange = banner_seq => {
         const updatedBanners = banners.map(banner =>
-            banner.banner_sysname === banner_sysname
+            banner.banner_seq === banner_seq
                 ? { ...banner, checked: !banner.checked }
                 : banner
         )
@@ -156,9 +173,7 @@ export const Banner = () => {
         }).then(result => {
             if (result.isConfirmed) {
                 // 배너 삭제 요청
-                deleteBanners(
-                    selectedBanners.map(banner => banner.banner_sysname)
-                )
+                deleteBanners(selectedBanners.map(banner => banner.banner_seq))
                     .then(() => {
                         Swal.fire({
                             title: '삭제 완료',
@@ -218,7 +233,7 @@ export const Banner = () => {
                                         checked={banner.checked || false}
                                         onChange={() =>
                                             handleCheckboxChange(
-                                                banner.banner_sysname
+                                                banner.banner_seq
                                             )
                                         }
                                     />
@@ -266,20 +281,31 @@ export const Banner = () => {
                 <div className={styles.selectInfo}>
                     <div className={styles.choiceDate}>
                         <div>시작일</div>
-                        <input type="datetime-local" name="" id="" />
+                        <input
+                            type="datetime-local"
+                            name="start_date"
+                            id=""
+                            onChange={handleChangeBanner}
+                        />
                     </div>
                     <div className={styles.choiceDate}>
                         <div>종료일</div>
-                        <input type="datetime-local" name="" id="" />
+                        <input
+                            type="datetime-local"
+                            name="end_date"
+                            id=""
+                            onChange={handleChangeBanner}
+                        />
                     </div>
                     <div className={styles.choiceOrder}>
                         <div>순서</div>
                         <input
                             type="number"
-                            name=""
+                            name="banner_order"
                             id=""
                             min={1}
                             placeholder="순서"
+                            onChange={handleChangeBanner}
                         />
                     </div>
                 </div>

@@ -37,8 +37,7 @@ public class BannerService {
     private String bucket;
 
 	public List<BannerDTO> getAllBanners() {
-		List<Banner> list = bannRepo.findAll();
-		return bannMap.toDTOList(list);
+		return bannDAO.getAllBanners();
 	}
 
 	public boolean addBanner(MultipartFile file) {
@@ -55,8 +54,8 @@ public class BannerService {
 				return false;
 			}
 			String result = "https://storage.google.com/" + bucket + "/" + sysName;
-			Banner banner = bannMap.toEntity(new BannerDTO(0L, sysName, result, null, null, 0));
-			bannRepo.save(banner);
+			// Banner banner = bannMap.toEntity(new BannerDTO(0L, sysName, result, null, null, 0));
+			// bannRepo.save(banner);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 public class BannerDTO {
 	private Long banner_seq;
-	private String banner_sysname;
+	private Long file_seq;
 	private String banner_url;
 	private Timestamp start_date;
 	private Timestamp end_date;
@@ -15,11 +15,11 @@ public class BannerDTO {
 	public void setBanner_seq(Long banner_seq) {
 		this.banner_seq = banner_seq;
 	}
-	public String getBanner_sysname() {
-		return banner_sysname;
+	public Long getFile_seq() {
+		return file_seq;
 	}
-	public void setBanner_sysname(String banner_sysname) {
-		this.banner_sysname = banner_sysname;
+	public void setFile_seq(Long file_seq) {
+		this.file_seq = file_seq;
 	}
 	public String getBanner_url() {
 		return banner_url;
@@ -45,11 +45,11 @@ public class BannerDTO {
 	public void setBanner_order(int banner_order) {
 		this.banner_order = banner_order;
 	}
-	public BannerDTO(Long banner_seq, String banner_sysname, String banner_url, Timestamp start_date,
-			Timestamp end_date, int banner_order) {
+	public BannerDTO(Long banner_seq, Long file_seq, String banner_url, Timestamp start_date, Timestamp end_date,
+			int banner_order) {
 		super();
 		this.banner_seq = banner_seq;
-		this.banner_sysname = banner_sysname;
+		this.file_seq = file_seq;
 		this.banner_url = banner_url;
 		this.start_date = start_date;
 		this.end_date = end_date;

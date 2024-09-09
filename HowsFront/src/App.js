@@ -6,13 +6,11 @@ import { Header } from './components/Header/Header'
 import { Footer } from './components/Footer/Footer'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { useAuthStore } from './store/store';
-
+import { useAuthStore } from './store/store'
 
 function App() {
-    const [session, setSession] = useState(true);
-    const { isAuth, login } = useAuthStore();
-
+    const [session, setSession] = useState(true)
+    const { isAuth, login } = useAuthStore()
 
     // 로딩
 
@@ -25,20 +23,12 @@ function App() {
     }, [])
 
     return (
-        <div className={session ? 'App' : 'Admin'}>
+        <div className="Admin">
             <Router>
-                {session ? (
-                    <>
-                        <Header />
-                        <Home />
-                        <Footer />
-                    </>
-                ) : (
-                    <>
-                        <Side />
-                        <Admin />
-                    </>
-                )}
+                <>
+                    <Side />
+                    <Admin />
+                </>
             </Router>
         </div>
     )

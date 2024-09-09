@@ -480,9 +480,9 @@ nocache;
 -- 쿠폰
 create table coupon (
     coupon_seq number primary key,
-    coupon_title varchar2(50) not null,
+    coupon_title varchar2(100) not null,
     coupon_type varchar2(20) not null,
-    coupon_discount number default null,
+    coupon_discount varchar2(20) default null,
     expired_date timestamp not null
 );
 
@@ -491,6 +491,17 @@ start with 1
 increment by 1
 nomaxvalue
 nocache;
+
+-- coupon dummy data
+INSERT INTO coupon
+VALUES ( coupon_seq.nextval, '[ 5% 할인 ] 가을 맞이 특가 5% 쿠폰', 'percent', '*0.95', '2024-12-31');
+INSERT INTO coupon
+VALUES ( coupon_seq.nextval, '[ 10% 할인 ] 가을 맞이 특가 10% 쿠폰', 'percent', '*0.9', '2024-12-31');
+INSERT INTO coupon
+VALUES ( coupon_seq.nextval, '[ 5000 할인 ] 가을 맞이 특가 5000원 할인 쿠폰', 'price', '-5000', '2024-12-31');
+INSERT INTO coupon
+VALUES ( coupon_seq.nextval, '[ 2000 할인 ] 한가위 맞이 2000원 할인 쿠폰', 'price', '-2000', '2024-12-31');
+
 
 -- 쿠폰 소유 
 create table coupon_owner (
@@ -515,7 +526,8 @@ create table payment (
     order_seq number not null,
     payment_code char(2) not null,
     payment_price number not null,    
-    payment_date timestamp
+    payment_date timestamp,
+    payment_id varchar2(100) not null
 );
 
 create sequence payment_seq

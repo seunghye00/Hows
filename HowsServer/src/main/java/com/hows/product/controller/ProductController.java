@@ -22,13 +22,6 @@ public class ProductController {
 	
 	// 전체 목록 출력
 	@GetMapping
-	public ResponseEntity<List<ProductDTO>> getProductList() throws Exception {
-		List<ProductDTO> products = productServ.getProductList();
-		return ResponseEntity.ok(products);
-	}
-	
-	// 전체 목록 출력
-	@GetMapping
 	public ResponseEntity<List<ProductDTO>> getProducts () throws Exception{
 		List<ProductDTO> products = productServ.getProducts();
 		return ResponseEntity.ok(products);

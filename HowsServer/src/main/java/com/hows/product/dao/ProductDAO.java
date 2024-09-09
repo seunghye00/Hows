@@ -10,6 +10,7 @@ import com.hows.product.dto.ProductDTO;
 
 @Repository
 public class ProductDAO {
+	
 	@Autowired
 	private SqlSession myBatis;
 	
@@ -26,10 +27,5 @@ public class ProductDAO {
 	// 디테일 출력
 	public ProductDTO getProductDetaile (String product_seq) throws Exception{
 		return myBatis.selectOne("Product.getProductDetaile", product_seq);
-	}
-
-	public List<ProductDTO> getProductList() {
-		// TODO Auto-generated method stub
-		return myBatis.selectList("Product.getProductListAll");
 	}
 }

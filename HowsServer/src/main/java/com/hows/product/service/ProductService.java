@@ -28,9 +28,4 @@ public class ProductService {
 	public ProductDTO getProductByDetail (String product_seq) throws Exception {
 		return productDAO.getProductDetaile(product_seq);
 	}
-
-	// 전체 목록 출력
-	public List<ProductDTO> getProductList() {
-		return productDAO.getProductList();
-	}
 }

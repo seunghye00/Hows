@@ -21,8 +21,5 @@
 		FROM PRODUCT
 		WHERE product_seq = #{product_seq}
     </select>
-    
-    <select id="getProductListAll" resultType="com.hows.product.dto.ProductDTO">
-        select * from product
-    </select>
+
 </mapper>

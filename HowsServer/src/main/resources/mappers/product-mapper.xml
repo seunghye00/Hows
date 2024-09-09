@@ -9,4 +9,10 @@
         FROM PRODUCT
         WHERE product_category_code = #{product_category_code}
     </select>
+    
+    <select id="getProductDetaile" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
+    	SELECT * 
+		FROM PRODUCT
+		WHERE product_seq = #{product_seq}
+    </select>
 </mapper>

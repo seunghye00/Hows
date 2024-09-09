@@ -3,8 +3,11 @@ import { useState } from "react";
 import logo from '../../../../../assets/images/logo_how.png'
 import axios from "axios";
 import { host } from './../../../../../config/config';
+import { useNavigate } from 'react-router-dom';
 
 export const ChangePw = ({ onSubmit }) => {
+
+    const navi = useNavigate();
 
     const [newPw, setNewPw] = useState('');
     const [newPw2, setNewPw2] = useState('');
@@ -56,17 +59,16 @@ export const ChangePw = ({ onSubmit }) => {
             alert('비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.');
             return;
         }
-
-        // alert('새 비밀번호가 설정되었습니다.');
         // 새 비밀번호 제출
         onSubmit(newPw);
+        navi("/signIn");
     };
 
 
     return (
         <div className={styles.container}>
             <div className={styles.changePwBox}>
-                <div className={styles.logo}>
+                <div className={styles.logo} onClick={() => navi("/")}>
                     <img src={logo} alt="logo" />
                     <h1 className={styles.title}>How's</h1>
                 </div>

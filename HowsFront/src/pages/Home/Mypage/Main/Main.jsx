@@ -5,7 +5,7 @@ import img from "../../../../assets/images/마이페이지_가로배너.jpg";
 import profile from "../../../../assets/images/마이페이지_프로필사진.jpg";
 
 import { Update } from "./../Update/Update";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { api } from "./../../../../config/config";
 import axios from "axios";
 import { Scrap } from "./Scrap/Scrap";
@@ -13,12 +13,14 @@ import { Guestbook } from "./Guestbook/Guestbook";
 
 export const Main = () => {
     const navi = useNavigate();
+    const [user, setUser] = useState([]);
 
     useEffect(() => {
-        api.get(`/member`).then((resp) => {
-            console.log(resp.data);
+        api.get(`/member/selectInfo`).then((resp) => {
+            console.log("데이터 : ", resp.data);
+            setUser(resp.data);
         });
-    });
+    }, []);
 
     return (
         <div className={styles.container}>
@@ -32,7 +34,7 @@ export const Main = () => {
                     </div>
                     <div className={styles.userInfo}>
                         <div className={styles.top}>
-                            <div className={styles.nickname}>Dobby</div>
+                            <div className={styles.nickname}>{user.nickname}</div>
                             <div className={styles.linkBtns}>
                                 <button
                                     className={styles.infoUpdate}
@@ -49,7 +51,7 @@ export const Main = () => {
                             </div>
                         </div>
                         <div className={styles.middle}>
-                            <span className={styles.id}>@dobby_66</span>
+                            <span className={styles.id}>@{user.member_id}</span>
                             <div className={styles.follower}>
                                 <span className={styles.followText}>팔로워</span>
                                 <span className={styles.followCount}>10</span>
@@ -98,6 +100,7 @@ export const Main = () => {
                 </div>
             </div>
 
-        </div>
+
+        </div >
     );
 };

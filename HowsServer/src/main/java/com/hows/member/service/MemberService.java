@@ -5,12 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.hows.blacklistreason.dto.BlacklistReasonDTO;
 import com.hows.grade.dto.GradeDTO;
@@ -70,9 +73,9 @@ public class MemberService implements UserDetailsService {
 	}
 
 	// 마이페이지 회원정보 출력
-//	public MemberDTO selectInfo(String loginId) {
-//		return memDao.selectInfo(loginId);
-//	}
+	public MemberDTO selectInfo(String member_id) {
+		return memDao.selectInfo(member_id);
+	}
 
 	// 비밀번호 변경시 기존 비밀번호 확인
 	public String getPasswordById(HashMap<String, String> map) {
@@ -83,7 +86,14 @@ public class MemberService implements UserDetailsService {
 	public int updatePw(HashMap<String, String> map) {
 		return memDao.updatePw(map);
 	}
-
+	
+	// 회원탈퇴
+	public int deleteUser(String member_id){
+		return memDao.deleteUser(member_id);
+	}
+	
+	
+	//========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	public List<MemberDTO> selectAll() {
 		return memDao.selectAll();

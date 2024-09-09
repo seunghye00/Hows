@@ -4,6 +4,7 @@ import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
 import { formatDate } from '../../../commons/commons'
+import Swal from 'sweetalert2'
 import {
     selectAll,
     detailMember,
@@ -108,51 +109,79 @@ export const Member = () => {
     }
 
     const confirmUpdate = () => {
-        const memberId = selectedMember.member_id
+        Swal.fire({
+            title: '역할과 등급을 수정하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '수정',
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                const memberId = selectedMember.member_id
 
-        console.log('내가 선택한 ID:', memberId) // 회원 ID 확인
-        console.log('내가 선택한 등급:', Grade) // 사용자가 선택한 등급
-        console.log('내가 선택한 역할:', Role) // 사용자가 선택한 역할
+                console.log('내가 선택한 ID:', memberId) // 회원 ID 확인
+                console.log('내가 선택한 등급:', Grade) // 사용자가 선택한 등급
+                console.log('내가 선택한 역할:', Role) // 사용자가 선택한 역할
 
-        // 등급과 역할을 코드로 변환
-        const gradeCode = getGradeCode(Grade)
-        const roleCode = getRoleCode(Role)
+                // 등급과 역할을 코드로 변환
+                const gradeCode = getGradeCode(Grade)
+                const roleCode = getRoleCode(Role)
 
-        // 로그 추가: 변환된 등급 코드와 역할 코드 확인
-        console.log('변환된 등급 코드:', gradeCode)
-        console.log('변환된 역할 코드:', roleCode)
+                // 로그 추가: 변환된 등급 코드와 역할 코드 확인
+                console.log('변환된 등급 코드:', gradeCode)
+                console.log('변환된 역할 코드:', roleCode)
 
-        if (!gradeCode) {
-            console.error('변환된 등급 코드가 NULL 또는 undefined 입니다.')
-        }
+                if (!gradeCode) {
+                    Swal.fire(
+                        '오류',
+                        '변환된 등급 코드가 NULL 또는 undefined 입니다.',
+                        'error'
+                    )
+                    return
+                }
 
-        if (!roleCode) {
-            console.error('변환된 역할 코드가 NULL 또는 undefined 입니다.')
-        }
+                if (!roleCode) {
+                    Swal.fire(
+                        '오류',
+                        '변환된 역할 코드가 NULL 또는 undefined 입니다.',
+                        'error'
+                    )
+                    return
+                }
 
-        // 블랙리스트 역할이 선택된 경우
-        if (roleCode === 'R3') {
-            openBlacklistModal() // 블랙리스트 모달 열기
-        } else {
-            // 등급과 역할 업데이트 API 호출
-            updateGrade({ member_id: memberId, grade_code: gradeCode })
-                .then(() => {
-                    console.log('등급 업데이트 성공:', gradeCode)
-                    return updateRole({
-                        member_id: memberId,
-                        role_code: roleCode,
-                    })
-                })
-                .then(() => {
-                    console.log('역할 업데이트 성공:', roleCode)
-                    alert('역할과 등급이 수정되었습니다.')
-                    setEditMode(false)
-                })
-                .catch(error => {
-                    console.error('업데이트 실패:', error)
-                    alert('업데이트에 실패했습니다.')
-                })
-        }
+                // 블랙리스트 역할이 선택된 경우
+                if (roleCode === 'R3') {
+                    openBlacklistModal() // 블랙리스트 모달 열기
+                } else {
+                    // 등급과 역할 업데이트 API 호출
+                    updateGrade({ member_id: memberId, grade_code: gradeCode })
+                        .then(() => {
+                            console.log('등급 업데이트 성공:', gradeCode)
+                            return updateRole({
+                                member_id: memberId,
+                                role_code: roleCode,
+                            })
+                        })
+                        .then(() => {
+                            console.log('역할 업데이트 성공:', roleCode)
+                            Swal.fire(
+                                '성공',
+                                '역할과 등급이 수정되었습니다.',
+                                'success'
+                            )
+                            setEditMode(false)
+                        })
+                        .catch(error => {
+                            console.error('업데이트 실패:', error)
+                            Swal.fire(
+                                '오류',
+                                '업데이트에 실패했습니다.',
+                                'error'
+                            )
+                        })
+                }
+            }
+        })
     }
 
     const openBlacklistModal = () => {
@@ -167,23 +196,43 @@ export const Member = () => {
     }
 
     const confirmBlacklist = () => {
-        const memberId = selectedMember.member_id
+        Swal.fire({
+            title: '블랙리스트로 등록하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '등록',
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                const memberId = selectedMember.member_id
 
-        // 블랙리스트 사유 등록 및 역할 업데이트
-        addBlacklist({
-            member_id: memberId,
-            blacklist_reason_code: blacklistReason,
+                // 블랙리스트 사유 등록 및 역할 업데이트
+                addBlacklist({
+                    member_id: memberId,
+                    blacklist_reason_code: blacklistReason,
+                })
+                    .then(() =>
+                        updateRole({ member_id: memberId, role_code: 'R3' })
+                    )
+                    .then(() => {
+                        Swal.fire(
+                            '성공',
+                            '블랙리스트로 등록되었습니다.',
+                            'success'
+                        )
+                        closeBlacklistModal()
+                        setModal(false)
+                    })
+                    .catch(error => {
+                        console.error('블랙리스트 등록 실패:', error)
+                        Swal.fire(
+                            '오류',
+                            '블랙리스트 등록에 실패했습니다.',
+                            'error'
+                        )
+                    })
+            }
         })
-            .then(() => updateRole({ member_id: memberId, role_code: 'R3' }))
-            .then(() => {
-                alert('블랙리스트로 등록되었습니다.')
-                closeBlacklistModal()
-                setModal(false)
-            })
-            .catch(error => {
-                console.error('블랙리스트 등록 실패:', error)
-                alert('블랙리스트 등록에 실패했습니다.')
-            })
     }
 
     return (

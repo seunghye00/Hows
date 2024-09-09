@@ -3,6 +3,7 @@ import styles from './Blacklist.module.css'
 import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
+import { formatDate } from '../../../commons/commons'
 import {
     selectBlacklist,
     modifyBlacklist,
@@ -149,7 +150,7 @@ export const Blacklist = () => {
                                 {member.blacklist_reason_code}
                             </div>
                             <div className={styles.memberItem}>
-                                {member.blacklist_date}
+                                {formatDate(member.blacklist_date)}
                             </div>
                             <div className={styles.memberItem}>
                                 <Button

@@ -2,13 +2,12 @@ package com.hows.order.controller;
 
 import java.util.List;
 
+import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.*;
 
 import com.hows.order.dto.OrderDTO;
 import com.hows.order.dto.OrderInfoListDTO;
@@ -38,6 +37,20 @@ public class OrderController {
 	public ResponseEntity<List<OrderInfoListDTO>> getOrdersByStatus(@RequestParam String status) throws Exception {
 		List<OrderInfoListDTO> list = orderServ.getOrdersByStatus(status);
 		return ResponseEntity.ok(list);
+	}
+
+	@PostMapping
+	public ResponseEntity<String> addOrder(@AuthenticationPrincipal CustomUserDetails user, @RequestBody OrderDTO orderDTO) throws Exception {
+		orderDTO.setMember_seq(user.getMemberSeq());
+		String result = orderServ.addOrder(orderDTO);
+		return ResponseEntity.ok(result);
+	}
+
+	@PutMapping
+	public ResponseEntity<String> updateOrder(@AuthenticationPrincipal CustomUserDetails user, @RequestBody OrderDTO orderDTO) throws Exception {
+		orderDTO.setMember_seq(user.getMemberSeq());
+		String result = orderServ.updateOrder(orderDTO);
+		return ResponseEntity.ok(result);
 	}
 
 	@ExceptionHandler(Exception.class)

@@ -130,6 +130,11 @@
     min-width: 80px;
 }
 
+.choiceDate div,
+.choiceOrder div {
+    padding-left: 5px;
+}
+
 .choiceOrder input {
     padding: 6px;
 }

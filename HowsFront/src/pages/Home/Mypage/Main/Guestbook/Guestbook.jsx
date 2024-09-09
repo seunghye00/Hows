@@ -3,6 +3,17 @@ import profile from "../../../../../assets/images/마이페이지_프로필사�
 
 
 export const Guestbook = () => {
+
+
+    const handleWriteBtn = () => {
+
+    }
+
+    // const write_date = new Date(user.guestbook_write_date);
+    // const write_currentDate = !isNaN(write_date)
+    //     ? format(write_date, "yyyy-MM-dd")
+    //     : "Invalid Date";
+
     return (
         <div className={styles.container}>
             <div className={styles.countContents}>
@@ -11,6 +22,17 @@ export const Guestbook = () => {
             </div>
             {/* =================== */}
             <div className={styles.visitPost}>
+                <div className={styles.input}>
+                    <img src={profile} alt="" />
+                    <div
+                        // ref={inputRef} // ref 설정
+                        className={styles.inputText}
+                        contentEditable="true"
+                        // onInput={handleInputReply}
+                        suppressContentEditableWarning={true}
+                    />
+                    <button onClick={handleWriteBtn}>등록</button>
+                </div>
                 <div className={styles.output}>
                     <img src={profile} />
                     <div>

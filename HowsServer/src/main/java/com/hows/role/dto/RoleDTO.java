@@ -2,32 +2,32 @@ package com.hows.role.dto;
 
 public class RoleDTO {
 
-	private String rolecode;
-	private String roletitle;
+	private String role_code;
+	private String role_title;
 
 	public RoleDTO() {
 	}
 
-	public RoleDTO(String rolecode, String roletitle) {
+	public RoleDTO(String role_code, String role_title) {
 		super();
-		this.rolecode = rolecode;
-		this.roletitle = roletitle;
+		this.role_code = role_code;
+		this.role_title = role_title;
 	}
 
-	public String getRolecode() {
-		return rolecode;
+	public String getRole_code() {
+		return role_code;
 	}
 
-	public void setRolecode(String rolecode) {
-		this.rolecode = rolecode;
+	public void setRole_code(String role_code) {
+		this.role_code = role_code;
 	}
 
-	public String getRoletitle() {
-		return roletitle;
+	public String getRole_title() {
+		return role_title;
 	}
 
-	public void setRoletitle(String roletitle) {
-		this.roletitle = roletitle;
+	public void setRole_title(String role_title) {
+		this.role_title = role_title;
 	}
 
 }

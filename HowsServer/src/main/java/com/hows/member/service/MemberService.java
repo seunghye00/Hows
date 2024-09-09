@@ -57,7 +57,6 @@ public class MemberService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		MemberDTO dto = memDao.findById(username);
-
 		User user = new User(dto.getMember_id(), dto.getPw(), AuthorityUtils.createAuthorityList(dto.getRole_code()));
 		return user;
 	}
@@ -77,6 +76,12 @@ public class MemberService implements UserDetailsService {
 		return memDao.selectInfo(member_id);
 	}
 
+	// 회원정보 수정
+	public int updateInfo(MemberDTO dto) {
+		return memDao.updateInfo(dto);
+	}
+	
+	
 	// 비밀번호 변경시 기존 비밀번호 확인
 	public String getPasswordById(HashMap<String, String> map) {
 		return memDao.getPasswordById(map);

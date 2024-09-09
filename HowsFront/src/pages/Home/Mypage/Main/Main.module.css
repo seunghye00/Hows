@@ -43,6 +43,9 @@
   height: 200px;
   width: 200px;
   margin-right: 50px;
+  cursor: pointer;
+  background-color: var(--hows-point-color-lightest);
+  border-radius: 50%;
 }
 .container .mainBox .header .profile > img {
   width: 100%;
@@ -146,6 +149,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+  transition-duration: 0.2s;
+}
+.container .mainBox .menus .menu > div:hover {
+  color: var(--hows-point-color-dark);
+}
+.container .mainBox .menus .menu > div.active {
+  color: var(--hows-point-color-dark);
 }
 .container .mainBox .menus .menu > div > i {
   margin-right: 13px;
@@ -154,8 +165,8 @@
 .container .mainBox .menus .menu > div > span {
   font-size: 24px;
   font-weight: 600;
-  cursor: pointer;
 }
+
 /* =========================== */
 
 .container .mainBox .body {

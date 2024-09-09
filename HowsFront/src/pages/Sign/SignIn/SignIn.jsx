@@ -26,16 +26,16 @@ export const SignIn = () => {
   };
 
   const handleLoginBtn = () => {
-    axios
-      .post(`${host}/auth`, user)
-      .then((resp) => {
-        const token = resp.data;
-        sessionStorage.setItem("token", token);
-        login(token);
+    axios.post(`${host}/auth`, user).then((resp) => {
+      console.log("로그인 : ", resp.data);
+      const { token, member_id } = resp.data; // 서버 응답에서 token과 memberId 분해 할당
+      sessionStorage.setItem("token", token);
+      sessionStorage.setItem("member_id", member_id); // 사용자 ID도 저장
+      login(token);
 
-        alert("로그인 성공!");
-        navi("/");
-      })
+      alert("로그인 성공!");
+      navi("/");
+    })
       .catch((error) => {
         alert("로그인에 실패하였습니다.");
       });

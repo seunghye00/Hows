@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,9 +81,17 @@ public class MemberController {
 
 		MemberDTO result = memServ.selectInfo(member_id);
 		return ResponseEntity.ok(result);
-//		return ResponseEntity.ok(null);
 	}
 
+	// 회원정보 수정
+	@PutMapping("/updateInfo")
+	public ResponseEntity<Integer> updateInfo(@RequestBody MemberDTO dto){
+		int result = memServ.updateInfo(dto);
+		return ResponseEntity.ok(result);
+	}
+	
+	
+	
 	// 비밀번호 변경 시 기존 비밀번호 확인
 	@PostMapping("/checkPw")
 	public ResponseEntity<Boolean> checkPw(@AuthenticationPrincipal UserDetails user,
@@ -213,4 +222,11 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
+	
+	@ExceptionHandler(Exception.class)
+	   public ResponseEntity<String> exceptionHandler(Exception e) {
+	      e.printStackTrace();
+	      return ResponseEntity.badRequest().body("fail");
+	   }
+	
 }

@@ -1,33 +1,33 @@
 package com.hows.blacklistreason.dto;
 
 public class BlacklistReasonDTO {
-	private String blacklistreasoncode;
-	private String blacklistreasondescription;
+	private String blacklist_reason_code;
+	private String blacklist_reason_description;
 
 	public BlacklistReasonDTO() {
 
 	}
 
-	public BlacklistReasonDTO(String blacklistreasoncode, String blacklistreasondescription) {
+	public BlacklistReasonDTO(String blacklist_reason_code, String blacklist_reason_description) {
 		super();
-		this.blacklistreasoncode = blacklistreasoncode;
-		this.blacklistreasondescription = blacklistreasondescription;
+		this.blacklist_reason_code = blacklist_reason_code;
+		this.blacklist_reason_description = blacklist_reason_description;
 	}
 
-	public String getBlacklistreasoncode() {
-		return blacklistreasoncode;
+	public String getBlacklist_reason_code() {
+		return blacklist_reason_code;
 	}
 
-	public void setBlacklistreasoncode(String blacklistreasoncode) {
-		this.blacklistreasoncode = blacklistreasoncode;
+	public void setBlacklist_reason_code(String blacklist_reason_code) {
+		this.blacklist_reason_code = blacklist_reason_code;
 	}
 
-	public String getBlacklistreasondescription() {
-		return blacklistreasondescription;
+	public String getBlacklist_reason_description() {
+		return blacklist_reason_description;
 	}
 
-	public void setBlacklistreasondescription(String blacklistreasondescription) {
-		this.blacklistreasondescription = blacklistreasondescription;
+	public void setBlacklist_reason_description(String blacklist_reason_description) {
+		this.blacklist_reason_description = blacklist_reason_description;
 	}
 
 }

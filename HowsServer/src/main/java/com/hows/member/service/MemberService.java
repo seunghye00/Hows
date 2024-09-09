@@ -36,7 +36,7 @@ public class MemberService implements UserDetailsService {
 	public boolean checkId(String member_id) {
 		return memDao.checkId(member_id);
 	}
-	
+
 	// 중복확인 - 닉네임
 	public boolean checkNickname(String nickname) {
 		return memDao.checkNickname(nickname);
@@ -61,12 +61,12 @@ public class MemberService implements UserDetailsService {
 		User user = new User(dto.getMember_id(), dto.getPw(), AuthorityUtils.createAuthorityList(dto.getRole_code()));
 		return user;
 	}
-	
+
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
 		return memDao.findId(map);
 	}
-	
+
 	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
 	public Boolean verifyUser(Map<String, String> map) {
 		return memDao.verifyUser(map);
@@ -115,21 +115,13 @@ public class MemberService implements UserDetailsService {
 	}
 
 	// 등급 업데이트 (관리자)
-	public int updateGrade(String memberId, String newGradeCode) {
-		HashMap<String, String> map = new HashMap<>();
-		map.put("member_id", memberId);
-		map.put("grade_code", newGradeCode);
-
-		return memDao.updateGrade(map);
+	public int updateGrade(String member_id, String grade_code) {
+	    return memDao.updateGrade(member_id, grade_code);
 	}
 
 	// 역할 업데이트 (관리자)
-	public int updateRole(String memberId, String newRoleCode) {
-		HashMap<String, String> map = new HashMap<>();
-		map.put("member_id", memberId);
-		map.put("role_code", newRoleCode);
-
-		return memDao.updateRole(map);
+	public int updateRole(String member_id, String role_code) {
+		return memDao.updateRole(member_id, role_code);
 	}
 
 	// 전체 블랙리스트 사유 가져오기 (관리자)
@@ -138,12 +130,8 @@ public class MemberService implements UserDetailsService {
 	}
 
 	// 블랙리스트 등록 (관리자)
-	public int addBlacklist(String memberId, String reasonCode) {
-		HashMap<String, String> map = new HashMap<>();
-		map.put("member_id", memberId);
-		map.put("blacklist_reason_code", reasonCode);
-
-		return memDao.addBlacklist(map);
+	public int addBlacklist(String member_id, String blacklist_reason_code) {
+		return memDao.addBlacklist(member_id, blacklist_reason_code);
 	}
 
 	// 블랙리스트 조회 (관리자)

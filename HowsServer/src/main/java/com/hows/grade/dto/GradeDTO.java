@@ -1,32 +1,32 @@
 package com.hows.grade.dto;
 
 public class GradeDTO {
-	private String gradecode;
-	private String gradetitle;
+	private String grade_code;
+	private String grade_title;
 
 	public GradeDTO() {
 	}
 
-	public GradeDTO(String gradecode, String gradetitle) {
+	public GradeDTO(String grade_code, String grade_title) {
 		super();
-		this.gradecode = gradecode;
-		this.gradetitle = gradetitle;
+		this.grade_code = grade_code;
+		this.grade_title = grade_title;
 	}
 
-	public String getGradecode() {
-		return gradecode;
+	public String getGrade_code() {
+		return grade_code;
 	}
 
-	public void setGradecode(String gradecode) {
-		this.gradecode = gradecode;
+	public void setGrade_code(String grade_code) {
+		this.grade_code = grade_code;
 	}
 
-	public String getGradetitle() {
-		return gradetitle;
+	public String getGrade_title() {
+		return grade_title;
 	}
 
-	public void setGradetitle(String gradetitle) {
-		this.gradetitle = gradetitle;
+	public void setGrade_title(String grade_title) {
+		this.grade_title = grade_title;
 	}
 
 }

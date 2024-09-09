@@ -10,14 +10,18 @@ const Faq = () => {
     const [isAdd, setIsAdd] = useState(false) // 추가 모드 상태
     const [editIndex, setEditIndex] = useState(null) // 수정 모드 인덱스
 
-    useEffect(() => {
-        // 서버에서 FAQ 목록 가져오기
+    const fetchFaqList = () => {
         selectAllFaq()
             .then(response => {
                 console.log(response.data)
-                setFaqList(response.data)
+                setFaqList(response.data) // 상태 업데이트 후 리렌더링
             })
             .catch(error => console.error('FAQ 목록 조회 실패:', error))
+    }
+
+    useEffect(() => {
+        // 서버에서 FAQ 목록 가져오기
+        fetchFaqList()
     }, [])
 
     // FAQ 항목 토글
@@ -57,6 +61,7 @@ const Faq = () => {
                 setIsAdd(false)
                 setEditIndex(null)
                 setExpandedFaqIndex(null)
+                fetchFaqList() // 등록 후 목록을 다시 불러옴
             })
             .catch(error => console.error('FAQ 등록 실패:', error))
     }
@@ -75,11 +80,15 @@ const Faq = () => {
 
     // 수정 모드 저장
     const saveEditMode = () => {
+        const confirmSave = window.confirm('이 FAQ를 저장하시겠습니까?')
+        if (!confirmSave) return
+
         const updatedFaq = faqList[editIndex]
 
         modifyFaq(updatedFaq.faq_seq, updatedFaq)
             .then(() => {
                 setEditIndex(null)
+                fetchFaqList() // 수정 후 목록을 다시 불러옴
             })
             .catch(error => console.error('FAQ 수정 실패:', error))
     }
@@ -91,12 +100,16 @@ const Faq = () => {
 
     // FAQ 삭제
     const deleteFaqItem = index => {
+        const confirmDelete = window.confirm('이 FAQ를 삭제하시겠습니까?')
+        if (!confirmDelete) return
+
         const faq_seq = faqList[index].faq_seq
 
         deleteFaq(faq_seq)
             .then(() => {
                 const updatedFaqList = faqList.filter((_, i) => i !== index)
                 setFaqList(updatedFaqList)
+                fetchFaqList() // 삭제 후 목록을 다시 불러옴
             })
             .catch(error => console.error('FAQ 삭제 실패:', error))
     }

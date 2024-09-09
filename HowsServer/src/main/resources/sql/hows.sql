@@ -95,18 +95,32 @@ color_code char(2) not null,
 member_id varchar2(20) not null
 );
 
+-- 게시판 이미지
 create table board_image (
-    board_image_seq number primary key,       -- 이미지 시퀀스    
-    board_seq number not null,                  -- 게시글과 연결되는 id
-    image_url varchar2(500) not null,  -- 이미지 경로
-    image_order number not null,                -- 이미지 순서
+    board_image_seq number primary key,          
+    board_seq number not null,                 
+    image_url varchar2(500) not null,    
+    image_order number not null          
 );
 
-create table image_tag (
-    board_tag_seq number primary key,         -- 태그 id
-    board_image_seq number not null,                   -- 이미지와 연결되는 id
-    product_id varchar2(20) not null,  -- 상품 id (연결된 상품의 id)
-);
+create sequence board_image_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
+
+-- 게시판 이미지 상품 태그
+create table board_tag (
+    board_tag_seq number primary key,       
+    board_image_seq number not null,              
+    product_seq varchar2(20) not null
+)
+
+create sequence board_tag_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
 
 create sequence board_seq
 start with 1
@@ -674,8 +688,10 @@ SELECT * FROM role;
 SELECT * FROM follow;
 SELECT * FROM blacklist_reason;
 
--- 게시판 관련 - 14개
+-- 게시판 관련 - 16개
 SELECT * FROM board;
+SELECT * FROM board_image;
+SELECT * FROM board_tag;
 SELECT * FROM housing_type;
 SELECT * FROM space_type;
 SELECT * FROM area_size;

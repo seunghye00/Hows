@@ -1,6 +1,7 @@
 package com.hows.community.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,5 +22,11 @@ public class CommunityController {
     public ResponseEntity<Void> insertPost(@RequestBody CommunityDTO dto) {
     	//communityService.insertWrite(dto);
     	return ResponseEntity.ok().build();
+    }
+    
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> exceptionHandler(Exception e) {
+       e.printStackTrace();
+       return ResponseEntity.badRequest().body("fail");
     }
 }

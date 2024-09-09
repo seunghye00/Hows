@@ -2,10 +2,12 @@ import styles from './Payment.module.css'
 import React, {useEffect, useState} from "react";
 import {useOrderStore} from "../../../store/orderStore";
 import {addCommas, shippingPrice} from "../../../commons/commons";
+import {requestPaymentEvent} from "../../../api/payment";
+import { v4 as uuidv4 } from 'uuid';
 
 export const Payment = () => {
 
-  const { orderPrice, setOrderPrice, orderProducts, setOrderProducts } = useOrderStore();
+  const { orderPrice, setOrderPrice, orderProducts, setOrderProducts, setPaymentInfo } = useOrderStore();
 
   // Daum PostCode
   const [postcode, setPostcode] = useState(false);
@@ -27,6 +29,7 @@ export const Payment = () => {
     member_seq: 0,
     name: "",
     phone: "",
+    email:"",
     zip_code: "",
     address: "",
     detail_address: "",
@@ -63,6 +66,40 @@ export const Payment = () => {
     setData(prev => ({ ...prev, way: name }));
   }
 
+  /** 결제 이벤트 **/
+  const handlePayment = async () => {
+    // 목록 빠진 거 없는지 체크해야됨
+
+
+    const name = orderProducts[0].product_title;
+    const paymentId = `how-${uuidv4()}`
+    const orderName = name.length > 10 ? name.slice(0,9) + "..." : name;
+    const totalAmount = paymentPrice.total - paymentPrice.point;
+    const payMethod = data.way;
+    const customer = {
+      fullName: data.name,
+      phoneNumber: data.phone,
+      email: data.email
+    }
+
+    // Order API
+    // 1. 주문 내용
+    // 2. 주문한 상품 목록
+
+    const param = { paymentId, orderName, totalAmount, payMethod, customer };
+    setPaymentInfo({ orderName, totalAmount });
+    const result = await requestPaymentEvent(param);
+    if(result === "ok") {
+
+      // Payment API
+
+      // 결제 완료
+      // ok → 주문 내역
+      // cancel → home
+    }
+
+  }
+
   /** 새로고침 시 세션에서 order list 가져옴 **/
   useEffect(() => {
     if(orderProducts.length <= 0){
@@ -84,6 +121,7 @@ export const Payment = () => {
       member_seq: 1,
       name: "박종호",
       phone: "01087654321",
+      email: "test@gmail.com",
       zip_code: "35062",
       address: "충청남도 천안호두시 과자동",
       detail_address: "호두마을 100-1",
@@ -206,7 +244,7 @@ export const Payment = () => {
           <div className={styles.payment}>
             <p>결제방식</p>
             <div>
-              <button name="card" style={ data.way === "card" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
+              <button name="card" style={ data.way === "CARD" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
               <button name="kakao" style={ data.way === "kakao" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카카오 페이</button>
               <button name="toss" style={ data.way === "toss" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 패스</button>
             </div>
@@ -264,7 +302,7 @@ export const Payment = () => {
           <input name="category2" checked={consent.category2} type="checkbox" onChange={handleCheck}/> <label>(필수) 결제에
             동의</label>
           </div>
-          <button>결제하기</button>
+          <button onClick={handlePayment}>결제하기</button>
         </div>
 
       </div>

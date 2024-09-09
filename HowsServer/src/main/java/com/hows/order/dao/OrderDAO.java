@@ -15,9 +15,26 @@ public class OrderDAO {
     @Autowired
     private SqlSession mybatis;
 
+    /** 주문 목록 **/
     public List<OrderDTO> orderList() {
         return mybatis.selectList("Order.orderList");
     }
+
+    /** 주문 등록 **/
+    public int addOrder(OrderDTO orderDTO) {
+        return mybatis.insert("Order.addOrder", orderDTO);
+    }
+
+    /** 주문 목록 등록 **/
+    public int addOrderList(){
+        return mybatis.insert("Order.addOrderList");
+    }
+
+    /** 주문 수정 **/
+    public int updateOrder(OrderDTO orderDTO) {
+        return mybatis.update("Order.updateOrder", orderDTO);
+    }
+
 
 	public List<OrderInfoListDTO> getOrdersByStatus(String status) {
 		return mybatis.selectList("Order.orderListByStatus", status);

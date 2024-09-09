@@ -13,6 +13,7 @@ export const Main = () => {
             <Route path='product' element={<Product />} />
             <Route path='category' element={<Category/>}></Route>
             <Route path='best' element={<Best/>}></Route>
+            {/* <Route path='/:product_category_code' element={<Category/>}></Route> */}
             <Route path='/:product_seq' element={<Detail/>}></Route>
         </Routes>
     </div>

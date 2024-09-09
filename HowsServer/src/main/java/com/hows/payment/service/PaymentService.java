@@ -1,19 +1,31 @@
 package com.hows.payment.service;
 
+import com.hows.payment.dao.PaymentDAO;
+import com.hows.payment.dto.PaymentDTO;
 import com.hows.payment.dto.PaymentRequestDTO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
+import java.util.List;
 import java.util.Map;
 
 @Service
 public class PaymentService {
 
+    @Autowired
+    private PaymentDAO paymentDAO;
+
     @Value("${portone.api.secret}")
     private String portoneApiSecret;
+
+    /** 내 결제 내역 **/
+    public List<PaymentDTO> paymentList(String id) {
+        return paymentDAO.paymentList(id);
+    }
 
     /** 결제 여부 확인 **/
     public String payment(PaymentRequestDTO paymentRequest) {

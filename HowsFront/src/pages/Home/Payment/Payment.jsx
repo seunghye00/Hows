@@ -29,6 +29,7 @@ export const Payment = () => {
     member_seq: 0,
     name: "",
     phone: "",
+    email:"",
     zip_code: "",
     address: "",
     detail_address: "",
@@ -67,18 +68,35 @@ export const Payment = () => {
 
   /** 결제 이벤트 **/
   const handlePayment = async () => {
+    // 목록 빠진 거 없는지 체크해야됨
+
+
+    const name = orderProducts[0].product_title;
     const paymentId = `how-${uuidv4()}`
-    const orderName = "나이키 와플 트레이너 2 SD";
+    const orderName = name.length > 10 ? name.slice(0,9) + "..." : name;
     const totalAmount = paymentPrice.total - paymentPrice.point;
-    const payMethod = "CARD";
+    const payMethod = data.way;
     const customer = {
-      fullName: "노시온",
-      phoneNumber: "01051224519",
-      email: "vmfpsel@gmail.com"
+      fullName: data.name,
+      phoneNumber: data.phone,
+      email: data.email
     }
+
+    // Order API
+    // 1. 주문 내용
+    // 2. 주문한 상품 목록
+
     const param = { paymentId, orderName, totalAmount, payMethod, customer };
     setPaymentInfo({ orderName, totalAmount });
     const result = await requestPaymentEvent(param);
+    if(result === "ok") {
+
+      // Payment API
+
+      // 결제 완료
+      // ok → 주문 내역
+      // cancel → home
+    }
 
   }
 
@@ -103,6 +121,7 @@ export const Payment = () => {
       member_seq: 1,
       name: "박종호",
       phone: "01087654321",
+      email: "test@gmail.com",
       zip_code: "35062",
       address: "충청남도 천안호두시 과자동",
       detail_address: "호두마을 100-1",
@@ -225,7 +244,7 @@ export const Payment = () => {
           <div className={styles.payment}>
             <p>결제방식</p>
             <div>
-              <button name="card" style={ data.way === "card" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
+              <button name="card" style={ data.way === "CARD" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
               <button name="kakao" style={ data.way === "kakao" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카카오 페이</button>
               <button name="toss" style={ data.way === "toss" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 패스</button>
             </div>

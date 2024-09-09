@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
@@ -52,11 +53,17 @@ public class MemberService implements UserDetailsService {
 	
 	// 회원정보 가져오기
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		MemberDTO dto = memDao.findById(username);
 
-		User user = new User(dto.getMember_id(), dto.getPw(), AuthorityUtils.createAuthorityList(dto.getRole_code()));
-		return user;
+		if(dto == null) throw new UsernameNotFoundException("User not found");
+
+		return new CustomUserDetails(
+				dto.getMember_id(),
+				dto.getPw(),
+				AuthorityUtils.createAuthorityList(dto.getRole_code()),
+				dto.getMember_seq()
+		);
 	}
 	
 	// 아이디 찾기

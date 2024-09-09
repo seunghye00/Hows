@@ -12,6 +12,8 @@ export const adminstart = () => {
     // 여기서 밑 부터 관리자 기능!
 }
 
+/************************************  [ 관리자 기능 ] /************************************/
+
 // 전체 회원 조회
 export const selectAll = () => {
     return api.get(`${baseUrl}/all`)

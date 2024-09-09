@@ -6,6 +6,7 @@ import { host } from '../../../../../config/config';
 import { useNavigate } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop';
+import { addCommas } from '../../../../../commons/commons';
 
 
 // 데이터를 4개씩 묶는 함수
@@ -208,7 +209,7 @@ export const Category = () => {
                           <div className={styles.img}><img src={item.product_thumbnail} alt='img'></img></div>
                           <div className={styles.title}>
                             <div>{item.product_title}</div>
-                            <div>{item.price}</div>
+                            <div>{ addCommas(item.price || 0) }</div>
                           </div>
                         </div>
                       )

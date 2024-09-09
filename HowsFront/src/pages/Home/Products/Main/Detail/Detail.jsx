@@ -1,19 +1,21 @@
-import { useParams } from 'react-router-dom'
 import styles from './Detail.module.css'
+import { useParams } from 'react-router-dom'
 import { DetailPage } from './DetailPage/DetailPage';
-import img from './../../../../../assets/images/interior_9.jpg'
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { host } from '../../../../../config/config';
+import { addCommas } from '../../../../../commons/commons';
 
 
 
 export const Detail = () => {
     const {product_seq} = useParams();
+    const [list, setList] = useState([]);
 
     useEffect(()=>{
         axios.get(`${host}/product/detail/${product_seq}`).then(resp=>{
             console.log(resp)
+            setList(resp.data);
         })
     },[])
 
@@ -25,12 +27,12 @@ export const Detail = () => {
             <div className={styles.contents}>
                 {/* <p>{product_seq}</p> */}
                 <div className={styles.img}>
-                    <img src={img}></img>
+                    <img src={list.product_thumbnail}></img>
                 </div>
                 <div className={styles.content}>
                     <div className={styles.product_title}>
                         <div>
-                            상품이름
+                            {list.product_title}
                         </div>
                         <div>
                             <div>
@@ -45,14 +47,13 @@ export const Detail = () => {
                         </div>
                     </div>
                     <div className={styles.product_contents}>
-                        <div>내용</div>
-                        <div>내용</div>
+                        <div>{list.product_contents}</div>
                         <div>내용</div>
                         <div>내용</div>
                         <div>내용</div>
                         <div>내용</div>
                     </div>
-                    <div>test</div>
+                    <div>{ addCommas (list.price || 0) } 원</div>
                 </div>
             </div>
             <DetailPage/>

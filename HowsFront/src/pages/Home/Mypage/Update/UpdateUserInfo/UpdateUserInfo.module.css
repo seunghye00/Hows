@@ -127,6 +127,13 @@ input[type="text"]:disabled {
   background-color: var(--hows-point-color-darker);
 }
 
+/* 에러, 안내문구 */
+.container .nicknameBox .error {
+  display: flex;
+  justify-content: flex-start;
+  margin-left: 5px;
+}
+
 /* ========== 개별 ========= */
 /* 생년월일 및 성별 */
 .container .updateInfo .birthBox > div {

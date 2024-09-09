@@ -41,7 +41,14 @@ public class MemberDAO {
 		Integer count = mybatis.selectOne("Member.checkEmail", email);
 		return count != null && count > 0;
 	}
-
+	
+	// [로그인]비밀번호 찾기 - 비밀번호 변경
+	public int changePw(Map<String, String> map) {
+		return mybatis.update("Member.changePw", map);
+	}
+	
+	
+	
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
 		return mybatis.selectOne("Member.findId", map);
@@ -61,8 +68,8 @@ public class MemberDAO {
 	}
 
 	// 마이페이지 회원정보 출력
-	public MemberDTO selectInfo() {
-		return mybatis.selectOne("Member.selectInfo");
+	public MemberDTO selectInfo(String member_id) {
+		return mybatis.selectOne("Member.selectInfo", member_id);
 	}
 
 	// 비밀번호 변경시 기존 비밀번호 확인
@@ -73,6 +80,11 @@ public class MemberDAO {
 	// 비밀번호 변경
 	public int updatePw(HashMap<String, String> map) {
 		return mybatis.update("Member.updatePw", map);
+	}
+	
+	// 회원탈퇴
+	public int deleteUser(String member_id) {
+		return mybatis.delete("Member.deleteUser", member_id);
 	}
 
 	// =======================================================[ 관리자 ]

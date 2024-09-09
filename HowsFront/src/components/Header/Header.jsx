@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import styles from './Header.module.css'
 import logo from '../../assets/images/logo_how.png'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from './../../store/store'
 import profile from '../../assets/images/마이페이지_프로필사진.jpg'
+import { throttle } from 'lodash'
 
 export const Header = () => {
     const navigate = useNavigate()
+    const location = useLocation() // 현재 경로 확인
     const [activeMenu, setActiveMenu] = useState('HowShop')
-    const [activeSubMenu, setActiveSubMenu] = useState('홈')
     const [isFixed, setIsFixed] = useState(false)
-    // const [session, setSession] = useState(false)
     const { isAuth, login, logout, setIsAuth } = useAuthStore()
-    const [profileMenu, setProfileMenu] = useState(false) // 상태 변수명 변경
+    const [profileMenu, setProfileMenu] = useState(false)
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
         if (menuName === 'HowShop') {
-            navigate('/products')
+            navigate('/')
         } else if (menuName === 'HowStory') {
             navigate('/communities')
         } else if (menuName === 'HowShare') {
@@ -25,21 +25,18 @@ export const Header = () => {
         }
     }
 
-    // const handleSubMenuClick = subMenu => {
-    //     setActiveSubMenu(subMenu)
-    // }
-
-    const handleScroll = () => {
-        if (window.scrollY > 50) {
+    const handleScroll = throttle(() => {
+        if (window.scrollY) {
             setIsFixed(true)
         } else {
             setIsFixed(false)
         }
-    }
+    }) // 100ms마다 스크롤 이벤트 실행
 
     const handleProfileClick = () => {
         setProfileMenu(prev => !prev)
     }
+
     const handleItemClick = () => {
         setProfileMenu(false)
     }
@@ -55,12 +52,11 @@ export const Header = () => {
     }
 
     useEffect(() => {
-        // 세션스토리지에서 토큰 확인
         const token = sessionStorage.getItem('token')
         if (token) {
-            login(token) // 토큰이 있으면 로그인
+            login(token)
         } else {
-            logout() // 토큰이 없으면 로그아웃
+            logout()
             setIsAuth(false)
         }
 
@@ -69,6 +65,17 @@ export const Header = () => {
             window.removeEventListener('scroll', handleScroll)
         }
     }, [login, logout, setIsAuth])
+
+    // 현재 URL에 맞춰서 활성화된 메뉴 설정
+    useEffect(() => {
+        if (location.pathname === '/') {
+            setActiveMenu('HowShop')
+        } else if (location.pathname.includes('/communities')) {
+            setActiveMenu('HowStory')
+        } else if (location.pathname.includes('/howshare')) {
+            setActiveMenu('HowShare')
+        }
+    }, [location.pathname])
 
     return (
         <div className="header">
@@ -140,58 +147,52 @@ export const Header = () => {
                             </div>
                             <div
                                 className={
-                                    // session
                                     isAuth
                                         ? `${styles.infoUser}`
                                         : `${styles.infoIcon}`
                                 }
                             >
-                                {
-                                    // session
-                                    isAuth ? (
-                                        <div className={styles.infoUser}>
+                                {isAuth ? (
+                                    <div>
+                                        <div className={styles.profileImg}>
                                             <img
                                                 src={profile}
                                                 alt="User"
                                                 onClick={handleProfileClick}
                                             />
-                                            {profileMenu && (
+                                        </div>
+                                        {profileMenu && (
+                                            <div className={styles.profileMenu}>
                                                 <div
                                                     className={
-                                                        styles.profileMenu
+                                                        styles.profileMenuItem
                                                     }
+                                                    onClick={() => {
+                                                        navigate('/mypage')
+                                                        handleItemClick()
+                                                    }}
                                                 >
-                                                    <div
-                                                        className={
-                                                            styles.profileMenuItem
-                                                        }
-                                                        onClick={() => {
-                                                            navigate('/mypage')
-                                                            handleItemClick()
-                                                        }}
-                                                    >
-                                                        마이페이지
-                                                    </div>
-                                                    <div
-                                                        className={
-                                                            styles.profileMenuItem
-                                                        }
-                                                        onClick={() => {
-                                                            handleLogout()
-                                                            handleItemClick()
-                                                        }}
-                                                    >
-                                                        로그아웃
-                                                    </div>
+                                                    마이페이지
                                                 </div>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <a onClick={() => navigate('/signIn')}>
-                                            <i className="bx bxs-user-circle"></i>
-                                        </a>
-                                    )
-                                }
+                                                <div
+                                                    className={
+                                                        styles.profileMenuItem
+                                                    }
+                                                    onClick={() => {
+                                                        handleLogout()
+                                                        handleItemClick()
+                                                    }}
+                                                >
+                                                    로그아웃
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <a onClick={() => navigate('/signIn')}>
+                                        <i className="bx bxs-user-circle"></i>
+                                    </a>
+                                )}
                             </div>
                         </div>
                     </div>

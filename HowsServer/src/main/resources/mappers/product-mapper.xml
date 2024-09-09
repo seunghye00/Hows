@@ -4,9 +4,22 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="Product">
+
+	<select id="getProducts" resultType="com.hows.product.dto.ProductDTO">
+		SELECT * 
+        FROM PRODUCT ORDER BY product_seq
+	</select>
+
 	<select id="getProductByCategory" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
         SELECT * 
         FROM PRODUCT
         WHERE product_category_code = #{product_category_code}
     </select>
+    
+    <select id="getProductDetaile" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
+    	SELECT * 
+		FROM PRODUCT
+		WHERE product_seq = #{product_seq}
+    </select>
+
 </mapper>

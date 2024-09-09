@@ -31,6 +31,8 @@ export const SignUp = () => {
     const [checkEmailStatus, setCheckEmailStatus] = useState('');
     const [idErrorMessage, setIdErrorMessage] = useState('');
     const [nicknameErrorMessage, setNicknameErrorMessage] = useState('');
+    const [idChecked, setIdChecked] = useState(false); // 중복확인 상태 검사
+    const [nicknameChecked, setNicknameChecked] = useState(false); // 중복확인 상태 검사
 
     const handleChange = e => {
         const { name, value } = e.target
@@ -38,6 +40,13 @@ export const SignUp = () => {
             ...prev,
             [name]: value,
         }))
+
+        // input창 변경 시
+        if (name === 'member_id') {
+            setIdChecked(false);
+        } else if (name === 'nickname') {
+            setNicknameChecked(false);
+        }
     }
 
     // 중복확인 버튼 핸들러
@@ -58,6 +67,7 @@ export const SignUp = () => {
             .then(resp => {
                 console.log("id : ", resp.data);
                 setIdAvailable(resp.data);
+                setIdChecked(!resp.data);
                 setCheckIdStatus(resp.data ? "이미 사용 중인 ID입니다." : "사용 가능한 ID입니다.");
             });
     }
@@ -80,6 +90,7 @@ export const SignUp = () => {
             .then(resp => {
                 console.log("nickname : ", resp.data);
                 setNicknameAvailable(resp.data);
+                setNicknameChecked(!resp.data);
                 setCheckNicknameStatus(resp.data ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
             });
     }
@@ -242,26 +253,42 @@ export const SignUp = () => {
 
     // 회원가입 버튼
     const handleSubmit = e => {
-        // e.preventDefault(); // 기본 폼 제출 방지
-        // if (validateFormData(formData)) {
-        //     console.log("폼 데이터가 유효합니다:", formData);
-        // }
-
-        //===============================
         e.preventDefault()
 
         // 유효성 검사 실행
         if (!validateFormData(formData)) {
-            // 유효성 검사를 통과하지 못하면 더 이상 진행하지 않음
             return;
         }
+
+        // 중복 확인 상태 체크
+        if (idAvailable === null) {
+            alert('아이디 중복 확인을 해주세요.');
+            return;
+        }
+        if (nicknameAvailable === null) {
+            alert('닉네임 중복 확인을 해주세요.');
+            return;
+        }
+        // if (emailAvailable === null) {
+        //     alert('이메일 중복 확인을 해주세요.');
+        //     return;
+        // }
+
+        if (!idChecked) {
+            alert("아이디 중복 확인을 해주세요.");
+            return;
+        }
+        if (!nicknameChecked) {
+            alert("닉네임 중복 확인을 해주세요.");
+            return;
+        }
+
         // 유효성 검사를 통과하면 서버에 데이터 전송
         axios
             .post(`${host}/member`, formData)
             .then(resp => {
                 console.log('회원가입 : ', resp.data)
                 alert('회원가입이 성공적으로 완료되었습니다.')
-                // setMember([...member, resp.data]);
                 navi("/");
             })
             .catch(error => {

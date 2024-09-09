@@ -50,7 +50,10 @@
 		where email = #{email}
 	</select>
 
-
+	<!-- [로그인]비밀번호 찾기 - 비밀번호 변경 -->
+	<update id="changePw">
+		update member set pw = #{pw} where member_id = #{member_id} and email = #{email}
+	</update>
 
 
 	<!-- 회원정보 가져오기 -->
@@ -73,8 +76,7 @@
 
 
 	<!-- 마이페이지 회원정보 출력 -->
-	<select id="selectInfo"
-		resultType="com.hows.member.dto.MemberDTO">
+	<select id="selectInfo" resultType="com.hows.member.dto.MemberDTO">
 		select * from member where member_id = #{member_id}
 	</select>
 
@@ -89,6 +91,12 @@
 		update member set pw = #{pw} where member_id =
 		#{member_id}
 	</update>
+	
+	<!-- 회원탈퇴 -->
+	<delete id="deleteUser">
+		delete from member where member_id = #{member_id}
+	</delete>
+
 
 	<!-- ===========================================[ 관리자 ] -->
 	<!-- 전체 회원조회 (관리자) -->

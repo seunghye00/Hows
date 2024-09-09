@@ -6,6 +6,7 @@ import { host } from '../../../../../config/config';
 import { useNavigate } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop';
+import { addCommas } from '../../../../../commons/commons';
 
 
 // 데이터를 4개씩 묶는 함수
@@ -84,7 +85,7 @@ export const Category = () => {
   // 카테고리 목록 출력
   const handleMenuClick = (product_category_code) => {
     
-    axios.get(`${host}/product/${product_category_code}`).then((resp)=> {
+    axios.get(`${host}/product/category/${product_category_code}`).then((resp)=> {
       setData(resp.data);
       
     }).catch((err) => {console.error(err); });
@@ -208,7 +209,7 @@ export const Category = () => {
                           <div className={styles.img}><img src={item.product_thumbnail} alt='img'></img></div>
                           <div className={styles.title}>
                             <div>{item.product_title}</div>
-                            <div>{item.price}</div>
+                            <div>{ addCommas(item.price || 0) }</div>
                           </div>
                         </div>
                       )

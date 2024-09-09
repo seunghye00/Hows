@@ -14,8 +14,18 @@ public class ProductService {
 	@Autowired
 	private ProductDAO productDAO;
 	
-	// 목록 출력
+	// 전체 목록 출력 
+	public List<ProductDTO> getProducts () throws Exception{
+		return productDAO.getProducts();
+	}
+	
+	// 카테고리별 목록 출력
 	public List<ProductDTO> getProductByCategory (String product_category_code) throws Exception {
 		return productDAO.getProductByCategory(product_category_code);
+	}
+	
+	// 디테일 출력
+	public ProductDTO getProductByDetail (String product_seq) throws Exception {
+		return productDAO.getProductDetaile(product_seq);
 	}
 }

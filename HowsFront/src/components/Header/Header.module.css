@@ -9,8 +9,9 @@
   color: var(--hows-gray-900);
   position: relative;
   z-index: 1000;
-  transition: all 0.1s ease;
+
   /* 애니메이션을 위한 트랜지션 */
+  transition: top 0.1s;
 }
 
 .headerCont.fixed {
@@ -18,6 +19,7 @@
   top: 0;
   left: 0;
   width: 100%;
+  height: 85px;
   background-color: var(--hows-white);
   /* 배경색이 필요하다면 추가 */
   z-index: 1000;
@@ -96,95 +98,44 @@
   border: 1px solid var(--hows-point-color);
   border-radius: 100%;
   display: flex;
-  overflow: hidden;
+  /* overflow: hidden; */
   cursor: pointer;
-  /* position: relative; */
+  position: relative;
 }
-.infoUser img {
+
+.infoUser .profileImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 100%;
+  overflow: hidden;
+}
+
+.profileImg img {
   width: 100%;
   height: 100%;
 }
+
 .profileMenu {
   position: absolute;
-  top: 70px;
-  right: 50px;
-  background-color: white;
+  top: 50px;
+  right: 0px;
+  background-color: var(--hows-point-color-lightest);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 10px 0;
   z-index: 1000;
   width: 120px;
 }
+
 .profileMenuItem {
   padding: 10px 15px;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
-  transition: background-color 0.2s ease;
+  color: var(--hows-point-color-darker);
 }
+
 .profileMenuItem:hover {
   font-weight: 600;
-  color: var(--hows-point-color-dark);
-}
-
-/* 서브메뉴 */
-.subMenuWrap {
-  border-bottom: 1px solid var(--hows-gray-300);
-}
-
-.subMenuCont {
-  width: 100%;
-  display: flex;
-  gap: 20px;
-  margin: 0px auto;
-  color: var(--hows-gray-900);
-  position: relative;
-  transition: all 0.1s ease;
-  z-index: 999;
-}
-
-.subMenuCont.fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background-color: var(--hows-white);
-  /* 배경색이 필요하다면 추가 */
-  z-index: 999;
-  border-bottom: 1px solid var(--hows-gray-300);
-  /* 패딩을 추가해도 좋습니다 */
-}
-
-.subMenuBar {
-  max-width: 1300px;
-  display: flex;
-  gap: 40px;
-  width: 100%;
-  margin: auto;
-}
-
-.subMenu {
-  font-weight: 500;
-  padding: 10px 0;
-  position: relative;
-}
-
-.subMenu.active {
-  color: var(--hows-point-color);
-  font-weight: 700;
-}
-
-.subMenu:hover {
-  color: var(--hows-point-color);
-}
-
-.subMenu.active::after {
-  content: "";
-  position: absolute;
-  display: block;
-  width: 100%;
-  background-color: var(--hows-point-color);
-  height: 2px;
-  bottom: 0;
+  color: var(--hows-black);
 }

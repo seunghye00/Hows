@@ -3,8 +3,11 @@ import { useState } from "react";
 import logo from '../../../../../assets/images/logo_how.png'
 import axios from "axios";
 import { host } from './../../../../../config/config';
+import { useNavigate } from 'react-router-dom';
 
 export const ChangePw = ({ onSubmit }) => {
+
+    const navi = useNavigate();
 
     const [newPw, setNewPw] = useState('');
     const [newPw2, setNewPw2] = useState('');
@@ -34,6 +37,17 @@ export const ChangePw = ({ onSubmit }) => {
         validatePassword(newPw, value);
     };
 
+    // input창의 borderColor 결정
+    const getInputBorderColor = (type) => {
+        if (type === "newPw") {
+            if (newPw === "") return ""; // 기본 CSS 적용
+            return pwValid ? "var(--hows-blue-dark)" : "var(--hows-red-dark)";
+        } else if (type === "newPw2") {
+            if (newPw2 === "") return ""; // 기본 CSS 적용
+            return newPw === newPw2 ? "var(--hows-blue-dark)" : "var(--hows-red-dark)";
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         // 유효성 검사
@@ -45,17 +59,16 @@ export const ChangePw = ({ onSubmit }) => {
             alert('비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.');
             return;
         }
-
-        alert('새 비밀번호가 설정되었습니다.');
         // 새 비밀번호 제출
         onSubmit(newPw);
+        navi("/signIn");
     };
 
 
     return (
         <div className={styles.container}>
             <div className={styles.changePwBox}>
-                <div className={styles.logo}>
+                <div className={styles.logo} onClick={() => navi("/")}>
                     <img src={logo} alt="logo" />
                     <h1 className={styles.title}>How's</h1>
                 </div>
@@ -65,14 +78,16 @@ export const ChangePw = ({ onSubmit }) => {
                     value={newPw}
                     onChange={handleNewPw}
                     placeholder="새 비밀번호를 입력해주세요."
-                    style={{ borderColor: pwValid ? "var(--hows-blue-dark)" : "var(--hows-red-dark)" }}
+                    style={{ borderColor: getInputBorderColor("newPw") }}
+                // style={{ borderColor: pwValid ? "var(--hows-blue-dark)" : "var(--hows-red-dark)" }}
                 />
                 <input
                     type="password"
                     value={newPw2}
                     onChange={handleNewPw2}
                     placeholder="한 번 더 입력해주세요."
-                    style={{ borderColor: checkPw ? "var(--hows-blue-dark)" : "var(--hows-red-dark)" }}
+                    style={{ borderColor: getInputBorderColor("newPw2") }}
+                // style={{ borderColor: checkPw ? "var(--hows-blue-dark)" : "var(--hows-red-dark)" }}
                 />
                 <button className={styles.btn} onClick={handleSubmit}>변경 완료</button>
             </div>

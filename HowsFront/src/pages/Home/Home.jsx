@@ -8,12 +8,13 @@ import { Main } from './Main/Main'
 import { Payment } from './Payment/Payment'
 import { SignIn } from '../Sign/SignIn/SignIn'
 import { SignUp } from '../Sign/SignUp/SignUp'
+import { FindPw } from '../Sign/SignIn/FindPw/FindPw'
 
 export const Home = () => {
     return (
         <div className={styles.container}>
             <Routes>
-                <Route path="/" element={<Main />} />
+                <Route path="/" element={<Products />} />
                 <Route path="/products/*" element={<Products />} />
                 <Route path="/communities/*" element={<Communities />} />
                 <Route path="/cart" element={<Cart />} />
@@ -21,6 +22,7 @@ export const Home = () => {
                 <Route path="/payment" element={<Payment />} />
 
                 <Route path="/signIn" element={<SignIn />} />
+                <Route path="/signIn/findPw" element={<FindPw />} />
                 <Route path="/signUp" element={<SignUp />} />
             </Routes>
         </div>

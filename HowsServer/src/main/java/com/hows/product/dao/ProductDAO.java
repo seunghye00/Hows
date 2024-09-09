@@ -17,4 +17,8 @@ public class ProductDAO {
 	public List<ProductDTO> getProductByCategory (String product_category_code) throws Exception{
 		return myBatis.selectList("Product.getProductByCategory", product_category_code);
 	}
+	
+	public ProductDTO getProductDetaile (String product_seq) throws Exception{
+		return myBatis.selectOne("Product.getProductDetaile", product_seq);
+	}
 }

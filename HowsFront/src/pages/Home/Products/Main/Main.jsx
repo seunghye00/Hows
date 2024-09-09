@@ -1,4 +1,3 @@
-import { Banner } from './Banner/Banner';
 import { Category } from './Category/Category';
 import { Product } from './Product/Product';
 import styles from './Main.module.css'

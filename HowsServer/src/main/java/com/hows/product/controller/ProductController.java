@@ -22,11 +22,24 @@ public class ProductController {
 	
 	
 	// 목록 출력
-	@GetMapping("/{product_category_code}")
+	@GetMapping("/category/{product_category_code}")
 	public ResponseEntity<List<ProductDTO>> getProductByCategory (@PathVariable String product_category_code) throws Exception {
 		List<ProductDTO> products = productServ.getProductByCategory(product_category_code);
 		return ResponseEntity.ok(products);
 	}
+	
+	// 디테일 출력 
+	@GetMapping("/detail/{product_seq}")
+	public ResponseEntity<ProductDTO> getProductByDetail (@PathVariable String product_seq) throws Exception{
+		ProductDTO detaile = productServ.getProductByDetail(product_seq);
+		return ResponseEntity.ok(detaile);
+	}
+	
+	
+	
+	
+	
+	
 	
 	@ExceptionHandler(Exception.class)
 	public String exceptionHandler(Exception e) {

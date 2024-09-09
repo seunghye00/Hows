@@ -13,7 +13,7 @@ export const Home = () => {
     return (
         <div className={styles.container}>
             <Routes>
-                <Route path="/" element={<Main />} />
+                <Route path="/" element={<Products />} />
                 <Route path="/products/*" element={<Products />} />
                 <Route path="/communities/*" element={<Communities />} />
                 <Route path="/cart" element={<Cart />} />

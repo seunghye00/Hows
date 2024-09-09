@@ -18,4 +18,9 @@ public class ProductService {
 	public List<ProductDTO> getProductByCategory (String product_category_code) throws Exception {
 		return productDAO.getProductByCategory(product_category_code);
 	}
+	
+	// 디테일 출력
+	public ProductDTO getProductByDetail (String product_seq) throws Exception {
+		return productDAO.getProductDetaile(product_seq);
+	}
 }

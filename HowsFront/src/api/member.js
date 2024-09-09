@@ -51,3 +51,13 @@ export const getAllBlacklistReasons = () => {
 export const addBlacklist = ({ member_id, reason }) => {
     return api.post(`${baseUrl}/addBlacklist`, { member_id, reason })
 }
+
+// 블랙리스트 조회
+export const selectBlacklist = () => {
+    return api.get(`${baseUrl}/blacklist`)
+}
+
+// 블랙리스트 수정 (블랙리스트 해제)
+export const modifyBlacklist = ({ member_id }) => {
+    return api.put(`${baseUrl}/modifyBlacklist`, { member_id })
+}

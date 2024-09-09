@@ -1,39 +1,55 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from './Blacklist.module.css'
 import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
+import { selectBlacklist, modifyBlacklist } from '../../../api/member'
 
 export const Blacklist = () => {
-    const [blacklistMembers, setBlacklistMembers] = useState([
-        {
-            name: '민바오',
-            id: 'user1234',
-            reason: '욕설 및 비방',
-            date: '2024-08-31',
-        },
-        {
-            name: '홍길동',
-            id: 'user5678',
-            reason: '스팸 및 광고',
-            date: '2024-07-15',
-        },
-    ])
-
+    const [blacklistMembers, setBlacklistMembers] = useState([])
     const [searchResults, setSearchResults] = useState([])
     const [selectedFilter, setSelectedFilter] = useState('전체')
 
+    // 블랙리스트 데이터를 서버로부터 가져오기
+    useEffect(() => {
+        const fetchBlacklist = async () => {
+            try {
+                const response = await selectBlacklist()
+                setBlacklistMembers(response.data) // 서버에서 가져온 데이터를 저장
+                console.log(response)
+            } catch (error) {
+                console.error(
+                    '블랙리스트 데이터를 가져오는 중 오류 발생:',
+                    error
+                )
+            }
+        }
+        fetchBlacklist()
+    }, [])
+
     // 블랙리스트 해제 함수
-    const removeFromBlacklist = id => {
-        const updatedList = blacklistMembers.filter(member => member.id !== id)
-        setBlacklistMembers(updatedList)
-        setSearchResults(updatedList)
+    const updateBlacklist = async id => {
+        const isConfirmed = window.confirm('블랙리스트를 해제시키겠습니까?')
+
+        if (isConfirmed) {
+            try {
+                await modifyBlacklist({ member_id: id })
+                const updatedList = blacklistMembers.filter(
+                    member => member.member_id !== id
+                )
+                setBlacklistMembers(updatedList)
+                setSearchResults(updatedList)
+            } catch (error) {
+                console.error('블랙리스트 해제 중 오류 발생:', error)
+            }
+        }
     }
 
     // 검색 기능 구현
     const handleSearch = query => {
         const results = blacklistMembers.filter(
-            member => member.name.includes(query) || member.id.includes(query)
+            member =>
+                member.name.includes(query) || member.member_id.includes(query)
         )
         setSearchResults(results)
     }
@@ -102,19 +118,21 @@ export const Blacklist = () => {
                             <div className={styles.memberItem}>
                                 {member.name}
                             </div>
-                            <div className={styles.memberItem}>{member.id}</div>
                             <div className={styles.memberItem}>
-                                {member.reason}
+                                {member.member_id}
                             </div>
                             <div className={styles.memberItem}>
-                                {member.date}
+                                {member.blacklist_reason_code}
+                            </div>
+                            <div className={styles.memberItem}>
+                                {member.blacklist_date}
                             </div>
                             <div className={styles.memberItem}>
                                 <Button
                                     size="s"
                                     title="해제"
                                     onClick={() =>
-                                        removeFromBlacklist(member.id)
+                                        updateBlacklist(member.member_id)
                                     }
                                 />
                             </div>

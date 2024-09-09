@@ -19,7 +19,9 @@ function App() {
     // if login
     useEffect(() => {
         const token = sessionStorage.getItem("token");
-        login(token);
+        if (token != null) {
+            login(token);
+        }
     }, [])
 
     return (

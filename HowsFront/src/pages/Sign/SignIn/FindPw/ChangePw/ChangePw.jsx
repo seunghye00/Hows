@@ -34,6 +34,17 @@ export const ChangePw = ({ onSubmit }) => {
         validatePassword(newPw, value);
     };
 
+    // input창의 borderColor 결정
+    const getInputBorderColor = (type) => {
+        if (type === "newPw") {
+            if (newPw === "") return ""; // 기본 CSS 적용
+            return pwValid ? "var(--hows-blue-dark)" : "var(--hows-red-dark)";
+        } else if (type === "newPw2") {
+            if (newPw2 === "") return ""; // 기본 CSS 적용
+            return newPw === newPw2 ? "var(--hows-blue-dark)" : "var(--hows-red-dark)";
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         // 유효성 검사
@@ -46,7 +57,7 @@ export const ChangePw = ({ onSubmit }) => {
             return;
         }
 
-        alert('새 비밀번호가 설정되었습니다.');
+        // alert('새 비밀번호가 설정되었습니다.');
         // 새 비밀번호 제출
         onSubmit(newPw);
     };
@@ -65,14 +76,16 @@ export const ChangePw = ({ onSubmit }) => {
                     value={newPw}
                     onChange={handleNewPw}
                     placeholder="새 비밀번호를 입력해주세요."
-                    style={{ borderColor: pwValid ? "var(--hows-blue-dark)" : "var(--hows-red-dark)" }}
+                    style={{ borderColor: getInputBorderColor("newPw") }}
+                // style={{ borderColor: pwValid ? "var(--hows-blue-dark)" : "var(--hows-red-dark)" }}
                 />
                 <input
                     type="password"
                     value={newPw2}
                     onChange={handleNewPw2}
                     placeholder="한 번 더 입력해주세요."
-                    style={{ borderColor: checkPw ? "var(--hows-blue-dark)" : "var(--hows-red-dark)" }}
+                    style={{ borderColor: getInputBorderColor("newPw2") }}
+                // style={{ borderColor: checkPw ? "var(--hows-blue-dark)" : "var(--hows-red-dark)" }}
                 />
                 <button className={styles.btn} onClick={handleSubmit}>변경 완료</button>
             </div>

@@ -47,7 +47,10 @@
 		select count(*) from member where email = #{email}
 	</select>
 
-
+	<!-- [로그인]비밀번호 찾기 - 비밀번호 변경 -->
+	<update id="changePw">
+		update member set pw = #{pw} where member_id = #{member_id} and email = #{email}
+	</update>
 
 
 	<!-- 회원정보 가져오기 -->
@@ -108,10 +111,12 @@
 		m.signup_date,
 		m.withdrawal_date,
 		g.grade_title AS grade_code,
-		r.role_title AS role_code
+		r.role_title AS
+		role_code
 		FROM member m
 		JOIN grade g ON m.grade_code = g.grade_code
-		JOIN role r ON m.role_code = r.role_code
+		JOIN
+		role r ON m.role_code = r.role_code
 		WHERE m.member_id = #{member_id}
 	</select>
 
@@ -158,5 +163,35 @@
 		WHERE member_id =
 		#{member_id}
 	</update>
+
+	<!-- 블랙리스트 조회 (관리자) -->
+	<select id="selectBlacklist"
+		resultType="com.hows.member.dto.MemberDTO">
+		SELECT
+		m.member_id,
+		m.name,
+		br.blacklist_reason_description AS
+		blacklist_reason_code,
+		m.blacklist_date
+		FROM
+		member m
+		JOIN
+		blacklist_reason br
+		ON
+		m.blacklist_reason_code =
+		br.blacklist_reason_code
+		WHERE
+		m.role_code = 'R3'
+	</select>
+
+	<!-- 블랙리스트 수정 (관리자) -->
+	<update id="modifyBlacklist">
+		UPDATE member
+		SET role_code = 'R2',
+		blacklist_reason_code = '',
+		blacklist_date = null
+		WHERE member_id = #{member_id}
+	</update>
+
 
 </mapper>

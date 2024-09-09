@@ -21,7 +21,14 @@ public class ProductController {
 	private ProductService productServ;
 	
 	
-	// 목록 출력
+	// 전체 목록 출력
+	@GetMapping
+	public ResponseEntity<List<ProductDTO>> getProducts () throws Exception{
+		List<ProductDTO> products = productServ.getProducts();
+		return ResponseEntity.ok(products);
+	}
+	
+	// 카테고리별 목록 출력
 	@GetMapping("/category/{product_category_code}")
 	public ResponseEntity<List<ProductDTO>> getProductByCategory (@PathVariable String product_category_code) throws Exception {
 		List<ProductDTO> products = productServ.getProductByCategory(product_category_code);

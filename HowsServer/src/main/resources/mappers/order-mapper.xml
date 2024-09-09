@@ -30,4 +30,29 @@
 		</where>
 	</select>
 
+	<insert id="addOrder">
+		<selectKey keyProperty="orders_seq" resultType="int" order="AFTER">
+			select orders_seq.currval from dual
+		</selectKey>
+
+		INSERT INTO
+			orders
+		VALUES(
+			orders_seq.nextval,
+			#{member_seq},
+			#{order_code},
+			default,
+			#{order_price}
+		)
+	</insert>
+
+	<update id="updateOrder">
+		UPDATE
+			orders
+		SET
+			orders_code = #{orders_code}
+		WHERE
+			orders_seq = #{orders_seq}
+	</update>
+
 </mapper>

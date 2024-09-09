@@ -2,11 +2,24 @@ import { useParams } from 'react-router-dom'
 import styles from './Detail.module.css'
 import { DetailPage } from './DetailPage/DetailPage';
 import img from './../../../../../assets/images/interior_9.jpg'
+import { useEffect } from 'react';
+import axios from 'axios';
+import { host } from '../../../../../config/config';
 
 
 
 export const Detail = () => {
     const {product_seq} = useParams();
+
+    useEffect(()=>{
+        axios.get(`${host}/product/detail/${product_seq}`).then(resp=>{
+            console.log(resp)
+        })
+    },[])
+
+
+
+
     return (
         <div className={styles.contailer}>
             <div className={styles.contents}>

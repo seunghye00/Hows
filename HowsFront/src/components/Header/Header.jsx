@@ -17,7 +17,7 @@ export const Header = () => {
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
         if (menuName === 'HowShop') {
-            navigate('/products')
+            navigate('/')
         } else if (menuName === 'HowStory') {
             navigate('/communities')
         } else if (menuName === 'HowShare') {

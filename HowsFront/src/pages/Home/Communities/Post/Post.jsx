@@ -3,12 +3,17 @@ import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import styles from './Post.module.css'
 import { Button } from '../../../../components/Button/Button'
+import { Search } from '../../../../components/Search/Search'
 import Swal from 'sweetalert2'
 import { useDropzone } from 'react-dropzone'
 import { Modal } from '../../../../components/Modal/Modal'
 import axios from 'axios'
 import { host } from '../../../../config/config'
-
+import img from '../../../../assets/images/패브릭.png'
+import img1 from '../../../../assets/images/수납.png'
+import img2 from '../../../../assets/images/조명.png'
+import img3 from '../../../../assets/images/주방용품.png'
+import img4 from '../../../../assets/images/테스트.jpg'
 // 이미지 순서 변경을 위한 타입
 const ItemType = 'IMAGE'
 
@@ -21,9 +26,19 @@ export const Post = () => {
     const [tagPosition, setTagPosition] = useState({}) // 태그 위치 저장
     const [searchTerm, setSearchTerm] = useState('') // 검색어
     const [searchResults, setSearchResults] = useState([
-        { id: 1, name: 'Hows 스테인리스 철제 프레임 데스크' },
-        { id: 2, name: 'Hows 철제 프레임 의자' },
-        { id: 3, name: 'Hows 나무 책상' },
+        {
+            product_seq: 1,
+            product_thumbnail: img,
+            name: 'Hows 스테인리스 철제 프레임 데스크',
+        },
+        {
+            product_seq: 2,
+            product_thumbnail: img1,
+            name: 'Hows 철제 프레임 의자',
+        },
+        { product_seq: 3, product_thumbnail: img2, name: 'Hows 나무 책상' },
+        { product_seq: 4, product_thumbnail: img3, name: 'Hows 철제 책상' },
+        { product_seq: 4, product_thumbnail: img4, name: 'Hows 조명' },
     ]) // 임시 상품 태그 데이터
     // 기존 state와 함수 유지
     const [postContent, setPostContent] = useState('') // 글 내용
@@ -383,12 +398,14 @@ export const Post = () => {
                         )}
                         {thumbnail && (
                             <div className={styles.thumbnailCont}>
-                                <img
-                                    src={thumbnail}
-                                    alt="썸네일"
-                                    className={styles.thumbnailPreview}
-                                    onClick={handleThumbnailClick} // 태그 추가는 썸네일에서만
-                                />
+                                <div className={styles.thumbnailBox}>
+                                    <img
+                                        src={thumbnail}
+                                        alt="썸네일"
+                                        className={styles.thumbnailPreview}
+                                        onClick={handleThumbnailClick} // 태그 추가는 썸네일에서만
+                                    />
+                                </div>
                                 {renderTagMarkers()} {/* 태그 마커 표시 */}
                                 <div className={styles.thumbnailControls}>
                                     <Button
@@ -529,27 +546,35 @@ export const Post = () => {
                         isOpen={isModalOpen}
                         onClose={() => setIsModalOpen(false)}
                     >
-                        <div className={styles.tagSearch}>
-                            <input
-                                type="text"
-                                placeholder="상품명, 브랜드를 검색"
-                                value={searchTerm}
-                                onChange={e => setSearchTerm(e.target.value)}
-                            />
-                            <button onClick={handleSearch}>검색</button>
-                            {searchResults.map(product => (
-                                <div
-                                    key={product.id}
-                                    className={styles.searchResultItem}
-                                >
-                                    <span>{product.name}</span>
-                                    <Button
-                                        size="s"
-                                        title="선택"
-                                        onClick={() => handleAddTag(product)}
-                                    />
-                                </div>
-                            ))}
+                        <div className={styles.tagModal}>
+                            <div className={styles.tagSearch}>
+                                <Search size="l" />
+                            </div>
+                            <div className={styles.productList}>
+                                {searchResults.map(product => (
+                                    <div
+                                        key={product.id}
+                                        className={styles.searchResultItem}
+                                    >
+                                        <div className={styles.productImg}>
+                                            <img
+                                                src={product.product_thumbnail}
+                                                alt={product.name}
+                                            />
+                                        </div>
+                                        <div className={styles.productInfo}>
+                                            <span>{product.name}</span>
+                                            <Button
+                                                size="s"
+                                                title="선택"
+                                                onClick={() =>
+                                                    handleAddTag(product)
+                                                }
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </Modal>
                 </div>

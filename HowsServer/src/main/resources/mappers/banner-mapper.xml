@@ -8,8 +8,4 @@
 	<delete id="delete">
 		delete from banner where banner_sysname = #{sysname}
 	</delete>
-	
-	<select id="selectAll" resultType="com.hows.banner.dto.BannerDTO">
-		select * from banner
-	</select>
 </mapper>

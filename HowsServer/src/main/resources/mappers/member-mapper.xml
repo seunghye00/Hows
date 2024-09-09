@@ -34,46 +34,64 @@
 
 	<!-- 중복확인 - ID -->
 	<select id="checkId" resultType="Integer">
-		select count(*) from member where member_id = #{member_id}
+		select count(*) from member
+		where member_id = #{member_id}
 	</select>
-	
+
 	<!-- 중복확인 - 닉네임 -->
 	<select id="checkNickname" resultType="Integer">
-		select count(*) from member where nickname = #{nickname}
+		select count(*) from
+		member where nickname = #{nickname}
 	</select>
-	
+
 	<!-- 중복확인 - 이메일 -->
 	<select id="checkEmail" resultType="Integer">
-		select count(*) from member where email = #{email}
+		select count(*) from member
+		where email = #{email}
 	</select>
 
 	<!-- [로그인]비밀번호 찾기 - 비밀번호 변경 -->
 	<update id="changePw">
-		update member set pw = #{pw} where member_id = #{member_id} and email = #{email}
+		update member set pw = #{pw} where member_id =
+		#{member_id} and email = #{email}
 	</update>
-
 
 	<!-- 회원정보 가져오기 -->
 	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
-		select * from member where
-		member_id = #{id}
+		select * from member where member_id = #{id}
 	</select>
-	
+
 	<!-- 아이디 찾기 -->
 	<select id="findId" resultType="String">
-		select member_id from member where name = #{name} and email = #{email} 
+		select member_id from member
+		where name = #{name} and email = #{email}
 	</select>
 
 	<!-- 비밀번호 찾기 - 아이디, 이메일 존재여부 검증 -->
 	<select id="verifyUser" resultType="Integer">
-		select count(*) from member where member_id = #{member_id} and email = #{email} 
+		select count(*) from member
+		where member_id = #{member_id} and email = #{email}
 	</select>
 
 
 	<!-- 마이페이지 회원정보 출력 -->
-	<select id="selectInfo" resultType="com.hows.member.dto.MemberDTO">
+	<select id="selectInfo"
+		resultType="com.hows.member.dto.MemberDTO">
 		select * from member where member_id = #{member_id}
 	</select>
+	
+	<!-- 회원정보 수정 -->
+	<update id="updateInfo">
+		update member set 
+			nickname = #{nickname}, 
+			email = #{email}, 
+			phone = #{phone}, 
+			zip_code = #{zip_code},
+			address = #{address},
+			detail_address = #{detail_address}
+		where member_id = #{member_id}
+	</update>
+
 
 	<!-- 비밀번호 변경 시 기존 비밀번호 확인 -->
 	<select id="getPasswordById" resultType="string">
@@ -86,7 +104,7 @@
 		update member set pw = #{pw} where member_id =
 		#{member_id}
 	</update>
-	
+
 	<!-- 회원탈퇴 -->
 	<delete id="deleteUser">
 		delete from member where member_id = #{member_id}
@@ -97,7 +115,25 @@
 	<!-- 전체 회원조회 (관리자) -->
 	<select id="selectAll"
 		resultType="com.hows.member.dto.MemberDTO">
-		select * from member
+		SELECT
+		m.member_seq,
+		m.member_id,
+		m.name,
+		m.nickname,
+		CONCAT(CONCAT(SUBSTR(m.phone, 1, 3), '-'), CONCAT(SUBSTR(m.phone, 4,
+		4), CONCAT('-', SUBSTR(m.phone, 8, 4)))) AS phone,
+		m.email,
+		m.address,
+		m.detail_address,
+		m.birth,
+		m.signup_date,
+		m.withdrawal_date,
+		m.member_avatar,
+		m.grade_code,
+		m.role_code
+		FROM member m
+		WHERE role_code
+		IN ('R1', 'R2')
 	</select>
 
 	<!-- 회원 상세조회 (관리자) -->
@@ -108,20 +144,32 @@
 		m.member_id,
 		m.name,
 		m.nickname,
-		m.phone,
+		CONCAT(CONCAT(SUBSTR(m.phone, 1, 3), '-'), CONCAT(SUBSTR(m.phone, 4,
+		4), CONCAT('-', SUBSTR(m.phone, 8, 4)))) AS phone,
 		m.email,
 		m.address,
 		m.detail_address,
-		m.birth,
+		CASE
+		WHEN SUBSTR(m.birth, 1, 1) = '0'
+		THEN
+		CONCAT(CONCAT(CONCAT('20', SUBSTR(m.birth, 1, 2)), '년 '),
+		CONCAT(CONCAT(SUBSTR(m.birth, 3, 2), '월 '), CONCAT(SUBSTR(m.birth, 5,
+		2), '일')))
+		ELSE CONCAT(CONCAT(CONCAT('19', SUBSTR(m.birth, 1, 2)), '년
+		'),
+		CONCAT(CONCAT(SUBSTR(m.birth, 3, 2), '월 '), CONCAT(SUBSTR(m.birth,
+		5,
+		2), '일')))
+		END AS birth,
 		m.signup_date,
 		m.withdrawal_date,
+		m.member_avatar,
 		g.grade_title AS grade_code,
-		r.role_title AS
-		role_code
+		r.role_title AS role_code
 		FROM member m
 		JOIN grade g ON m.grade_code = g.grade_code
-		JOIN
-		role r ON m.role_code = r.role_code
+		JOIN role r ON
+		m.role_code = r.role_code
 		WHERE m.member_id = #{member_id}
 	</select>
 
@@ -149,26 +197,29 @@
 	<update id="updateRole">
 		UPDATE member
 		SET role_code = #{role_code}
-		WHERE
-		member_id = #{member_id}
+		<if test="role_code == 'R3'">
+			, blacklist_date = SYSDATE
+		</if>
+		<if test="role_code != 'R3'">
+			, blacklist_date = NULL
+		</if>
+		WHERE member_id = #{member_id}
 	</update>
 
 	<!-- 전체 블랙리스트 사유 가져오기 (관리자) -->
 	<select id="getAllBlacklistReason"
 		resultType="com.hows.blacklistreason.dto.BlacklistReasonDTO">
-		SELECT blacklist_reason_code, blacklist_reason_description
-		FROM blacklist_reason
+		SELECT * FROM blacklist_reason
 	</select>
 
-	<!-- 블랙리스트 등록 (관리자) -->
 	<update id="addBlacklist">
 		UPDATE member
 		SET role_code = 'R3',
-		blacklist_reason_code = #{blacklist_reason_code}
-		WHERE member_id =
-		#{member_id}
+		blacklist_reason_code = #{blacklist_reason_code, jdbcType=VARCHAR},  <!-- 문자열 타입 명시 -->
+		blacklist_date = SYSDATE
+		WHERE member_id = #{member_id, jdbcType=VARCHAR}  <!-- 문자열 타입 명시 -->
 	</update>
-
+	
 	<!-- 블랙리스트 조회 (관리자) -->
 	<select id="selectBlacklist"
 		resultType="com.hows.member.dto.MemberDTO">
@@ -195,7 +246,8 @@
 		SET role_code = 'R2',
 		blacklist_reason_code = '',
 		blacklist_date = null
-		WHERE member_id = #{member_id}
+		WHERE member_id =
+		#{member_id}
 	</update>
 
 

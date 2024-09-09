@@ -10,7 +10,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,24 +69,18 @@ public class MemberController {
 	    return ResponseEntity.ok(result);
 	}
 	
-	
-	
-	
-	
-	
-	
 
 	// 마이페이지 회원정보 출력
-	@GetMapping
+	@GetMapping("/selectInfo")
 	public ResponseEntity<MemberDTO> selectInfo(@AuthenticationPrincipal UserDetails user) {
 
 		System.out.println("요청한 사용자의 ID : " + user.getUsername());
 
-		String loginId = user.getUsername();
+		String member_id = user.getUsername();
 
-//		MemberDTO result = memServ.selectInfo(loginId);
-//		return ResponseEntity.ok(result);
-		return ResponseEntity.ok(null);
+		MemberDTO result = memServ.selectInfo(member_id);
+		return ResponseEntity.ok(result);
+//		return ResponseEntity.ok(null);
 	}
 
 	// 비밀번호 변경 시 기존 비밀번호 확인
@@ -123,6 +119,13 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
+	
+	// 회원탈퇴
+	@DeleteMapping("/deleteUser/{member_id}")
+	public ResponseEntity<Integer> deleteUser(@PathVariable("member_id") String member_id){
+		int result = memServ.deleteUser(member_id);
+		return ResponseEntity.ok(result);
+	}
 	
 	
 	

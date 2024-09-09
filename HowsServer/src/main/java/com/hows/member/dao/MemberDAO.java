@@ -69,8 +69,8 @@ public class MemberDAO {
 	}
 
 	// 마이페이지 회원정보 출력
-	public MemberDTO selectInfo() {
-		return mybatis.selectOne("Member.selectInfo");
+	public MemberDTO selectInfo(String member_id) {
+		return mybatis.selectOne("Member.selectInfo", member_id);
 	}
 
 	// 비밀번호 변경시 기존 비밀번호 확인
@@ -81,6 +81,11 @@ public class MemberDAO {
 	// 비밀번호 변경
 	public int updatePw(HashMap<String, String> map) {
 		return mybatis.update("Member.updatePw", map);
+	}
+	
+	// 회원탈퇴
+	public int deleteUser(String member_id) {
+		return mybatis.delete("Member.deleteUser", member_id);
 	}
 
 	

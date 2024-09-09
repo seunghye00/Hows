@@ -8,6 +8,7 @@ import { Main } from './Main/Main'
 import { Payment } from './Payment/Payment'
 import { SignIn } from '../Sign/SignIn/SignIn'
 import { SignUp } from '../Sign/SignUp/SignUp'
+import { FindPw } from '../Sign/SignIn/FindPw/FindPw'
 
 export const Home = () => {
     return (
@@ -21,6 +22,7 @@ export const Home = () => {
                 <Route path="/payment" element={<Payment />} />
 
                 <Route path="/signIn" element={<SignIn />} />
+                <Route path="/signIn/findPw" element={<FindPw />} />
                 <Route path="/signUp" element={<SignUp />} />
             </Routes>
         </div>

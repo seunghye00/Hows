@@ -56,7 +56,7 @@ public class FileService {
 
 				// 4. 태이블에 저장 실패 시 gcs 서버에서 이미지 삭제
 				if (value <= 0) {
-					gcsFile.deleteFileGcs(sysName);
+					gcsFile.deleteFileGcs(sysName, code);
 				}
 
 				// 배너를 등록한 경우 생성된 file 데이터 반환
@@ -76,10 +76,10 @@ public class FileService {
 	}
 
 	/** 파일 삭제 **/
-	public String deleteFile(String sysName) {
+	public String deleteFile(String sysName, String code) {
 		String result = "fail";
 		try {
-			result = gcsFile.deleteFileGcs(sysName);
+			result = gcsFile.deleteFileGcs(sysName, code);
 			fileDAO.deleteFile(sysName);
 		} catch (Exception e) {
 			e.printStackTrace();

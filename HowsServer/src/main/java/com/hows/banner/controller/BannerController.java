@@ -61,7 +61,7 @@ public class BannerController {
 			return ResponseEntity.ok("success");
 		} else {
 			// banner에 대한 정보를 DB에 저장하는데 실패했을 경우 file 관련 정보 삭제
-			fileServ.deleteFile(sysName);
+			fileServ.deleteFile(sysName, "F5");
 			return ResponseEntity.badRequest().body("fail");
 		}
 	}
@@ -74,7 +74,7 @@ public class BannerController {
 			try {
 				int banner_seq = Integer.parseInt(bannerSeq);
                 String sysName = fileServ.getSysName(banner_seq);
-                String result = fileServ.deleteFile(sysName);
+                String result = fileServ.deleteFile(sysName, "F5");
                 if (result.equals("fail")) {
                     throw new RuntimeException("파일 삭제 실패: " + sysName);
                 }

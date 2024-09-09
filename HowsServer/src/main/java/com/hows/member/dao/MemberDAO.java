@@ -120,4 +120,14 @@ public class MemberDAO {
 		return mybatis.update("Member.addBlacklist", map);
 	}
 
+	// 블랙리스트 조회 (관리자)
+	public List<MemberDTO> selectBlacklist() {
+		return mybatis.selectList("Member.selectBlacklist");
+	}
+
+	// 블랙리스트 수정 (관리자)
+	public int modifyBlacklist(String member_id) {
+		return mybatis.update("Member.modifyBlacklist", member_id);
+	}
+
 }

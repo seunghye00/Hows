@@ -67,7 +67,6 @@
 		select count(*) from member where member_id = #{member_id} and email = #{email} 
 	</select>
 
-
 	<!-- 마이페이지 회원정보 출력 -->
 	<select id="selectInfo" resultType="com.hows.member.dto.MemberDTO">
 		select * from member where member_id = #{member_id}
@@ -85,7 +84,6 @@
 		where member_id = #{member_id}
 	</update>
 
-
 	<!-- 비밀번호 변경 시 기존 비밀번호 확인 -->
 	<select id="getPasswordById" resultType="string">
 		select pw from member
@@ -102,6 +100,12 @@
 	<delete id="deleteUser">
 		delete from member where member_id = #{member_id}
 	</delete>
+
+	<!-- [방명록] 방명록 작성 위한 member_seq 뽑기 -->
+	<select id="findMemberSeq" resultType="int">
+		select member_seq from member where member_id = #{member_id}
+	</select>
+
 
 
 	<!-- ===========================================[ 관리자 ] -->

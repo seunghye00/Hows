@@ -97,6 +97,12 @@ public class MemberService implements UserDetailsService {
 		return memDao.deleteUser(member_id);
 	}
 	
+	// [방명록] 방명록 작성 위한 member_seq 뽑기
+	public int findMemberSeq(String member_id) {
+        return memDao.findMemberSeq(member_id); 
+    }
+	
+	
 	
 	//========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
@@ -159,5 +165,10 @@ public class MemberService implements UserDetailsService {
 	// 블랙리스트 수정 (관리자)
 	public int modifyBlacklist(String member_id) {
 		return memDao.modifyBlacklist(member_id);
+	}
+
+	public int getMemberSeq() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

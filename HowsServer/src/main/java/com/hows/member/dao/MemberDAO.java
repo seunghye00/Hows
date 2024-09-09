@@ -46,9 +46,7 @@ public class MemberDAO {
 	public int changePw(Map<String, String> map) {
 		return mybatis.update("Member.changePw", map);
 	}
-	
-	
-	
+
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
 		return mybatis.selectOne("Member.findId", map);
@@ -59,9 +57,6 @@ public class MemberDAO {
 		Integer count =  mybatis.selectOne("Member.verifyUser", map);
 		return count != null && count > 0;
 	}
-	
-	
-	// 아이디로 회원 불러오기
 
 	// 회원정보 가져오기
 	public MemberDTO findById(String id) {
@@ -92,6 +87,11 @@ public class MemberDAO {
 	public int deleteUser(String member_id) {
 		return mybatis.delete("Member.deleteUser", member_id);
 	}
+	
+	// [방명록] 방명록 작성 위한 member_seq 뽑기
+	 public int findMemberSeq(String member_id) {
+        return mybatis.selectOne("Member.findMemberSeq");
+     }
 
 	
 	//=======================================================[ 관리자 ]

@@ -44,8 +44,10 @@ public class MemberService implements UserDetailsService {
 		return memDao.checkEmail(email);
 	}
 	
-	
-	
+	// [로그인]비밀번호 찾기 - 비밀번호 변경
+	public int changePw(Map<String, String> map) {
+		return memDao.changePw(map);
+	}
 	
 	
 	// 회원정보 가져오기

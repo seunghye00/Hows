@@ -1,11 +1,11 @@
 import styles from './Home.module.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Cart } from './Cart/Cart'
-import { Community } from './Community/Community'
+import { Communities } from './Communities/Communities'
 import { Products } from './Products/Products'
 import { Mypage } from './Mypage/Mypage'
 import { Main } from './Main/Main'
-import {Payment} from "./Payment/Payment";
+import { Payment } from './Payment/Payment'
 import { SignIn } from '../Sign/SignIn/SignIn'
 import { SignUp } from '../Sign/SignUp/SignUp'
 
@@ -15,7 +15,7 @@ export const Home = () => {
             <Routes>
                 <Route path="/" element={<Main />} />
                 <Route path="/products/*" element={<Products />} />
-                <Route path="/community/*" element={<Community />} />
+                <Route path="/communities/*" element={<Communities />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/mypage/*" element={<Mypage />} />
                 <Route path="/payment" element={<Payment />} />

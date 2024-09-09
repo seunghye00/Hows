@@ -243,3 +243,8 @@ select {
 .swiper-pagination-bullet-active {
   background: var(--hows-point-color-darkest) !important;
 }
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: var(--hows-point-color-darkest) !important;
+}

@@ -2,6 +2,7 @@
     display: flex;
     flex-direction: column;
     gap: 30px;
+    height: calc(100vh - 440px);
 }
 
 .writeTit {
@@ -10,9 +11,6 @@
 }
 
 /* Post.module.css */
-.community {
-    padding: 20px;
-}
 
 .writeTit {
     font-size: 24px;
@@ -23,44 +21,24 @@
     display: flex;
     justify-content: space-between;
     gap: 30px;
+    height: calc(100vh - 510px);
 }
 
 .imageUploader {
     width: 40%;
-}
-
-.emptyImageBox {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    border: 2px dashed var(--hows-point-color-darkest);
-    padding: 20px;
-    gap: 10px;
-}
-
-.emptyTxt {
-    font-size: 16px;
-
-}
-
-.uploadButton {
-    background-color: var(--hows-point-color-darkest);
-    color: var(--hows-white);
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
+    gap: 20px;
 }
 
 .imagePreviewList {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 20%;
 }
 
 .imagePreview {
     position: relative;
-    max-width: 80px;
 }
 
 .imageBox {
@@ -81,7 +59,7 @@
 .deleteButton {
     position: absolute;
     top: calc((50px - 20px)/2);
-    right: 0;
+    right: 10px;
     color: var(--hows-point-color);
     border: none;
     border-radius: 50%;
@@ -101,9 +79,74 @@
     border-radius: 8px;
 }
 
+.uploadButton {
+    background-color: var(--hows-point-color-darkest);
+    color: var(--hows-white);
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.dropzone {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 2px dashed var(--hows-point-color);
+    gap: 10px;
+    height: 100%;
+    font-size: 16px;
+    text-align: center;
+}
+
+.addImageBtn {
+    background: url(../../../../assets/images/plus.png) center no-repeat;
+    background-size: 24px;
+    width: 100%;
+    height: 100%;
+}
+
 .addButton {
     font-size: 24px;
     color: var(--hows-point-color-darkest);
+}
+
+.thumbnailCont {
+    width: 80%;
+    border: 2px solid var(--hows-point-color);
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+}
+
+.thumbnailCont img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tagIcon {
+    position: absolute;
+    font-size: 24px;
+    color: #00bcd4;
+}
+
+.tagMarker {
+    background-color: var(--hows-point-color);
+    color: var(--hows-white);
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
 }
 
 .txtBox {
@@ -124,4 +167,7 @@
     border: 2px solid var(--hows-point-color);
     border-radius: 8px;
     height: 100%;
+    resize: none;
+    padding: 10px;
+    font-size: 16px;
 }

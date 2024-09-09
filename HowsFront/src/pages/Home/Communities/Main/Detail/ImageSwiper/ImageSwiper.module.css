@@ -1,0 +1,49 @@
+.imageSwiperContainer {
+    position: relative;
+    width: 100%;
+}
+
+.imageSwiper {
+    width: 100%;
+}
+
+.slideImage {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+/* 커스텀 네비게이션 버튼 스타일 */
+.swiperButtonPrev,
+.swiperButtonNext {
+    width: 40px;
+    height: 40px;
+    background-color: var(--hows-gray);
+    border-radius: 50%;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--hows-point-color-darkest);
+}
+
+.swiperButtonPrev {
+    left: 0px;
+    /* 왼쪽 버튼 위치 */
+}
+
+.swiperButtonNext {
+    right: 0px;
+    /* 오른쪽 버튼 위치 */
+}
+
+/* 비활성화 상태의 네비게이션 버튼 숨기기 */
+:global(.swiper-button-disabled) {
+    display: none !important;
+}

@@ -1,0 +1,138 @@
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.imageSection {
+    margin: 20px 0;
+}
+
+.productTagSection {
+    margin-top: 20px;
+}
+
+/* Modal.module.css */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* 어두운 배경 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    /* 모달이 상단에 뜨도록 */
+}
+
+.modal {
+    background-color: #fff;
+    /* 모달 배경색 */
+    padding: 20px;
+    width: 400px;
+    /* 모달 너비 */
+    border-radius: 8px;
+    /* 둥근 모서리 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.content {
+    margin-top: 20px;
+    /* 닫기 버튼 아래 공간 */
+    font-size: 16px;
+}
+
+.reportButton {
+    display: flex;
+    justify-content: center;
+    padding: 10px 0;
+    background-color: #f05a28;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.reportButton:hover {
+    background-color: #d94d22;
+    /* hover 시 색상 변경 */
+}
+
+/* Detail.module.css */
+.container {
+    max-width: 700px;
+    margin: 0 auto;
+    /* 페이지 가운데 정렬 */
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.imageSection,
+.productTagSection {
+    margin-bottom: 30px;
+    /* 이미지 섹션과 태그 섹션 사이 간격 */
+}
+
+.likesComments {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+}
+
+.likesComments i {
+    font-size: 24px;
+    margin-right: 8px;
+}
+
+.commentSection {
+    margin-top: 30px;
+}
+
+.commentBox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.commentBox img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.commentInput {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+}
+
+.replySection {
+    margin-top: 10px;
+    padding-left: 50px;
+}
+
+.replyButton {
+    color: #f05a28;
+    cursor: pointer;
+}
+
+.replyButton:hover {
+    text-decoration: underline;
+}

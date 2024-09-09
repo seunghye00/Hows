@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
 import styles from './Category.module.css'
-import img from '../../../../../assets/images/마이페이지_프로필사진.jpg'
-import img1 from '../../../../../assets/images/꼬래.png'
-import img2 from '../../../../../assets/images/cry.jpg'
+import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
+import img1 from '../../../../../../assets/images/꼬래.png'
+import img2 from '../../../../../../assets/images/cry.jpg'
 import { useNavigate } from 'react-router-dom'
 
 export const Category = () => {
@@ -31,21 +30,24 @@ export const Category = () => {
     }
 
     return (
-        <div className={styles.CategoryWrap}>
-            {categories.map(category => (
-                <div
-                    key={category.id}
-                    className={styles.CategoryItem}
-                    onClick={() => handleCategoryClick(category)} // 클릭 이벤트 추가
-                >
-                    <img
-                        src={category.imageUrl}
-                        alt={category.name}
-                        className={styles.CategoryImage}
-                    />
-                    <p>{category.name}</p>
-                </div>
-            ))}
+        <div className={styles.categoryWrap}>
+            <div className={styles.categoryTit}>카테고리</div>
+            <div className={styles.categoryCont}>
+                {categories.map(category => (
+                    <div
+                        key={category.id}
+                        className={styles.categoryItem}
+                        onClick={() => handleCategoryClick(category)} // 클릭 이벤트 추가
+                    >
+                        <img
+                            src={category.imageUrl}
+                            alt={category.name}
+                            className={styles.categoryImage}
+                        />
+                        <p>{category.name}</p>
+                    </div>
+                ))}
+            </div>
         </div>
     )
 }

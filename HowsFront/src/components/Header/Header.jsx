@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import styles from './Header.module.css'
 import logo from '../../assets/images/logo_how.png'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from './../../store/store';
-import profile from "../../assets/images/마이페이지_프로필사진.jpg"
+import { useAuthStore } from './../../store/store'
+import profile from '../../assets/images/마이페이지_프로필사진.jpg'
 
 export const Header = () => {
     const navigate = useNavigate()
@@ -11,14 +11,15 @@ export const Header = () => {
     const [activeSubMenu, setActiveSubMenu] = useState('홈')
     const [isFixed, setIsFixed] = useState(false)
     // const [session, setSession] = useState(false)
-    const { isAuth } = useAuthStore()
+    const { isAuth, login, logout, setIsAuth } = useAuthStore()
+    const [profileMenu, setProfileMenu] = useState(false) // 상태 변수명 변경
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
         if (menuName === 'HowShop') {
             navigate('/products')
         } else if (menuName === 'HowStory') {
-            navigate('/community')
+            navigate('/communities')
         } else if (menuName === 'HowShare') {
             navigate('/')
         }
@@ -36,19 +37,46 @@ export const Header = () => {
         }
     }
 
+    const handleProfileClick = () => {
+        setProfileMenu(prev => !prev)
+    }
+    const handleItemClick = () => {
+        setProfileMenu(false)
+    }
+
+    const handleLogout = () => {
+        const confirmLogout = window.confirm('정말 로그아웃을 하시겠습니까?')
+        if (confirmLogout) {
+            logout()
+            sessionStorage.removeItem('token')
+            setIsAuth(false)
+            navigate('/')
+        }
+    }
+
     useEffect(() => {
+        // 세션스토리지에서 토큰 확인
+        const token = sessionStorage.getItem('token')
+        if (token) {
+            login(token) // 토큰이 있으면 로그인
+        } else {
+            logout() // 토큰이 없으면 로그아웃
+            setIsAuth(false)
+        }
+
         window.addEventListener('scroll', handleScroll)
         return () => {
             window.removeEventListener('scroll', handleScroll)
         }
-    }, [])
+    }, [login, logout, setIsAuth])
 
     return (
         <div className="header">
             <div className={styles.headerWrap}>
                 <div
-                    className={`${styles.headerCont} ${isFixed ? styles.fixed : ''
-                        }`}
+                    className={`${styles.headerCont} ${
+                        isFixed ? styles.fixed : ''
+                    }`}
                 >
                     <div className={styles.mainNavi}>
                         <div className={styles.menuBox}>
@@ -59,28 +87,31 @@ export const Header = () => {
                             </div>
                             <div className={styles.naviMenuList}>
                                 <div
-                                    className={`${styles.naviMenu} ${activeMenu === 'HowShop'
-                                        ? styles.active
-                                        : ''
-                                        }`}
+                                    className={`${styles.naviMenu} ${
+                                        activeMenu === 'HowShop'
+                                            ? styles.active
+                                            : ''
+                                    }`}
                                     onClick={() => handleMenuClick('HowShop')}
                                 >
                                     <a>HowShop</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${activeMenu === 'HowStory'
-                                        ? styles.active
-                                        : ''
-                                        }`}
+                                    className={`${styles.naviMenu} ${
+                                        activeMenu === 'HowStory'
+                                            ? styles.active
+                                            : ''
+                                    }`}
                                     onClick={() => handleMenuClick('HowStory')}
                                 >
                                     <a>HowStory</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${activeMenu === 'HowShare'
-                                        ? styles.active
-                                        : ''
-                                        }`}
+                                    className={`${styles.naviMenu} ${
+                                        activeMenu === 'HowShare'
+                                            ? styles.active
+                                            : ''
+                                    }`}
                                     onClick={() => handleMenuClick('HowShare')}
                                 >
                                     <a>HowShare</a>
@@ -117,16 +148,50 @@ export const Header = () => {
                             >
                                 {
                                     // session
-                                    isAuth
-                                        ? (
-                                            <a>
-                                                <img src={profile} alt="User" onClick={() => navigate("/mypage")} />
-                                            </a>
-                                        ) : (
-                                            <a onClick={() => navigate('/signIn')}>
-                                                <i className="bx bxs-user-circle"></i>
-                                            </a>
-                                        )}
+                                    isAuth ? (
+                                        <div className={styles.infoUser}>
+                                            <img
+                                                src={profile}
+                                                alt="User"
+                                                onClick={handleProfileClick}
+                                            />
+                                            {profileMenu && (
+                                                <div
+                                                    className={
+                                                        styles.profileMenu
+                                                    }
+                                                >
+                                                    <div
+                                                        className={
+                                                            styles.profileMenuItem
+                                                        }
+                                                        onClick={() => {
+                                                            navigate('/mypage')
+                                                            handleItemClick()
+                                                        }}
+                                                    >
+                                                        마이페이지
+                                                    </div>
+                                                    <div
+                                                        className={
+                                                            styles.profileMenuItem
+                                                        }
+                                                        onClick={() => {
+                                                            handleLogout()
+                                                            handleItemClick()
+                                                        }}
+                                                    >
+                                                        로그아웃
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <a onClick={() => navigate('/signIn')}>
+                                            <i className="bx bxs-user-circle"></i>
+                                        </a>
+                                    )
+                                }
                             </div>
                         </div>
                     </div>

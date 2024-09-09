@@ -8,6 +8,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useAuthStore } from './../../../store/store';
 import { host } from './../../../config/config';
 import { FindId } from './FindId/FindId';
+import { FindPw } from './FindPw/FindPw';
 
 
 export const SignIn = () => {
@@ -47,6 +48,9 @@ export const SignIn = () => {
 
   if (page === 'findId') {
     return <FindId onBack={() => handlePageChange('login')} />;
+  }
+  if (page === 'findPw') {
+    return <FindPw onBack={() => handlePageChange('login')} />;
   }
 
 

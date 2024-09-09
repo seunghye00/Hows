@@ -59,9 +59,11 @@ export const Header = () => {
         const token = sessionStorage.getItem('token')
         if (token) {
             login(token) // 토큰이 있으면 로그인
+            console.log("로그인 상태:", true);
         } else {
             logout() // 토큰이 없으면 로그아웃
             setIsAuth(false)
+            console.log("로그아웃 상태:", false);
         }
 
         window.addEventListener('scroll', handleScroll)
@@ -74,9 +76,8 @@ export const Header = () => {
         <div className="header">
             <div className={styles.headerWrap}>
                 <div
-                    className={`${styles.headerCont} ${
-                        isFixed ? styles.fixed : ''
-                    }`}
+                    className={`${styles.headerCont} ${isFixed ? styles.fixed : ''
+                        }`}
                 >
                     <div className={styles.mainNavi}>
                         <div className={styles.menuBox}>
@@ -87,31 +88,28 @@ export const Header = () => {
                             </div>
                             <div className={styles.naviMenuList}>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShop'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowShop'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowShop')}
                                 >
                                     <a>HowShop</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowStory'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowStory'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowStory')}
                                 >
                                     <a>HowStory</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShare'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowShare'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowShare')}
                                 >
                                     <a>HowShare</a>
@@ -138,47 +136,34 @@ export const Header = () => {
                                     <i className="bx bx-bell"></i>
                                 </a>
                             </div>
-                            <div
-                                className={
-                                    // session
-                                    isAuth
-                                        ? `${styles.infoUser}`
-                                        : `${styles.infoIcon}`
-                                }
-                            >
+                            <div className={isAuth ? `${styles.infoUser}` : `${styles.infoIcon}`}>
                                 {
-                                    // session
                                     isAuth ? (
-                                        <div className={styles.infoUser}>
-                                            <img
-                                                src={profile}
-                                                alt="User"
-                                                onClick={handleProfileClick}
-                                            />
+                                        // <div className={styles.infoUser}>
+                                        <div>
+                                            <div className={styles.profileImg}>
+                                                <img
+                                                    src={profile}
+                                                    alt="User"
+                                                    onClick={handleProfileClick}
+                                                />
+                                            </div>
                                             {profileMenu && (
-                                                <div
-                                                    className={
-                                                        styles.profileMenu
-                                                    }
-                                                >
+                                                <div className={styles.profileMenu}>
                                                     <div
-                                                        className={
-                                                            styles.profileMenuItem
-                                                        }
+                                                        className={styles.profileMenuItem}
                                                         onClick={() => {
-                                                            navigate('/mypage')
-                                                            handleItemClick()
+                                                            navigate('/mypage');
+                                                            handleItemClick();
                                                         }}
                                                     >
                                                         마이페이지
                                                     </div>
                                                     <div
-                                                        className={
-                                                            styles.profileMenuItem
-                                                        }
+                                                        className={styles.profileMenuItem}
                                                         onClick={() => {
-                                                            handleLogout()
-                                                            handleItemClick()
+                                                            handleLogout();
+                                                            handleItemClick();
                                                         }}
                                                     >
                                                         로그아웃
@@ -192,6 +177,7 @@ export const Header = () => {
                                         </a>
                                     )
                                 }
+
                             </div>
                         </div>
                     </div>

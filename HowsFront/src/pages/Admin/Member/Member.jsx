@@ -223,7 +223,7 @@ export const Member = () => {
                                 <label>ID</label>
                                 <input
                                     type="text"
-                                    value={selectedMember.id}
+                                    value={selectedMember.member_id}
                                     readOnly
                                     disabled
                                 />

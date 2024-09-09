@@ -65,6 +65,40 @@ public class AuthController {
 		return ResponseEntity.ok(foundId);
 	}
 	
+	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
+	@PostMapping("/verifyUser")
+	public ResponseEntity<Boolean> verifyUser(@RequestParam String member_id, @RequestParam String email){
+		
+		Map<String, String> map = new HashMap<>();
+		map.put("member_id", member_id);
+		map.put("email", email);
+		
+		Boolean result = memServ.verifyUser(map);
+		return ResponseEntity.ok(result);
+	}
+	
+	// 비밀번호 찾기 - 비밀번호 변경
+	@PostMapping("/changePw")
+	public ResponseEntity<Integer> changePw(@RequestParam Map<String, String> request){
+		String member_id = request.get("member_id");
+		String pw = pwEncoder.encode(request.get("pw"));
+	    String email = request.get("email");
+
+	    Map<String, String> map = new HashMap<>();
+	    map.put("member_id", member_id);
+	    map.put("pw", pw);
+	    map.put("email", email);
+
+	    int result = memServ.changePw(map);
+	    if (result > 0) {
+	        return ResponseEntity.ok(result);
+	    } else {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+	    }
+	}
+	
+	
+	
 	
 	
 	

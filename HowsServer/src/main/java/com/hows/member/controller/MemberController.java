@@ -42,6 +42,37 @@ public class MemberController {
 		memServ.insert(dto);
 		return ResponseEntity.ok().build();
 	}
+	
+	// 중복확인 - ID
+	@PostMapping("/checkId")
+	public ResponseEntity<Boolean> checkId(@RequestBody Map<String, String> request) {
+	    String member_id = request.get("member_id");
+	    boolean result = memServ.checkId(member_id);
+	    return ResponseEntity.ok(result);
+	}
+	
+	// 중복확인 - 닉네임
+	@PostMapping("/checkNickname")
+	public ResponseEntity<Boolean> checkNickname(@RequestBody Map<String, String> request) {
+	    String nickname = request.get("nickname");
+	    boolean result = memServ.checkNickname(nickname);
+	    return ResponseEntity.ok(result);
+	}
+	
+	// 중복확인 - 이메일
+	@PostMapping("/checkEmail")
+	public ResponseEntity<Boolean> checkEmail(@RequestBody Map<String, String> request) {
+	    String email = request.get("email");
+	    boolean result = memServ.checkEmail(email);
+	    return ResponseEntity.ok(result);
+	}
+	
+	
+	
+	
+	
+	
+	
 
 	// 마이페이지 회원정보 출력
 	@GetMapping
@@ -92,6 +123,10 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
+	
+	
+	
+	// ========================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	@GetMapping("/all")
 	public ResponseEntity<List<MemberDTO>> selectAll() {
@@ -157,6 +192,21 @@ public class MemberController {
 		// 역할을 블랙리스트로 변경하고, 블랙리스트 사유 코드 업데이트
 		int result = memServ.addBlacklist(memberId, reasonCode);
 
+		return ResponseEntity.ok(result);
+	}
+
+	// 블랙리스트 조회 (관리자)
+	@GetMapping("/blacklist")
+	public ResponseEntity<List<MemberDTO>> selectBlacklist() {
+		List<MemberDTO> blacklist = memServ.selectBlacklist();
+		return ResponseEntity.ok(blacklist);
+	}
+
+	// 블랙리스트 수정 (관리자)
+	@PutMapping("/modifyBlacklist")
+	public ResponseEntity<Integer> modifyBlacklist(@RequestBody Map<String, String> request) {
+		String memberId = request.get("member_id");
+		int result = memServ.modifyBlacklist(memberId);
 		return ResponseEntity.ok(result);
 	}
 

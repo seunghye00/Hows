@@ -14,4 +14,8 @@ public class CommunityDAO {
 	public void insertWrite(CommunityDTO dto) {
 		mybatis.insert("Community.insertWrite", dto);
 	}
+	
+	public int selectBoardSeq() {
+		return mybatis.selectOne("Community.selectBoardSeq");
+	}
 }

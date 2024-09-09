@@ -11,7 +11,9 @@ public class CommunityService {
     @Autowired
     private CommunityDAO communityDAO;
     
-    public void insertWrite(CommunityDTO dto) {
+    public int insertWrite(CommunityDTO dto) {
     	communityDAO.insertWrite(dto);
+        return communityDAO.selectBoardSeq();
     }
+    
 }

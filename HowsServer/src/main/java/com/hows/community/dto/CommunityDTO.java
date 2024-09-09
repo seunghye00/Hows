@@ -13,12 +13,14 @@ public class CommunityDTO {
 	private int view_count;
 	private String housing_type_code;
 	private String space_type_code;
+	private String Area_size_code;
 	private String color_code;
 	private String member_id;
-    //private List<TagDTO> tags; // 태그 정보
-    
-	public CommunityDTO(int board_seq, String board_title, String board_contents, Timestamp board_wirte_date,
-			int view_count, String housing_type_code, String space_type_code, String color_code, String member_id) {
+	private List<ImageDTO> images;
+
+	CommunityDTO(int board_seq, String board_title, String board_contents, Timestamp board_wirte_date, int view_count,
+			String housing_type_code, String space_type_code, String area_size_code, String color_code,
+			String member_id, List<ImageDTO> images) {
 		super();
 		this.board_seq = board_seq;
 		this.board_title = board_title;
@@ -27,11 +29,13 @@ public class CommunityDTO {
 		this.view_count = view_count;
 		this.housing_type_code = housing_type_code;
 		this.space_type_code = space_type_code;
+		Area_size_code = area_size_code;
 		this.color_code = color_code;
 		this.member_id = member_id;
+		this.images = images;
 	}
 
-	public CommunityDTO() {
+	CommunityDTO() {
 		super();
 	}
 
@@ -67,8 +71,6 @@ public class CommunityDTO {
 		this.board_wirte_date = board_wirte_date;
 	}
 
-
-
 	public int getView_count() {
 		return view_count;
 	}
@@ -93,6 +95,14 @@ public class CommunityDTO {
 		this.space_type_code = space_type_code;
 	}
 
+	public String getArea_size_code() {
+		return Area_size_code;
+	}
+
+	public void setArea_size_code(String area_size_code) {
+		Area_size_code = area_size_code;
+	}
+
 	public String getColor_code() {
 		return color_code;
 	}
@@ -107,6 +117,14 @@ public class CommunityDTO {
 
 	public void setMember_id(String member_id) {
 		this.member_id = member_id;
+	}
+
+	public List<ImageDTO> getImages() {
+		return images;
+	}
+
+	public void setImages(List<ImageDTO> images) {
+		this.images = images;
 	}
 
 }

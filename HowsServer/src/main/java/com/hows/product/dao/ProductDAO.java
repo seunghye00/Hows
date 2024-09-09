@@ -10,6 +10,7 @@ import com.hows.product.dto.ProductDTO;
 
 @Repository
 public class ProductDAO {
+	
 	@Autowired
 	private SqlSession myBatis;
 	

@@ -4,5 +4,52 @@
     border-radius: 15px;
     display: flex;
     flex-direction: column;
-    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.btns {
+    position: absolute;
+    display: flex;
+    gap: 10px;
+    right: 30px;
+    top: 82px;
+}
+
+.btns select {
+    padding: 6px;
+}
+
+.listBox {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    padding: 10px;
+}
+
+.empty {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+}
+
+.cols {
+    border: 1px solid #ddd;
+    padding: 10px;
+}
+
+.cols img {
+    width: 100%;
+}
+
+.info {
+    display: flex;
+    justify-content: space-between;
+}
+
+.productTitle {
+    display: flex;
+    gap: 7px;
 }

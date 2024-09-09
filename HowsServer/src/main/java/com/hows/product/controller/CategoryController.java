@@ -20,18 +20,15 @@ public class CategoryController {
 	@Autowired
 	private CategoryService categoryServ;
 	
-	
 	@GetMapping
 	public ResponseEntity<List<CategoryDTO>> categoryList () throws Exception{ 
 		List<CategoryDTO> list = categoryServ.categoryList();
 		return ResponseEntity.ok(list);
 	} 
 	
-	
 	@ExceptionHandler(Exception.class)
-	public String exceptionHandler(Exception e) {
+	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();
-		return "redirect:/error";
+		return ResponseEntity.badRequest().body("fail");
 	}
-	
 }

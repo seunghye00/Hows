@@ -20,7 +20,6 @@ public class ProductController {
 	@Autowired
 	private ProductService productServ;
 	
-	
 	// 전체 목록 출력
 	@GetMapping
 	public ResponseEntity<List<ProductDTO>> getProducts () throws Exception{
@@ -42,15 +41,9 @@ public class ProductController {
 		return ResponseEntity.ok(detaile);
 	}
 	
-	
-	
-	
-	
-	
-	
 	@ExceptionHandler(Exception.class)
-	public String exceptionHandler(Exception e) {
+	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();
-		return "redirect:/error";
+		return ResponseEntity.badRequest().body("fail");
 	}
 }

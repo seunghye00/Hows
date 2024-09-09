@@ -42,37 +42,30 @@ public class MemberController {
 		memServ.insert(dto);
 		return ResponseEntity.ok().build();
 	}
-	
+
 	// 중복확인 - ID
 	@PostMapping("/checkId")
 	public ResponseEntity<Boolean> checkId(@RequestBody Map<String, String> request) {
-	    String member_id = request.get("member_id");
-	    boolean result = memServ.checkId(member_id);
-	    return ResponseEntity.ok(result);
+		String member_id = request.get("member_id");
+		boolean result = memServ.checkId(member_id);
+		return ResponseEntity.ok(result);
 	}
-	
+
 	// 중복확인 - 닉네임
 	@PostMapping("/checkNickname")
 	public ResponseEntity<Boolean> checkNickname(@RequestBody Map<String, String> request) {
-	    String nickname = request.get("nickname");
-	    boolean result = memServ.checkNickname(nickname);
-	    return ResponseEntity.ok(result);
+		String nickname = request.get("nickname");
+		boolean result = memServ.checkNickname(nickname);
+		return ResponseEntity.ok(result);
 	}
-	
+
 	// 중복확인 - 이메일
 	@PostMapping("/checkEmail")
 	public ResponseEntity<Boolean> checkEmail(@RequestBody Map<String, String> request) {
-	    String email = request.get("email");
-	    boolean result = memServ.checkEmail(email);
-	    return ResponseEntity.ok(result);
+		String email = request.get("email");
+		boolean result = memServ.checkEmail(email);
+		return ResponseEntity.ok(result);
 	}
-	
-	
-	
-	
-	
-	
-	
 
 	// 마이페이지 회원정보 출력
 	@GetMapping
@@ -123,15 +116,11 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	
-	
-	
 	// ========================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	@GetMapping("/all")
 	public ResponseEntity<List<MemberDTO>> selectAll() {
 		List<MemberDTO> members = memServ.selectAll();
-		System.out.println(members);
 		return ResponseEntity.ok(members);
 	}
 
@@ -156,42 +145,49 @@ public class MemberController {
 		return ResponseEntity.ok(roles);
 	}
 
-	// 등급만 업데이트 (관리자)
 	@PutMapping("/updateGrade")
 	public ResponseEntity<Integer> updateGrade(@RequestBody Map<String, String> request) {
-		String memberId = request.get("member_id");
-		String newGradeCode = request.get("grade_code");
+	    String memberId = request.get("member_id");
+	    String newGradeCode = request.get("grade_code");
 
-		int result = memServ.updateGrade(memberId, newGradeCode);
-		return ResponseEntity.ok(result);
+	    if (newGradeCode == null || newGradeCode.isEmpty()) {
+	        return ResponseEntity.badRequest().body(0); // 변환 실패 시 400 에러 반환
+	    }
+
+	    int result = memServ.updateGrade(memberId, newGradeCode);
+	    return ResponseEntity.ok(result);
 	}
+    // 역할만 업데이트 (관리자)
+    @PutMapping("/updateRole")
+    public ResponseEntity<Integer> updateRole(@RequestBody Map<String, String> request) {
+        String memberId = request.get("member_id");
+        String newRoleCode = request.get("role_code");
+        System.out.println("컨트롤러(역할) : " + newRoleCode);
 
-	// 역할만 업데이트 (관리자)
-	@PutMapping("/updateRole")
-	public ResponseEntity<Integer> updateRole(@RequestBody Map<String, String> request) {
-		String memberId = request.get("member_id");
-		String newRoleCode = request.get("role_code");
+        if (newRoleCode == null || newRoleCode.isEmpty()) {
+            return ResponseEntity.badRequest().body(0);
+        }
 
-		int result = memServ.updateRole(memberId, newRoleCode);
-		return ResponseEntity.ok(result);
-	}
+        int result = memServ.updateRole(memberId, newRoleCode);
+        return ResponseEntity.ok(result);
+    }
 
 	// 전체 블랙리스트 사유 가져오기 (관리자)
 	@GetMapping("/blacklistreason")
 	public ResponseEntity<List<BlacklistReasonDTO>> getAllBlacklistReason() {
 		List<BlacklistReasonDTO> blacklistreasons = memServ.getAllBlacklistReason();
+		System.out.println("컨트롤러 사유 : " + blacklistreasons);
 		return ResponseEntity.ok(blacklistreasons);
 	}
 
 	// 블랙리스트 등록 (관리자)
-	@PutMapping("/addBlacklist")
+	@PostMapping("/addBlacklist")
 	public ResponseEntity<Integer> addBlacklist(@RequestBody Map<String, String> request) {
 		String memberId = request.get("member_id");
 		String reasonCode = request.get("blacklist_reason_code");
 
-		// 역할을 블랙리스트로 변경하고, 블랙리스트 사유 코드 업데이트
+		// 역할을 블랙리스트로 변환하고, 블랙리스트 사유 코드 업데이트
 		int result = memServ.addBlacklist(memberId, reasonCode);
-
 		return ResponseEntity.ok(result);
 	}
 
@@ -199,6 +195,7 @@ public class MemberController {
 	@GetMapping("/blacklist")
 	public ResponseEntity<List<MemberDTO>> selectBlacklist() {
 		List<MemberDTO> blacklist = memServ.selectBlacklist();
+		System.out.println(blacklist);
 		return ResponseEntity.ok(blacklist);
 	}
 

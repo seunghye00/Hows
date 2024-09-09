@@ -3,6 +3,7 @@ import styles from './Member.module.css'
 import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
+import { formatDate } from '../../../commons/commons'
 import {
     selectAll,
     detailMember,
@@ -23,8 +24,8 @@ export const Member = () => {
     const [blacklistReasons, setBlacklistReasons] = useState([])
     const [Grade, setGrade] = useState('')
     const [Role, setRole] = useState('')
-    const [grades, setGrades] = useState([]) // 서버에서 받아온 등급 데이터
-    const [roles, setRoles] = useState([]) // 서버에서 받아온 역할 데이터
+    const [grades, setGrades] = useState([])
+    const [roles, setRoles] = useState([])
     const [blacklistReason, setBlacklistReason] = useState('')
     const [searchTerm, setSearchTerm] = useState('') // 검색어
     const [filteredMembers, setFilteredMembers] = useState([]) // 검색된 회원 목록
@@ -62,8 +63,8 @@ export const Member = () => {
                 console.log(resp.data) // 서버로부터 받는 데이터를 확인
                 setSelectedMember(resp.data)
                 setModal(true)
-                setGrade(resp.data.grade_code || '') // grade_code가 없을 경우 빈 문자열 설정
-                setRole(resp.data.role_code || '') // role_code가 없을 경우 빈 문자열 설정
+                setGrade(resp.data.grade_code || '') // 빈 값 대신 기본값 설정
+                setRole(resp.data.role_code || '') // 빈 값 대신 기본값 설정
             })
             .catch(error => console.error('회원 상세 조회 실패:', error))
     }
@@ -78,20 +79,80 @@ export const Member = () => {
         setEditMode(!editMode)
     }
 
+    // 등급을 코드로 변환하는 함수
+    const getGradeCode = grade => {
+        switch (grade) {
+            case '골드':
+                return 'G1'
+            case '실버':
+                return 'G2'
+            case '브론즈':
+                return 'G3'
+            default:
+                return '' // 변환되지 않는 경우를 대비한 기본값
+        }
+    }
+
+    // 역할을 코드로 변환하는 함수
+    const getRoleCode = role => {
+        switch (role) {
+            case '관리자':
+                return 'R1'
+            case '회원':
+                return 'R2'
+            case '블랙리스트':
+                return 'R3'
+            default:
+                return '' // 변환되지 않는 경우를 대비한 기본값
+        }
+    }
+
     const confirmUpdate = () => {
         const memberId = selectedMember.member_id
 
-        // 등급과 역할 업데이트 API 호출
-        updateGrade({ member_id: memberId, grade_code: Grade })
-            .then(() => updateRole({ member_id: memberId, role_code: Role }))
-            .then(() => {
-                alert('역할과 등급이 수정되었습니다.')
-                setEditMode(false)
-            })
-            .catch(error => {
-                console.error('업데이트 실패:', error)
-                alert('업데이트에 실패했습니다.')
-            })
+        console.log('내가 선택한 ID:', memberId) // 회원 ID 확인
+        console.log('내가 선택한 등급:', Grade) // 사용자가 선택한 등급
+        console.log('내가 선택한 역할:', Role) // 사용자가 선택한 역할
+
+        // 등급과 역할을 코드로 변환
+        const gradeCode = getGradeCode(Grade)
+        const roleCode = getRoleCode(Role)
+
+        // 로그 추가: 변환된 등급 코드와 역할 코드 확인
+        console.log('변환된 등급 코드:', gradeCode)
+        console.log('변환된 역할 코드:', roleCode)
+
+        if (!gradeCode) {
+            console.error('변환된 등급 코드가 NULL 또는 undefined 입니다.')
+        }
+
+        if (!roleCode) {
+            console.error('변환된 역할 코드가 NULL 또는 undefined 입니다.')
+        }
+
+        // 블랙리스트 역할이 선택된 경우
+        if (roleCode === 'R3') {
+            openBlacklistModal() // 블랙리스트 모달 열기
+        } else {
+            // 등급과 역할 업데이트 API 호출
+            updateGrade({ member_id: memberId, grade_code: gradeCode })
+                .then(() => {
+                    console.log('등급 업데이트 성공:', gradeCode)
+                    return updateRole({
+                        member_id: memberId,
+                        role_code: roleCode,
+                    })
+                })
+                .then(() => {
+                    console.log('역할 업데이트 성공:', roleCode)
+                    alert('역할과 등급이 수정되었습니다.')
+                    setEditMode(false)
+                })
+                .catch(error => {
+                    console.error('업데이트 실패:', error)
+                    alert('업데이트에 실패했습니다.')
+                })
+        }
     }
 
     const openBlacklistModal = () => {
@@ -179,7 +240,7 @@ export const Member = () => {
                             onClick={() => Modalopen(member.member_id)}
                         >
                             <div className={styles.memberItem}>
-                                {member.nickname}
+                                {member.name}
                             </div>
                             <div className={styles.memberItem}>
                                 {member.member_id}
@@ -191,7 +252,7 @@ export const Member = () => {
                                 {member.email}
                             </div>
                             <div className={styles.memberItem}>
-                                {member.signup_date}
+                                {formatDate(member.signup_date)}
                             </div>
                         </div>
                     ))
@@ -206,13 +267,13 @@ export const Member = () => {
             </div>
 
             {/* 상세 모달 */}
-            {Modal && selectedMember && selectedMember.grade_code && (
+            {Modal && selectedMember && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
                         <div className={styles.profile}>
                             <img
                                 src={
-                                    selectedMember.profileImageUrl ||
+                                    selectedMember?.member_avatar ||
                                     '/default.png'
                                 }
                                 alt="프로필 이미지"
@@ -295,7 +356,9 @@ export const Member = () => {
                                 <label>가입날짜</label>
                                 <input
                                     type="text"
-                                    value={selectedMember.signup_date}
+                                    value={formatDate(
+                                        selectedMember.signup_date
+                                    )}
                                     readOnly
                                     disabled
                                 />
@@ -316,13 +379,13 @@ export const Member = () => {
                                 <label>등급</label>
                                 {editMode ? (
                                     <select
-                                        value={Grade || ''} // 빈 문자열로 처리
+                                        value={Grade}
                                         onChange={e => setGrade(e.target.value)}
                                     >
                                         {grades.map(grade => (
                                             <option
                                                 key={grade.grade_code}
-                                                value={grade.grade_code}
+                                                value={grade.grade_title}
                                             >
                                                 {grade.grade_title}
                                             </option>
@@ -331,10 +394,7 @@ export const Member = () => {
                                 ) : (
                                     <input
                                         type="text"
-                                        value={
-                                            selectedMember?.grade_code ||
-                                            '등급 없음'
-                                        } // grade_code가 없을 경우 '등급 없음'
+                                        value={selectedMember.grade_code}
                                         readOnly
                                         disabled
                                     />
@@ -345,13 +405,13 @@ export const Member = () => {
                                 <label>역할</label>
                                 {editMode ? (
                                     <select
-                                        value={Role || ''} // Role이 없을 경우 빈 문자열로 설정
+                                        value={Role || ''}
                                         onChange={e => setRole(e.target.value)}
                                     >
                                         {roles.map(role => (
                                             <option
                                                 key={role.role_code}
-                                                value={role.role_code}
+                                                value={role.role_title}
                                             >
                                                 {role.role_title}
                                             </option>
@@ -360,10 +420,7 @@ export const Member = () => {
                                 ) : (
                                     <input
                                         type="text"
-                                        value={
-                                            selectedMember?.role_code ||
-                                            '역할 없음'
-                                        } // role_code가 없을 경우 '역할 없음'
+                                        value={selectedMember.role_code}
                                         readOnly
                                         disabled
                                     />

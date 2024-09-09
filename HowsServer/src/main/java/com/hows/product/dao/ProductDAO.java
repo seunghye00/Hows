@@ -21,4 +21,9 @@ public class ProductDAO {
 	public ProductDTO getProductDetaile (String product_seq) throws Exception{
 		return myBatis.selectOne("Product.getProductDetaile", product_seq);
 	}
+
+	public List<ProductDTO> getProductList() {
+		// TODO Auto-generated method stub
+		return myBatis.selectList("Product.getProductListAll");
+	}
 }

@@ -17,11 +17,11 @@ export const Order = () => {
         orderList(status)
             .then(resp => {
                 // console.log(resp.data)
-                const beforOrders = resp.data.map(order => ({
+                const beforeOrders = resp.data.map(order => ({
                     ...order,
                     checked: false, // 초기 체크 상태
                 }))
-                setOrders(beforOrders) // 데이터 설정
+                setOrders(beforeOrders) // 데이터 설정
             })
             .catch(error => {
                 console.log('데이터 가져오기 실패: ' + error) // 오류 처리

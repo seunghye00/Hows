@@ -84,7 +84,7 @@ export const Category = () => {
   // 카테고리 목록 출력
   const handleMenuClick = (product_category_code) => {
     
-    axios.get(`${host}/product/${product_category_code}`).then((resp)=> {
+    axios.get(`${host}/product/category/${product_category_code}`).then((resp)=> {
       setData(resp.data);
       
     }).catch((err) => {console.error(err); });

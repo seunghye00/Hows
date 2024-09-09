@@ -32,32 +32,33 @@ export const Banner = () => {
     useEffect(() => {
         
         // 배너 목록 요청
-        // bannerList().then(resp => {
-        //     console.log('1', JSON.stringify(resp));
+        bannerList().then(resp => {
+            console.log('1', JSON.stringify(resp));
 
-        //     // URL을 올바른 형식으로 변환
-        //     const imageUrls = resp.data.map(item => {
-        //         // console.log('원본 URL 확인:', item.banner_url); 
-        //         // let updatedUrl = item.banner_url.replace('https://storage.google.com/', 'https://storage.googleapis.com/');
-        //         // console.log('변환된 URL 확인:', updatedUrl); 
-        //         let updatedUrl = `https://storage.googleapis.com/eunmi-exam-attachment/2f8563bf-afbc-4d06-81ac-0af54c0aa4ea`;
-        //         return updatedUrl;
-        //     });
+            // URL을 올바른 형식으로 변환
+            const imageUrls = resp.data.map(item => {
+                console.log('원본 URL 확인 1:', item); 
+                console.log('원본 URL 확인 2:', item.banner_url); 
+                let updatedUrl = item.banner_url.replace('https://storage.google.com/', 'https://storage.googleapis.com/');
+                console.log('변환된 URL 확인:', updatedUrl); 
+                // let updatedUrl = `https://storage.googleapis.com/eunmi-exam-attachment/2f8563bf-afbc-4d06-81ac-0af54c0aa4ea`;
+                return updatedUrl;
+            });
             
-        //     setImages(imageUrls); 
-        // })
-        // .catch(error => {
-        //     console.error('error', error);
-        // });
+            setImages(imageUrls); 
+        })
+        .catch(error => {
+            console.error('error', error);
+        });
         
         
         // 배너 - 임시 내 GCS 접근 
-        let imgList = [
-            'https://storage.googleapis.com/eunmi-exam-attachment/2f8563bf-afbc-4d06-81ac-0af54c0aa4ea',
-            'https://storage.googleapis.com/eunmi-exam-attachment/363b2269-3fb8-4fa2-8c1a-803fb6e0831d'
-        ];
+        // let imgList = [
+        //     'https://storage.googleapis.com/eunmi-exam-attachment/2f8563bf-afbc-4d06-81ac-0af54c0aa4ea',
+        //     'https://storage.googleapis.com/eunmi-exam-attachment/363b2269-3fb8-4fa2-8c1a-803fb6e0831d'
+        // ];
         
-        setImages(imgList);
+        // setImages(imgList);
         
     }, []);
     // console.log("2"+images);

@@ -1,6 +1,8 @@
 package com.hows.product.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,5 +29,18 @@ public class ProductDAO {
 	// 디테일 출력
 	public ProductDTO getProductDetaile (String product_seq) throws Exception{
 		return myBatis.selectOne("Product.getProductDetaile", product_seq);
+	}
+
+	// 상품 추가
+	public int addProduct(ProductDTO dto) {
+		return myBatis.insert("Product.insert", dto);
+	}
+
+	// 상품 대표 이미지 수정
+	public int updateThumbNail(int product_seq, String url) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("url", url);
+		params.put("seq", product_seq);
+		return myBatis.update("Product.updateThumbNail", params);
 	}
 }

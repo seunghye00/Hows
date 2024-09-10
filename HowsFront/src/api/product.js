@@ -18,3 +18,5 @@ export const productList = () => {
 export const addProduct = formData => {
     return axios.post(`${baseUrl}`, formData)
 }
+
+// 신고 리뷰 조회 (관리자)

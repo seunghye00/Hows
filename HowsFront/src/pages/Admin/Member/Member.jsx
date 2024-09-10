@@ -135,10 +135,10 @@ export const Member = () => {
     // 회원 역할과 등급 업데이트
     const confirmUpdate = () => {
         Swal.fire({
-            title: '역할과 등급을 수정하시겠습니까?',
+            title: '변경 사항을 저장하시겠습니까?',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: '수정',
+            confirmButtonText: '저장',
             cancelButtonText: '취소',
         }).then(result => {
             if (result.isConfirmed) {
@@ -146,7 +146,7 @@ export const Member = () => {
                 const gradeCode = getGradeCode(Grade)
                 const roleCode = getRoleCode(Role)
 
-                if (!gradeCode || !roleCode) {
+                if (!gradeCode && !roleCode) {
                     Swal.fire(
                         '오류',
                         '유효하지 않은 등급 또는 역할 코드입니다.',
@@ -155,28 +155,35 @@ export const Member = () => {
                     return
                 }
 
-                if (roleCode === 'R3') {
-                    openBlacklistModal() // 블랙리스트 역할이 선택된 경우 모달 열기
-                } else {
-                    updateGrade({ member_id: memberId, grade_code: gradeCode })
-                        .then(() =>
-                            updateRole({
-                                member_id: memberId,
-                                role_code: roleCode,
-                            })
+                const gradeUpdate = gradeCode
+                    ? updateGrade({
+                          member_id: memberId,
+                          grade_code: gradeCode,
+                      })
+                    : Promise.resolve()
+
+                const roleUpdate = roleCode
+                    ? updateRole({ member_id: memberId, role_code: roleCode })
+                    : Promise.resolve()
+
+                // 등급과 역할 각각 업데이트
+                Promise.all([gradeUpdate, roleUpdate])
+                    .then(() => {
+                        Swal.fire(
+                            '성공',
+                            '변경 사항이 저장되었습니다.',
+                            'success'
                         )
-                        .then(() => {
-                            Swal.fire(
-                                '성공',
-                                '역할과 등급이 수정되었습니다.',
-                                'success'
-                            )
-                            setEditMode(false)
-                        })
-                        .catch(error =>
-                            Swal.fire('오류', '업데이트 실패', 'error')
+                        setEditMode(false)
+                        setModal(false) // 모달 닫기
+                    })
+                    .catch(error =>
+                        Swal.fire(
+                            '오류',
+                            '변경 사항 저장에 실패했습니다.',
+                            'error'
                         )
-                }
+                    )
             }
         })
     }

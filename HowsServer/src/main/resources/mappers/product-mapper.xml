@@ -21,5 +21,16 @@
 		FROM PRODUCT
 		WHERE product_seq = #{product_seq}
     </select>
+    
+    <insert id="insert">
+    	<selectKey keyProperty="product_seq" resultType="int" order="AFTER">
+        	select product_seq.currval from dual
+   	 	</selectKey>
+    	insert into product values (product_seq.nextval, ' ', #{product_title}, #{product_contents}, #{price}, #{product_category_code})
+    </insert>
+    
+    <update id="updateThumbNail">
+    	update product set product_thumbnail = #{url} where product_seq = #{seq}
+    </update>
 
 </mapper>

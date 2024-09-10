@@ -6,7 +6,7 @@ import { Button } from '../../../components/Button/Button'
 import { formatDate } from '../../../commons/commons'
 import Swal from 'sweetalert2'
 import {
-    selectAll,
+    selectAll, // selectAll API 호출
     detailMember,
     updateGrade,
     updateRole,
@@ -29,15 +29,49 @@ export const Member = () => {
     const [roles, setRoles] = useState([])
     const [blacklistReason, setBlacklistReason] = useState('')
     const [searchTerm, setSearchTerm] = useState('') // 검색어
-    const [filteredMembers, setFilteredMembers] = useState([]) // 검색된 회원 목록
+    const [chosung, setChosung] = useState('전체') // 초성 필터 상태
+    const [page, setPage] = useState(1) // 현재 페이지 상태
+    const [totalMembers, setTotalMembers] = useState(0) // 전체 회원 수 저장
+    const itemsPerPage = 10 // 페이지당 보여줄 항목 수
 
+    // 페이지에 따른 startRow와 endRow 계산
+    const startRow = (page - 1) * itemsPerPage + 1
+    const endRow = page * itemsPerPage
+
+    // 회원 목록과 전체 회원 수를 서버에서 가져오는 함수
     useEffect(() => {
-        // 전체 회원 조회
-        selectAll()
-            .then(resp => setMembers(resp.data))
-            .catch(error => console.error('전체 회원 조회 실패:', error))
+        const fetchMembers = async () => {
+            try {
+                // selectAll 함수에 필요한 파라미터 전달 (startRow, endRow, chosung, searchTerm)
+                const response = await selectAll(
+                    startRow,
+                    endRow,
+                    chosung,
+                    searchTerm
+                )
+                setMembers(response.data.members) // 멤버 리스트 저장
+                setTotalMembers(response.data.totalCount) // 전체 회원 수 저장
+                console.log('Total Members: ', totalMembers)
+                console.log('Fetched Members: ', response.data.members)
+                console.log('Total Count: ', response.data.totalCount)
+                console.log(
+                    'Start Row:',
+                    startRow,
+                    'End Row:',
+                    endRow,
+                    'Page:',
+                    page
+                )
+            } catch (error) {
+                console.error('전체 회원 조회 실패:', error)
+            }
+        }
 
-        // 서버에서 등급 정보 가져오기
+        fetchMembers()
+    }, [page, chosung, searchTerm]) // page, chosung, searchTerm 변경 시마다 호출
+
+    // 서버에서 등급 정보 가져오기
+    useEffect(() => {
         getAllGrades()
             .then(resp => setGrades(resp.data))
             .catch(error => console.error('등급 조회 실패:', error))
@@ -48,24 +82,14 @@ export const Member = () => {
             .catch(error => console.error('역할 조회 실패:', error))
     }, [])
 
-    useEffect(() => {
-        // 검색어가 바뀔 때마다 필터링된 회원 목록 업데이트
-        setFilteredMembers(
-            members.filter(member =>
-                member.nickname.toLowerCase().includes(searchTerm.toLowerCase())
-            )
-        )
-    }, [searchTerm, members])
-
     // 모달 열기 및 회원 상세 조회 API 호출
     const Modalopen = member_id => {
         detailMember(member_id)
             .then(resp => {
-                console.log(resp.data) // 서버로부터 받는 데이터를 확인
                 setSelectedMember(resp.data)
                 setModal(true)
-                setGrade(resp.data.grade_code || '') // 빈 값 대신 기본값 설정
-                setRole(resp.data.role_code || '') // 빈 값 대신 기본값 설정
+                setGrade(resp.data.grade_code || '')
+                setRole(resp.data.role_code || '')
             })
             .catch(error => console.error('회원 상세 조회 실패:', error))
     }
@@ -90,7 +114,7 @@ export const Member = () => {
             case '브론즈':
                 return 'G3'
             default:
-                return '' // 변환되지 않는 경우를 대비한 기본값
+                return ''
         }
     }
 
@@ -104,82 +128,62 @@ export const Member = () => {
             case '블랙리스트':
                 return 'R3'
             default:
-                return '' // 변환되지 않는 경우를 대비한 기본값
+                return ''
         }
     }
 
+    // 회원 역할과 등급 업데이트
     const confirmUpdate = () => {
         Swal.fire({
-            title: '역할과 등급을 수정하시겠습니까?',
+            title: '변경 사항을 저장하시겠습니까?',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonText: '수정',
+            confirmButtonText: '저장',
             cancelButtonText: '취소',
         }).then(result => {
             if (result.isConfirmed) {
                 const memberId = selectedMember.member_id
-
-                console.log('내가 선택한 ID:', memberId) // 회원 ID 확인
-                console.log('내가 선택한 등급:', Grade) // 사용자가 선택한 등급
-                console.log('내가 선택한 역할:', Role) // 사용자가 선택한 역할
-
-                // 등급과 역할을 코드로 변환
                 const gradeCode = getGradeCode(Grade)
                 const roleCode = getRoleCode(Role)
 
-                // 로그 추가: 변환된 등급 코드와 역할 코드 확인
-                console.log('변환된 등급 코드:', gradeCode)
-                console.log('변환된 역할 코드:', roleCode)
-
-                if (!gradeCode) {
+                if (!gradeCode && !roleCode) {
                     Swal.fire(
                         '오류',
-                        '변환된 등급 코드가 NULL 또는 undefined 입니다.',
+                        '유효하지 않은 등급 또는 역할 코드입니다.',
                         'error'
                     )
                     return
                 }
 
-                if (!roleCode) {
-                    Swal.fire(
-                        '오류',
-                        '변환된 역할 코드가 NULL 또는 undefined 입니다.',
-                        'error'
-                    )
-                    return
-                }
+                const gradeUpdate = gradeCode
+                    ? updateGrade({
+                          member_id: memberId,
+                          grade_code: gradeCode,
+                      })
+                    : Promise.resolve()
 
-                // 블랙리스트 역할이 선택된 경우
-                if (roleCode === 'R3') {
-                    openBlacklistModal() // 블랙리스트 모달 열기
-                } else {
-                    // 등급과 역할 업데이트 API 호출
-                    updateGrade({ member_id: memberId, grade_code: gradeCode })
-                        .then(() => {
-                            console.log('등급 업데이트 성공:', gradeCode)
-                            return updateRole({
-                                member_id: memberId,
-                                role_code: roleCode,
-                            })
-                        })
-                        .then(() => {
-                            console.log('역할 업데이트 성공:', roleCode)
-                            Swal.fire(
-                                '성공',
-                                '역할과 등급이 수정되었습니다.',
-                                'success'
-                            )
-                            setEditMode(false)
-                        })
-                        .catch(error => {
-                            console.error('업데이트 실패:', error)
-                            Swal.fire(
-                                '오류',
-                                '업데이트에 실패했습니다.',
-                                'error'
-                            )
-                        })
-                }
+                const roleUpdate = roleCode
+                    ? updateRole({ member_id: memberId, role_code: roleCode })
+                    : Promise.resolve()
+
+                // 등급과 역할 각각 업데이트
+                Promise.all([gradeUpdate, roleUpdate])
+                    .then(() => {
+                        Swal.fire(
+                            '성공',
+                            '변경 사항이 저장되었습니다.',
+                            'success'
+                        )
+                        setEditMode(false)
+                        setModal(false) // 모달 닫기
+                    })
+                    .catch(error =>
+                        Swal.fire(
+                            '오류',
+                            '변경 사항 저장에 실패했습니다.',
+                            'error'
+                        )
+                    )
             }
         })
     }
@@ -205,8 +209,6 @@ export const Member = () => {
         }).then(result => {
             if (result.isConfirmed) {
                 const memberId = selectedMember.member_id
-
-                // 블랙리스트 사유 등록 및 역할 업데이트
                 addBlacklist({
                     member_id: memberId,
                     blacklist_reason_code: blacklistReason,
@@ -223,16 +225,16 @@ export const Member = () => {
                         closeBlacklistModal()
                         setModal(false)
                     })
-                    .catch(error => {
-                        console.error('블랙리스트 등록 실패:', error)
-                        Swal.fire(
-                            '오류',
-                            '블랙리스트 등록에 실패했습니다.',
-                            'error'
-                        )
-                    })
+                    .catch(error =>
+                        Swal.fire('오류', '블랙리스트 등록 실패', 'error')
+                    )
             }
         })
+    }
+
+    // 페이지 변경 처리 함수
+    const handlePageChange = pageNumber => {
+        setPage(pageNumber)
     }
 
     return (
@@ -259,8 +261,10 @@ export const Member = () => {
                     ].map((filter, index) => (
                         <span
                             key={index}
-                            className={`${styles.filterItem}`}
-                            onClick={() => console.log(filter)} // 필터 클릭 시 처리 로직 추가 가능
+                            className={`${styles.filterItem} ${
+                                chosung === filter ? styles.selected : ''
+                            }`}
+                            onClick={() => setChosung(filter)} // 초성 필터 변경
                         >
                             {filter}
                         </span>
@@ -284,8 +288,8 @@ export const Member = () => {
                     <div className={styles.headerItem}>가입 날짜</div>
                 </div>
 
-                {filteredMembers.length > 0 ? (
-                    filteredMembers.map((member, index) => (
+                {members.length > 0 ? (
+                    members.map((member, index) => (
                         <div
                             className={styles.memberRow}
                             key={index}
@@ -315,7 +319,12 @@ export const Member = () => {
 
             {/* Paging Component */}
             <div className={styles.pagination}>
-                <Paging />
+                <Paging
+                    page={page}
+                    count={totalMembers}
+                    perpage={itemsPerPage}
+                    setPage={handlePageChange}
+                />
             </div>
 
             {/* 상세 모달 */}

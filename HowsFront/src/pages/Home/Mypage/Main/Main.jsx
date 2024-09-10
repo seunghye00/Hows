@@ -8,14 +8,16 @@ import { useEffect, useState } from "react";
 import { api } from "./../../../../config/config";
 import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
+import { Modal } from "../../../../components/Modal/Modal"
 
 export const Main = () => {
     const navi = useNavigate();
     const location = useLocation();
 
     const [user, setUser] = useState([]);
-    const [memberId, setMemberId] = useState(null);
     const { member_id } = useParams(); // URL에서 member_id 가져오기
+    const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
+    const [selectedImage, setSelectedImage] = useState(profile); // 선택한 이미지 초기값
 
 
     useEffect(() => {
@@ -37,8 +39,8 @@ export const Main = () => {
             </div>
             <div className={styles.mainBox}>
                 <div className={styles.header}>
-                    <div className={styles.profile}>
-                        <img src={profile}></img>
+                    <div className={styles.profile} onClick={() => setIsModalOpen(true)}>
+                        <img src={selectedImage} alt="Profile" />
                     </div>
                     <div className={styles.userInfo}>
                         <div className={styles.top}>
@@ -107,6 +109,38 @@ export const Main = () => {
                     </Routes>
                 </div>
             </div>
+
+            {/* 모달 컴포넌트 추가 */}
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <div className={styles.modalBox}>
+                    <h2>프로필 사진 변경</h2>
+                    <button className={styles.modBtn} onClick={() => {
+                        document.getElementById("fileInput").click(); // 파일 input 클릭
+                    }}>수정</button>
+                    <button className={styles.delBtn} onClick={() => {
+                        setSelectedImage(profile); // 기본 이미지로 변경
+                        setIsModalOpen(false);
+                    }}>삭제</button>
+                    <input
+                        id="fileInput"
+                        type="file"
+                        style={{ display: "none" }} // 숨김
+                        accept="image/*"
+                        onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                    setSelectedImage(reader.result); // 선택한 이미지 업데이트
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                            setIsModalOpen(false); // 모달 닫기
+                        }}
+                    />
+                </div>
+            </Modal>
         </div >
+
     );
 };

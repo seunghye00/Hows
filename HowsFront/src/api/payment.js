@@ -1,7 +1,7 @@
 import {api} from "../config/config";
 import {addOrder} from "./order";
 
-// 결제 추가
+/** 결제 추가 **/
 export const addPayment = (payment) => {
   return api.post(`/payment/complete`, payment)
 }
@@ -33,20 +33,33 @@ export const requestPaymentEvent = async(payment, orderInfo) => {
     txId:"0191d583-3f51-d60d-79ee-73eb634b4911"
   }
 
-  addOrder(orderInfo).then(res => {
-    const paymentResult = {
-      ...response,
-      orderName,
-      totalAmount,
-      orderSeq: res.data
-    }
-    if(res.data > 0) {
-      return addPayment(paymentResult);
-    }
-    else {
-      // 결제 실패
-      return null;
-    }
+  const paymentResult = {
+    ...response,
+    orderName,
+    totalAmount,
+    orderSeq: 14
+  }
+
+  addPayment(paymentResult).then(res => {
+      console.log("res ===== ", res);
   });
+
+  return "ok";
+
+  // addOrder(orderInfo).then(res => {
+  //   const paymentResult = {
+  //     ...response,
+  //     orderName,
+  //     totalAmount,
+  //     orderSeq: res.data
+  //   }
+  //   if(res.data > 0) {
+  //     return addPayment(paymentResult);
+  //   }
+  //   else {
+  //     // 결제 실패
+  //     return "fail";
+  //   }
+  // });
 }
 

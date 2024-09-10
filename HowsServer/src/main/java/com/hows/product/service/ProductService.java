@@ -28,4 +28,14 @@ public class ProductService {
 	public ProductDTO getProductByDetail (String product_seq) throws Exception {
 		return productDAO.getProductDetaile(product_seq);
 	}
+
+	// 상품 추가
+	public int addProduct(ProductDTO dto) {
+		return productDAO.addProduct(dto);
+	}
+
+	// 상품 대표 이미지 변경
+	public int updateThumbNail(int product_seq, String url) {
+		return productDAO.updateThumbNail(product_seq, url);
+	}
 }

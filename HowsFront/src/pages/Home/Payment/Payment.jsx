@@ -4,6 +4,7 @@ import {useOrderStore} from "../../../store/orderStore";
 import {addCommas, shippingPrice} from "../../../commons/commons";
 import {requestPaymentEvent} from "../../../api/payment";
 import { v4 as uuidv4 } from 'uuid';
+import {Link} from "react-router-dom";
 
 export const Payment = () => {
 
@@ -22,7 +23,7 @@ export const Payment = () => {
   const [paymentPrice, setPaymentPrice] = useState({ price: orderPrice, coupon: 0, point: 0, shipping: 0, total: 0 });
   
   // 필수 동의 항목
-  const [consent, setConsent] = useState({category1: false, category2: false});
+  const [consent, setConsent] = useState({category1: false, category2: false, category3: false});
 
   // 주문 데이터
   const [data, setData] = useState({
@@ -69,6 +70,11 @@ export const Payment = () => {
   /** 결제 이벤트 **/
   const handlePayment = async () => {
     // 목록 빠진 거 없는지 체크해야됨
+    if(!consent.category1 || !consent.category2 || !consent.category3) {
+      alert("필수 동의 항목을 체크해주세요.");
+      return false;
+    }
+    
 
     const name = orderProducts[0].product_title;
     const paymentId = `how-${uuidv4()}`
@@ -80,15 +86,6 @@ export const Payment = () => {
       phoneNumber: data.phone,
       email: data.email
     }
-
-    // Order API
-    // 1. 주문 내용
-    // order_seq 뽑아와야됨 총 가격 보내면 됨 totalAmount
-    console.log("totalAmount ==== ", totalAmount)
-
-    // 2. 주문한 상품 목록
-    // 상품 번호, 상품 수량, 가격 보내면 됨
-    console.log("orderProducts ====== ", orderProducts);
 
     const orderInfo = {
       totalAmount,
@@ -253,9 +250,9 @@ export const Payment = () => {
           <div className={styles.payment}>
             <p>결제방식</p>
             <div>
-              <button name="card" style={ data.way === "CARD" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
-              <button name="kakao" style={ data.way === "kakao" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카카오 페이</button>
-              <button name="toss" style={ data.way === "toss" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 패스</button>
+              <button name="CARD" style={ data.way === "CARD" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
+              <button name="KAKAO" style={ data.way === "KAKAO" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카카오 페이</button>
+              <button name="TOSS" style={ data.way === "TOSS" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 패스</button>
             </div>
           </div>
           <div className={styles.payment}>
@@ -304,12 +301,16 @@ export const Payment = () => {
           </div>
 
           <div className={styles.consent}>
-            <input name="category1" checked={consent.category1} type="checkbox" onChange={handleCheck}/> <label>(필수) 결제에
-            동의</label>
+            <input name="category1" checked={consent.category1} type="checkbox" onChange={handleCheck}/> <label>(필수)
+            개인정보 수집/이용 동의 보기</label>
           </div>
           <div className={styles.consent}>
-          <input name="category2" checked={consent.category2} type="checkbox" onChange={handleCheck}/> <label>(필수) 결제에
-            동의</label>
+            <input name="category2" checked={consent.category2} type="checkbox" onChange={handleCheck}/> <label>(필수)
+            개인정보 제3자 제공 동의 보기</label>
+          </div>
+          <div className={styles.consent}>
+            <input name="category3" checked={consent.category3} type="checkbox" onChange={handleCheck}/> <label>(필수)
+            결제대행 서비스 이용약관 <a href="https://www.inicis.com/terms">(주)KG이니시스</a></label>
           </div>
           <button onClick={handlePayment}>결제하기</button>
         </div>

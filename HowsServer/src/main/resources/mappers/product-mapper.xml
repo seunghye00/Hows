@@ -32,5 +32,12 @@
     <update id="updateThumbNail">
     	update product set product_thumbnail = #{url} where product_seq = #{seq}
     </update>
+    
+    <!-- 리뷰등록 -->
+	<insert id="insertReview" parameterType="com.hows.product.dto.ReviewDTO">
+	    INSERT INTO review (review_seq, rating, review_contents, review_date, product_seq, member_id)
+	    VALUES (review_seq.nextval, #{rating}, #{review_contents}, SYSDATE, #{product_seq}, #{member_id})
+	</insert>
+
 
 </mapper>

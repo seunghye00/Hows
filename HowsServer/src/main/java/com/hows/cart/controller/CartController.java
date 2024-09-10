@@ -22,7 +22,6 @@ public class CartController {
 
     @GetMapping
     public ResponseEntity<List<HashMap<String, Object>>> cartList(@AuthenticationPrincipal CustomUserDetails user) {
-        System.out.println("member seq ===== " + user.getMemberSeq());
         try{
             List<HashMap<String, Object>> list = cartServ.cartList(user.getMemberSeq());
             return ResponseEntity.ok(list);

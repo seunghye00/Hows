@@ -3,6 +3,8 @@ package com.hows.community.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +23,6 @@ public class OptionController {
 	
 	@GetMapping("/housing-types")
     public List<HousingTypeDTO> getHousingTypes() {
-		System.out.println("요청확인");
         return optionServ.getHousingTypes();
     }
 	
@@ -35,8 +36,13 @@ public class OptionController {
         return optionServ.getColors();
     }
     
-    @GetMapping("/area-size")
+    @GetMapping("/area-sizes")
     public List<AreaSizeDTO> getAreaSize() {
         return optionServ.getAreaSize();
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> exceptionHandler(Exception e) {
+       e.printStackTrace();
+       return ResponseEntity.badRequest().body("fail");
     }
 }

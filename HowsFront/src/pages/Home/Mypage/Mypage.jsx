@@ -9,6 +9,8 @@ export const Mypage = () => {
     <div className={styles.container}>
       <Routes>
         <Route path="/" element={<Navigate to="main" replace />} />
+        {/* <Route path="main/*" element={<Main setMain={Main} />} /> */}
+        {/* <Route path="main/:member_id" element={<Main />} /> */}
         <Route path="main/*" element={<Main />} />
         <Route path="update/*" element={<Update />} />
         <Route path="userDashboard/*" element={<UserDashboard />} />

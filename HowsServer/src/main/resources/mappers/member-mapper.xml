@@ -58,7 +58,8 @@
 
 	<!-- 회원정보 가져오기 -->
 	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
-		select * from member where member_id = #{id}
+		select * from member where
+		member_id = #{id}
 	</select>
 
 	<!-- 아이디 찾기 -->
@@ -73,25 +74,23 @@
 		where member_id = #{member_id} and email = #{email}
 	</select>
 
-
 	<!-- 마이페이지 회원정보 출력 -->
 	<select id="selectInfo"
 		resultType="com.hows.member.dto.MemberDTO">
 		select * from member where member_id = #{member_id}
 	</select>
-	
+
 	<!-- 회원정보 수정 -->
 	<update id="updateInfo">
-		update member set 
-			nickname = #{nickname}, 
-			email = #{email}, 
-			phone = #{phone}, 
-			zip_code = #{zip_code},
-			address = #{address},
-			detail_address = #{detail_address}
+		update member set
+		nickname = #{nickname},
+		email = #{email},
+		phone = #{phone},
+		zip_code = #{zip_code},
+		address = #{address},
+		detail_address = #{detail_address}
 		where member_id = #{member_id}
 	</update>
-
 
 	<!-- 비밀번호 변경 시 기존 비밀번호 확인 -->
 	<select id="getPasswordById" resultType="string">
@@ -109,6 +108,12 @@
 	<delete id="deleteUser">
 		delete from member where member_id = #{member_id}
 	</delete>
+
+	<!-- [방명록] 방명록 작성 위한 member_seq 뽑기 -->
+	<select id="findMemberSeq" resultType="int">
+		select member_seq from member where member_id = #{member_id}
+	</select>
+
 
 
 	<!-- ===========================================[ 관리자 ] -->
@@ -150,16 +155,12 @@
 		m.address,
 		m.detail_address,
 		CASE
-		WHEN SUBSTR(m.birth, 1, 1) = '0'
-		THEN
-		CONCAT(CONCAT(CONCAT('20', SUBSTR(m.birth, 1, 2)), '년 '),
-		CONCAT(CONCAT(SUBSTR(m.birth, 3, 2), '월 '), CONCAT(SUBSTR(m.birth, 5,
-		2), '일')))
-		ELSE CONCAT(CONCAT(CONCAT('19', SUBSTR(m.birth, 1, 2)), '년
-		'),
-		CONCAT(CONCAT(SUBSTR(m.birth, 3, 2), '월 '), CONCAT(SUBSTR(m.birth,
-		5,
-		2), '일')))
+		WHEN SUBSTR(m.birth, 1, 1) = '0' THEN
+		'20' || SUBSTR(m.birth, 1, 2) || '년 ' || SUBSTR(m.birth, 3, 2) || '월 ' ||
+		SUBSTR(m.birth, 5, 2) || '일'
+		ELSE
+		'19' || SUBSTR(m.birth, 1, 2) || '년 ' || SUBSTR(m.birth, 3, 2) || '월 ' ||
+		SUBSTR(m.birth, 5, 2) || '일'
 		END AS birth,
 		m.signup_date,
 		m.withdrawal_date,
@@ -169,7 +170,8 @@
 		FROM member m
 		JOIN grade g ON m.grade_code = g.grade_code
 		JOIN role r ON
-		m.role_code = r.role_code
+		m.role_code =
+		r.role_code
 		WHERE m.member_id = #{member_id}
 	</select>
 
@@ -212,14 +214,16 @@
 		SELECT * FROM blacklist_reason
 	</select>
 
+	<!-- 블랙리스트 등록 (관리자) -->
 	<update id="addBlacklist">
 		UPDATE member
 		SET role_code = 'R3',
-		blacklist_reason_code = #{blacklist_reason_code, jdbcType=VARCHAR},  <!-- 문자열 타입 명시 -->
-		blacklist_date = SYSDATE
-		WHERE member_id = #{member_id, jdbcType=VARCHAR}  <!-- 문자열 타입 명시 -->
+		blacklist_reason_code = #{blacklist_reason_code},
+		blacklist_date =
+		SYSDATE
+		WHERE member_id = #{member_id}
 	</update>
-	
+
 	<!-- 블랙리스트 조회 (관리자) -->
 	<select id="selectBlacklist"
 		resultType="com.hows.member.dto.MemberDTO">

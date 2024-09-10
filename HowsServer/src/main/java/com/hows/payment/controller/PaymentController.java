@@ -2,14 +2,20 @@ package com.hows.payment.controller;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.hows.common.CustomUserDetails;
 import com.hows.payment.dto.PaymentDTO;
 import com.hows.payment.dto.PaymentRequestDTO;
 import com.hows.payment.service.PaymentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/payment")
@@ -19,7 +25,7 @@ public class PaymentController {
     private PaymentService paymentServ;
 
     @GetMapping
-    public ResponseEntity<List<PaymentDTO>> paymentList(@AuthenticationPrincipal UserDetails user) {
+    public ResponseEntity<List<PaymentDTO>> paymentList(@AuthenticationPrincipal CustomUserDetails user) {
         try{
             List<PaymentDTO> list = paymentServ.paymentList(user.getUsername());
             return ResponseEntity.ok(list);

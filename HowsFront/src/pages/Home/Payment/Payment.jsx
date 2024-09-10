@@ -253,7 +253,7 @@ export const Payment = () => {
           <div className={styles.payment}>
             <p>결제방식</p>
             <div>
-              <button name="card" style={ data.way === "CARD" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
+              <button name="CARD" style={ data.way === "CARD" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
               <button name="kakao" style={ data.way === "kakao" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카카오 페이</button>
               <button name="toss" style={ data.way === "toss" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 패스</button>
             </div>

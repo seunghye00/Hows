@@ -116,7 +116,7 @@ create table board_tag (
     product_seq number not null,
     left_position NUMBER not null,
     top_position NUMBER not null
-)
+);
 
 create sequence board_tag_seq
 start with 1
@@ -361,10 +361,9 @@ nocache;
 -- 리뷰
 create table review (
     review_seq number primary key,
-    rating number not null,
-    review_title varchar2(100) not null,
     review_contents varchar2(900) not null,
     review_date timestamp default sysdate,
+    rating number not null,
     product_seq number not null,
     member_id varchar2(20) not null
 );
@@ -603,7 +602,7 @@ notice_title varchar2(100) not null,
 notice_contents varchar2(4000) not null,
 notice_date timestamp default sysdate,
 view_count number default 0 not null,
-notice_code char(2) default 'N1 not null
+notice_code char(2) default 'N1' not null
 );
 
 create sequence notice_seq

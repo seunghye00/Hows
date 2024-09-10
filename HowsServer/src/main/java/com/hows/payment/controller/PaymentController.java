@@ -38,6 +38,9 @@ public class PaymentController {
 
     @PostMapping("/complete")
     public ResponseEntity<?> complete(@RequestBody PaymentRequestDTO paymentRequest) throws Exception {
+
+        System.out.println(paymentRequest.getOrderSeq());
+
         String result = paymentServ.payment(paymentRequest);
         return ResponseEntity.ok(result);
     }

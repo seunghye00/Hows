@@ -1,3 +1,4 @@
+
 package com.hows.product.dto;
 
 import java.sql.Timestamp;
@@ -11,12 +12,11 @@ public class ReviewDTO {
 	private int product_seq;
 	private String member_id;
 	
-	
 	public ReviewDTO() {
 		super();
 	}
-	public ReviewDTO(int review_seq, int rating, String review_contents, Timestamp review_date,
-			int product_seq, String member_id) {
+	public ReviewDTO(int review_seq, int rating, String review_contents, Timestamp review_date, int product_seq,
+			String member_id) {
 		super();
 		this.review_seq = review_seq;
 		this.rating = rating;
@@ -61,7 +61,6 @@ public class ReviewDTO {
 	public void setMember_id(String member_id) {
 		this.member_id = member_id;
 	}
-	
 	
 	
 }

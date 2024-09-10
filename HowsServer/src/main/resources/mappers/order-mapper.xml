@@ -30,19 +30,34 @@
 		</where>
 	</select>
 
-	<insert id="addOrder">
-		<selectKey keyProperty="orders_seq" resultType="int" order="AFTER">
-			select orders_seq.currval from dual
+	<insert id="addOrder" parameterType="com.hows.order.dto.OrderDTO">
+		<selectKey keyProperty="order_seq" resultType="int" order="BEFORE">
+			SELECT
+				order_seq.nextval
+			FROM
+				dual
 		</selectKey>
 
 		INSERT INTO
 			orders
 		VALUES(
-			orders_seq.nextval,
+			#{order_seq},
 			#{member_seq},
 			#{order_code},
 			default,
 			#{order_price}
+		)
+	</insert>
+
+	<insert id="addOrderList">
+		INSERT INTO
+			order_list
+		VALUES (
+			order_list_seq.nextval,
+			#{order_seq},
+			#{product_seq},
+			#{order_list_count},
+			#{order_list_price}
 		)
 	</insert>
 

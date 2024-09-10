@@ -6,6 +6,7 @@ public class PaymentRequestDTO {
     private String txId;
     private String orderName;
     private int totalAmount;
+    private int orderSeq;
 
     public String getPaymentId() {
         return paymentId;
@@ -47,14 +48,23 @@ public class PaymentRequestDTO {
         this.totalAmount = totalAmount;
     }
 
+    public int getOrderSeq() {
+        return orderSeq;
+    }
+
+    public void setOrderSeq(int orderSeq) {
+        this.orderSeq = orderSeq;
+    }
+
     public PaymentRequestDTO() {
     }
 
-    public PaymentRequestDTO(String paymentId, String transactionType, String txId, String orderName, int totalAmount) {
+    public PaymentRequestDTO(String paymentId, String transactionType, String txId, String orderName, int totalAmount, int orderSeq) {
         this.paymentId = paymentId;
         this.transactionType = transactionType;
         this.txId = txId;
         this.orderName = orderName;
         this.totalAmount = totalAmount;
+        this.orderSeq = orderSeq;
     }
 }

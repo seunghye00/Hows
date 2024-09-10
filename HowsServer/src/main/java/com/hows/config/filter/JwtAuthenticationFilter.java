@@ -2,6 +2,7 @@ package com.hows.config.filter;
 
 import java.io.IOException;
 
+import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		if(token != null && jwt.isVerified(token)) {
 		
 		String id = jwt.getSubject(token);
-		UserDetails member = memServ.loadUserByUsername(id); 
+		CustomUserDetails member = memServ.loadUserByUsername(id);
 		
 		Authentication auth = new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(auth);

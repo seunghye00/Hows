@@ -47,8 +47,8 @@ export const Banner = () => {
     }
 
     // 이미지 업로드 버튼 클릭
-    const handleFileChange = event => {
-        const file = event.target.files[0]
+    const handleFileChange = e => {
+        const file = e.target.files[0]
         if (file) {
             // 이미지 파일인지 확인
             if (!file.type.startsWith('image/')) {

@@ -4,6 +4,7 @@ import { Button } from '../../../../../components/Button/Button'
 import { useEffect, useState } from 'react'
 import { categoryList, productList } from '../../../../../api/product'
 import { addCommas } from '../../../../../commons/commons'
+import { useNavigate } from 'react-router-dom'
 
 export const ViewList = () => {
     // 상태 변수 초기화
@@ -12,6 +13,7 @@ export const ViewList = () => {
     const [selectedCategory, setSelectedCategory] = useState('') // 선택된 카테고리
     const [selectAll, setSelectAll] = useState(false) // 전체 선택 상태
     const [categories, setCategories] = useState([]) // 카테고리 목록
+    const navi = useNavigate()
 
     useEffect(() => {
         // 컴포넌트가 처음 렌더링될 때 전체 상품 목록과 카테고리 목록을 비동기 호출
@@ -93,7 +95,12 @@ export const ViewList = () => {
                     </select>
                 </div>
                 <Search /> {/* 검색 컴포넌트 */}
-                <Button size={'s'} title={'등록'} /> {/* 등록 버튼 */}
+                <Button
+                    size={'s'}
+                    title={'등록'}
+                    onClick={() => navi('/admin/product/addProduct')}
+                />{' '}
+                {/* 등록 버튼 */}
                 <Button size={'s'} title={'삭제'} /> {/* 삭제 버튼 */}
                 <Button
                     size={'s'}

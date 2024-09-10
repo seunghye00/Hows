@@ -16,8 +16,8 @@ public class CartDAO {
     private SqlSession mybatis;
 
     /** 상품 목록 **/
-    public List<HashMap<String, Object>> cartList(String id) {
-        return mybatis.selectList("Cart.cartList");
+    public List<HashMap<String, Object>> cartList(int memberSeq) {
+        return mybatis.selectList("Cart.cartList", memberSeq);
     }
 
     /** 상품 추가 **/

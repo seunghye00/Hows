@@ -1,13 +1,11 @@
 import styles from "./Main.module.css";
 import { Post } from "./Post/Post";
-import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import img from "../../../../assets/images/마이페이지_가로배너.jpg";
 import profile from "../../../../assets/images/마이페이지_프로필사진.jpg";
 
-import { Update } from "./../Update/Update";
 import { useEffect, useState } from "react";
 import { api } from "./../../../../config/config";
-import axios from "axios";
 import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
 
@@ -17,18 +15,18 @@ export const Main = () => {
 
     const [user, setUser] = useState([]);
     const [memberId, setMemberId] = useState(null);
+    const { member_id } = useParams(); // URL에서 member_id 가져오기
 
 
     useEffect(() => {
-        const storedMemberId = sessionStorage.getItem('member_id');
-        if (storedMemberId) {
-            setMemberId(storedMemberId); // 상태 업데이트
-            api.get(`/member/selectInfo`).then((resp) => {
+        // url에서 가져온 member_id로 해당 페이지 member_id의 데이터 가져오기
+        if (member_id) {
+            api.get(`/member/selectInfo`, { params: { member_id } }).then((resp) => {
                 console.log("데이터 : ", resp.data);
                 setUser(resp.data);
             });
         }
-    }, []);
+    }, [member_id]);
 
 
 
@@ -79,22 +77,22 @@ export const Main = () => {
                     </div>
                 </div>
                 <div className={styles.menus}>
-                    <div className={styles.menu} onClick={() => navi("./post")}>
+                    <div className={styles.menu} onClick={() => navi(`/mypage/main/${member_id}/post`)}>
                         <div className={location.pathname.includes("post") ? styles.active : ""}>
                             <i className="bx bx-grid"></i>
                             <span>게시물</span>
                         </div>
                     </div>
-                    <div className={styles.menu} onClick={() => navi("./scrap")}>
+                    <div className={styles.menu} onClick={() => navi(`/mypage/main/${member_id}/scrap`)}>
                         <div className={location.pathname.includes("scrap") ? styles.active : ""}>
                             <i className="bx bx-bookmark"></i>
-                            <span >스크랩</span>
+                            <span>스크랩</span>
                         </div>
                     </div>
-                    <div className={styles.menu} onClick={() => navi("./guestbook")}>
+                    <div className={styles.menu} onClick={() => navi(`/mypage/main/${member_id}/guestbook`)}>
                         <div className={location.pathname.includes("guestbook") ? styles.active : ""}>
                             <i className="bx bx-message-dots"></i>
-                            <span>집들이</span>
+                            <span>방명록</span>
                         </div>
                     </div>
                 </div>
@@ -105,9 +103,8 @@ export const Main = () => {
                         <Route path="/" element={<Navigate to="post" replace />} />
                         <Route path="post" element={<Post />} />
                         <Route path="scrap" element={<Scrap />} />
-                        <Route path="guestbook" element={<Guestbook memberId={memberId} />} />
+                        <Route path="guestbook" element={<Guestbook />} />
                     </Routes>
-
                 </div>
             </div>
         </div >

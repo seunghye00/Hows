@@ -8,13 +8,28 @@
 	<!-- 글 작성 -->
 	<insert id="insert">
 		insert into guestbook values(
-			guestbook_seq = ${guestbook_seq},
-			guestbook_contents = #{guestbook_contents},
-			guestbook_write_date = sysdate,
-			member_seq = ${member_seq},
-			member_id = #{member_id}
+			guestbook_seq.nextval, #{guestbook_contents}, sysdate, ${member_seq}, #{member_id}
 		)
 	</insert>
+
+	<!-- 방금 삽입된 데이터 조회 -->
+	<!-- <select id="selectBySeq" resultType="com.hows.member.dto.GuestbookDTO" parameterType="int">
+	    select * from guestbook where guestbook_seq = ${guestbook_seq}
+	</select> -->
+
+	<!-- 전체 출력 -->
+	<select id="selectAll" resultType="com.hows.member.dto.GuestbookSubDTO">
+	    select g.*, m.nickname
+	    from guestbook g
+	    join member m on g.member_seq = m.member_seq
+	    where g.member_seq = ${member_seq}
+	    order by g.guestbook_seq desc
+	</select>
+
+	<!-- 글 삭제 -->
+	<delete id="delete">
+		delete from guestbook where guestbook_seq = ${guestbook_seq}
+	</delete>
 
 
 </mapper>

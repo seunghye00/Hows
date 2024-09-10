@@ -5,12 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.hows.common.CustomUserDetails;
 import com.hows.payment.dto.PaymentDTO;
@@ -37,11 +32,14 @@ public class PaymentController {
     }
 
     @PostMapping("/complete")
-    public ResponseEntity<?> complete(@RequestBody PaymentRequestDTO paymentRequest) throws Exception {
+    public ResponseEntity<?> complete(@RequestBody PaymentRequestDTO paymentRequest, @AuthenticationPrincipal CustomUserDetails user) throws Exception {
+        String result = paymentServ.payment(paymentRequest, user.getMemberSeq());
+        return ResponseEntity.ok(result);
+    }
 
-        System.out.println(paymentRequest.getOrderSeq());
-
-        String result = paymentServ.payment(paymentRequest);
+    @DeleteMapping("/{id}/cancel")
+    public ResponseEntity<?> cancel(@PathVariable("id") String paymentId) throws Exception {
+        String result = paymentServ.paymentCancel(paymentId);
         return ResponseEntity.ok(result);
     }
 

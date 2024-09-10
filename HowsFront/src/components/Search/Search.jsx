@@ -11,6 +11,12 @@ export const Search = ({ placeholder = 'Search...', onSearch, size }) => {
         }
     }
 
+    const handleKeyPress = e => {
+        if (e.key === 'Enter') {
+            handleSearch() // 엔터키를 눌렀을 때 검색 동작
+        }
+    }
+
     return (
         <div className={`${styles.searchBox} ${styles[size]}`}>
             <input
@@ -18,6 +24,7 @@ export const Search = ({ placeholder = 'Search...', onSearch, size }) => {
                 value={searchValue}
                 placeholder={placeholder} // 사용자 정의 placeholder
                 onChange={e => setSearchValue(e.target.value)}
+                onKeyDown={handleKeyPress} // 엔터키 감지
             />
             <button
                 className={styles.searchBtn}

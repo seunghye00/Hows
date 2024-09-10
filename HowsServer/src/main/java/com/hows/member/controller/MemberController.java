@@ -69,7 +69,6 @@ public class MemberController {
 		boolean result = memServ.checkEmail(email);
 		return ResponseEntity.ok(result);
 	}
-	
 
 	// 마이페이지 회원정보 출력
 	@GetMapping("/selectInfo")
@@ -85,13 +84,11 @@ public class MemberController {
 
 	// 회원정보 수정
 	@PutMapping("/updateInfo")
-	public ResponseEntity<Integer> updateInfo(@RequestBody MemberDTO dto){
+	public ResponseEntity<Integer> updateInfo(@RequestBody MemberDTO dto) {
 		int result = memServ.updateInfo(dto);
 		return ResponseEntity.ok(result);
 	}
-	
-	
-	
+
 	// 비밀번호 변경 시 기존 비밀번호 확인
 	@PostMapping("/checkPw")
 	public ResponseEntity<Boolean> checkPw(@AuthenticationPrincipal UserDetails user,
@@ -128,22 +125,34 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	
 	// 회원탈퇴
 	@DeleteMapping("/deleteUser/{member_id}")
-	public ResponseEntity<Integer> deleteUser(@PathVariable("member_id") String member_id){
+	public ResponseEntity<Integer> deleteUser(@PathVariable("member_id") String member_id) {
 		int result = memServ.deleteUser(member_id);
 		return ResponseEntity.ok(result);
 	}
-	
-	
-	
+
 	// ========================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	@GetMapping("/all")
-	public ResponseEntity<List<MemberDTO>> selectAll() {
-		List<MemberDTO> members = memServ.selectAll();
-		return ResponseEntity.ok(members);
+	public ResponseEntity<Map<String, Object>> selectAll(@RequestParam int startRow, @RequestParam int endRow,
+			@RequestParam(required = false) String chosung, @RequestParam(required = false) String searchTerm) {
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("startRow", startRow);
+		params.put("endRow", endRow);
+		params.put("chosung", chosung);
+		params.put("searchTerm", searchTerm);
+		System.out.println("Start Row: " + startRow + ", End Row: " + endRow);
+
+		List<MemberDTO> members = memServ.selectAll(params);
+		int totalCount = memServ.selectMemberCount(params); // 전체 회원 수 조회
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("members", members);
+		response.put("totalCount", totalCount);
+
+		return ResponseEntity.ok(response);
 	}
 
 	// 회원 상세조회 (관리자)
@@ -167,32 +176,34 @@ public class MemberController {
 		return ResponseEntity.ok(roles);
 	}
 
+	// 등급만 업데이트 (관리자)
 	@PutMapping("/updateGrade")
 	public ResponseEntity<Integer> updateGrade(@RequestBody Map<String, String> request) {
-	    String memberId = request.get("member_id");
-	    String newGradeCode = request.get("grade_code");
+		String memberId = request.get("member_id");
+		String newGradeCode = request.get("grade_code");
 
-	    if (newGradeCode == null || newGradeCode.isEmpty()) {
-	        return ResponseEntity.badRequest().body(0); // 변환 실패 시 400 에러 반환
-	    }
+		if (newGradeCode == null || newGradeCode.isEmpty()) {
+			return ResponseEntity.badRequest().body(0); // 변환 실패 시 400 에러 반환
+		}
 
-	    int result = memServ.updateGrade(memberId, newGradeCode);
-	    return ResponseEntity.ok(result);
+		int result = memServ.updateGrade(memberId, newGradeCode);
+		return ResponseEntity.ok(result);
 	}
-    // 역할만 업데이트 (관리자)
-    @PutMapping("/updateRole")
-    public ResponseEntity<Integer> updateRole(@RequestBody Map<String, String> request) {
-        String memberId = request.get("member_id");
-        String newRoleCode = request.get("role_code");
-        System.out.println("컨트롤러(역할) : " + newRoleCode);
 
-        if (newRoleCode == null || newRoleCode.isEmpty()) {
-            return ResponseEntity.badRequest().body(0);
-        }
+	// 역할만 업데이트 (관리자)
+	@PutMapping("/updateRole")
+	public ResponseEntity<Integer> updateRole(@RequestBody Map<String, String> request) {
+		String memberId = request.get("member_id");
+		String newRoleCode = request.get("role_code");
+		System.out.println("컨트롤러(역할) : " + newRoleCode);
 
-        int result = memServ.updateRole(memberId, newRoleCode);
-        return ResponseEntity.ok(result);
-    }
+		if (newRoleCode == null || newRoleCode.isEmpty()) {
+			return ResponseEntity.badRequest().body(0);
+		}
+
+		int result = memServ.updateRole(memberId, newRoleCode);
+		return ResponseEntity.ok(result);
+	}
 
 	// 전체 블랙리스트 사유 가져오기 (관리자)
 	@GetMapping("/blacklistreason")
@@ -205,24 +216,40 @@ public class MemberController {
 	// 블랙리스트 등록 (관리자)
 	@PostMapping("/addBlacklist")
 	public ResponseEntity<Integer> addBlacklist(@RequestBody Map<String, String> request) {
-	    String memberId = request.get("member_id");
-	    String reasonCode = request.get("blacklist_reason_code");
-	    
-	    // 로그 출력으로 데이터 확인
-	    System.out.println("Received member_id: " + memberId);
-	    System.out.println("Received blacklist_reason_code: " + reasonCode);
+		String memberId = request.get("member_id");
+		String reasonCode = request.get("blacklist_reason_code");
 
-	    int result = memServ.addBlacklist(memberId, reasonCode);
-	    return ResponseEntity.ok(result);
+		// 로그 출력으로 데이터 확인
+		System.out.println("Received member_id: " + memberId);
+		System.out.println("Received blacklist_reason_code: " + reasonCode);
+
+		int result = memServ.addBlacklist(memberId, reasonCode);
+		return ResponseEntity.ok(result);
 	}
-	
 
 	// 블랙리스트 조회 (관리자)
 	@GetMapping("/blacklist")
-	public ResponseEntity<List<MemberDTO>> selectBlacklist() {
-		List<MemberDTO> blacklist = memServ.selectBlacklist();
+	public ResponseEntity<Map<String, Object>> selectBlacklist(@RequestParam int startRow, @RequestParam int endRow,
+			@RequestParam(required = false) String chosung, @RequestParam(required = false) String searchTerm) {
+
+		Map<String, Object> params = new HashMap<>();
+		params.put("startRow", startRow);
+		params.put("endRow", endRow);
+		params.put("chosung", chosung);
+		params.put("searchTerm", searchTerm);
+
+		// 블랙리스트 목록 조회
+		List<MemberDTO> blacklist = memServ.selectBlacklist(params);
 		System.out.println(blacklist);
-		return ResponseEntity.ok(blacklist);
+		// 블랙리스트 총 수 카운트
+		int totalCount = memServ.selectBlacklistCount(params);
+
+		// 응답 데이터로 블랙리스트 목록과 총 수를 반환
+		Map<String, Object> response = new HashMap<>();
+		response.put("blacklist", blacklist);
+		response.put("totalCount", totalCount);
+
+		return ResponseEntity.ok(response);
 	}
 
 	// 블랙리스트 수정 (관리자)
@@ -233,11 +260,10 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	
 	@ExceptionHandler(Exception.class)
-	   public ResponseEntity<String> exceptionHandler(Exception e) {
-	      e.printStackTrace();
-	      return ResponseEntity.badRequest().body("fail");
-	   }
-	
+	public ResponseEntity<String> exceptionHandler(Exception e) {
+		e.printStackTrace();
+		return ResponseEntity.badRequest().body("fail");
+	}
+
 }

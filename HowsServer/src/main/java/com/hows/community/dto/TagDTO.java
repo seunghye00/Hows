@@ -7,7 +7,7 @@ public class TagDTO {
 	private int left_position;
 	private int top_position;
 
-	TagDTO(int board_tag_seq, int board_image_seq, int product_seq, int left_position, int top_position) {
+	public TagDTO(int board_tag_seq, int board_image_seq, int product_seq, int left_position, int top_position) {
 		super();
 		this.board_tag_seq = board_tag_seq;
 		this.board_image_seq = board_image_seq;
@@ -16,7 +16,7 @@ public class TagDTO {
 		this.top_position = top_position;
 	}
 
-	TagDTO() {
+	public TagDTO() {
 		super();
 	}
 

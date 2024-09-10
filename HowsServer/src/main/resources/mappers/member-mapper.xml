@@ -82,16 +82,31 @@
 
 	<!-- 회원정보 수정 -->
 	<update id="updateInfo">
-		update member set
-		nickname = #{nickname},
-		email =
-		#{email},
-		phone = #{phone},
-		zip_code = #{zip_code},
-		address = #{address},
-		detail_address = #{detail_address}
+		update member 
+		set	nickname = #{nickname},
+			email = #{email},
+			phone = #{phone},
+			zip_code = #{zip_code},
+			address = #{address},
+			detail_address = #{detail_address}
 		where member_id = #{member_id}
 	</update>
+	
+	<!-- 프로필 이미지 업데이트 -->
+    <update id="updateProfileImage">
+        update member set member_avatar = #{member_avatar} where member_seq = ${member_seq}
+    </update>
+    
+    <!--  현재 프로필 사진 URL 가져오기 -->
+	<select id="getProfileImageUrl" resultType="String">
+	    select member_avatar from member where member_seq = ${member_seq}
+	</select>
+	
+	<!-- 프로필 삭제 시 member_avatar => null  -->
+	<update id="updateProfileImageToNull">
+	    update member set member_avatar = null where member_seq = ${member_seq}
+	</update>
+	
 
 	<!-- 비밀번호 변경 시 기존 비밀번호 확인 -->
 	<select id="getPasswordById" resultType="string">

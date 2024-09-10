@@ -2,71 +2,73 @@ import styles from "./Guestbook.module.css";
 import profile from "../../../../../assets/images/마이페이지_프로필사진.jpg";
 import { useMemberStore } from "../../../../../store/store";
 import { useEffect, useState, useRef } from 'react';
+import { useParams } from "react-router-dom";
+
 import { api } from "../../../../../config/config";
+import { format } from 'date-fns';
 
 
-export const Guestbook = ({ memberId }) => {
+export const Guestbook = () => {
 
     const { memberSeq, setMemberSeq } = useMemberStore();
     const [contents, setContents] = useState("");
-    const [change, setChange] = useState(false);
+    const [outputs, setOutputs] = useState([]); // 방문 글 상태 추가
+    const { member_id } = useParams();
     const inputRef = useRef(null);
+    const [change, setChange] = useState(false);
 
     // 페이지 로드 시 member_seq 받아오기
     useEffect(() => {
-        // 예시로 현재 사용자의 member_seq를 가져오는 API 호출
-        api.get(`/guestbook/findMemberSeq`, { params: { member_id: memberId } }).then((resp) => {
-            // const seq = resp.data.member_seq;
-            const seq = resp.data;
-
-            console.log("뭐니!!! : ", seq);
-
-            setMemberSeq(seq); // zustand에 memberSeq 저장
-        });
-    }, [setMemberSeq]); // 처음 렌더링 시 1회만 실행
+        if (member_id) {
+            api.get(`/guestbook/findMemberSeq`, { params: { member_id } }).then((resp) => {
+                console.log("member_seq : ", resp.data);
+                setMemberSeq(resp.data); // zustand에 memberSeq 저장
+            });
+        }
+    }, [member_id, setMemberSeq]);
 
 
-    // 글 작성
-    const handleInput = (e) => {
-        const htmlContent = e.target.innerHTML;
-        console.log("작성 : ", htmlContent);
-        setContents(htmlContent);
-    };
-
+    // "등록" 버튼
     const handleWriteBtn = () => {
+        const content = inputRef.current.innerText; // innerText 사용
         const requestBody = {
-            member_id: memberId,
             member_seq: memberSeq,
-            contents: contents
+            guestbook_contents: content
         };
 
-
-        console.log("seq; ", requestBody.member_seq);
-
+        // 데이터를 서버에 저장한 후 전체 목록 다시 불러오기
         api.post(`/guestbook/insert`, requestBody).then((resp) => {
+            if (resp.data > 0) {
+                api.get(`/guestbook/list`, { params: { member_seq: memberSeq } }).then((resp) => {
+                    setOutputs(resp.data);
+                });
+                setContents("");
+                inputRef.current.innerText = "";
+            }
+        });
+    };
 
-            console.log("결과 : ", resp.data);
+    // 전체 출력 
+    useEffect(() => {
+        if (memberSeq) {
+            api.get(`/guestbook/list`, { params: { member_seq: memberSeq } }).then((resp) => {
+                setOutputs(resp.data);
+            });
+        }
+    }, [memberSeq]);
 
-            // if (resp.data !== "") {
-            //     setChange((prev) => !prev);
-
-            //     if (inputRef.current) {
-            //         inputRef.current.innerHTML = ""; // div 내용 비우기
-            //         setContents("");
-            //     }
-            // }
+    const handleDelBtn = (guestbook_seq) => {
+        api.delete(`/guestbook/${guestbook_seq}`).then(resp => {
+            setOutputs(outputs.filter(output => output.guestbook_seq !== guestbook_seq));
+        }).catch(error => {
+            console.error("삭제 실패:", error);
         });
     }
-
-    // const write_date = new Date(user.guestbook_write_date);
-    // const write_currentDate = !isNaN(write_date)
-    //     ? format(write_date, "yyyy-MM-dd")
-    //     : "Invalid Date";
 
     return (
         <div className={styles.container}>
             <div className={styles.countContents}>
-                <span>3</span>
+                <span>{outputs.length}</span>
                 <span>개의 방문글</span>
             </div>
             {/* =================== */}
@@ -74,47 +76,40 @@ export const Guestbook = ({ memberId }) => {
                 <div className={styles.input}>
                     <img src={profile} alt="" />
                     <div
-                        // ref={inputRef} // ref 설정
+                        ref={inputRef} // ref 설정
                         className={styles.inputText}
                         contentEditable="true"
-                        onInput={handleInput}
                         suppressContentEditableWarning={true}
                     />
                     <button onClick={handleWriteBtn}>등록</button>
                 </div>
-                <div className={styles.output}>
-                    <img src={profile} />
-                    <div>
-                        <div className={styles.writer_writeDate}>
-                            <span>dobby111</span>
-                            <span> 2024-09-05 16:15</span>
-                        </div>
-                        <div className={styles.content}>내용입니다.</div>
-                    </div>
-                    <button>X</button>
-                </div>
-                <div className={styles.output}>
-                    <img src={profile} />
-                    <div>
-                        <div className={styles.writer_writeDate}>
-                            <span>dobby111</span>
-                            <span> 2024-09-05 16:15</span>
-                        </div>
-                        <div className={styles.content}>내용입니다.</div>
-                    </div>
-                    <button>X</button>
-                </div>
-                <div className={styles.output}>
-                    <img src={profile} />
-                    <div>
-                        <div className={styles.writer_writeDate}>
-                            <span>dobby111</span>
-                            <span> 2024-09-05 16:15</span>
-                        </div>
-                        <div className={styles.content}>내용입니다.</div>
-                    </div>
-                    <button>X</button>
-                </div>
+
+                {
+                    outputs.map((output, i) => {
+
+                        const write_date = new Date(output.guestbook_write_date);
+                        const write_currentDate = !isNaN(write_date)
+                            ? format(write_date, "yyyy-MM-dd HH:mm:ss")
+                            : "Invalid Date";
+
+                        return (
+                            <div className={styles.output} key={i} >
+                                <img src={profile} alt="" />
+                                <div>
+                                    <div className={styles.writer_writeDate}>
+                                        <span>{output.nickname}</span>
+                                        <span> {write_currentDate}</span>
+                                    </div>
+                                    <div className={styles.content}>{output.guestbook_contents}</div>
+                                </div>
+                                {/* 로그인된 사용자와 댓글 작성자가 같은 경우에만 X 버튼 표시 */}
+                                {output.member_seq === memberSeq && (
+                                    <button onClick={() => handleDelBtn(output.guestbook_seq)}>X</button>
+                                )}
+                            </div>
+                        )
+                    })
+                }
             </div>
         </div>
     );

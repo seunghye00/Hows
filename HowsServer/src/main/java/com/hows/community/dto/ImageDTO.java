@@ -9,7 +9,7 @@ public class ImageDTO {
 	private int image_order;
 	private List<TagDTO> tags;
 
-	ImageDTO(int board_image_seq, int board_seq, String image_url, int image_order, List<TagDTO> tags) {
+	public ImageDTO(int board_image_seq, int board_seq, String image_url, int image_order, List<TagDTO> tags) {
 		super();
 		this.board_image_seq = board_image_seq;
 		this.board_seq = board_seq;
@@ -17,8 +17,7 @@ public class ImageDTO {
 		this.image_order = image_order;
 		this.tags = tags;
 	}
-
-	ImageDTO() {
+	public ImageDTO() {
 		super();
 	}
 

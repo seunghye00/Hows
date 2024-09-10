@@ -6,6 +6,7 @@ import { ViewList } from './List/ViewList/ViewList'
 import { ModifyList } from './List/ModifyList/ModifyList'
 import { Delivery } from './Delivery/Delivery'
 import { Return } from './Return/Return'
+import { AddProduct } from './List/AddProduct/AddProduct'
 
 export const Product = () => {
     return (
@@ -25,6 +26,15 @@ export const Product = () => {
                     <>
                         <Title title={'상품 정보 수정'} />
                         <ModifyList />
+                    </>
+                }
+            />
+            <Route
+                path="/addProduct"
+                element={
+                    <>
+                        <Title title={'상품 등록'} />
+                        <AddProduct />
                     </>
                 }
             />

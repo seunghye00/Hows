@@ -1,7 +1,11 @@
 import styles from "./BuyList.module.css"
 import { addCommas } from "../../../../../commons/commons";
+import { TextBox } from "../TextBox/TextBox";
 
-export const BuyList = () => {
+export const BuyList = ({ data }) => {
+    // if (!data || data.length === 0) {
+    //     return <TextBox text="구매내역" />
+    // }
 
     const list = [
         {

@@ -1,19 +1,34 @@
 import { useState } from 'react';
 import styles from './DetailPage.module.css'
-import img from '../../../../../../assets/images/interior_1.jpg'
+import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
+import StarRating from '../../../../../../components/StarRating/StarRating';
+import { Modal } from '../../../../../../components/Modal/Modal';
+import { ImageSwiper } from '../../../../Communities/Main/Detail/ImageSwiper/ImageSwiper';
 
 export const DetailPage = () => {
+    // 모달창 상태
+    const [isModalOpen,setIsModalOpen] = useState(false);
+    const [preview,setPreview] = useState('');
 
-    // 초기 상태는 'info'
+    // 탭 메뉴 상태 
     const [activeTab, setActiveTab] = useState('info'); 
-
     const handleTabChange = (tabName) => {
         setActiveTab(tabName);
     };
 
+    // 모달창 열기
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    }
+    // 모달창 닫기
+    const handleCloseModal = () => {
+        setPreview('');
+        setIsModalOpen(false);
+    }
+
     return(
         <div className={styles.container}>
-            <div className={styles.buttons}>
+            <div className={styles.menu}>
                 <button onClick={() => handleTabChange('info')}>상품정보</button>
                 <button onClick={() => handleTabChange('reviews')}>리뷰</button>
                 <button onClick={() => handleTabChange('details')}>배송/환불</button>
@@ -24,20 +39,147 @@ export const DetailPage = () => {
                     {/* 상품 정보 내용 */}
                     <h2>상품 정보</h2>
                     <div>
-                        <img src={img}></img>
-                        <img src={img}></img>
-                        <img src={img}></img>
-                        <img src={img}></img>
+                        여기는 상품 정보.
                     </div>
                 </div>
                 )}
+
                 {activeTab === 'reviews' && (
                 <div className={styles.reviews}>
                     {/* 상품 리뷰 내용 */}
-                    <h2>상품 리뷰</h2>
-                    <div>여기는 리뷰 정보.</div>
+                    <div className={styles.reviewsBox}>
+                        <div className={styles.reviewsHeader}>
+                            <div>리뷰 11,111</div>
+                            <div onClick={handleOpenModal}>리뷰쓰기</div>
+                            {/* 모달 */}
+                            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                                <div className={styles.modalBox}>
+                                    <h2>리뷰 쓰기</h2>
+                                    <div><span>별점 평가</span> <StarRating/> </div>
+        
+                                    <h2>리뷰 작성</h2>
+                                    <div className={styles.reviewModal}>
+                                        <input type='text' placeholder='리뷰 제목' className={styles.reviewTitle}/>
+                                        <input type='text' placeholder='리뷰 내용' className={styles.reviewContent}/>
+                                        <button onClick={handleCloseModal}>완료</button> 
+                                    </div>
+                                </div>
+                            </Modal>
+                        </div>
+                        <div className={styles.reviewsStarRating}>
+                            <div><StarRating/>&nbsp;&nbsp;<span>4.8</span></div>
+                            <div>
+                                <ul>
+                                    <li>
+                                        5점&nbsp;&nbsp;1,000명
+                                    </li>
+                                    <li>
+                                        4점&nbsp;&nbsp;500명
+                                    </li>
+                                    <li>
+                                        3점&nbsp;&nbsp;50명
+                                    </li>
+                                    <li>
+                                        2점&nbsp;&nbsp;10명
+                                    </li>
+                                    <li>
+                                        1점&nbsp;&nbsp;1명
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className={styles.reviewsMain}>
+                            <div className={styles.option}>
+                                <div>베스트순</div>
+                                <div>최신순</div>
+                            </div>
+                            <div className={styles.reviewBox}>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 )}
+
                 {activeTab === 'details' && (
                 <div className={styles.details}>
                     {/* 상품 질문 내용 */}

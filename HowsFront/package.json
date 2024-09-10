@@ -28,6 +28,7 @@
         "react-responsive-carousel": "^3.2.23",
         "react-router-dom": "^6.26.1",
         "react-scripts": "5.0.1",
+        "react-star-ratings": "^2.3.0",
         "sweetalert2": "^11.12.4",
         "swiper": "^11.1.11",
         "uuid": "^10.0.0",

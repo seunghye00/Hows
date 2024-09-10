@@ -28,4 +28,6 @@ public class ProductDAO {
 	public ProductDTO getProductDetaile (String product_seq) throws Exception{
 		return myBatis.selectOne("Product.getProductDetaile", product_seq);
 	}
+	
+	// 신고 리뷰 조회 (관리자)
 }

@@ -28,4 +28,6 @@ public class ProductService {
 	public ProductDTO getProductByDetail (String product_seq) throws Exception {
 		return productDAO.getProductDetaile(product_seq);
 	}
+	
+	// 신고 리뷰 조회 (관리자)
 }

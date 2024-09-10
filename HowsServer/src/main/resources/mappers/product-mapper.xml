@@ -21,5 +21,7 @@
 		FROM PRODUCT
 		WHERE product_seq = #{product_seq}
     </select>
+    
+    <!-- 신고 리뷰 조회 (관리자) -->
 
 </mapper>

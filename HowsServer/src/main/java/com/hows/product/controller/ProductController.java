@@ -42,6 +42,9 @@ public class ProductController {
 		return ResponseEntity.ok(detaile);
 	}
 	
+	
+	// 신고 리뷰 조회 (관리자)
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

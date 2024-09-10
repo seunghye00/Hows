@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import com.hows.product.dao.LikesDAO;
 
 @Service
-public class LikesService {
+public class LikesService { 
 	@Autowired
 	private LikesDAO likesDAO;
 	

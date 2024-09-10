@@ -3,9 +3,11 @@ import styles from './DetailPage.module.css'
 import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
 import StarRating from '../../../../../../components/StarRating/StarRating';
 import { Modal } from '../../../../../../components/Modal/Modal';
-import { ImageSwiper } from '../../../../Communities/Main/Detail/ImageSwiper/ImageSwiper';
 
 export const DetailPage = () => {
+    // 선택된 별점 상태 관리
+    const [rating, setRating] = useState(0); 
+
     // 모달창 상태
     const [isModalOpen,setIsModalOpen] = useState(false);
     const [preview,setPreview] = useState('');
@@ -25,6 +27,26 @@ export const DetailPage = () => {
         setPreview('');
         setIsModalOpen(false);
     }
+
+
+    // 별점 변경 시 호출되는 함수
+    const handleRatingChange = (newRating) => {
+        setRating(newRating); // 새로운 별점 값 설정
+        console.log('별점', newRating);
+    };
+
+
+    const [data, setData] = useState({rating:0,review_title:'',review_contents:'',product_seq:''}) 
+    /**
+     * 	private int review_seq;
+	private int rating;
+	private String review_title;
+	private String review_contents;
+	private Timestamp review_date;
+	private int product_seq;
+	private String member_id;
+
+     */
 
     return(
         <div className={styles.container}>
@@ -55,11 +77,13 @@ export const DetailPage = () => {
                             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
                                 <div className={styles.modalBox}>
                                     <h2>리뷰 쓰기</h2>
-                                    <div><span>별점 평가</span> <StarRating/> </div>
+                                    <div>
+                                        <span>별점 평가</span> 
+                                        <StarRating rating={rating} onRatingChange={handleRatingChange} />
+                                    </div>
         
                                     <h2>리뷰 작성</h2>
                                     <div className={styles.reviewModal}>
-                                        <input type='text' placeholder='리뷰 제목' className={styles.reviewTitle}/>
                                         <input type='text' placeholder='리뷰 내용' className={styles.reviewContent}/>
                                         <button onClick={handleCloseModal}>완료</button> 
                                     </div>
@@ -273,3 +297,27 @@ export const DetailPage = () => {
         </div>
     )
 }
+
+
+// import React, { useState } from 'react';
+// import StarRating from './StarRating'; // 위에서 만든 컴포넌트 임포트
+
+// const App = () => {
+//     const [rating, setRating] = useState(0); // 선택된 별점 상태 관리
+
+//     // 별점 변경 시 호출되는 함수
+//     const handleRatingChange = (newRating) => {
+//         setRating(newRating); // 새로운 별점 값 설정
+//         console.log('선택한 별점:', newRating);
+//     };
+
+//     return (
+//         <div>
+//             <span>별점 평가</span>
+//             <StarRating rating={rating} onRatingChange={handleRatingChange} />
+//             <p>선택한 별점: {rating}</p>
+//         </div>
+//     );
+// };
+
+// export default App;

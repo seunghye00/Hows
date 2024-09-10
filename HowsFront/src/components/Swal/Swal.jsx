@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2'
 
-export const Swal = ({ type, text }) => {
+export const SwalComp = ({ type, text }) => {
     // type 종류 : success, error, confirm, warning, question
 
     switch (type) {

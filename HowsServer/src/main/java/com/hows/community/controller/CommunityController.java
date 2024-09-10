@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.hows.File.service.FileService; // FileService 클래스 import
 import com.hows.community.dto.CommunityDTO; // CommunityDTO import
 import com.hows.community.dto.ImageDTO; // ImageDTO import
@@ -33,15 +32,15 @@ import com.hows.community.service.CommunityService; // CommunityService import
 @RequestMapping("/community")
 public class CommunityController {
     @Autowired
-    private CommunityService communityService;
+    private CommunityService communityServ;
 
     @Autowired
-    private FileService fileService;
+    private FileService fileServ;
 
     // 게시글 저장
     @PostMapping
     public ResponseEntity<Integer> insertWrite(@RequestBody CommunityDTO dto) {
-        int board_seq = communityService.insertWrite(dto);
+        int board_seq = communityServ.insertWrite(dto);
         System.out.println(board_seq + " 현재 시퀀스 값");
         return ResponseEntity.ok(board_seq);
     }
@@ -57,7 +56,7 @@ public class CommunityController {
         try {
             // 1. FileService를 통해 GCS에 이미지 업로드
             String code = "F2"; // 커뮤니티 코드 (필요에 따라 변경 가능)
-            String uploadResult = fileService.upload(file, board_seq, code); 
+            String uploadResult = fileServ.upload(file, board_seq, code); 
             System.out.println(uploadResult + " 업로드 결과 확인");
 
             // 2. 이미지가 성공적으로 업로드되었다면 sysname을 image_url에 저장
@@ -68,7 +67,7 @@ public class CommunityController {
                 imageDTO.setImage_order(image_order);
 
                 // 3. 이미지 정보 DB에 저장
-                int board_image_seq = communityService.insertImage(imageDTO);
+                int board_image_seq = communityServ.insertImage(imageDTO);
                 System.out.println("저장된 이미지 시퀀스: " + board_image_seq);
 
                 // 4. 태그 데이터 처리 (tagsJson을 JSON으로 파싱)
@@ -76,7 +75,7 @@ public class CommunityController {
                 if (tags != null && !tags.isEmpty()) {
                     for (TagDTO tag : tags) {
                         tag.setBoard_image_seq(board_image_seq);
-                        communityService.insertTag(tag); // 태그 DB에 저장
+                        communityServ.insertTag(tag); // 태그 DB에 저장
                     }
                 }
             }
@@ -102,8 +101,8 @@ public class CommunityController {
     // 커뮤니티 게시글 불러오는 메서드
     @GetMapping
     public ResponseEntity<List<Map<String, Object>>> selectAll() {
-        List<Map<String, Object>> list = communityService.selectAll();
-        List<Map<String, Object>> listImg = communityService.selectAllImg();
+        List<Map<String, Object>> list = communityServ.selectAll();
+        List<Map<String, Object>> listImg = communityServ.selectAllImg();
 
         Map<Integer, List<String>> imageMap = new HashMap<>();
         for (Map<String, Object> imgData : listImg) {
@@ -129,9 +128,9 @@ public class CommunityController {
     
     // 커뮤니티 디테일
     @GetMapping("/{board_seq}")
-    public ResponseEntity<Void> selectAllSeq(@PathVariable int board_seq) {
-        System.out.println("Request received for board_seq: " + board_seq);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Map<String, Object>> selectAllSeq(@PathVariable int board_seq) {
+    	Map<String, Object> boardDetail = communityServ.selectAllSeq(board_seq);
+        return ResponseEntity.ok(boardDetail);
     }
 
     @ExceptionHandler(Exception.class)

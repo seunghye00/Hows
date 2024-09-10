@@ -33,11 +33,7 @@ export const Detail = () => {
                     `${host}/community/${board_seq}`
                 )
                 setPostData(response.data)
-                console.log(response.data)
-                setLikeCount(response.data.likeCount) // example of setting initial data
-                setViewCount(response.data.viewCount)
-                setBookmarkCount(response.data.bookmarkCount)
-                setComments(response.data.comments)
+                console.log(response.data + '데이터 값 확인')
             } catch (error) {
                 console.error('Error fetching post data:', error)
             }
@@ -58,6 +54,7 @@ export const Detail = () => {
     }
 
     // 링크 복사 기능 구현
+    // 링크 복사 기능 구현
     const copyLinkToClipboard = () => {
         const dummyLink = window.location.href // 현재 URL
         navigator.clipboard.writeText(dummyLink).then(() => {
@@ -71,63 +68,67 @@ export const Detail = () => {
         })
     }
 
-    if (!postData) {
-        return <div>Loading...</div> // Show loading state while data is being fetched
-    }
-
     return (
         <div className={styles.container}>
-            {/* 프로필 섹션 */}
-            <ProfileSection profileData={postData.profile} />
+            {/* postData가 null이 아닐 때만 렌더링 */}
+            {postData && (
+                <>
+                    {/* 프로필 섹션 */}
+                    <ProfileSection profileData={postData} />
+                    {/* 이미지 섹션 */}
+                    <div className={styles.imageSection}>
+                        <ImageSwiper images={postData} />
+                    </div>
+                    {/* 상품 태그 섹션 */}
+                    <div className={styles.productTagSection}>
+                        <ProductTagSwiper tags={postData} />
+                    </div>
+                    {/* 게시글 상단 */}
+                    <div className={styles.postActions}>
+                        <div className={styles.likesViewBook}>
+                            <div onClick={toggleLike}>
+                                <i
+                                    className={
+                                        isLiked ? 'bx bxs-heart' : 'bx bx-heart'
+                                    }
+                                ></i>
+                                {postData.LIKE_COUNT}
+                            </div>
+                            <div onClick={toggleBookmark}>
+                                <i
+                                    className={
+                                        isBookmarked
+                                            ? 'bx bxs-bookmark'
+                                            : 'bx bx-bookmark'
+                                    }
+                                ></i>
+                                {postData.BOOKMARK_COUNT}
+                            </div>
+                            <div>
+                                <i className="bx bx-show"></i>{' '}
+                                {postData.VIEW_COUNT}
+                            </div>
+                        </div>
+                        <div className={styles.subMitLink}>
+                            <div
+                                className={styles.Link}
+                                onClick={copyLinkToClipboard}
+                            >
+                                <i className="bx bx-link"></i>
+                            </div>
+                            <div onClick={() => setIsModalOpen(true)}>
+                                <PiSiren />
+                                신고하기
+                            </div>
+                        </div>
+                    </div>
 
-            {/* 이미지 섹션 */}
-            <div className={styles.imageSection}>
-                <ImageSwiper images={postData.images} />
-            </div>
-
-            {/* 상품 태그 섹션 */}
-            <div className={styles.productTagSection}>
-                <ProductTagSwiper tags={postData.productTags} />
-            </div>
-
-            {/* 게시글 상단 */}
-            <div className={styles.postActions}>
-                <div className={styles.likesViewBook}>
-                    <div onClick={toggleLike}>
-                        <i
-                            className={isLiked ? 'bx bxs-heart' : 'bx bx-heart'}
-                        ></i>
-                        {likeCount}
+                    {/* 게시글 콘텐츠 */}
+                    <div className={styles.mainContent}>
+                        <p>{postData.BOARD_CONTENTS}</p>
                     </div>
-                    <div onClick={toggleBookmark}>
-                        <i
-                            className={
-                                isBookmarked
-                                    ? 'bx bxs-bookmark'
-                                    : 'bx bx-bookmark'
-                            }
-                        ></i>
-                        {bookmarkCount}
-                    </div>
-                    <div>
-                        <i className="bx bx-show"></i> {viewCount}
-                    </div>
-                </div>
-                <div className={styles.subMitLink}>
-                    <div className={styles.Link} onClick={copyLinkToClipboard}>
-                        <i className="bx bx-link"></i>
-                    </div>
-                    <div onClick={() => setIsModalOpen(true)}>
-                        <PiSiren />
-                        신고하기
-                    </div>
-                </div>
-            </div>
-
-            {/* 게시글 콘텐츠 */}
-            <div className={styles.mainContent}>
-                <p>{postData.content}</p>
-            </div>
+                </>
+            )}
 
             {/* 댓글 작성 영역 */}
             <div className={styles.commentInput}>
@@ -140,36 +141,6 @@ export const Detail = () => {
                     name="comment_contents"
                     className={styles.replyArea}
                 ></input>
-            </div>
-
-            {/* 댓글 리스트 */}
-            <div className={styles.commentsSection}>
-                {comments.map(comment => (
-                    <div key={comment.comment_seq} className={styles.comment}>
-                        <div className={styles.replyImg}>
-                            <img src={comment.member_avatar} alt="" />
-                        </div>
-                        <div className={styles.replyInfo}>
-                            <div className={styles.userName}>
-                                {comment.nickname}
-                            </div>
-                            <p>{comment.text}</p>
-                            <div className={styles.commentActions}>
-                                <span>
-                                    <i className="bx bxs-like"></i>{' '}
-                                    {comment.likes}
-                                </span>
-                                <span>
-                                    <i className="bx bx-message"></i> 답글달기
-                                </span>
-                                <span>
-                                    <PiSiren />
-                                    신고하기
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                ))}
             </div>
 
             {/* 신고 모달 */}
@@ -200,7 +171,6 @@ export const Detail = () => {
                     />
                 </div>
             </Modal>
-
             <ScrollTop />
         </div>
     )

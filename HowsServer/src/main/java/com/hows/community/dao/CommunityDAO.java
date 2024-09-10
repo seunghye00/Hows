@@ -36,8 +36,14 @@ public class CommunityDAO {
     public List<Map<String, Object>> selectAll() {
     	return mybatis.selectList("Community.selectAll");
     }
+    
     // 게시글 리스트 이미지 출력
     public List<Map<String, Object>> selectAllImg() {
     	return mybatis.selectList("Community.selectAllImg");
+    }
+    
+    // 게시글 리스트 이미지 출력
+    public Map<String, Object> selectAllSeq(int board_seq) {
+    	return mybatis.selectOne("Community.selectAllSeq", board_seq);
     }
 }

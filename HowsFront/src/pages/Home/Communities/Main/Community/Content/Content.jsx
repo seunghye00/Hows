@@ -26,14 +26,7 @@ export const Content = () => {
             const resp = await axios.get(`${host}/community`, {
                 params: { page, limit }, // 페이지와 limit를 서버로 전달
             })
-
-            console.log(
-                'Fetched data for page:',
-                page,
-                'Length:',
-                resp.data.length
-            )
-
+            console.log(resp.data)
             // 페이지에 받아온 데이터의 길이가 limit보다 작다면 더 이상 불러올 데이터가 없음
             if (resp.data.length < limit || resp.data.length === 0) {
                 setHasMore(false) // 데이터가 없으면 스크롤 멈춤

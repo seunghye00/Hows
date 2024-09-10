@@ -44,6 +44,8 @@ export const requestPaymentEvent = async(payment, orderInfo) => {
       console.log("res ===== ", res);
   });
 
+  return "ok";
+
   // addOrder(orderInfo).then(res => {
   //   const paymentResult = {
   //     ...response,
@@ -56,7 +58,7 @@ export const requestPaymentEvent = async(payment, orderInfo) => {
   //   }
   //   else {
   //     // 결제 실패
-  //     return null;
+  //     return "fail";
   //   }
   // });
 }

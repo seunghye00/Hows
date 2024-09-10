@@ -1,5 +1,8 @@
 package com.hows.community.service;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,5 +30,14 @@ public class CommunityService {
    public void insertTag(TagDTO tagDTO) {
        communityDAO.insertTag(tagDTO);
    }
-    
+   
+   // 게시글 리스트 출력   
+   public List<Map<String, Object>> selectAll() {
+	   return communityDAO.selectAll();
+   }
+   
+   // 게시글 리스트 이미지 출력
+   public List<Map<String, Object>> selectAllImg() {
+	   return communityDAO.selectAllImg();
+   }
 }

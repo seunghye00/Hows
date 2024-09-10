@@ -528,7 +528,7 @@ create table payment (
     order_seq number not null,
     payment_code char(2) not null,
     payment_price number not null,    
-    payment_date timestamp,
+    payment_date timestamp default sysdate,
     payment_id varchar2(100) not null
 );
 

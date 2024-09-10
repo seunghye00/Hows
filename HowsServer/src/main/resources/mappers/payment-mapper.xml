@@ -14,4 +14,23 @@
             member_id = #{id}
     </select>
 
+    <insert id="addPayment">
+        INSERT INTO
+            payment
+        VALUES (
+            payment_seq.nextval,
+            #{member_seq},
+            #{order_seq},
+            #{payment_code},
+            #{payment_price},
+            <if test="payment_code == 'P1'">
+                null,
+            </if>
+            <if test="payment_code != 'P1'">
+                sysdate,
+            </if>
+            #{payment_id}
+        )
+    </insert>
+
 </mapper>

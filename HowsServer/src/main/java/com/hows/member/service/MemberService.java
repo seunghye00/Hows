@@ -47,26 +47,22 @@ public class MemberService implements UserDetailsService {
 	public boolean checkEmail(String email) {
 		return memDao.checkEmail(email);
 	}
-	
+
 	// [로그인]비밀번호 찾기 - 비밀번호 변경
 	public int changePw(Map<String, String> map) {
 		return memDao.changePw(map);
 	}
-	
-	
+
 	// 회원정보 가져오기
 	@Override
 	public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		MemberDTO dto = memDao.findById(username);
 
-		if(dto == null) throw new UsernameNotFoundException("User not found");
+		if (dto == null)
+			throw new UsernameNotFoundException("User not found");
 
-		return new CustomUserDetails(
-				dto.getMember_id(),
-				dto.getPw(),
-				AuthorityUtils.createAuthorityList(dto.getRole_code()),
-				dto.getMember_seq()
-		);
+		return new CustomUserDetails(dto.getMember_id(), dto.getPw(),
+				AuthorityUtils.createAuthorityList(dto.getRole_code()), dto.getMember_seq());
 	}
 
 	// 아이디 찾기
@@ -89,7 +85,6 @@ public class MemberService implements UserDetailsService {
 		return memDao.updateInfo(dto);
 	}
 
-
 	// 비밀번호 변경시 기존 비밀번호 확인
 	public String getPasswordById(HashMap<String, String> map) {
 		return memDao.getPasswordById(map);
@@ -101,21 +96,24 @@ public class MemberService implements UserDetailsService {
 	}
 
 	// 회원탈퇴
-	public int deleteUser(String member_id){
+	public int deleteUser(String member_id) {
 		return memDao.deleteUser(member_id);
 	}
-	
+
 	// [방명록] 방명록 작성 위한 member_seq 뽑기
 	public int findMemberSeq(String member_id) {
-        return memDao.findMemberSeq(member_id); 
-    }
-	
-	
-	
-	//========================================[ 관리자 ]
+		return memDao.findMemberSeq(member_id);
+	}
+
+	// ========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
-	public List<MemberDTO> selectAll() {
-		return memDao.selectAll();
+	public List<MemberDTO> selectAll(Map<String, Object> params) {
+		return memDao.selectAll(params);
+	}
+
+	// 전체 회원 수 조회 (관리자)
+	public int selectMemberCount(Map<String, Object> params) {
+		return memDao.selectMemberCount(params);
 	}
 
 	// 회원 상세조회 (관리자)
@@ -135,7 +133,7 @@ public class MemberService implements UserDetailsService {
 
 	// 등급 업데이트 (관리자)
 	public int updateGrade(String member_id, String grade_code) {
-	    return memDao.updateGrade(member_id, grade_code);
+		return memDao.updateGrade(member_id, grade_code);
 	}
 
 	// 역할 업데이트 (관리자)
@@ -154,8 +152,13 @@ public class MemberService implements UserDetailsService {
 	}
 
 	// 블랙리스트 조회 (관리자)
-	public List<MemberDTO> selectBlacklist() {
-		return memDao.selectBlacklist();
+	public List<MemberDTO> selectBlacklist(Map<String, Object> params) {
+		return memDao.selectBlacklist(params);
+	}
+
+	// 블랙리스트 수 카운트 (관리자)
+	public int selectBlacklistCount(Map<String, Object> params) {
+		return memDao.selectBlacklistCount(params);
 	}
 
 	// 블랙리스트 수정 (관리자)

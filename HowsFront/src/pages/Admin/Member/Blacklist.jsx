@@ -12,34 +12,66 @@ import {
 } from '../../../api/member'
 
 export const Blacklist = () => {
-    const [blacklistMembers, setBlacklistMembers] = useState([])
-    const [searchResults, setSearchResults] = useState([])
-    const [selectedFilter, setSelectedFilter] = useState('전체')
-    const [selectedMember, setSelectedMember] = useState(null)
-    const [modalOpen, setModalOpen] = useState(false)
+    const [blacklistMembers, setBlacklistMembers] = useState([]) // 기본값을 빈 배열로 설정
+    const [searchTerm, setSearchTerm] = useState('') // 검색어 상태 추가
+    const [chosung, setChosung] = useState('전체') // 초성 필터 상태 추가
+    const [page, setPage] = useState(1) // 현재 페이지 상태
+    const [totalMembers, setTotalMembers] = useState(0) // 전체 회원 수 저장
+    const itemsPerPage = 10 // 페이지당 보여줄 항목 수
+    const [searchResults, setSearchResults] = useState([]) // 검색 결과 상태 추가
+
+    const [selectedMember, setSelectedMember] = useState(null) // 선택된 멤버 상태
+    const [modalOpen, setModalOpen] = useState(false) // 모달 상태
+
+    // 페이지에 따른 startRow와 endRow 계산
+    const startRow = (page - 1) * itemsPerPage + 1
+    const endRow = page * itemsPerPage
 
     // 블랙리스트 데이터를 서버로부터 가져오기
     useEffect(() => {
         const fetchBlacklist = async () => {
             try {
-                const response = await selectBlacklist()
-                setBlacklistMembers(response.data) // 서버에서 가져온 데이터를 저장
+                const response = await selectBlacklist(
+                    startRow,
+                    endRow,
+                    chosung,
+                    searchTerm
+                )
+                console.log('Fetched blacklist members:', response.data) // 콘솔에서 데이터를 확인
+                setBlacklistMembers(response.data.blacklist || []) // 데이터가 없으면 빈 배열을 설정
+                setTotalMembers(response.data.totalCount || 0) // 전체 블랙리스트 회원 수 저장
             } catch (error) {
                 console.error(
                     '블랙리스트 데이터를 가져오는 중 오류 발생:',
                     error
                 )
+                setBlacklistMembers([]) // 오류 발생 시 빈 배열을 설정
             }
         }
         fetchBlacklist()
-    }, [])
+    }, [chosung, searchTerm, page])
+
+    // 검색 기능 처리
+    const handleSearch = query => {
+        setSearchTerm(query) // 검색어 상태 업데이트
+    }
+
+    // 초성 필터 변경 처리
+    const handleFilterClick = filter => {
+        setChosung(filter) // 초성 필터 상태 업데이트
+    }
+
+    // 페이지 변경 처리
+    const handlePageChange = pageNumber => {
+        setPage(pageNumber)
+    }
 
     // 모달 열기 및 회원 상세 조회 API 호출
     const openModal = member_id => {
         detailMember(member_id)
             .then(resp => {
-                setSelectedMember(resp.data)
-                setModalOpen(true)
+                setSelectedMember(resp.data) // 멤버 상세 정보를 저장
+                setModalOpen(true) // 모달 열기
             })
             .catch(error => console.error('회원 상세 조회 실패:', error))
     }
@@ -84,24 +116,6 @@ export const Blacklist = () => {
         }
     }
 
-    // 검색 기능 구현
-    const handleSearch = query => {
-        const results = blacklistMembers.filter(
-            member =>
-                member.name.includes(query) || member.member_id.includes(query)
-        )
-        setSearchResults(results)
-    }
-
-    const handleFilterClick = filter => {
-        setSelectedFilter(filter)
-        // 필터 클릭 시 처리할 로직 추가 가능
-    }
-
-    // 검색 결과가 있으면 그 결과를, 없으면 전체 리스트를 보여줌
-    const displayMembers =
-        searchResults.length > 0 ? searchResults : blacklistMembers
-
     return (
         <div className={styles.memberContainer}>
             <div className={styles.headerSection}>
@@ -126,7 +140,7 @@ export const Blacklist = () => {
                         <span
                             key={index}
                             className={`${styles.filterItem} ${
-                                selectedFilter === filter ? styles.selected : ''
+                                chosung === filter ? styles.selected : ''
                             }`}
                             onClick={() => handleFilterClick(filter)}
                         >
@@ -151,8 +165,8 @@ export const Blacklist = () => {
                     <div className={styles.headerItem}>해제</div>
                 </div>
 
-                {displayMembers.length > 0 ? (
-                    displayMembers.map((member, index) => (
+                {blacklistMembers.length > 0 ? (
+                    blacklistMembers.map((member, index) => (
                         <div
                             className={styles.memberRow}
                             key={index}
@@ -174,10 +188,9 @@ export const Blacklist = () => {
                                 <Button
                                     size="s"
                                     title="해제"
-                                    onClick={e => {
-                                        e.stopPropagation() // 모달과 충돌 방지
+                                    onClick={() =>
                                         updateBlacklist(member.member_id)
-                                    }}
+                                    }
                                 />
                             </div>
                         </div>
@@ -187,8 +200,14 @@ export const Blacklist = () => {
                 )}
             </div>
 
+            {/* 페이지네이션 컴포넌트 */}
             <div className={styles.pagination}>
-                <Paging />
+                <Paging
+                    page={page}
+                    count={totalMembers}
+                    perpage={itemsPerPage}
+                    setPage={handlePageChange}
+                />
             </div>
 
             {/* 상세 모달 */}

@@ -15,8 +15,15 @@ export const adminstart = () => {
 /************************************  [ 관리자 기능 ] /************************************/
 
 // 전체 회원 조회
-export const selectAll = () => {
-    return axios.get(`${baseUrl}/all`)
+export const selectAll = (startRow, endRow, chosung = '', searchTerm = '') => {
+    return axios.get(`${baseUrl}/all`, {
+        params: {
+            startRow,
+            endRow,
+            chosung,
+            searchTerm,
+        },
+    })
 }
 
 // 회원 상세 조회
@@ -58,8 +65,20 @@ export const addBlacklist = ({ member_id, blacklist_reason_code }) => {
 }
 
 // 블랙리스트 조회
-export const selectBlacklist = () => {
-    return axios.get(`${baseUrl}/blacklist`)
+export const selectBlacklist = (
+    startRow,
+    endRow,
+    chosung = '',
+    searchTerm = ''
+) => {
+    return axios.get(`${baseUrl}/blacklist`, {
+        params: {
+            startRow,
+            endRow,
+            chosung,
+            searchTerm,
+        },
+    })
 }
 
 // 블랙리스트 수정 (블랙리스트 해제)

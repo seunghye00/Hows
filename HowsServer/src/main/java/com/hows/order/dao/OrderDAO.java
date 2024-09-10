@@ -2,6 +2,7 @@ package com.hows.order.dao;
 
 import java.util.List;
 
+import com.hows.order.dto.OrderListDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,8 +27,8 @@ public class OrderDAO {
     }
 
     /** 주문 목록 등록 **/
-    public int addOrderList(){
-        return mybatis.insert("Order.addOrderList");
+    public int addOrderList(OrderListDTO orderListDTO){
+        return mybatis.insert("Order.addOrderList", orderListDTO);
     }
 
     /** 주문 수정 **/

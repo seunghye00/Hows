@@ -1,12 +1,12 @@
 package com.hows.order.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import com.hows.order.dto.OrderDTO;
@@ -40,9 +40,9 @@ public class OrderController {
 	}
 
 	@PostMapping
-	public ResponseEntity<String> addOrder(@AuthenticationPrincipal CustomUserDetails user, @RequestBody OrderDTO orderDTO) throws Exception {
-		orderDTO.setMember_seq(user.getMemberSeq());
-		String result = orderServ.addOrder(orderDTO);
+	public ResponseEntity<Integer> addOrder(@AuthenticationPrincipal CustomUserDetails user, @RequestBody Map<String, Object> map) throws Exception {
+//		int result = orderServ.addOrder(map, user.getMemberSeq());
+		int result = orderServ.addOrder(map, 1);
 		return ResponseEntity.ok(result);
 	}
 

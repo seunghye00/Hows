@@ -84,11 +84,19 @@ export const Payment = () => {
 
     // Order API
     // 1. 주문 내용
+    // order_seq 뽑아와야됨 총 가격 보내면 됨 totalAmount
+    console.log("totalAmount ==== ", totalAmount)
     // 2. 주문한 상품 목록
+    // 상품 번호, 상품 수량, 가격 보내면 됨
+    console.log("orderProducts ====== ", orderProducts);
+    const orderInfo = {
+      totalAmount,
+      orderProducts
+    }
 
-    const param = { paymentId, orderName, totalAmount, payMethod, customer };
+    const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
     setPaymentInfo({ orderName, totalAmount });
-    const result = await requestPaymentEvent(param);
+    const result = await requestPaymentEvent(paymentInfo, orderName, totalAmount, orderInfo);
     if(result === "ok") {
 
       // Payment API

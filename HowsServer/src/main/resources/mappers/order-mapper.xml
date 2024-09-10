@@ -46,6 +46,18 @@
 		)
 	</insert>
 
+	<insert id="addOrderList">
+		INSERT INTO
+			order_list
+		VALUES (
+			order_list_seq.nextval,
+			#{order_seq},
+			#{product_seq},
+			#{order_list_count},
+			#{order_list_price}
+		)
+	</insert>
+
 	<update id="updateOrder">
 		UPDATE
 			orders

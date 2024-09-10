@@ -16,10 +16,13 @@ export const Main = () => {
     const location = useLocation();
 
     const [user, setUser] = useState([]);
+    const [memberId, setMemberId] = useState(null);
+
 
     useEffect(() => {
-        const memberId = sessionStorage.getItem('member_id');
-        if (memberId) {
+        const storedMemberId = sessionStorage.getItem('member_id');
+        if (storedMemberId) {
+            setMemberId(storedMemberId); // 상태 업데이트
             api.get(`/member/selectInfo`).then((resp) => {
                 console.log("데이터 : ", resp.data);
                 setUser(resp.data);
@@ -102,13 +105,11 @@ export const Main = () => {
                         <Route path="/" element={<Navigate to="post" replace />} />
                         <Route path="post" element={<Post />} />
                         <Route path="scrap" element={<Scrap />} />
-                        <Route path="guestbook" element={<Guestbook />} />
+                        <Route path="guestbook" element={<Guestbook memberId={memberId} />} />
                     </Routes>
 
                 </div>
             </div>
-
-
         </div >
     );
 };

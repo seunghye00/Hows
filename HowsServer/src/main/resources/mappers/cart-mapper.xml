@@ -34,7 +34,7 @@
             cart c
             JOIN product p ON c.product_seq = p.product_seq
         WHERE
-            id = #{id}
+            member_seq = #{member_seq}
     </select>
 
     <insert id="addCart">

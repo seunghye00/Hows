@@ -1,8 +1,10 @@
-import PortOne from "@portone/browser-sdk/v2";
-import axios from "axios";
-import {api, host} from "../config/config";
+import {api} from "../config/config";
+import {addOrder} from "./order";
 
-const baseUrl = `${host}/payment`
+// 결제 추가
+export const addPayment = (payment) => {
+  return api.post(`/payment/complete`, payment)
+}
 
 /** 결제 시스템 ( PortOne ) **/
 export const requestPaymentEvent = async(payment, orderInfo) => {
@@ -31,14 +33,20 @@ export const requestPaymentEvent = async(payment, orderInfo) => {
     txId:"0191d583-3f51-d60d-79ee-73eb634b4911"
   }
 
-  const orderSeq = await api.post(`/order`, orderInfo);
-  const paymentResult = {
-    ...response,
-    orderName,
-    totalAmount,
-    orderSeq
-  }
-  if(orderSeq > 0) return api.post(`/payment/complete`, paymentResult);
-  else return null;
-
+  addOrder(orderInfo).then(res => {
+    const paymentResult = {
+      ...response,
+      orderName,
+      totalAmount,
+      orderSeq: res.data
+    }
+    if(res.data > 0) {
+      return addPayment(paymentResult);
+    }
+    else {
+      // 결제 실패
+      return null;
+    }
+  });
 }
+

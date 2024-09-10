@@ -2,6 +2,7 @@ package com.hows.cart.controller;
 
 import com.hows.cart.dto.CartDTO;
 import com.hows.cart.service.CartService;
+import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,9 +21,9 @@ public class CartController {
     private CartService cartServ;
 
     @GetMapping
-    public ResponseEntity<List<HashMap<String, Object>>> cartList(@AuthenticationPrincipal UserDetails user) {
+    public ResponseEntity<List<HashMap<String, Object>>> cartList(@AuthenticationPrincipal CustomUserDetails user) {
         try{
-            List<HashMap<String, Object>> list = cartServ.cartList(user.getUsername());
+            List<HashMap<String, Object>> list = cartServ.cartList(user.getMemberSeq());
             return ResponseEntity.ok(list);
 
         } catch (Exception e){

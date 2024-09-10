@@ -16,8 +16,8 @@ public class CartService {
     private CartDAO cartDAO;
 
     /** 상품 목록 **/
-    public List<HashMap<String, Object>> cartList(String id) {
-        return cartDAO.cartList(id);
+    public List<HashMap<String, Object>> cartList(int memberSeq) {
+        return cartDAO.cartList(memberSeq);
     }
 
     /** 상품 추가 **/

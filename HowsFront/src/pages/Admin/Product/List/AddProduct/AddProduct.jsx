@@ -127,12 +127,12 @@ export const AddProduct = () => {
         formData.append('product_category_code', product.product_category_code)
         formData.append('product_contents', product.product_contents)
 
-        selectedFiles.forEach((file, index) => {
-            formData.append(`images[${index}]`, file)
+        selectedFiles.forEach(file => {
+            formData.append('images', file, file.name)
         })
 
         // 대표 이미지가 선택된 경우
-        formData.append('thumNailIndex', selectedImage) // selectedImage의 index만 전송
+        formData.append('thumbNailIndex', selectedImage) // selectedImage의 index만 전송
 
         // 서버에 데이터를 전송하는 로직
         addProduct(formData)
@@ -144,7 +144,7 @@ export const AddProduct = () => {
                     confirmButtonText: '확인',
                 })
 
-                navi('/admin/product/viewList')
+                // navi('/admin/product/viewList')
             })
             .catch(error => {
                 console.error('업로드 실패 :', error)

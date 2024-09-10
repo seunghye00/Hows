@@ -10,6 +10,7 @@ public class PaymentDTO {
     private String payment_code;
     private int payment_price;
     private Timestamp payment_date;
+    private String payment_id;
 
     public int getPayment_seq() {
         return payment_seq;
@@ -59,14 +60,31 @@ public class PaymentDTO {
         this.payment_date = payment_date;
     }
 
+    public String getPayment_id() {
+        return payment_id;
+    }
+
+    public void setPayment_id(String payment_id) {
+        this.payment_id = payment_id;
+    }
+
     public PaymentDTO() {}
 
-    public PaymentDTO(int payment_seq, int member_seq, int order_seq, String payment_code, int payment_price, Timestamp payment_date) {
+    public PaymentDTO(int member_seq, int order_seq, String payment_code, int payment_price, String payment_id) {
+        this.member_seq = member_seq;
+        this.order_seq = order_seq;
+        this.payment_code = payment_code;
+        this.payment_price = payment_price;
+        this.payment_id = payment_id;
+    }
+
+    public PaymentDTO(int payment_seq, int member_seq, int order_seq, String payment_code, int payment_price, Timestamp payment_date, String payment_id) {
         this.payment_seq = payment_seq;
         this.member_seq = member_seq;
         this.order_seq = order_seq;
         this.payment_code = payment_code;
         this.payment_price = payment_price;
         this.payment_date = payment_date;
+        this.payment_id = payment_id;
     }
 }

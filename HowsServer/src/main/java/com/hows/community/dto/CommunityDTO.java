@@ -18,7 +18,7 @@ public class CommunityDTO {
 	private String member_id;
 	private List<ImageDTO> images;
 
-	CommunityDTO(int board_seq, String board_title, String board_contents, Timestamp board_wirte_date, int view_count,
+	public CommunityDTO(int board_seq, String board_title, String board_contents, Timestamp board_wirte_date, int view_count,
 			String housing_type_code, String space_type_code, String area_size_code, String color_code,
 			String member_id, List<ImageDTO> images) {
 		super();
@@ -35,7 +35,7 @@ public class CommunityDTO {
 		this.images = images;
 	}
 
-	CommunityDTO() {
+	public CommunityDTO() {
 		super();
 	}
 

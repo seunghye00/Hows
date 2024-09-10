@@ -28,29 +28,22 @@ public class OrderService {
     /** 주문 등록 **/
     @Transactional
     public int addOrder(Map<String, Object> map, int memberSeq) {
-        System.out.println("totalAmount ==== " + (int) map.get("totalAmount"));
-        System.out.println("member seq ===== " + memberSeq);
-
         try {
             int orderSeq = orderDAO.addOrder(new OrderDTO(memberSeq, (int) map.get("totalAmount")));
-            System.out.println("order seq ===== " + orderSeq);
 
             /** 주문 목록 등록 **/
-            List<Map<String, ?>> param = new ArrayList<>();
-            param =  (List<Map<String, ?>>) map.get("orderInfo");
-            System.out.println("size ==== " + param.size());
-            for(Map<String, ?> dto : param) {
-                int productSeq = (int) dto.get("product_seq");
-                int orderListCount = (int) dto.get("product_quantity");
-                int orderListPrice = (int) dto.get("product_total_price");
+            List<Map<String, ?>> param = (List<Map<String, ?>>) map.get("orderProducts");
+            if(param.size() > 0) {
+                for(Map<String, ?> dto : param) {
+                    int productSeq = (int) dto.get("product_seq");
+                    int orderListCount = (int) dto.get("product_quantity");
+                    int orderListPrice = (int) dto.get("product_total_price");
 
-                System.out.println("productSeq ==== " + productSeq);
-                System.out.println("orderListCount ==== " + orderListCount);
-                System.out.println("orderListPrice ==== " + orderListPrice);
-
-                orderDAO.addOrderList(new OrderListDTO(0, orderSeq, productSeq, orderListCount, orderListPrice));
+                    orderDAO.addOrderList(new OrderListDTO(0, orderSeq, productSeq, orderListCount, orderListPrice));
+                }
+                return orderSeq;
             }
-            return orderSeq;
+            return -1;
 
         } catch (Exception e) {
             e.printStackTrace();

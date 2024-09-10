@@ -438,7 +438,7 @@ nocache;
 
 -- 주문
 create table orders (
-    orders_seq number primary key,
+    order_seq number primary key,
     member_seq number not null,
     order_code char(2) not null,
     order_date timestamp default sysdate not null,
@@ -551,7 +551,7 @@ insert into payment_status (payment_code, payment_title) values ('P3', '고민 �
 -- 배송
 create table shipping (
     shipping_seq number primary key,
-    orders_seq number not null,
+    order_seq number not null,
     shipping_code char(2) not null,
     shipping_address varchar2(255) not null,
     shipping_detail_address varchar2(255) not null

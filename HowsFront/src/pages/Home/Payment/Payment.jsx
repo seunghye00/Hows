@@ -70,7 +70,6 @@ export const Payment = () => {
   const handlePayment = async () => {
     // 목록 빠진 거 없는지 체크해야됨
 
-
     const name = orderProducts[0].product_title;
     const paymentId = `how-${uuidv4()}`
     const orderName = name.length > 10 ? name.slice(0,9) + "..." : name;
@@ -86,9 +85,11 @@ export const Payment = () => {
     // 1. 주문 내용
     // order_seq 뽑아와야됨 총 가격 보내면 됨 totalAmount
     console.log("totalAmount ==== ", totalAmount)
+
     // 2. 주문한 상품 목록
     // 상품 번호, 상품 수량, 가격 보내면 됨
     console.log("orderProducts ====== ", orderProducts);
+
     const orderInfo = {
       totalAmount,
       orderProducts
@@ -96,7 +97,7 @@ export const Payment = () => {
 
     const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
     setPaymentInfo({ orderName, totalAmount });
-    const result = await requestPaymentEvent(paymentInfo, orderName, totalAmount, orderInfo);
+    const result = await requestPaymentEvent(paymentInfo, orderInfo);
     if(result === "ok") {
 
       // Payment API

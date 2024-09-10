@@ -23,7 +23,8 @@ public class OrderDAO {
 
     /** 주문 등록 **/
     public int addOrder(OrderDTO orderDTO) {
-        return mybatis.insert("Order.addOrder", orderDTO);
+        mybatis.insert("Order.addOrder", orderDTO);
+        return orderDTO.getOrder_seq();
     }
 
     /** 주문 목록 등록 **/

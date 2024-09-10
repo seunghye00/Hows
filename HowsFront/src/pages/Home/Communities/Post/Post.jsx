@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { DndProvider, useDrag, useDrop } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
+import { useNavigate } from 'react-router-dom' // 리다이렉트를 위한 Hook 추가
 import styles from './Post.module.css'
 import { Button } from '../../../../components/Button/Button'
 import { Search } from '../../../../components/Search/Search'
@@ -14,7 +15,7 @@ import img1 from '../../../../assets/images/수납.png'
 import img2 from '../../../../assets/images/조명.png'
 import img3 from '../../../../assets/images/주방용품.png'
 import img4 from '../../../../assets/images/테스트.jpg'
-// 이미지 순서 변경을 위한 타입
+
 const ItemType = 'IMAGE'
 
 export const Post = () => {
@@ -40,7 +41,7 @@ export const Post = () => {
         { product_seq: 4, product_thumbnail: img3, name: 'Hows 철제 책상' },
         { product_seq: 4, product_thumbnail: img4, name: 'Hows 조명' },
     ]) // 임시 상품 태그 데이터
-    // 기존 state와 함수 유지
+
     const [postContent, setPostContent] = useState('') // 글 내용
     const MAX_IMAGE_SIZE_BYTES = 1024 * 1024 * 2
     const MAX_IMAGES = 5
@@ -54,6 +55,8 @@ export const Post = () => {
     const [selectedSpaceType, setSelectedSpaceType] = useState('')
     const [selectedAreaSize, setSelectedAreaSize] = useState('')
 
+    const navigate = useNavigate() // 리다이렉트를 위한 useNavigate Hook 추가
+
     // 좌표를 퍼센트로 변환하는 함수
     const convertToPercent = (x, y, imgWidth, imgHeight) => {
         const leftPercent = (x / imgWidth) * 100
@@ -61,7 +64,6 @@ export const Post = () => {
         return { left: leftPercent, top: topPercent }
     }
 
-    // 이미지 드롭존 설정
     const { getRootProps, getInputProps } = useDropzone({
         onDrop: acceptedFiles => {
             const validFiles = acceptedFiles.filter(file => {
@@ -105,7 +107,7 @@ export const Post = () => {
                         ]
                         if (prevImages.length === 0) {
                             setThumbnail(reader.result)
-                            setSelectedImageIndex(0) // 첫 번째 이미지를 기본 선택
+                            setSelectedImageIndex(0)
                         }
                         return updatedImages
                     })
@@ -131,13 +133,11 @@ export const Post = () => {
         })
     }
 
-    // 썸네일 설정
     const handleSetThumbnail = (imageSrc, index) => {
         setThumbnail(imageSrc)
-        setSelectedImageIndex(index) // 상품 태그 모달에서 사용할 인덱스 설정
+        setSelectedImageIndex(index)
     }
 
-    // 이미지 삭제 처리
     const handleRemoveImage = index => {
         const updatedImages = images.filter((_, i) => i !== index)
         setImages(updatedImages)
@@ -148,12 +148,10 @@ export const Post = () => {
         }
     }
 
-    // 상품 검색 핸들러
     const handleSearch = () => {
         setSearchResults(searchResults)
     }
 
-    // 상품 태그 추가 핸들러
     const handleAddTag = product => {
         const updatedImages = [...images]
         updatedImages[selectedImageIndex].tags.push({
@@ -166,10 +164,9 @@ export const Post = () => {
             title: '상품 태그 추가 완료',
             text: `${product.name}이(가) 태그로 추가되었습니다.`,
         })
-        setIsModalOpen(false) // 태그 추가 후 모달 닫기
+        setIsModalOpen(false)
     }
 
-    // 태그 위치 지정 후 상품 태그 모달 열기
     const handleThumbnailClick = e => {
         if (isEditingTags && selectedImageIndex !== null) {
             const rect = e.target.getBoundingClientRect()
@@ -181,17 +178,14 @@ export const Post = () => {
             const { left, top } = convertToPercent(x, y, imgWidth, imgHeight)
 
             setTagPosition({ left, top })
-            console.log(`태그 추가됨, 위치: Left: ${left}%, Top: ${top}%`) // 콘솔에 위치값 출력
-            setIsModalOpen(true) // 상품 태그 선택 모달 열기
+            setIsModalOpen(true)
         }
     }
 
-    // 태그 편집 완료 처리
     const handleFinishEditingTags = () => {
         setIsEditingTags(false)
     }
 
-    // 태그 삭제 처리
     const handleDeleteTag = (tagIndex, productName) => {
         Swal.fire({
             title: `태그 삭제: ${productName}`,
@@ -210,7 +204,6 @@ export const Post = () => {
         })
     }
 
-    // 태그를 이미지 위에 표시하는 컴포넌트
     const renderTagMarkers = () => {
         return images[selectedImageIndex]?.tags.map((tag, i) => (
             <div
@@ -222,14 +215,13 @@ export const Post = () => {
                     top: `${tag.position.top}%`,
                     margin: '-9px 0 0 -9px',
                 }}
-                onClick={() => handleDeleteTag(i, tag.product.name)} // 상품명도 함께 표시
+                onClick={() => handleDeleteTag(i, tag.product.name)}
             >
                 <i className="bx bx-plus"></i>
             </div>
         ))
     }
 
-    // 이미지 렌더링 컴포넌트
     const Image = ({ image, index, moveImage }) => {
         const ref = useRef(null)
         const [, drop] = useDrop({
@@ -272,7 +264,7 @@ export const Post = () => {
                     <img
                         src={image.src}
                         alt={`preview ${index}`}
-                        onClick={() => handleSetThumbnail(image.src, index)} // 썸네일 변경
+                        onClick={() => handleSetThumbnail(image.src, index)}
                     />
                 </div>
                 <button
@@ -285,21 +277,22 @@ export const Post = () => {
         )
     }
 
-    // 정렬 데이터 가져오기
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const housingTypesResponse = await axios.get(
                     `${host}/option/housing-types`
                 )
+                setHousingTypes(housingTypesResponse.data)
+
                 const spaceTypesResponse = await axios.get(
                     `${host}/option/space-types`
                 )
+                setSpaceTypes(spaceTypesResponse.data)
+
                 const areaSizesResponse = await axios.get(
                     `${host}/option/area-sizes`
                 )
-                setHousingTypes(housingTypesResponse.data)
-                setSpaceTypes(spaceTypesResponse.data)
                 setAreaSizes(areaSizesResponse.data)
             } catch (error) {
                 console.error(error)
@@ -307,29 +300,67 @@ export const Post = () => {
         }
         fetchData()
     }, [])
+
     // 게시글 작성 완료 처리 핸들러
     const handleSubmitPost = async () => {
-        // 서버에 보낼 데이터를 수집합니다.
-        const postData = {
-            housingType: selectedHousingType, // 선택된 주거 형태
-            spaceType: selectedSpaceType, // 선택된 공간 타입
-            areaSize: selectedAreaSize, // 선택된 평수
-            images: images.map(image => ({
-                src: image.src,
-                tags: image.tags,
-            })), // 이미지와 태그 배열
-            content: postContent, // 작성한 글 내용
+        // 필수 입력값 확인
+        if (!postContent || images.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: '작성 실패',
+                text: '글 내용과 이미지를 모두 입력해주세요.',
+            })
+            return
+        }
+
+        // 태그 편집 중인 상태에서 작성 완료를 막기
+        if (isEditingTags) {
+            Swal.fire({
+                icon: 'warning',
+                title: '작성 실패',
+                text: '태그 편집을 완료한 후 다시 시도해주세요.',
+            })
+            return
         }
 
         try {
-            // 서버에 POST 요청
-            const response = await axios.post(`${host}/posts`, postData)
+            const postData = {
+                housing_type_code: selectedHousingType,
+                space_type_code: selectedSpaceType,
+                area_size_code: selectedAreaSize,
+                board_contents: postContent,
+                member_id: 'qwer1234',
+            }
+
+            const response = await axios.post(`${host}/community`, postData)
+
             if (response.status === 200) {
+                const board_seq = response.data // 서버가 정수 값을 반환한다고 가정
+
+                await Promise.all(
+                    images.map((image, index) => {
+                        const imageData = {
+                            board_seq: board_seq,
+                            image_url: image.src,
+                            image_order: index + 1,
+                            tags: image.tags.map(tag => ({
+                                product_seq: tag.product.product_seq,
+                                left_position: tag.position.left,
+                                top_position: tag.position.top,
+                            })),
+                        }
+                        return axios.post(`${host}/community/images`, imageData)
+                    })
+                )
+
                 Swal.fire({
                     icon: 'success',
                     title: '게시글 작성 완료',
-                    text: '게시글이 성공적으로 작성되었습니다.',
+                    text: '게시글과 이미지가 성공적으로 작성되었습니다.',
                 })
+
+                // 커뮤니티 페이지로 리다이렉트
+                navigate('/communities')
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -403,10 +434,10 @@ export const Post = () => {
                                         src={thumbnail}
                                         alt="썸네일"
                                         className={styles.thumbnailPreview}
-                                        onClick={handleThumbnailClick} // 태그 추가는 썸네일에서만
+                                        onClick={handleThumbnailClick}
                                     />
                                 </div>
-                                {renderTagMarkers()} {/* 태그 마커 표시 */}
+                                {renderTagMarkers()}
                                 <div className={styles.thumbnailControls}>
                                     <Button
                                         size="s"
@@ -531,14 +562,13 @@ export const Post = () => {
                             className={styles.txtWriteBox}
                             placeholder="내용을 입력해주세요"
                             value={postContent}
-                            onChange={e => setPostContent(e.target.value)} // 글 내용 업데이트
+                            onChange={e => setPostContent(e.target.value)}
                         ></textarea>
 
-                        {/* 작성 완료 버튼 */}
                         <Button
                             size="s"
                             title="작성 완료"
-                            onClick={handleSubmitPost} // 버튼 클릭 시 호출할 함수
+                            onClick={handleSubmitPost}
                             className={styles.submitButton}
                         />
                     </div>
@@ -553,7 +583,7 @@ export const Post = () => {
                             <div className={styles.productList}>
                                 {searchResults.map(product => (
                                     <div
-                                        key={product.id}
+                                        key={product.product_seq}
                                         className={styles.searchResultItem}
                                     >
                                         <div className={styles.productImg}>

@@ -3,6 +3,8 @@ import styles from './Blacklist.module.css'
 import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
+import { formatDate } from '../../../commons/commons'
+import Swal from 'sweetalert2'
 import {
     selectBlacklist,
     modifyBlacklist,
@@ -47,11 +49,18 @@ export const Blacklist = () => {
         setSelectedMember(null)
     }
 
-    // 블랙리스트 해제 함수
+    // 블랙리스트 해제 함수 (Swal 적용)
     const updateBlacklist = async id => {
-        const isConfirmed = window.confirm('블랙리스트를 해제시키겠습니까?')
+        const result = await Swal.fire({
+            title: '블랙리스트 해제',
+            text: '블랙리스트를 해제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '해제',
+            cancelButtonText: '취소',
+        })
 
-        if (isConfirmed) {
+        if (result.isConfirmed) {
             try {
                 await modifyBlacklist({ member_id: id })
                 const updatedList = blacklistMembers.filter(
@@ -59,8 +68,18 @@ export const Blacklist = () => {
                 )
                 setBlacklistMembers(updatedList)
                 setSearchResults(updatedList)
+                Swal.fire(
+                    '해제 완료',
+                    '해제가 성공적으로 완료되었습니다.',
+                    'success'
+                )
             } catch (error) {
                 console.error('블랙리스트 해제 중 오류 발생:', error)
+                Swal.fire(
+                    '해제 실패',
+                    '오류가 발생했습니다. 다시 시도해주세요.',
+                    'error'
+                )
             }
         }
     }
@@ -149,7 +168,7 @@ export const Blacklist = () => {
                                 {member.blacklist_reason_code}
                             </div>
                             <div className={styles.memberItem}>
-                                {member.blacklist_date}
+                                {formatDate(member.blacklist_date)}
                             </div>
                             <div className={styles.memberItem}>
                                 <Button
@@ -179,7 +198,7 @@ export const Blacklist = () => {
                         <div className={styles.profile}>
                             <img
                                 src={
-                                    selectedMember.profileImageUrl ||
+                                    selectedMember?.member_avatar ||
                                     '/default.png'
                                 }
                                 alt="프로필 이미지"
@@ -262,7 +281,9 @@ export const Blacklist = () => {
                                 <label>가입날짜</label>
                                 <input
                                     type="text"
-                                    value={selectedMember.signup_date}
+                                    value={formatDate(
+                                        selectedMember.signup_date
+                                    )}
                                     readOnly
                                     disabled
                                 />

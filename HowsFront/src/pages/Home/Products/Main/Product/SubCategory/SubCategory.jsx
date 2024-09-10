@@ -8,8 +8,11 @@ import img03 from '../../../../../../assets/images/패브릭.png'
 import img04 from '../../../../../../assets/images/수납.png'
 import img05 from '../../../../../../assets/images/주방용품.png'
 import img06 from '../../../../../../assets/images/가전.png'
+import { useNavigate } from 'react-router-dom'
 
 export const SubCategory = () => {
+    const navi = useNavigate();
+
     // 임시 이미지
     const images = [img01, img02, img03, img04, img05, img06]
 
@@ -19,7 +22,6 @@ export const SubCategory = () => {
         axios
             .get(`${host}/category`)
             .then(resp => {
-                // console.log(JSON.stringify(resp))
                 setCategoriesList(resp.data)
             })
             .catch(err => {
@@ -27,13 +29,16 @@ export const SubCategory = () => {
             })
     }, []) // 컴포넌트가 처음 렌더링될 때 한 번만 실행
 
+
+
+
     return (
         <div className={styles.container}>
             <div className={styles.title}>카테고리</div>
             <div className={styles.item}>
                 {categoriesList.map((item, i) => {
                     return (
-                        <div key={i} className={styles.categoryItem}>
+                        <div key={i} className={styles.categoryItem} onClick={()=> navi(`/products/category?code=${item.product_category_code}`)}>
                             <div>
                                 <img
                                     src={images[i]}

@@ -5,11 +5,36 @@
 
 <mapper namespace="Cart">
 
-    <select id="cartList" resultType="com.hows.cart.dto.CartDTO">
+    <resultMap id="cartProductMap" type="java.util.HashMap">
+        <result property="cart_seq" column="cart_seq"/>
+        <result property="product_seq" column="product_seq"/>
+        <result property="member_seq" column="member_seq"/>
+        <result property="cart_quantity" column="cart_quantity"/>
+        <result property="cart_price" column="cart_price"/>
+        <result property="product_thumbnail" column="product_thumbnail"/>
+        <result property="product_title" column="product_title"/>
+        <result property="product_contents" column="product_contents"/>
+        <result property="price" column="price"/>
+        <result property="product_category_code" column="product_category_code"/>
+    </resultMap>
+
+    <select id="cartList" resultMap="cartProductMap">
         SELECT
-            *
+            c.cart_seq,
+            c.product_seq,
+            c.member_seq,
+            c.cart_quantity,
+            c.cart_price,
+            p.product_thumbnail,
+            p.product_title,
+            p.product_contents,
+            p.price,
+            p.product_category_code
         FROM
-            cart
+            cart c
+            JOIN product p ON c.product_seq = p.product_seq
+        WHERE
+            id = #{id}
     </select>
 
     <insert id="addCart">
@@ -29,9 +54,10 @@
         UPDATE
             cart
         SET
-            cart_quantity = #{count}
+            cart_quantity = #{cart_quantity},
+            cart_price = #{cart_price}
         WHERE
-            cart_seq = #{seq}
+            cart_seq = #{cart_seq}
     </update>
 
     <delete id="deleteCart">

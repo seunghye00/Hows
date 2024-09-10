@@ -1,5 +1,5 @@
 import styles from './Detail.module.css'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { ProfileSection } from './ProfileSection/ProfileSection'
 import { ImageSwiper } from './ImageSwiper/ImageSwiper'
 import { ProductTagSwiper } from './ProductTagSwiper/ProductTagSwiper'
@@ -8,26 +8,43 @@ import { Modal } from '../../../../../components/Modal/Modal'
 import Swal from 'sweetalert2'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
 import { PiSiren } from 'react-icons/pi'
+import axios from 'axios'
+import { useParams } from 'react-router-dom' // for accessing the board_seq from URL
 import img from './../../../../../assets/images/cry.jpg'
 import img1 from './../../../../../assets/images/마이페이지_프로필사진.jpg'
+import { host } from '../../../../../config/config'
 
 export const Detail = () => {
+    const { board_seq } = useParams() // get board_seq from the route params
+    const [postData, setPostData] = useState(null) // State to store post data
     const [isLiked, setIsLiked] = useState(false)
-    const [likeCount, setLikeCount] = useState(1)
+    const [likeCount, setLikeCount] = useState(0)
     const [isBookmarked, setIsBookmarked] = useState(false)
-    const [viewCount, setViewCount] = useState(84543)
-    const [bookmarkCount, setBookmarkCount] = useState(1400)
+    const [viewCount, setViewCount] = useState(0)
+    const [bookmarkCount, setBookmarkCount] = useState(0)
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [comments, setComments] = useState([
-        {
-            comment_seq: 1,
-            member_avatar: img1,
-            nickname: 'Moontari_96',
-            text: '공무원인 근로자는 법률이 정하는 자에 한하여...',
-            likes: 10,
-            replies: [],
-        },
-    ])
+    const [comments, setComments] = useState([])
+
+    // 게시글 정보 받아오기
+    useEffect(() => {
+        const fetchPostData = async () => {
+            try {
+                const response = await axios.get(
+                    `${host}/community/${board_seq}`
+                )
+                setPostData(response.data)
+                console.log(response.data)
+                setLikeCount(response.data.likeCount) // example of setting initial data
+                setViewCount(response.data.viewCount)
+                setBookmarkCount(response.data.bookmarkCount)
+                setComments(response.data.comments)
+            } catch (error) {
+                console.error('Error fetching post data:', error)
+            }
+        }
+
+        fetchPostData()
+    }, [board_seq])
 
     // 좋아요, 북마크 상태 변경
     const toggleLike = () => {
@@ -38,23 +55,6 @@ export const Detail = () => {
     const toggleBookmark = () => {
         setIsBookmarked(!isBookmarked)
         setBookmarkCount(isBookmarked ? bookmarkCount - 1 : bookmarkCount + 1)
-    }
-
-    // 댓글 추가
-    const handleAddComment = e => {
-        e.preventDefault()
-        const commentText = e.target.comment.value
-        setComments([
-            ...comments,
-            {
-                id: comments.length + 1,
-                user: 'YourUsername', // 현재 유저 정보
-                text: commentText,
-                likes: 0,
-                replies: [],
-            },
-        ])
-        e.target.comment.value = ''
     }
 
     // 링크 복사 기능 구현
@@ -71,19 +71,23 @@ export const Detail = () => {
         })
     }
 
+    if (!postData) {
+        return <div>Loading...</div> // Show loading state while data is being fetched
+    }
+
     return (
         <div className={styles.container}>
             {/* 프로필 섹션 */}
-            <ProfileSection />
+            <ProfileSection profileData={postData.profile} />
 
             {/* 이미지 섹션 */}
             <div className={styles.imageSection}>
-                <ImageSwiper />
+                <ImageSwiper images={postData.images} />
             </div>
 
             {/* 상품 태그 섹션 */}
             <div className={styles.productTagSection}>
-                <ProductTagSwiper />
+                <ProductTagSwiper tags={postData.productTags} />
             </div>
 
             {/* 게시글 상단 */}
@@ -111,7 +115,7 @@ export const Detail = () => {
                 </div>
                 <div className={styles.subMitLink}>
                     <div className={styles.Link} onClick={copyLinkToClipboard}>
-                        <i class="bx bx-link"></i>
+                        <i className="bx bx-link"></i>
                     </div>
                     <div onClick={() => setIsModalOpen(true)}>
                         <PiSiren />
@@ -122,20 +126,11 @@ export const Detail = () => {
 
             {/* 게시글 콘텐츠 */}
             <div className={styles.mainContent}>
-                <p>
-                    로렘 입숨(lorem ipsum; 줄여서 립숨, lipsum)은 출판이나
-                    그래픽 디자인 분야에서 폰트, 타이포그래피, 레이아웃 같은
-                    그래픽 요소나 시각적 연출을 보여줄 때 사용하는 표준 채우기
-                    텍스트로, 최종 결과물에 들어가는 실제적인 문장 내용이
-                    채워지기 전에 시각 디자인 프로젝트 모형의 채움 글로도
-                    이용된다. 이런 용도로 사용할 때 로렘 입숨을
-                    그리킹(greeking)이라고도 부르며, 때로 로렘 입숨은 공간만
-                    차지하는 무언가를 지칭하는 용어로도 사용된다.
-                </p>
+                <p>{postData.content}</p>
             </div>
 
             {/* 댓글 작성 영역 */}
-            <div className={styles.commentInput} onSubmit={handleAddComment}>
+            <div className={styles.commentInput}>
                 <div className={styles.writerProfile}>
                     <img src={img} alt="" />
                 </div>
@@ -150,7 +145,7 @@ export const Detail = () => {
             {/* 댓글 리스트 */}
             <div className={styles.commentsSection}>
                 {comments.map(comment => (
-                    <div key={comment.id} className={styles.comment}>
+                    <div key={comment.comment_seq} className={styles.comment}>
                         <div className={styles.replyImg}>
                             <img src={comment.member_avatar} alt="" />
                         </div>

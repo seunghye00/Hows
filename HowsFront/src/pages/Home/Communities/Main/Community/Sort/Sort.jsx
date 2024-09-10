@@ -5,9 +5,10 @@ import axios from 'axios'
 import { Button } from '../../../../../../components/Button/Button'
 import { Search } from '../../../../../../components/Search/Search'
 import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../../../../../../store/store' // 로그인 상태 확인을 위한 store
 
 export const Sort = () => {
-    console.log(`${host}`)
+    const { isAuth } = useAuthStore() // 로그인 여부 확인
     const [housingTypes, setHousingTypes] = useState([])
     const [spaceTypes, setSpaceTypes] = useState([])
     const [areaSizes, setAreaSizes] = useState([])
@@ -52,7 +53,14 @@ export const Sort = () => {
 
     // 글쓰기 버튼 클릭 시 페이지 이동 함수
     const handleWritePage = () => {
-        navigate('/communities/post') // '/post' 페이지로 이동
+        if (!isAuth) {
+            // 로그인되지 않았으면 로그인 페이지로 리다이렉트
+            navigate('/signIn', { state: { from: '/communities/post' } })
+            // 'from'으로 돌아가야할 링크를 저장, 로그인 후 다시 리다이렉트될 수 있도록 설정
+        } else {
+            // 로그인되어 있으면 글쓰기 페이지로 이동
+            navigate('/communities/post')
+        }
     }
 
     // 선택 해제 함수

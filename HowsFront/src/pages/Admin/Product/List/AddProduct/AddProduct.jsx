@@ -3,6 +3,7 @@ import { Button } from '../../../../../components/Button/Button'
 import { BiCamera } from 'react-icons/bi'
 import { categoryList, addProduct } from '../../../../../api/product'
 import { useEffect, useState } from 'react'
+import { SwalComp } from '../../../../../commons/commons'
 import Swal from 'sweetalert2'
 import { FaCheckSquare, FaRegSquare } from 'react-icons/fa' // 체크박스 아이콘
 import { EditorComp } from '../../../../../components/Editor/Editor'
@@ -42,11 +43,9 @@ export const AddProduct = () => {
         const files = Array.from(e.target.files)
 
         if (files.length + selectedFiles.length > 10) {
-            Swal.fire({
-                title: '경고 !',
+            SwalComp({
+                type: 'warning',
                 text: '최대 10개의 파일만 업로드할 수 있습니다.',
-                icon: 'warning',
-                confirmButtonText: '확인',
             })
             return
         }

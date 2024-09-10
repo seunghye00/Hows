@@ -1,19 +1,23 @@
 package com.hows.community.controller;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.hows.community.dto.CommunityDTO;
 import com.hows.community.dto.ImageDTO;
@@ -73,6 +77,56 @@ public class CommunityController {
 
         return ResponseEntity.ok().build();
     }
+    
+    @GetMapping
+    public ResponseEntity<List<Map<String, Object>>> selectAll() {
+        // 게시글 정보 리스트
+        List<Map<String, Object>> list = communityService.selectAll();
+        // 이미지 정보 리스트
+        List<Map<String, Object>> listImg = communityService.selectAllImg();
+
+        // 이미지 데이터를 board_seq로 매핑하기 위한 맵 생성
+        Map<Integer, List<String>> imageMap = new HashMap<>();
+
+        // listImg에서 board_seq를 기준으로 이미지 리스트를 맵에 저장
+        for (Map<String, Object> imgData : listImg) {
+            BigDecimal boardSeqDecimal = (BigDecimal) imgData.get("BOARD_SEQ");
+            Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+            String imageUrl = (String) imgData.get("IMAGE_URL");
+            // 이미지 URL이 null이 아닌 경우에만 추가
+            if (imageUrl != null) {
+                imageMap.putIfAbsent(boardSeq, new ArrayList<>());
+                imageMap.get(boardSeq).add(imageUrl);
+            }
+        }
+
+        // 게시글 리스트에 이미지 리스트를 병합
+        for (Map<String, Object> boardData : list) {
+            // 먼저 BigDecimal로 값을 가져옴
+            BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
+            
+            // BigDecimal을 Integer로 변환
+            Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+            
+            List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
+
+            // 이미지가 없는 경우 빈 배열 설정
+            boardData.put("images", images);
+        }
+
+        // 최종 합쳐진 리스트 반환
+        return ResponseEntity.ok(list);
+    }
+    
+    @GetMapping("/{board_seq}")
+    public ResponseEntity<Void> selectAllSeq(@PathVariable int board_seq) {
+        // 요청이 제대로 들어오는지 확인하기 위해 콘솔에 찍어봄
+        System.out.println("Request received for board_seq: " + board_seq);
+
+        // 이후 실제 로직을 추가할 수 있음
+        return ResponseEntity.ok().build();
+    }
+
 
 
     // base64 디코딩 함수 (추가 필요)

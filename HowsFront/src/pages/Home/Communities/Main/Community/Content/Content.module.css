@@ -124,3 +124,7 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
 }
+
+h4 {
+    text-align: center;
+}

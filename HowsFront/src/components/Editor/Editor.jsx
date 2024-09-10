@@ -4,8 +4,9 @@ import { uploadFile } from '../../api/file'
 import '@toast-ui/editor/dist/toastui-editor.css' // CSS import
 import styles from './Editor.module.css' // CSS 모듈 import
 
-export const EditorComp = () => {
+export const EditorComp = ({ onChange }) => {
     const editorRef = useRef(null)
+    let editorInstance = null
 
     useEffect(() => {
         if (editorRef.current) {
@@ -14,6 +15,12 @@ export const EditorComp = () => {
                 height: '100%',
                 initialEditType: 'wysiwyg',
                 previewStyle: 'vertical',
+                events: {
+                    change: () => {
+                        const content = editorInstance.getMarkdown()
+                        onChange(content) // 에디터 내용이 변경될 때마다 부모 컴포넌트로 전달
+                    },
+                },
                 customImageUploadHandler: file => {
                     // 파일을 서버에 업로드하고 URL을 반환하는 로직
                     const formData = new FormData()

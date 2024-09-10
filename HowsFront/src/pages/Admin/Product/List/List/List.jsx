@@ -1,4 +1,4 @@
-import styles from './ViewList.module.css'
+import styles from './List.module.css'
 import { Search } from '../../../../../components/Search/Search'
 import { Button } from '../../../../../components/Button/Button'
 import { useEffect, useState } from 'react'
@@ -6,13 +6,14 @@ import { categoryList, productList } from '../../../../../api/product'
 import { addCommas } from '../../../../../commons/commons'
 import { useNavigate } from 'react-router-dom'
 
-export const ViewList = () => {
+export const List = () => {
     // 상태 변수 초기화
     const [products, setProducts] = useState([]) // 전체 상품 목록
     const [filteredProducts, setFilteredProducts] = useState([]) // 필터링된 상품 목록
     const [selectedCategory, setSelectedCategory] = useState('') // 선택된 카테고리
     const [selectAll, setSelectAll] = useState(false) // 전체 선택 상태
     const [categories, setCategories] = useState([]) // 카테고리 목록
+    const [searchQuery, setSearchQuery] = useState('') // 검색어 상태
     const navi = useNavigate()
 
     useEffect(() => {
@@ -31,17 +32,21 @@ export const ViewList = () => {
     }, []) // 빈 배열을 의존성으로 설정하여 컴포넌트 마운트 시 한 번만 실행
 
     useEffect(() => {
-        // 선택된 카테고리에 따라 상품을 필터링
-        if (selectedCategory === '') {
-            setFilteredProducts(products)
-        } else {
-            setFilteredProducts(
-                products.filter(
-                    product => product.category === selectedCategory
-                )
+        let filtered = products
+        if (selectedCategory !== '') {
+            filtered = filtered.filter(
+                product => product.product_category_code === selectedCategory
             )
         }
-    }, [selectedCategory, products]) // selectedCategory 또는 products가 변경될 때마다 실행
+        if (searchQuery !== '') {
+            filtered = filtered.filter(product =>
+                product.product_title
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase())
+            )
+        }
+        setFilteredProducts(filtered)
+    }, [selectedCategory, searchQuery, products]) // 카테고리 or 상품 목록 or 검색어가 변경될 때마다 실행
 
     // 카테고리 선택 변경 핸들러
     const handleChangeCategory = e => {
@@ -74,6 +79,16 @@ export const ViewList = () => {
         setSelectAll(allChecked) // 모든 상품이 체크되었는지 확인하고 전체 선택 상태 업데이트
     }
 
+    // 상품 영역 클릭 핸들러
+    const handleProductClick = productSeq => {
+        handleCheckboxChange(productSeq)
+    }
+
+    // 상품명 검색 핸들러
+    const handleSearch = e => {
+        setSearchQuery(e)
+    }
+
     return (
         <>
             <div className={styles.btns}>
@@ -94,20 +109,20 @@ export const ViewList = () => {
                         ))}
                     </select>
                 </div>
-                <Search /> {/* 검색 컴포넌트 */}
+                <Search onSearch={handleSearch} />
                 <Button
                     size={'s'}
                     title={'등록'}
                     onClick={() => navi('/admin/product/addProduct')}
                 />{' '}
-                {/* 등록 버튼 */}
-                <Button size={'s'} title={'삭제'} /> {/* 삭제 버튼 */}
+                <Button size={'s'} title={'삭제'} />
+                <Button size={'s'} title={'수정'} />
+                <Button size={'s'} title={'상태 변경'} />
                 <Button
                     size={'s'}
                     title={'전체 선택'}
                     onClick={handleSelectAllChange}
                 />{' '}
-                {/* 전체 선택 버튼 */}
             </div>
             <div className={styles.container}>
                 <div
@@ -122,7 +137,12 @@ export const ViewList = () => {
                         : filteredProducts.map(product => (
                               <div
                                   key={product.product_seq}
-                                  className={styles.cols}
+                                  className={`${styles.cols} ${
+                                      product.checked ? styles.checked : ''
+                                  }`}
+                                  onClick={() =>
+                                      handleProductClick(product.product_seq)
+                                  }
                               >
                                   <img
                                       src={product.product_thumbnail}

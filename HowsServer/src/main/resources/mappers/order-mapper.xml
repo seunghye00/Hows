@@ -11,7 +11,7 @@
 
 	<select id="orderListByStatus" resultType="com.hows.order.dto.OrderInfoListDTO">
 		select
-		o.orders_seq, o.order_date, m.name, o.order_price, s.order_title
+		o.order_seq, o.order_date, m.name, o.order_price, s.order_title
 		from orders o
 		join member m ON o.member_seq = m.member_seq
 		join order_status s ON o.order_code = s.order_code

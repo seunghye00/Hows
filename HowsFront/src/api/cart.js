@@ -11,11 +11,11 @@ export const addCart = (item) => {
 }
 
 /** 상품 수량 변경 ( 수량, 가격 ) **/
-export const deleteCart = (seq) => {
-  return api.delete(`/cart/${seq}`);
+export const updateCart = (item) => {
+  return api.put(`/cart`, item);
 }
 
 /** 상품 삭제 **/
-export const updateCart = (item) => {
-  return api.put(`/cart/`, item);
+export const deleteCart = (seq) => {
+  return api.delete(`/cart/${seq}`);
 }

@@ -267,7 +267,7 @@
 }
 
 .paymentInfo > .paymentPrice > .priceInfo > div > p {
-    margin: 8px;
+    margin: 6px;
     padding: 2px;
 }
 
@@ -280,14 +280,22 @@
 .paymentInfo > .paymentPrice > .consent {
     width: 90%;
     padding: 2px;
-    margin-top: 4px;
+    margin-top: 3px;
+}
+
+.paymentInfo > .paymentPrice > .consent > label {
+    color: var(--hows-gray-500);
+}
+
+.paymentInfo > .paymentPrice > .consent > label > a {
+    font-weight: 600;
 }
 
 .paymentInfo > .paymentPrice > button {
     width: 90%;
-    height: 40px;
+    height: 45px;
     padding: 2px;
-    margin: 10px;
+    margin: 8px;
     border: none;
     background-color: var(--hows-point-color);
     color: var(--hows-white);

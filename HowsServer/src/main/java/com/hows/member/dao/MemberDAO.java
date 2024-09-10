@@ -90,7 +90,7 @@ public class MemberDAO {
 	
 	// [방명록] 방명록 작성 위한 member_seq 뽑기
 	 public int findMemberSeq(String member_id) {
-        return mybatis.selectOne("Member.findMemberSeq");
+        return mybatis.selectOne("Member.findMemberSeq", member_id);
      }
 
 	// =======================================================[ 관리자 ]

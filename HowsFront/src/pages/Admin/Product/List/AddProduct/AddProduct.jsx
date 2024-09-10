@@ -3,7 +3,7 @@ import { Button } from '../../../../../components/Button/Button'
 import { BiCamera } from 'react-icons/bi'
 import { categoryList, addProduct } from '../../../../../api/product'
 import { useEffect, useState } from 'react'
-import { SwalComp } from '../../../../../components/Swal/Swal'
+import { SwalComp } from '../../../../../commons/commons'
 import Swal from 'sweetalert2'
 import { FaCheckSquare, FaRegSquare } from 'react-icons/fa' // 체크박스 아이콘
 import { EditorComp } from '../../../../../components/Editor/Editor'

@@ -544,9 +544,9 @@ create table payment_status (
     payment_title varchar2(50)
 );
 
-insert into payment_status (payment_code, payment_title) values ('P1', '담당자 가');
-insert into payment_status (payment_code, payment_title) values ('P2', '뭐 할지');
-insert into payment_status (payment_code, payment_title) values ('P3', '고민 합시다!');
+insert into payment_status (payment_code, payment_title) values ('P1', '결제대기');
+insert into payment_status (payment_code, payment_title) values ('P2', '결제완료');
+insert into payment_status (payment_code, payment_title) values ('P3', '결제실패');
 
 -- 배송
 create table shipping (

@@ -16,6 +16,12 @@ export const BuyList = () => {
             product_quantity: 100,
             product_total_price: 9990000
         },
+        {
+            product_seq: 3,
+            product_title: '배도 고프구요',
+            product_quantity: 5,
+            product_total_price: 3000
+        },
     ]
 
 

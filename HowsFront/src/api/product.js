@@ -13,3 +13,8 @@ export const categoryList = () => {
 export const productList = () => {
     return axios.get(`${baseUrl}`)
 }
+
+// 상품 추가 요청 함수
+export const addProduct = formData => {
+    return axios.post(`${baseUrl}`, formData)
+}

@@ -157,26 +157,12 @@ export const Cart = () => {
   
   /** 페이지 로드 **/
   useEffect(() => {
-    // 서버에서 받아올 실제 사용 데이터 ( 표본 )
-    const arr = [
-      {cart_seq: 1, product_seq: 1, member_seq: 1, cart_quantity: 1, cart_price: 199000, cart_date: "2024-09-05", product_thumbnail: img1, product_title: "consectetur adipisicing elit Lorem ipsum dolor sit amet, ....", product_contents: "test", price: 199000, product_category_code: 1},
-      {cart_seq: 2, product_seq: 2, member_seq: 1, cart_quantity: 1, cart_price: 299000, cart_date: "2024-09-05", product_thumbnail: img2, product_title: "Lorem ipsum consectetur adipisicingdolor sit amet,  elit....", product_contents: "test", price: 299000, product_category_code: 1},
-      {cart_seq: 3, product_seq: 3, member_seq: 1, cart_quantity: 1, cart_price: 219000, cart_date: "2024-09-05", product_thumbnail: img3, product_title: "sit amet, consecteturLorem ipsum dolor  adipisicing elit....", product_contents: "test", price: 219000, product_category_code: 1},
-      {cart_seq: 4, product_seq: 4, member_seq: 1, cart_quantity: 1, cart_price: 87000, cart_date: "2024-09-05", product_thumbnail: img4, product_title: "adipisicing elit Lorem ipsum dolor sit amet, consectetur ....", product_contents: "test", price: 87000, product_category_code: 1}
-    ]
-    const newArr = arr.map(item => ({ ...item, checked: true }));
-    setCarts(newArr);
-    setCheckCart(newArr);
-    totalPrice();
-
-
-    // cartList().then(res => {
-    //   const arr = res.data.map(item => ({ ...item, checked: true }));
-    //   setCarts(arr);
-    //   setCheckCart(arr);
-    //   totalPrice();
-    // });
-
+    cartList().then(res => {
+      const arr = res.data.map(item => ({ ...item, checked: true }));
+      setCarts(arr);
+      setCheckCart(arr);
+      totalPrice();
+    });
   }, []);
 
   return (

@@ -22,6 +22,9 @@ public class PaymentService {
     @Value("${portone.api.secret}")
     private String portoneApiSecret;
 
+    @Value("${portone.api.url}")
+    private String portoneApiUrl;
+
     /** 내 결제 내역 **/
     public List<PaymentDTO> paymentList(String id) {
         return paymentDAO.paymentList(id);
@@ -40,7 +43,7 @@ public class PaymentService {
             headers.set("Authorization", "PortOne " + portoneApiSecret);
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            String url = "https://api.portone.io/payments/" + URLEncoder.encode(paymentId, "UTF-8");
+            String url = portoneApiUrl + URLEncoder.encode(paymentId, "UTF-8");
             ResponseEntity<Object> paymentResponse = restTemplate.exchange(
                     url, HttpMethod.GET, entity, Object.class);
 

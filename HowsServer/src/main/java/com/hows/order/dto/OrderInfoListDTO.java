@@ -9,6 +9,7 @@ public class OrderInfoListDTO {
 	private String name;			// 주문자명
 	private int order_price;		// 주문 금액
 	private String order_title;		// 주문 상태
+
 	public int getOrders_seq() {
 		return orders_seq;
 	}

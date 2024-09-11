@@ -35,20 +35,39 @@ const formatDate = dateString => {
 export const ProfileSection = ({ profileData }) => {
     const { isAuth, user } = useAuthStore() // 로그인 여부 및 로그인한 유저 정보
     const navigate = useNavigate() // 페이지 전환을 위한 훅
+    const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+
+    // 본인 여부 확인 (세션에서 가져온 member_id와 게시글 작성자의 MEMBER_ID 비교)
+    const isOwner = isAuth && member_id === profileData?.MEMBER_ID
 
     const handleModify = () => {
+        // 로그인되지 않았으면 로그인 페이지로 리다이렉트
+        if (!isAuth) {
+            navigate('/signIn')
+            return
+        }
         navigate('/communities/post') // '/post' 페이지로 이동
     }
 
     const handleDelete = () => {
-        // 삭제 로직 처리
+        // 로그인되지 않았으면 로그인 페이지로 리다이렉트
+        if (!isAuth) {
+            navigate('/signIn')
+            return
+        }
+        // 삭제 로직 처리 (API 호출 또는 상태 업데이트)
+        console.log('삭제 처리')
     }
 
     const handleFollow = () => {
-        // 팔로우 로직 처리
+        // 로그인되지 않았으면 로그인 페이지로 리다이렉트
+        if (!isAuth) {
+            navigate('/signIn')
+            return
+        }
+        // 팔로우 로직 처리 (API 호출 또는 상태 업데이트)
+        console.log('팔로우 처리')
     }
-
-    const isOwner = isAuth && user?.member_id === profileData?.MEMBER_ID // 본인 여부 확인
 
     return (
         <div className={styles.profileSection}>
@@ -67,13 +86,16 @@ export const ProfileSection = ({ profileData }) => {
                         : '알 수 없음'}
                 </div>
             </div>
+
             <div className={styles.actionButtons}>
                 {isOwner ? (
+                    // 본인일 경우 수정, 삭제 버튼
                     <>
                         <Button title="수정" size="s" onClick={handleModify} />
                         <Button title="삭제" size="s" onClick={handleDelete} />
                     </>
                 ) : (
+                    // 본인이 아닐 경우 팔로우 버튼
                     <Button title="팔로우" size="s" onClick={handleFollow} />
                 )}
             </div>

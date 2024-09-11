@@ -1,13 +1,13 @@
 import styles from './List.module.css'
-import { Search } from '../../../../../components/Search/Search'
-import { Button } from '../../../../../components/Button/Button'
+import { Search } from '../../../../components/Search/Search'
+import { Button } from '../../../../components/Button/Button'
 import { useEffect, useState } from 'react'
 import {
     categoryList,
     productList,
     deleteProducts,
-} from '../../../../../api/product'
-import { addCommas, SwalComp } from '../../../../../commons/commons'
+} from '../../../../api/product'
+import { addCommas, SwalComp } from '../../../../commons/commons'
 import { useNavigate } from 'react-router-dom'
 
 export const List = () => {

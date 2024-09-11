@@ -1,7 +1,7 @@
 import styles from './Payment.module.css'
 import React, {useEffect, useState} from "react";
 import {useOrderStore} from "../../../store/orderStore";
-import {addCommas, shippingPrice} from "../../../commons/commons";
+import {addCommas, shippingPrice, SwalComp, validateName, validatePhone} from "../../../commons/commons";
 import {requestPaymentEvent} from "../../../api/payment";
 import { v4 as uuidv4 } from 'uuid';
 import {Link} from "react-router-dom";
@@ -25,6 +25,9 @@ export const Payment = () => {
   // 필수 동의 항목
   const [consent, setConsent] = useState({category1: false, category2: false, category3: false});
 
+  // 주소 체크 항목
+  const [addressCheck, setAddressCheck] = useState({ default: true, direct: false });
+
   // 주문 데이터
   const [data, setData] = useState({
     member_seq: 0,
@@ -46,8 +49,19 @@ export const Payment = () => {
 
   /** 동의 항목 체크 **/
   const handleCheck = (e) => {
-    const {name, checked} = e.target;
-    setConsent(prev => ({ ...prev, [name]: checked }));
+    const {id, name, checked} = e.target;
+    if(name === "addressOption") {
+      setAddressCheck(prev => ({
+        default: id === "default" ? checked : false,
+        direct: id === "direct" ? checked : false,
+      }));
+    } else {
+      setConsent(prev => ({ ...prev, [name]: checked }));
+    }
+  }
+
+  const handleHistory = () => {
+
   }
 
   /** 주문 정보 ( 이름, 전화번호, 주소, 결제방식, 쿠폰, 포인트 ) **/
@@ -69,16 +83,31 @@ export const Payment = () => {
 
   /** 결제 이벤트 **/
   const handlePayment = async () => {
-    // 목록 빠진 거 없는지 체크해야됨
-    if(!consent.category1 || !consent.category2 || !consent.category3) {
-      alert("필수 동의 항목을 체크해주세요.");
+
+    if(!validateName(data.name)) {
+      SwalComp({type: "warning", text: "이름을 확인해주세요"});
       return false;
     }
     
+    if(!validatePhone(data.phone)){
+      SwalComp({type: "warning", text: "전화번호를 확인해주세요"});
+      return false;
+    }
 
-    const name = orderProducts[0].product_title;
+    if(data.zip_code === "" || data.address === "" || data.detail_address === "") {
+      SwalComp({type: "warning", text: "배송지를 입력해주세요"});
+      return false;
+    }
+
+    if(!consent.category1 || !consent.category2 || !consent.category3) {
+      SwalComp({type: "warning", text: "필수 동의 항목을 체크해주세요"});
+      return false;
+    }
+
+    const name = orderProducts[0].product_title.length > 10 ? orderProducts[0].product_title.slice(0,9) + "..." : orderProducts[0].product_title;
+    const count = orderProducts.length > 1 ? ` 외 ${orderProducts.length-1}종` :  "";
     const paymentId = `how-${uuidv4()}`
-    const orderName = name.length > 10 ? name.slice(0,9) + "..." : name;
+    const orderName = name + count;
     const totalAmount = paymentPrice.total - paymentPrice.point;
     const payMethod = data.way;
     const customer = {
@@ -92,19 +121,34 @@ export const Payment = () => {
       orderProducts
     }
 
-    const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
-    setPaymentInfo({ orderName, totalAmount });
-    const result = await requestPaymentEvent(paymentInfo, orderInfo);
-    if(result === "ok") {
-
-      // Payment API
-
-      // 결제 완료
-      // ok → 주문 내역
-      // cancel → home
-    }
+    // const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
+    // setPaymentInfo({ orderName, totalAmount });
+    // const result = await requestPaymentEvent(paymentInfo, orderInfo);
+    // if(result === "ok") {
+    //   // Payment API
+    //   // 결제 완료
+    //   // ok → 주문 내역
+    //   // cancel → home
+    // }
 
   }
+
+  /** 쿠폰 선택시 할인 가격 계산 **/
+  useEffect(() => {
+    let discount = "";
+    coupon.forEach(item => {
+      if(parseInt(item.coupon_seq) === parseInt(data.coupon)) discount = item.coupon_discount;
+    });
+    const result = `${orderPrice.toString()}${discount}`;
+    setPaymentPrice(prev => {
+      return {
+        ...prev,
+        coupon: paymentPrice.price-eval(result),
+        total: eval(result)
+      }
+    });
+
+  }, [data.coupon]);
 
   /** 새로고침 시 세션에서 order list 가져옴 **/
   useEffect(() => {
@@ -117,15 +161,19 @@ export const Payment = () => {
         setOrderPrice(parseInt(price));
 
         setPaymentPrice(prev => ({
-          ... prev, price: parseInt(price), shipping: shippingPrice(parseInt(price)), total: price-shippingPrice(price)
+          ... prev,
+          price: parseInt(price),
+          shipping: shippingPrice(parseInt(price)),
+          total: parseInt(price) + shippingPrice(price)
         }));
+
       }
     }
 
     // 1. 회원 정보 ( 주소, 이름, 전화번호 )
     const memberData = {
       member_seq: 1,
-      name: "박종호",
+      name: "종호두",
       phone: "01087654321",
       email: "test@gmail.com",
       zip_code: "35062",
@@ -158,25 +206,17 @@ export const Payment = () => {
     setCoupon(couponData);
   }, []);
 
-  /** 쿠폰 선택시 할인 가격 계산 **/
-  useEffect(() => {
-    let discount = "";
-    coupon.forEach(item => {
-      if(parseInt(item.coupon_seq) === parseInt(data.coupon)) discount = item.coupon_discount;
-    });
-    const result = `${orderPrice.toString()}${discount}`;
-    setPaymentPrice(prev => {
-      return {
-        ...prev,
-        coupon: paymentPrice.price-eval(result),
-        total: eval(result)
-      }
-    });
-
-  }, [data.coupon]);
 
   useEffect(() => {
-    setPaymentPrice(prev => ({ ...prev, point: data.point, total: prev.price - prev.coupon - shippingPrice(prev.price)}));
+      setData(prev => {
+        if (addressCheck.default) return { ...prev, zip_code: member.zip_code, address: member.address, detail_address: member.detail_address };
+        if (addressCheck.direct) return { ...prev, zip_code: "", address: "", detail_address: "" };
+        return prev;
+      });
+  }, [addressCheck, member]);
+
+  useEffect(() => {
+    setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon + shippingPrice(prev.price)}));
   }, [data.point])
 
   return (
@@ -212,12 +252,12 @@ export const Payment = () => {
         <div className={styles.shipping}>
           <div className={styles.addressCheck}>
             <div>
-              <input id="default" type="checkbox"/>
+              <input id="default" name="addressOption" onChange={handleCheck} type="radio" checked={addressCheck.default}/>
               <label htmlFor="default">기본 주소</label>
-              <input id="direct" type="checkbox"/>
+              <input id="direct" name="addressOption" onChange={handleCheck} type="radio" checked={addressCheck.direct}/>
               <label htmlFor="direct">직접 입력</label>
             </div>
-            <button>배송지 내역 조회</button>
+            <button onClick={handleHistory}>배송지 내역 조회</button>
           </div>
           <div className={styles.address}>
             <div className={styles.postcode}>
@@ -301,16 +341,23 @@ export const Payment = () => {
           </div>
 
           <div className={styles.consent}>
-            <input name="category1" checked={consent.category1} type="checkbox" onChange={handleCheck}/> <label>(필수)
-            개인정보 수집/이용 동의 보기</label>
+            <input name="category1" id="category1" checked={consent.category1} type="checkbox" onChange={handleCheck}/>
+            <label htmlFor="category1">
+              (필수) 개인정보 수집/이용 동의 보기
+            </label>
           </div>
           <div className={styles.consent}>
-            <input name="category2" checked={consent.category2} type="checkbox" onChange={handleCheck}/> <label>(필수)
-            개인정보 제3자 제공 동의 보기</label>
+            <input name="category2" id="category2" checked={consent.category2} type="checkbox" onChange={handleCheck}/>
+            <label htmlFor="category2">
+              (필수) 개인정보 제3자 제공 동의 보기
+            </label>
           </div>
           <div className={styles.consent}>
-            <input name="category3" checked={consent.category3} type="checkbox" onChange={handleCheck}/> <label>(필수)
-            결제대행 서비스 이용약관 <a href="https://www.inicis.com/terms">(주)KG이니시스</a></label>
+            <input name="category3" id="category3" checked={consent.category3} type="checkbox" onChange={handleCheck}/>
+            <label htmlFor="category3">
+              (필수) 결제대행 서비스 이용약관
+              <a href="https://www.inicis.com/terms"> (주)KG이니시스</a>
+            </label>
           </div>
           <button onClick={handlePayment}>결제하기</button>
         </div>

@@ -31,7 +31,7 @@
 			select product_seq.currval from dual
 		</selectKey>
 		insert into product values (product_seq.nextval, ' ',
-		#{product_title}, #{product_contents}, #{price},
+		#{product_title}, #{product_contents}, #{price}, #{quantity},
 		#{product_category_code})
 	</insert>
 	
@@ -54,7 +54,7 @@
 	
 	<!-- 관리자 -->
 	<!-- 리뷰 신고목록 조회 (관리자) -->
-<select id="getReportedReviews" resultType="map">
+	<select id="getReportedReviews" resultType="map">
     SELECT *
     FROM (
         SELECT 
@@ -77,7 +77,7 @@
             r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
     )
     WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
-</select>
+	</select>
 
 
 	<!-- 리뷰 신고내역 조회 (관리자) -->

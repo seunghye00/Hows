@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './Content.module.css'
+import axios from 'axios'
 import {
-    getCommunityPosts, // 커뮤니티 게시글 목록을 가져오는 함수
-    toggleLike, // 좋아요 상태를 변경하는 함수
-    toggleBookmark, // 북마크 상태를 변경하는 함수
-    toggleFollow, // 팔로우 상태를 변경하는 함수
+    getCommunityPosts,
+    toggleLike,
+    toggleBookmark,
+    toggleFollow,
 } from '../../../../../../api/community' // API 호출 함수 불러오기
+import { host } from '../../../../../../config/config'
 import { Button } from '../../../../../../components/Button/Button'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination } from 'swiper/modules'
-import { useAuthStore } from '../../../../../../store/store' // 인증 상태를 확인하기 위한 store
+import { useAuthStore } from '../../../../../../store/store'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import InfiniteScroll from 'react-infinite-scroll-component'
@@ -23,97 +25,101 @@ export const Content = () => {
     const { isAuth } = useAuthStore() // 로그인 여부 확인
     const [loaderVisible, setLoaderVisible] = useState(true) // 로딩 상태
     const [endMessageVisible, setEndMessageVisible] = useState(true) // 종료 메시지 상태
-
-    // 데이터를 가져오는 함수 (페이지네이션 처리)
+    console.log(isAuth + '토큰 갑 확인')
     const fetchData = async (page, limit = 20) => {
         try {
-            const resp = await getCommunityPosts(page, limit) // API 호출 함수 사용
-            if (resp.data.length < limit) {
-                setHasMore(false) // 받아온 데이터가 limit보다 적으면 스크롤 중지
+            const data = await getCommunityPosts(page, limit)
+
+            // 데이터가 undefined인 경우 빈 배열로 처리
+            if (!data || data.length === 0) {
+                console.log('데이터가 없습니다.')
+                setHasMore(false)
+                return []
             }
-            return resp.data // 받아온 데이터 반환
+
+            console.log('받아온 데이터:', data) // 받아온 데이터 출력
+            if (data.length < limit) {
+                setHasMore(false)
+            }
+            return data
         } catch (error) {
-            console.error('Error fetching data:', error)
-            return [] // 오류 발생 시 빈 배열 반환
+            console.error('데이터 가져오는 중 오류 발생:', error)
+            return []
         }
     }
 
-    // 첫 번째 데이터 로드 (초기 로드)
+    // 첫 번째 데이터 로드
     useEffect(() => {
         const loadInitialData = async () => {
-            const initialData = await fetchData(page) // 첫 번째 페이지의 데이터를 가져옴
-            setContentList(initialData) // 가져온 데이터를 state에 저장
+            const initialData = await fetchData(page)
+            setContentList(initialData) // 초기 데이터 설정
 
             if (initialData.length < 20) {
-                setHasMore(false) // 처음부터 데이터가 limit보다 적으면 스크롤 중지
+                setHasMore(false) // 처음부터 데이터가 limit보다 적다면 바로 스크롤 중지
                 console.log('Initial data less than 20, stopping scroll')
             }
             console.log('Initial load complete, hasMore:', hasMore)
         }
-        loadInitialData() // 데이터 로딩 실행
+        loadInitialData()
     }, [])
 
-    // InfiniteScroll을 통한 추가 데이터 로드
+    // 데이터 추가 로드
     const loadMoreData = async () => {
-        const nextPage = page + 1 // 다음 페이지
+        const nextPage = page + 1
         console.log(
             `Loading more data for page: ${nextPage}, hasMore: ${hasMore}`
         )
 
-        const newContent = await fetchData(nextPage) // 새로운 데이터 가져오기
+        const newContent = await fetchData(nextPage)
+
         console.log(`Fetched newContent length: ${newContent.length}`)
 
-        // 받아온 데이터가 기존 데이터에 있는지 확인 (중복 방지)
+        // 받아온 데이터가 이미 기존 데이터에 있는지 확인
         const isDuplicate = newContent.every(newItem =>
             contentList.some(
                 existingItem => existingItem.BOARD_SEQ === newItem.BOARD_SEQ
             )
         )
 
-        // 중복 데이터가 있거나 새로운 데이터가 없으면 스크롤 중지
         if (isDuplicate || newContent.length === 0) {
-            setHasMore(false)
+            setHasMore(false) // 중복 데이터가 있거나 새로운 데이터가 없으면 스크롤 중지
             console.log(
                 'No new unique data or no more data to load, stopping scroll'
             )
             return
         }
 
-        // 새로운 데이터를 기존 데이터와 합침
         if (newContent.length > 0) {
             console.log(`Adding ${newContent.length} new items`)
             setContentList(prevList => [...prevList, ...newContent])
             setPage(nextPage) // 페이지 증가
         }
 
-        // 추가로 받아온 데이터가 limit보다 적으면 스크롤 중지
         if (newContent.length < 20) {
-            setHasMore(false)
+            setHasMore(false) // 추가로 받아온 데이터가 limit보다 적으면 스크롤 중지
             console.log('Loaded all data, stopping scroll')
         }
         console.log(
             `After loading more, page: ${nextPage}, hasMore: ${hasMore}`
         )
     }
-
     // 좋아요 상태 업데이트 함수
-    const handleToggleLike = async board_seq => {
+    const toggleLike = async board_seq => {
         if (!isAuth) {
             navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
             return
         }
         try {
-            await toggleLike(board_seq) // 좋아요 상태 변경 API 호출
-            // 좋아요 상태를 업데이트 (토글 방식)
+            await axios.post(`${host}/community/${board_seq}/like`)
             setContentList(prevList =>
                 prevList.map(item =>
                     item.BOARD_SEQ === board_seq
                         ? {
                               ...item,
-                              isLiked: !item.isLiked, // 토글
+                              isLiked: !item.isLiked,
                               likes: item.isLiked
                                   ? item.likes - 1
-                                  : item.likes + 1, // 좋아요 수 갱신
+                                  : item.likes + 1,
                           }
                         : item
                 )
@@ -124,14 +130,13 @@ export const Content = () => {
     }
 
     // 북마크 상태 업데이트 함수
-    const handleToggleBookmark = async board_seq => {
+    const toggleBookmark = async board_seq => {
         if (!isAuth) {
             navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
             return
         }
         try {
-            await toggleBookmark(board_seq) // 북마크 상태 변경 API 호출
-            // 북마크 상태를 업데이트 (토글 방식)
+            await axios.post(`${host}/community/${board_seq}/bookmark`)
             setContentList(prevList =>
                 prevList.map(item =>
                     item.BOARD_SEQ === board_seq
@@ -151,8 +156,7 @@ export const Content = () => {
             return
         }
         try {
-            await toggleFollow(nickname) // 팔로우 상태 변경 API 호출
-            // 팔로우 상태를 업데이트 (토글 방식)
+            await axios.post(`${host}/user/${nickname}/follow`)
             setContentList(prevList =>
                 prevList.map(item =>
                     item.NICKNAME === nickname
@@ -165,50 +169,48 @@ export const Content = () => {
         }
     }
 
-    // 상세 페이지로 이동 함수
+    // 상세 페이지로 이동
     const goToDetailPage = board_seq => {
-        navigate(`/communities/${board_seq}`) // 게시글의 상세 페이지로 이동
+        navigate(`/communities/${board_seq}`)
     }
 
-    // 마이페이지로 이동 함수
+    // 마이페이지로 이동
     const goToUserPage = nickname => {
-        navigate(`/user/${nickname}`) // 사용자의 마이페이지로 이동
+        navigate(`/user/${nickname}`) // nickname을 기반으로 마이페이지로 이동
     }
-
-    // 로딩 메시지 숨기기 (1초 후)
+    // 1초 후 loader 숨기기
     useEffect(() => {
         if (hasMore) {
             setLoaderVisible(true)
             const timer = setTimeout(() => {
-                setLoaderVisible(false)
+                setLoaderVisible(false) // 1초 후 loader 사라짐
             }, 1000)
             return () => clearTimeout(timer)
         }
     }, [hasMore])
 
-    // 종료 메시지 숨기기 (1초 후)
+    // 1초 후 endMessage 숨기기
     useEffect(() => {
         if (!hasMore) {
             setEndMessageVisible(true)
             const timer = setTimeout(() => {
-                setEndMessageVisible(false)
+                setEndMessageVisible(false) // 1초 후 endMessage 사라짐
             }, 1000)
             return () => clearTimeout(timer)
         }
     }, [hasMore])
-
     return (
         <div className={styles.contentWrap}>
             <InfiniteScroll
-                dataLength={contentList.length} // 현재까지 불러온 데이터 수
-                next={loadMoreData} // 더 많은 데이터를 불러오는 함수
-                hasMore={hasMore} // 더 불러올 데이터가 있는지 여부
+                dataLength={contentList.length}
+                next={loadMoreData}
+                hasMore={hasMore}
                 loader={loaderVisible ? <h4>로딩 중입니다.</h4> : null} // 로딩 메시지 1초 후 사라짐
                 endMessage={
                     endMessageVisible ? (
                         <h4>더 이상 불러올 데이터가 없습니다.</h4>
                     ) : null
-                } // 데이터가 없을 때 표시할 메시지
+                } // 더 이상 데이터가 없을 때 1초만 표시
             >
                 <div className={styles.contentCont}>
                     {contentList.map(content => (
@@ -221,7 +223,7 @@ export const Content = () => {
                                 <div
                                     className={styles.profile}
                                     onClick={e => {
-                                        e.stopPropagation() // 클릭 시 상세 페이지로 이동하지 않도록 중단
+                                        e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
                                         goToUserPage(content.NICKNAME) // 마이페이지로 이동
                                     }}
                                 >
@@ -244,8 +246,8 @@ export const Content = () => {
                                         }
                                         size="s"
                                         onClick={e => {
-                                            e.stopPropagation() // 클릭 시 상세 페이지로 이동하지 않도록 중단
-                                            handleFollow(content.NICKNAME) // 팔로우/언팔로우 처리
+                                            e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
+                                            handleFollow(content.NICKNAME) // 팔로우
                                         }}
                                     />
                                 </div>
@@ -254,7 +256,7 @@ export const Content = () => {
                             <div className={styles.mainContent}>
                                 <div className={styles.mainContentImg}>
                                     <Swiper
-                                        pagination={{ clickable: true }}
+                                        pagination={(true, { clickable: true })}
                                         modules={[Pagination]}
                                         className={styles.swiperBox}
                                     >
@@ -272,10 +274,10 @@ export const Content = () => {
                                             <div
                                                 className={styles.likeBtn}
                                                 onClick={e => {
-                                                    e.stopPropagation() // 클릭 시 상세 페이지로 이동하지 않도록 중단
-                                                    handleToggleLike(
+                                                    e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
+                                                    toggleLike(
                                                         content.BOARD_SEQ
-                                                    ) // 좋아요 토글 처리
+                                                    )
                                                 }}
                                             >
                                                 <i
@@ -306,10 +308,10 @@ export const Content = () => {
                                             <a
                                                 className={styles.bookMark}
                                                 onClick={e => {
-                                                    e.stopPropagation() // 클릭 시 상세 페이지로 이동하지 않도록 중단
-                                                    handleToggleBookmark(
+                                                    e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
+                                                    toggleBookmark(
                                                         content.BOARD_SEQ
-                                                    ) // 북마크 토글 처리
+                                                    )
                                                 }}
                                             >
                                                 <i

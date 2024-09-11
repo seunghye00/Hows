@@ -13,11 +13,12 @@ export const AddProduct = () => {
     const [selectedCategory, setSelectedCategory] = useState('')
     const [selectedFiles, setSelectedFiles] = useState([])
     const [previews, setPreviews] = useState([])
-    const [selectedImage, setSelectedImage] = useState(10) // 기본값을 10으로 설정
+    const [selectedImage, setSelectedImage] = useState(0)
     const [product, setProduct] = useState({
         product_title: '',
         price: 0,
         product_category_code: '',
+        quantity: 0,
         product_contents: '', // 상세 설명 필드
     })
 
@@ -218,6 +219,12 @@ export const AddProduct = () => {
                         type="text"
                         placeholder="상품명을 입력해주세요"
                         name="product_title"
+                        onChange={handleInputProductInfo}
+                    />
+                    <input
+                        type="number"
+                        placeholder="상품 수량을 입력해주세요"
+                        name="quantity"
                         onChange={handleInputProductInfo}
                     />
                     <input

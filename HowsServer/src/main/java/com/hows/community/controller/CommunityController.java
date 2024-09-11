@@ -132,8 +132,7 @@ public class CommunityController {
 				imageMap.get(boardSeq).add(imageUrl);
 			}
 		}
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(list);
     }
     
     //커뮤니티 좋아요

@@ -23,13 +23,13 @@ public class MemberDAO {
 	public void insert(MemberDTO dto) {
 		mybatis.insert("Member.insert", dto);
 	}
-	
+
 	// 중복확인 - ID
 	public boolean checkId(String member_id) {
 		Integer count = mybatis.selectOne("Member.checkId", member_id);
 		return count != null && count > 0;
 	}
-	
+
 	// 중복확인 - 닉네임
 	public boolean checkNickname(String nickname) {
 		Integer count = mybatis.selectOne("Member.checkNickname", nickname);
@@ -41,27 +41,22 @@ public class MemberDAO {
 		Integer count = mybatis.selectOne("Member.checkEmail", email);
 		return count != null && count > 0;
 	}
-	
+
 	// [로그인]비밀번호 찾기 - 비밀번호 변경
 	public int changePw(Map<String, String> map) {
 		return mybatis.update("Member.changePw", map);
 	}
-	
-	
-	
+
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
 		return mybatis.selectOne("Member.findId", map);
 	}
-	
+
 	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
 	public boolean verifyUser(Map<String, String> map) {
-		Integer count =  mybatis.selectOne("Member.verifyUser", map);
+		Integer count = mybatis.selectOne("Member.verifyUser", map);
 		return count != null && count > 0;
 	}
-	
-	
-	// 아이디로 회원 불러오기
 
 	// 회원정보 가져오기
 	public MemberDTO findById(String id) {
@@ -73,6 +68,26 @@ public class MemberDAO {
 		return mybatis.selectOne("Member.selectInfo", member_id);
 	}
 
+	// 회원정보 수정
+	public int updateInfo(MemberDTO dto) {
+		return mybatis.update("Member.updateInfo", dto);
+	}
+	
+	// 프로필 사진 변경
+	public int updateProfileImage(Map<String, Object> map) {
+	    return mybatis.update("Member.updateProfileImage", map);
+	}
+	
+	// 현재 프로필 사진 URL 가져오기
+	public String getProfileImageUrl(int member_seq) {
+		return mybatis.selectOne("Member.getProfileImageUrl",member_seq);
+	}
+	
+	// 프로필 삭제 시 member_avatar => null 
+	 public void updateProfileImageToNull(int member_seq) {
+		 mybatis.update("Member.updateProfileImageToNull", member_seq);
+	    }
+	
 	// 비밀번호 변경시 기존 비밀번호 확인
 	public String getPasswordById(HashMap<String, String> map) {
 		return mybatis.selectOne("Member.getPasswordById", map);
@@ -82,17 +97,27 @@ public class MemberDAO {
 	public int updatePw(HashMap<String, String> map) {
 		return mybatis.update("Member.updatePw", map);
 	}
-	
+
 	// 회원탈퇴
 	public int deleteUser(String member_id) {
 		return mybatis.delete("Member.deleteUser", member_id);
 	}
 
-	
-	//=======================================================[ 관리자 ]
+	// [방명록] 방명록 작성 위한 member_seq 뽑기
+	 public int findMemberSeq(String member_id) {
+        return mybatis.selectOne("Member.findMemberSeq", member_id);
+     }
+
+	// =======================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
-	public List<MemberDTO> selectAll() {
-		return mybatis.selectList("Member.selectAll");
+	public List<MemberDTO> selectAll(Map<String, Object> params) {
+		System.out.println("DAO 전체회원 조회 : " + mybatis.selectList("Member.selectAll", params));
+		return mybatis.selectList("Member.selectAll", params);
+	}
+
+	// 전체 회원 수 조회 (관리자)
+	public int selectMemberCount(Map<String, Object> params) {
+		return mybatis.selectOne("Member.selectMemberCount", params);
 	}
 
 	// 회원 상세조회 (관리자)
@@ -111,13 +136,25 @@ public class MemberDAO {
 	}
 
 	// 등급 업데이트 (관리자)
-	public int updateGrade(HashMap<String, String> map) {
-		return mybatis.update("Member.updateGrade", map);
+	public int updateGrade(String member_id, String grade_code) {
+		HashMap<String, String> params = new HashMap<>();
+		params.put("member_id", member_id);
+		params.put("grade_code", grade_code);
+
+		System.out.println("DAO등급 : " + grade_code);
+
+		return mybatis.update("Member.updateGrade", params);
 	}
 
 	// 역할 업데이트 (관리자)
-	public int updateRole(HashMap<String, String> map) {
-		return mybatis.update("Member.updateRole", map);
+	public int updateRole(String member_id, String role_code) {
+		HashMap<String, String> params = new HashMap<>();
+		params.put("member_id", member_id);
+		params.put("role_code", role_code);
+
+		System.out.println("DAO역할 : " + role_code);
+
+		return mybatis.update("Member.updateRole", params);
 	}
 
 	// 전체 블랙리스트 사유 가져오기 (관리자)
@@ -126,13 +163,22 @@ public class MemberDAO {
 	}
 
 	// 블랙리스트 등록 (관리자)
-	public int addBlacklist(HashMap<String, String> map) {
-		return mybatis.update("Member.addBlacklist", map);
+	public int addBlacklist(String member_id, String blacklist_reason_code) {
+		HashMap<String, String> params = new HashMap<>();
+		params.put("member_id", member_id);
+		params.put("blacklist_reason_code", blacklist_reason_code);
+
+		return mybatis.update("Member.addBlacklist", params);
 	}
 
 	// 블랙리스트 조회 (관리자)
-	public List<MemberDTO> selectBlacklist() {
-		return mybatis.selectList("Member.selectBlacklist");
+	public List<MemberDTO> selectBlacklist(Map<String, Object> params) {
+	    return mybatis.selectList("Member.selectBlacklist", params);
+	}
+	
+	// 블랙리스트 수 카운트 (관리자)
+	public int selectBlacklistCount(Map<String, Object> params) {
+	    return mybatis.selectOne("Member.selectBlacklistCount", params);
 	}
 
 	// 블랙리스트 수정 (관리자)

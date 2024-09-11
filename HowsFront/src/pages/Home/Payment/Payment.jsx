@@ -2,10 +2,13 @@ import styles from './Payment.module.css'
 import React, {useEffect, useState} from "react";
 import {useOrderStore} from "../../../store/orderStore";
 import {addCommas, shippingPrice} from "../../../commons/commons";
+import {requestPaymentEvent} from "../../../api/payment";
+import { v4 as uuidv4 } from 'uuid';
+import {Link} from "react-router-dom";
 
 export const Payment = () => {
 
-  const { orderPrice, setOrderPrice, orderProducts, setOrderProducts } = useOrderStore();
+  const { orderPrice, setOrderPrice, orderProducts, setOrderProducts, setPaymentInfo } = useOrderStore();
 
   // Daum PostCode
   const [postcode, setPostcode] = useState(false);
@@ -20,13 +23,14 @@ export const Payment = () => {
   const [paymentPrice, setPaymentPrice] = useState({ price: orderPrice, coupon: 0, point: 0, shipping: 0, total: 0 });
   
   // 필수 동의 항목
-  const [consent, setConsent] = useState({category1: false, category2: false});
+  const [consent, setConsent] = useState({category1: false, category2: false, category3: false});
 
   // 주문 데이터
   const [data, setData] = useState({
     member_seq: 0,
     name: "",
     phone: "",
+    email:"",
     zip_code: "",
     address: "",
     detail_address: "",
@@ -63,6 +67,45 @@ export const Payment = () => {
     setData(prev => ({ ...prev, way: name }));
   }
 
+  /** 결제 이벤트 **/
+  const handlePayment = async () => {
+    // 목록 빠진 거 없는지 체크해야됨
+    if(!consent.category1 || !consent.category2 || !consent.category3) {
+      alert("필수 동의 항목을 체크해주세요.");
+      return false;
+    }
+    
+
+    const name = orderProducts[0].product_title;
+    const paymentId = `how-${uuidv4()}`
+    const orderName = name.length > 10 ? name.slice(0,9) + "..." : name;
+    const totalAmount = paymentPrice.total - paymentPrice.point;
+    const payMethod = data.way;
+    const customer = {
+      fullName: data.name,
+      phoneNumber: data.phone,
+      email: data.email
+    }
+
+    const orderInfo = {
+      totalAmount,
+      orderProducts
+    }
+
+    const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
+    setPaymentInfo({ orderName, totalAmount });
+    const result = await requestPaymentEvent(paymentInfo, orderInfo);
+    if(result === "ok") {
+
+      // Payment API
+
+      // 결제 완료
+      // ok → 주문 내역
+      // cancel → home
+    }
+
+  }
+
   /** 새로고침 시 세션에서 order list 가져옴 **/
   useEffect(() => {
     if(orderProducts.length <= 0){
@@ -84,6 +127,7 @@ export const Payment = () => {
       member_seq: 1,
       name: "박종호",
       phone: "01087654321",
+      email: "test@gmail.com",
       zip_code: "35062",
       address: "충청남도 천안호두시 과자동",
       detail_address: "호두마을 100-1",
@@ -206,9 +250,9 @@ export const Payment = () => {
           <div className={styles.payment}>
             <p>결제방식</p>
             <div>
-              <button name="card" style={ data.way === "card" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
-              <button name="kakao" style={ data.way === "kakao" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카카오 페이</button>
-              <button name="toss" style={ data.way === "toss" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 패스</button>
+              <button name="CARD" style={ data.way === "CARD" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
+              <button name="KAKAO" style={ data.way === "KAKAO" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카카오 페이</button>
+              <button name="TOSS" style={ data.way === "TOSS" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 패스</button>
             </div>
           </div>
           <div className={styles.payment}>
@@ -257,14 +301,18 @@ export const Payment = () => {
           </div>
 
           <div className={styles.consent}>
-            <input name="category1" checked={consent.category1} type="checkbox" onChange={handleCheck}/> <label>(필수) 결제에
-            동의</label>
+            <input name="category1" checked={consent.category1} type="checkbox" onChange={handleCheck}/> <label>(필수)
+            개인정보 수집/이용 동의 보기</label>
           </div>
           <div className={styles.consent}>
-          <input name="category2" checked={consent.category2} type="checkbox" onChange={handleCheck}/> <label>(필수) 결제에
-            동의</label>
+            <input name="category2" checked={consent.category2} type="checkbox" onChange={handleCheck}/> <label>(필수)
+            개인정보 제3자 제공 동의 보기</label>
           </div>
-          <button>결제하기</button>
+          <div className={styles.consent}>
+            <input name="category3" checked={consent.category3} type="checkbox" onChange={handleCheck}/> <label>(필수)
+            결제대행 서비스 이용약관 <a href="https://www.inicis.com/terms">(주)KG이니시스</a></label>
+          </div>
+          <button onClick={handlePayment}>결제하기</button>
         </div>
 
       </div>

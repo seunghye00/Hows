@@ -12,10 +12,13 @@ export const useStore = create((set) => {
 
 /* 유나 */
 // 회원
-// export const useMemberStore = create((set) => ({
-//     member: [],
-//     setMember: (member) => set({ member })
-// }));
+export const useMemberStore = create((set) => ({
+    memberSeq: 0,
+    memberId: null,
+
+    setMemberSeq: (seq) => set({ memberSeq: seq }),
+    setMemberId: (id) => set({ memberId: id })
+}));
 
 export const useAuthStore = create((set) => ({
     token: null,

@@ -1,5 +1,7 @@
 package com.hows.File.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -17,7 +19,7 @@ public class FileDAO {
 	@Transactional
 	public int upload(FileDTO fileDTO) {
 		try {
-			return mybatis.insert("upload", fileDTO); // 성공적으로 생성된 file_seq 반환
+			return mybatis.insert("upload", fileDTO);
 		} catch (Exception e) {
 			// 예외 발생 시 실패 처리
 			e.printStackTrace();
@@ -33,5 +35,10 @@ public class FileDAO {
 	// 배너 SEQ로 파일 sysname 조회
 	public String getSysName(int bannerSeq) {
 		return mybatis.selectOne("File.getSysName", bannerSeq);
+	}
+
+	// parent_seq로 파일 sysname 조회
+	public List<String> getSysNames(int parentSeq) {
+		return mybatis.selectList("File.getSysNames", parentSeq);
 	}
 }

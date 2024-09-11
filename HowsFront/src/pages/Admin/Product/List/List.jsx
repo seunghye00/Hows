@@ -1,17 +1,24 @@
-import styles from './ViewList.module.css'
-import { Search } from '../../../../../components/Search/Search'
-import { Button } from '../../../../../components/Button/Button'
+import styles from './List.module.css'
+import { Search } from '../../../../components/Search/Search'
+import { Button } from '../../../../components/Button/Button'
 import { useEffect, useState } from 'react'
-import { categoryList, productList } from '../../../../../api/product'
-import { addCommas } from '../../../../../commons/commons'
+import {
+    categoryList,
+    productList,
+    deleteProducts,
+} from '../../../../api/product'
+import { addCommas, SwalComp } from '../../../../commons/commons'
+import { useNavigate } from 'react-router-dom'
 
-export const ViewList = () => {
+export const List = () => {
     // 상태 변수 초기화
     const [products, setProducts] = useState([]) // 전체 상품 목록
     const [filteredProducts, setFilteredProducts] = useState([]) // 필터링된 상품 목록
     const [selectedCategory, setSelectedCategory] = useState('') // 선택된 카테고리
     const [selectAll, setSelectAll] = useState(false) // 전체 선택 상태
     const [categories, setCategories] = useState([]) // 카테고리 목록
+    const [searchQuery, setSearchQuery] = useState('') // 검색어 상태
+    const navi = useNavigate()
 
     useEffect(() => {
         // 컴포넌트가 처음 렌더링될 때 전체 상품 목록과 카테고리 목록을 비동기 호출
@@ -29,17 +36,21 @@ export const ViewList = () => {
     }, []) // 빈 배열을 의존성으로 설정하여 컴포넌트 마운트 시 한 번만 실행
 
     useEffect(() => {
-        // 선택된 카테고리에 따라 상품을 필터링
-        if (selectedCategory === '') {
-            setFilteredProducts(products)
-        } else {
-            setFilteredProducts(
-                products.filter(
-                    product => product.category === selectedCategory
-                )
+        let filtered = products
+        if (selectedCategory !== '') {
+            filtered = filtered.filter(
+                product => product.product_category_code === selectedCategory
             )
         }
-    }, [selectedCategory, products]) // selectedCategory 또는 products가 변경될 때마다 실행
+        if (searchQuery !== '') {
+            filtered = filtered.filter(product =>
+                product.product_title
+                    .toLowerCase()
+                    .includes(searchQuery.toLowerCase())
+            )
+        }
+        setFilteredProducts(filtered)
+    }, [selectedCategory, searchQuery, products]) // 카테고리 or 상품 목록 or 검색어가 변경될 때마다 실행
 
     // 카테고리 선택 변경 핸들러
     const handleChangeCategory = e => {
@@ -60,6 +71,7 @@ export const ViewList = () => {
 
     // 개별 체크박스 변경 핸들러
     const handleCheckboxChange = productSeq => {
+        console.log(productSeq)
         const updatedProducts = filteredProducts.map(product =>
             product.product_seq === productSeq
                 ? { ...product, checked: !product.checked } // 선택된 상품의 체크 상태 토글
@@ -70,6 +82,63 @@ export const ViewList = () => {
         // 전체 선택 상태를 업데이트
         const allChecked = updatedProducts.every(product => product.checked)
         setSelectAll(allChecked) // 모든 상품이 체크되었는지 확인하고 전체 선택 상태 업데이트
+    }
+
+    // 상품 영역 클릭 핸들러
+    const handleProductClick = productSeq => {
+        handleCheckboxChange(productSeq)
+    }
+
+    // 상품명 검색 핸들러
+    const handleSearch = e => {
+        setSearchQuery(e)
+    }
+
+    // 체크된 상품 삭제 핸들러
+    const handleDeleteBanner = () => {
+        console.log(filteredProducts)
+
+        // 체크된 상품이 존재하는 지 확인
+        const selectedProducts = filteredProducts.filter(
+            product => product.checked
+        )
+        if (selectedProducts.length === 0) {
+            SwalComp({
+                type: 'warning',
+                text: '삭제할 상품을 선택해주세요.',
+            })
+            return
+        }
+
+        // 삭제 확인
+        SwalComp({
+            type: 'question',
+            text: '정말로 삭제하시겠습니까?',
+        }).then(result => {
+            if (result.isConfirmed) {
+                // 배너 삭제 요청
+                deleteProducts(
+                    selectedProducts.map(product => product.product_seq)
+                )
+                    .then(() => {
+                        SwalComp({
+                            type: 'success',
+                            text: '선택한 상품이 삭제되었습니다.',
+                        })
+                        setProducts(
+                            products.filter(product => !product.checked)
+                        )
+                        setSelectAll(false)
+                    })
+                    .catch(error => {
+                        SwalComp({
+                            type: 'error',
+                            text: '상품 삭제에 실패했습니다.',
+                        })
+                        console.error('삭제 실패 :', error)
+                    })
+            }
+        })
     }
 
     return (
@@ -92,15 +161,33 @@ export const ViewList = () => {
                         ))}
                     </select>
                 </div>
-                <Search /> {/* 검색 컴포넌트 */}
-                <Button size={'s'} title={'등록'} /> {/* 등록 버튼 */}
-                <Button size={'s'} title={'삭제'} /> {/* 삭제 버튼 */}
+                <Search onSearch={handleSearch} />
                 <Button
                     size={'s'}
-                    title={'전체 선택'}
-                    onClick={handleSelectAllChange}
+                    title={'등록'}
+                    onClick={() => navi('/admin/product/addProduct')}
                 />{' '}
-                {/* 전체 선택 버튼 */}
+                <Button
+                    size={'s'}
+                    title={'삭제'}
+                    onClick={handleDeleteBanner}
+                />
+                <Button size={'s'} title={'수정'} />
+                <Button size={'s'} title={'상태 변경'} />
+                {selectAll ? (
+                    <Button
+                        size={'s'}
+                        title={'전체 해제'}
+                        isChecked={'Y'}
+                        onClick={handleSelectAllChange}
+                    />
+                ) : (
+                    <Button
+                        size={'s'}
+                        title={'전체 선택'}
+                        onClick={handleSelectAllChange}
+                    />
+                )}
             </div>
             <div className={styles.container}>
                 <div
@@ -115,7 +202,12 @@ export const ViewList = () => {
                         : filteredProducts.map(product => (
                               <div
                                   key={product.product_seq}
-                                  className={styles.cols}
+                                  className={`${styles.cols} ${
+                                      product.checked ? styles.checked : ''
+                                  }`}
+                                  onClick={() =>
+                                      handleProductClick(product.product_seq)
+                                  }
                               >
                                   <img
                                       src={product.product_thumbnail}

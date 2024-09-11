@@ -5,6 +5,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,8 @@ public class CartDAO {
     private SqlSession mybatis;
 
     /** 상품 목록 **/
-    public List<CartDTO> cartList() {
-        return mybatis.selectList("Cart.cartList");
+    public List<HashMap<String, Object>> cartList(int memberSeq) {
+        return mybatis.selectList("Cart.cartList", memberSeq);
     }
 
     /** 상품 추가 **/
@@ -25,8 +26,8 @@ public class CartDAO {
     }
 
     /** 상품 수정 (수량 ) **/
-    public int updateCart(Map<String, Integer> map) {
-        return mybatis.update("Cart.updateCart", map);
+    public int updateCart(CartDTO cartDTO) {
+        return mybatis.update("Cart.updateCart", cartDTO);
     }
 
     /** 상품 삭제 **/

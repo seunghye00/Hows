@@ -1,26 +1,82 @@
 import styles from "./Main.module.css";
 import { Post } from "./Post/Post";
-import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
 import img from "../../../../assets/images/마이페이지_가로배너.jpg";
 import profile from "../../../../assets/images/마이페이지_프로필사진.jpg";
 
-import { Update } from "./../Update/Update";
 import { useEffect, useState } from "react";
 import { api } from "./../../../../config/config";
-import axios from "axios";
 import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
+import { Modal } from "../../../../components/Modal/Modal"
+import { useMemberStore } from "../../../../store/store";
 
 export const Main = () => {
     const navi = useNavigate();
+    const location = useLocation();
+
     const [user, setUser] = useState([]);
+    const { member_id } = useParams(); // URL에서 member_id 가져오기
+    const { memberSeq, setMemberSeq } = useMemberStore();
+    const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
+    const [selectedImage, setSelectedImage] = useState(profile); // 선택한 이미지 초기값
+    const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
+
 
     useEffect(() => {
-        api.get(`/member/selectInfo`).then((resp) => {
-            console.log("데이터 : ", resp.data);
-            setUser(resp.data);
-        });
-    }, []);
+        // url에서 가져온 member_id로 해당 페이지 member_id의 데이터 가져오기
+        if (member_id) {
+            api.get(`/member/selectInfo`, { params: { member_id } }).then((resp) => {
+                console.log("데이터 : ", resp.data);
+                setUser(resp.data);
+                // 사용자 정보에서 프로필 이미지 설정
+                setSelectedImage(resp.data.member_avatar || profile); // 기본 이미지로 초기화
+
+            });
+            api.get(`/guestbook/findMemberSeq`, { params: { member_id } }).then((resp) => {
+                console.log("member_seq : ", resp.data);
+                setMemberSeq(resp.data); // zustand에 memberSeq 저장
+            });
+        }
+    }, [member_id, setMemberSeq]);
+
+    // 서버로 이미지 업로드 함수
+    const uploadProfileImage = (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('member_seq', memberSeq);
+
+        api.post('/member/uploadProfileImage', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(resp => {
+                console.log('이미지 업로드 성공:', resp.data);
+                // 업로드 후 상태 업데이트
+                setSelectedImage(resp.data); // 서버에서 반환된 이미지 URL로 업데이트
+            })
+            .catch(error => {
+                console.error('이미지 업로드 실패:', error);
+            });
+    };
+
+    // 프로필 사진 삭제
+    const deleteProfileImage = () => {
+        api.delete('/member/deleteProfileImage', {
+            params: { member_seq: memberSeq }
+        })
+            .then(resp => {
+                console.log('이미지 삭제 성공:', resp.data);
+                setSelectedImage(profile); // 기본 이미지로 변경
+            })
+            .catch(error => {
+                console.error('이미지 삭제 실패:', error);
+            });
+    };
+
+
+
 
     return (
         <div className={styles.container}>
@@ -29,25 +85,23 @@ export const Main = () => {
             </div>
             <div className={styles.mainBox}>
                 <div className={styles.header}>
-                    <div className={styles.profile}>
-                        <img src={profile}></img>
+                    <div className={styles.profile} onClick={() => setIsModalOpen(true)}>
+                        <img src={selectedImage} alt="Profile" />
                     </div>
                     <div className={styles.userInfo}>
                         <div className={styles.top}>
                             <div className={styles.nickname}>{user.nickname}</div>
                             <div className={styles.linkBtns}>
-                                <button
-                                    className={styles.infoUpdate}
-                                    onClick={() => navi("/mypage/update")}
-                                >
-                                    수정
-                                </button>
-                                <button
-                                    className={styles.mypage}
-                                    onClick={() => navi("/mypage/userDashboard")}
-                                >
-                                    마이페이지
-                                </button>
+                                {sessionStorage.getItem('member_id') === user.member_id && (
+                                    <>
+                                        <button className={styles.infoUpdate} onClick={() => navi("/mypage/update")}>
+                                            수정
+                                        </button>
+                                        <button className={styles.mypage} onClick={() => navi("/mypage/userDashboard")}>
+                                            마이페이지
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </div>
                         <div className={styles.middle}>
@@ -62,30 +116,33 @@ export const Main = () => {
                             </div>
                         </div>
                         <div className={styles.bottom}>
-                            <button className={styles.followBtn}>팔로우 +</button>
+                            {sessionStorage.getItem('member_id') != user.member_id && ( // 본인이 아닐시에는 표시 X
+                                <>
+                                    <button className={styles.followBtn}>팔로우 +</button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
                 <div className={styles.menus}>
-                    <div className={styles.menu} onClick={() => navi("./post")}>
-                        <div>
+                    <div className={styles.menu} onClick={() => navi(`/mypage/main/${member_id}/post`)}>
+                        <div className={location.pathname.includes("post") ? styles.active : ""}>
                             <i className="bx bx-grid"></i>
                             <span>게시물</span>
                         </div>
                     </div>
-                    <div className={styles.menu} onClick={() => navi("./scrap")}>
-                        <div>
+                    <div className={styles.menu} onClick={() => navi(`/mypage/main/${member_id}/scrap`)}>
+                        <div className={location.pathname.includes("scrap") ? styles.active : ""}>
                             <i className="bx bx-bookmark"></i>
                             <span>스크랩</span>
                         </div>
                     </div>
-                    <div className={styles.menu} onClick={() => navi("./guestbook")}>
-                        <div>
+                    <div className={styles.menu} onClick={() => navi(`/mypage/main/${member_id}/guestbook`)}>
+                        <div className={location.pathname.includes("guestbook") ? styles.active : ""}>
                             <i className="bx bx-message-dots"></i>
-                            <span>집들이</span>
+                            <span>방명록</span>
                         </div>
                     </div>
-
                 </div>
 
                 {/* 바뀌는 부분 */}
@@ -96,11 +153,42 @@ export const Main = () => {
                         <Route path="scrap" element={<Scrap />} />
                         <Route path="guestbook" element={<Guestbook />} />
                     </Routes>
-
                 </div>
             </div>
 
-
+            {/* 모달 컴포넌트 추가 */}
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                <div className={styles.modalBox}>
+                    <h2>프로필 사진 변경</h2>
+                    <button className={styles.modBtn} onClick={() => {
+                        document.getElementById("fileInput").click(); // 파일 input 클릭
+                    }}>수정</button>
+                    <button className={styles.delBtn} onClick={() => {
+                        deleteProfileImage(); // 서버에 이미지 삭제 요청
+                        // setSelectedImage(profile); // 기본 이미지로 변경
+                        setIsModalOpen(false);
+                    }}>삭제</button>
+                    <input
+                        id="fileInput"
+                        type="file"
+                        style={{ display: "none" }}
+                        accept="image/*"
+                        onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                    setSelectedImage(reader.result); // 선택한 이미지 미리보기
+                                    uploadProfileImage(file); // 이미지 서버로 전송
+                                };
+                                reader.readAsDataURL(file);
+                            }
+                            setIsModalOpen(false); // 모달 닫기
+                        }}
+                    />
+                </div>
+            </Modal>
         </div >
+
     );
 };

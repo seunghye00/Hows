@@ -1,19 +1,121 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './DetailPage.module.css'
-import img from '../../../../../../assets/images/interior_1.jpg'
+import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
+import StarRating from '../../../../../../components/StarRating/StarRating';
+import { Modal } from '../../../../../../components/Modal/Modal';
+import axios from 'axios';
+import { host } from '../../../../../../config/config';
+import { useParams } from 'react-router-dom';
 
 export const DetailPage = () => {
+    const { product_seq } = useParams();
 
-    // 초기 상태는 'info'
+    const [data, setData] = useState({
+        rating: 0,                  // 별점 상태
+        review_contents: '',        // 리뷰 내용
+        product_seq: product_seq,   // 상품 번호를 URL에서 가져온 현재 product_seq 로 설정
+        image_url: '',              // 이미지 URL
+    });
+
+    // 탭 메뉴 상태 
     const [activeTab, setActiveTab] = useState('info'); 
+    const handleTabChange = (tabName) => setActiveTab(tabName);
 
-    const handleTabChange = (tabName) => {
-        setActiveTab(tabName);
+    // 모달창 상태
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // 모달창 열기 및 닫기
+    const handleOpenModal = () => setIsModalOpen(true);
+    const handleCloseModal = () => setIsModalOpen(false);
+
+    // 별점 변경 시 호출되는 함수
+    const handleRatingChange = (newRating) => {
+        setData((prevData) => ({
+            ...prevData,
+            rating: newRating, 
+        }));
     };
+
+    // 리뷰 내용 변경 핸들러
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    // 이미지 선택 핸들러
+    const handleImageChange = (event) => {
+        const files = event.target.files;
+        if (files) {
+            // 파일 수를 4개로 제한
+            if (files.length > 4) {
+                alert('최대 4개의 파일만 선택할 수 있습니다.');
+                handleCloseModal(); // 모달 창 닫기
+                return;
+            }
+    
+            // 파일 목록을 상태로 저장
+            setData(prevData => ({
+                ...prevData,
+                images: Array.from(files) // 파일 리스트를 배열로 변환
+            }));
+        }
+    };
+    
+    
+    // 모든 필드를 입력했는지 검사
+    const isFormValid = () => {
+        const { rating, review_contents, images } = data;
+        return rating && review_contents && images && images.length > 0;
+    };
+
+    // 리뷰 등록
+    const handleSubmit = () => {
+        if (!isFormValid()) {
+            alert('별점, 리뷰 내용, 그리고 이미지를 모두 입력해 주세요.');
+            return;
+        }
+
+        const formData = new FormData();
+    
+        // 리뷰 데이터를 JSON 형식으로 변환하여 FormData에 추가함
+        const reviewData = JSON.stringify({
+            rating: data.rating,
+            review_contents: data.review_contents,
+            product_seq: data.product_seq,
+            member_id: 'hahaha123'  // 임시 사용자 ID
+        });
+        formData.append('reviewData', reviewData);
+    
+        // 이미지 여러 파일 추가 
+        if (data.images && data.images.length > 0) {
+            data.images.forEach((image) => {
+                formData.append('images', image); 
+            });
+        }
+    
+        // 서버로 전송
+        axios.post(`${host}/product/reviewAdd`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        }).then((response) => {
+            console.log('성공', response.data);
+            alert('리뷰 제출에 성공했습니다');
+            handleCloseModal();
+        }).catch((error) => {
+            console.error('실패', error);
+            alert('리뷰 제출에 실패했습니다');
+            handleCloseModal();
+        });
+    };
+    
+    
+
 
     return(
         <div className={styles.container}>
-            <div className={styles.buttons}>
+            <div className={styles.menu}>
                 <button onClick={() => handleTabChange('info')}>상품정보</button>
                 <button onClick={() => handleTabChange('reviews')}>리뷰</button>
                 <button onClick={() => handleTabChange('details')}>배송/환불</button>
@@ -24,20 +126,163 @@ export const DetailPage = () => {
                     {/* 상품 정보 내용 */}
                     <h2>상품 정보</h2>
                     <div>
-                        <img src={img}></img>
-                        <img src={img}></img>
-                        <img src={img}></img>
-                        <img src={img}></img>
+                        여기는 상품 정보.
                     </div>
                 </div>
                 )}
+
                 {activeTab === 'reviews' && (
                 <div className={styles.reviews}>
                     {/* 상품 리뷰 내용 */}
-                    <h2>상품 리뷰</h2>
-                    <div>여기는 리뷰 정보.</div>
+                    <div className={styles.reviewsBox}>
+                        <div className={styles.reviewsHeader}>
+                            <div>리뷰 11,111</div>
+                            <div onClick={handleOpenModal}>리뷰쓰기</div>
+
+                            {/* 모달창 */}
+                            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                                <div className={styles.modalBox}>
+                                    <h2>리뷰 쓰기</h2>
+                                    <div>
+                                        <span>별점 평가</span>
+                                        <StarRating 
+                                            rating={data.rating} // 현재 별점 상태 전달
+                                            onRatingChange={handleRatingChange} // 별점 변경 시 호출
+                                        />
+                                    </div>
+
+                                    <h2>리뷰 작성</h2>
+                                    <div className={styles.reviewModal}>
+                                        <textarea
+                                            name="review_contents" 
+                                            placeholder="리뷰 내용을 입력하세요"
+                                            value={data.review_contents}
+                                            onChange={handleInputChange}  
+                                        ></textarea>
+
+                                        {/* 이미지 업로드 */}
+                                        <input type="file" accept="image/*" onChange={handleImageChange} multiple />
+
+                                        <button onClick={handleSubmit}>리뷰 제출</button> 
+                                    </div>
+                                </div>
+                            </Modal>
+
+                        </div>
+                        <div className={styles.reviewsStarRating}>
+                            <div><StarRating/>&nbsp;&nbsp;<span>4.8</span></div>
+                            <div>
+                                <ul>
+                                    <li>
+                                        5점&nbsp;&nbsp;1,000명
+                                    </li>
+                                    <li>
+                                        4점&nbsp;&nbsp;500명
+                                    </li>
+                                    <li>
+                                        3점&nbsp;&nbsp;50명
+                                    </li>
+                                    <li>
+                                        2점&nbsp;&nbsp;10명
+                                    </li>
+                                    <li>
+                                        1점&nbsp;&nbsp;1명
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className={styles.reviewsMain}>
+                            <div className={styles.option}>
+                                <div>베스트순</div>
+                                <div>최신순</div>
+                            </div>
+                            <div className={styles.reviewBox}>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>작성자</div>
+                                            <div><StarRating/></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div> <img src={img} alt='img'/> </div>
+                                        <div>
+                                            <div>제목 - 후기후기후기후기후기</div>
+                                            <div>내용 - 후기후기후기후기후기</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 )}
+
                 {activeTab === 'details' && (
                 <div className={styles.details}>
                     {/* 상품 질문 내용 */}

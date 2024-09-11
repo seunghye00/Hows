@@ -51,6 +51,12 @@ public class OrderDTO {
 
     public OrderDTO() {}
 
+    public OrderDTO(int member_seq, int order_price) {
+        this.member_seq = member_seq;
+        this.order_price = order_price;
+        this.order_code = "O1";
+    }
+
     public OrderDTO(int order_seq, int member_seq, String order_code, Timestamp order_date, int order_price) {
         this.order_seq = order_seq;
         this.member_seq = member_seq;

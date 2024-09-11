@@ -2,7 +2,7 @@ import styles from './Order.module.css'
 import { Button } from '../../../../components/Button/Button'
 import { orderList } from '../../../../api/order'
 import { useEffect, useState } from 'react'
-import { formatDate } from '../../../../commons/commons'
+import { formatDate, addCommas } from '../../../../commons/commons'
 import { Modal } from '../../../../components/Modal/Modal'
 import Swal from 'sweetalert2'
 
@@ -179,14 +179,14 @@ export const Order = () => {
                                         />
                                     </div>
                                     <div className={styles.cols}>
-                                        {order.order_date}
+                                        {formatDate(order.order_date)}
                                     </div>
                                     <div className={styles.cols}>상품명</div>
                                     <div className={styles.cols}>
                                         {order.name}
                                     </div>
                                     <div className={styles.cols}>
-                                        {order.order_price}
+                                        \ {addCommas(order.order_price)}
                                     </div>
                                     <div className={styles.cols}>
                                         {order.order_title}

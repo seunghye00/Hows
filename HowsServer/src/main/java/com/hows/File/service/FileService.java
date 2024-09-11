@@ -1,6 +1,7 @@
 package com.hows.File.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -52,7 +53,8 @@ public class FileService {
 			if (!result.equals("fail")) {
 
 				// 3. 이미지 File 테이블에 저장
-				int value = fileDAO.upload(new FileDTO(0, code, oriName, sysName, parentSeq));
+				FileDTO dto = new FileDTO(0, code, oriName, sysName, parentSeq);
+				int value = fileDAO.upload(dto);
 
 				// 4. 태이블에 저장 실패 시 gcs 서버에서 이미지 삭제
 				if (value <= 0) {
@@ -62,7 +64,7 @@ public class FileService {
 				// 배너를 등록한 경우 생성된 file 데이터 반환
 				if (code.equals("F5")) {
 					Map<String, Object> bannerInfo = new HashMap<>();
-					bannerInfo.put("file_seq", value);
+					bannerInfo.put("file_seq", dto.getFile_seq());
 					bannerInfo.put("sysName", sysName);
 					bannerInfo.put("banner_url", result);
 					// Jackson 라이브러리를 사용하여 Map을 JSON 문자열로 변환하여 반환
@@ -87,8 +89,13 @@ public class FileService {
 		return result;
 	}
 
-	// 배너 SEQ로 파일 sysname 조회
+	// banner_seq로 파일 sysname 조회
 	public String getSysName(int bannerSeq) {
 		return fileDAO.getSysName(bannerSeq);
+	}
+	
+	// parent_seq로 파일 sysname 조회
+	public List<String> getSysNames(int parentSeq) {
+		return fileDAO.getSysNames(parentSeq);
 	}
 }

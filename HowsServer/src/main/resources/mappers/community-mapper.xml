@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Community">
+
+    <!-- 게시글 작성 -->
+    <insert id="insertWrite" parameterType="com.hows.community.dto.CommunityDTO">
+        <selectKey keyProperty="board_seq" resultType="int" order="BEFORE">
+            SELECT board_seq.NEXTVAL FROM dual
+        </selectKey>
+        insert into board (board_seq, board_contents, board_write_date, view_count, housing_type_code, space_type_code, area_size_code, color_code, member_id)
+        values (#{board_seq}, #{board_contents}, default, default, #{housing_type_code}, #{space_type_code}, #{area_size_code}, default, #{member_id})
+    </insert>
+
+    <!-- board_image 테이블에 이미지 정보 저장 후 시퀀스 반환 -->
+    <insert id="insertImage" parameterType="com.hows.community.dto.ImageDTO">
+        <selectKey keyProperty="board_image_seq" resultType="int" order="BEFORE">
+            SELECT board_image_seq.NEXTVAL FROM dual
+        </selectKey>
+        insert into board_image (board_image_seq, board_seq, image_url, image_order)
+        values (#{board_image_seq}, #{board_seq}, #{image_url}, #{image_order})
+    </insert>
+	
+    <!-- 방금 삽입한 이미지 시퀀스 값 조회 -->
+    <select id="selectBoardImg" resultType="int">
+        select board_image_seq.currval from dual
+    </select>
+
+    <!-- board_tag 테이블에 태그 정보 저장 -->
+    <insert id="insertTag" parameterType="com.hows.community.dto.TagDTO">
+        insert into board_tag (board_tag_seq, board_image_seq, product_seq, left_position, top_position)
+        values (board_tag_seq.nextval, #{board_image_seq}, #{product_seq}, #{left_position}, #{top_position})
+    </insert>
+    
+    <!-- 게시글 리스트 출력  -->
+	<select id="selectAll" resultType="map">
+		select b.board_seq,
+		   b.view_count, 
+	       m.nickname, 
+	       m.member_avatar, 
+	       count(distinct bl.board_like_seq) as like_count,
+	       (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments,
+	       b.board_contents
+		from board b
+		join member m on b.member_id = m.member_id
+		left join board_like bl on b.board_seq = bl.board_seq
+		left join comments c on b.board_seq = c.board_seq
+		left join reply r on c.comment_seq = r.comment_seq
+		group by b.board_seq, b.view_count, m.nickname, m.member_avatar, b.board_contents
+	</select>
+	<!-- 게시글 이미지 출력 -->
+	<select id="selectAllImg" resultType="map">
+		select board_seq, image_url
+			from board_image
+		where board_seq in (select board_seq from board)
+	</select>
+	
+	
+</mapper>

@@ -11,7 +11,7 @@
 
 	<select id="orderListByStatus" resultType="com.hows.order.dto.OrderInfoListDTO">
 		select
-		o.orders_seq, o.order_date, m.name, o.order_price, s.order_title
+		o.order_seq, o.order_date, m.name, o.order_price, s.order_title
 		from orders o
 		join member m ON o.member_seq = m.member_seq
 		join order_status s ON o.order_code = s.order_code
@@ -29,5 +29,45 @@
 			</choose>
 		</where>
 	</select>
+
+	<insert id="addOrder" parameterType="com.hows.order.dto.OrderDTO">
+		<selectKey keyProperty="order_seq" resultType="int" order="BEFORE">
+			SELECT
+				order_seq.nextval
+			FROM
+				dual
+		</selectKey>
+
+		INSERT INTO
+			orders
+		VALUES(
+			#{order_seq},
+			#{member_seq},
+			#{order_code},
+			default,
+			#{order_price}
+		)
+	</insert>
+
+	<insert id="addOrderList">
+		INSERT INTO
+			order_list
+		VALUES (
+			order_list_seq.nextval,
+			#{order_seq},
+			#{product_seq},
+			#{order_list_count},
+			#{order_list_price}
+		)
+	</insert>
+
+	<update id="updateOrder">
+		UPDATE
+			orders
+		SET
+			orders_code = #{orders_code}
+		WHERE
+			orders_seq = #{orders_seq}
+	</update>
 
 </mapper>

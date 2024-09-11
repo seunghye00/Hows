@@ -18,6 +18,7 @@ detail_address varchar2(255) not null,
 grade_code char(2) default 'G3' not null,
 role_code char(2) default 'R2' not null,
 blacklist_reason_code char(2) default null,
+blacklist_date timestamp default null,
 signup_date timestamp default sysdate,
 withdrawal_date timestamp default null,
 withdrawal_yn char(1) default 'N',
@@ -113,8 +114,10 @@ nocache;
 create table board_tag (
     board_tag_seq number primary key,       
     board_image_seq number not null,              
-    product_seq varchar2(20) not null
-)
+    product_seq number not null,
+    left_position NUMBER not null,
+    top_position NUMBER not null
+);
 
 create sequence board_tag_seq
 start with 1
@@ -359,10 +362,9 @@ nocache;
 -- 리뷰
 create table review (
     review_seq number primary key,
-    rating number not null,
-    review_title varchar2(100) not null,
     review_contents varchar2(900) not null,
     review_date timestamp default sysdate,
+    rating number not null,
     product_seq number not null,
     member_id varchar2(20) not null
 );
@@ -436,7 +438,7 @@ nocache;
 
 -- 주문
 create table orders (
-    orders_seq number primary key,
+    order_seq number primary key,
     member_seq number not null,
     order_code char(2) not null,
     order_date timestamp default sysdate not null,
@@ -480,9 +482,9 @@ nocache;
 -- 쿠폰
 create table coupon (
     coupon_seq number primary key,
-    coupon_title varchar2(50) not null,
+    coupon_title varchar2(100) not null,
     coupon_type varchar2(20) not null,
-    coupon_discount number default null,
+    coupon_discount varchar2(20) default null,
     expired_date timestamp not null
 );
 
@@ -491,6 +493,17 @@ start with 1
 increment by 1
 nomaxvalue
 nocache;
+
+-- coupon dummy data
+INSERT INTO coupon
+VALUES ( coupon_seq.nextval, '[ 5% 할인 ] 가을 맞이 특가 5% 쿠폰', 'percent', '*0.95', '2024-12-31');
+INSERT INTO coupon
+VALUES ( coupon_seq.nextval, '[ 10% 할인 ] 가을 맞이 특가 10% 쿠폰', 'percent', '*0.9', '2024-12-31');
+INSERT INTO coupon
+VALUES ( coupon_seq.nextval, '[ 5000 할인 ] 가을 맞이 특가 5000원 할인 쿠폰', 'price', '-5000', '2024-12-31');
+INSERT INTO coupon
+VALUES ( coupon_seq.nextval, '[ 2000 할인 ] 한가위 맞이 2000원 할인 쿠폰', 'price', '-2000', '2024-12-31');
+
 
 -- 쿠폰 소유 
 create table coupon_owner (
@@ -515,7 +528,8 @@ create table payment (
     order_seq number not null,
     payment_code char(2) not null,
     payment_price number not null,    
-    payment_date timestamp
+    payment_date timestamp default sysdate,
+    payment_id varchar2(100) not null
 );
 
 create sequence payment_seq
@@ -530,14 +544,14 @@ create table payment_status (
     payment_title varchar2(50)
 );
 
-insert into payment_status (payment_code, payment_title) values ('P1', '담당자 가');
-insert into payment_status (payment_code, payment_title) values ('P2', '뭐 할지');
-insert into payment_status (payment_code, payment_title) values ('P3', '고민 합시다!');
+insert into payment_status (payment_code, payment_title) values ('P1', '결제대기');
+insert into payment_status (payment_code, payment_title) values ('P2', '결제완료');
+insert into payment_status (payment_code, payment_title) values ('P3', '결제실패');
 
 -- 배송
 create table shipping (
     shipping_seq number primary key,
-    orders_seq number not null,
+    order_seq number not null,
     shipping_code char(2) not null,
     shipping_address varchar2(255) not null,
     shipping_detail_address varchar2(255) not null
@@ -589,7 +603,7 @@ notice_title varchar2(100) not null,
 notice_contents varchar2(4000) not null,
 notice_date timestamp default sysdate,
 view_count number default 0 not null,
-notice_code char(2) default 'N1 not null
+notice_code char(2) default 'N1' not null
 );
 
 create sequence notice_seq

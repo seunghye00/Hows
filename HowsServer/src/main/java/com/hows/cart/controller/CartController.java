@@ -2,8 +2,11 @@ package com.hows.cart.controller;
 
 import com.hows.cart.dto.CartDTO;
 import com.hows.cart.service.CartService;
+import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -18,9 +21,9 @@ public class CartController {
     private CartService cartServ;
 
     @GetMapping
-    public ResponseEntity<List<CartDTO>> cartList() {
+    public ResponseEntity<List<HashMap<String, Object>>> cartList(@AuthenticationPrincipal CustomUserDetails user) {
         try{
-            List<CartDTO> list = cartServ.cartList();
+            List<HashMap<String, Object>> list = cartServ.cartList(user.getMemberSeq());
             return ResponseEntity.ok(list);
 
         } catch (Exception e){
@@ -35,13 +38,9 @@ public class CartController {
         return ResponseEntity.ok(result);
     }
 
-    @PutMapping("/{seq}")
-    public ResponseEntity<String> updateCart(@PathVariable int seq, int count) throws Exception {
-        Map<String, Integer> map = new HashMap<>();
-        map.put("seq", seq);
-        map.put("count", count);
-
-        String result = cartServ.updateCart(map);
+    @PutMapping
+    public ResponseEntity<String> updateCart(@RequestBody CartDTO cartDTO) throws Exception {
+        String result = cartServ.updateCart(cartDTO);
         return ResponseEntity.ok(result);
     }
 

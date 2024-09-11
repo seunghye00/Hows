@@ -6,6 +6,12 @@ import { Button } from '../../../../../../components/Button/Button'
 import { Search } from '../../../../../../components/Search/Search'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../../../../../store/store' // 로그인 상태 확인을 위한 store
+import {
+    getHousingTypes,
+    getSpaceTypes,
+    getAreaSizes,
+    getColors,
+} from '../../../../../../api/community' // 분리된 API 호출 함수들
 
 export const Sort = () => {
     const { isAuth } = useAuthStore() // 로그인 여부 확인
@@ -26,23 +32,17 @@ export const Sort = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const housingTypesResponse = await axios.get(
-                    `${host}/option/housing-types`
-                )
-                setHousingTypes(housingTypesResponse.data)
+                const housingTypesResponse = await getHousingTypes()
+                setHousingTypes(housingTypesResponse)
 
-                const spaceTypesResponse = await axios.get(
-                    `${host}/option/space-types`
-                )
-                setSpaceTypes(spaceTypesResponse.data)
+                const spaceTypesResponse = await getSpaceTypes()
+                setSpaceTypes(spaceTypesResponse)
 
-                const areaSizesResponse = await axios.get(
-                    `${host}/option/area-sizes`
-                )
-                setAreaSizes(areaSizesResponse.data)
+                const areaSizesResponse = await getAreaSizes()
+                setAreaSizes(areaSizesResponse)
 
-                const colorsResponse = await axios.get(`${host}/option/colors`)
-                setColors(colorsResponse.data)
+                const colorsResponse = await getColors()
+                setColors(colorsResponse)
             } catch (error) {
                 console.error('Error fetching data', error)
             }

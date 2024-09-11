@@ -4,13 +4,19 @@ import {useOrderStore} from "../../../store/orderStore";
 import {addCommas, shippingPrice, SwalComp, validateName, validatePhone} from "../../../commons/commons";
 import {requestPaymentEvent} from "../../../api/payment";
 import { v4 as uuidv4 } from 'uuid';
-import {Link} from "react-router-dom";
-import {api} from "../../../config/config";
 import {userInfo} from "../../../api/member";
+import {Modal} from "../../../components/Modal/Modal";
+import DaumPostcode from "react-daum-postcode";
+import {useNavigate} from "react-router-dom";
 
 export const Payment = () => {
 
   const { orderPrice, setOrderPrice, orderProducts, setOrderProducts, setPaymentInfo } = useOrderStore();
+
+  const navi = useNavigate();
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Daum PostCode
   const [postcode, setPostcode] = useState(false);
@@ -44,9 +50,24 @@ export const Payment = () => {
     point: 0,
   });
 
+  /** 주소 찾기 **/
+  const handleAddress = () => {
+    SwalComp({ type: "confirm", text: "주소를 변경하시곘습니까?" }).then(res => {
+      if(res) {
+        setAddressCheck(prev => ({ default: false, direct: true }));
+        setIsModalOpen(true);
+      }
+    });
+  }
+
   /** postcode data set **/
   const completeHandler = (data) => {
-    console.log("data ==== ", data);
+    setIsModalOpen(false);
+    setData(prev => ({
+      ...prev,
+      zip_code: data.zonecode,
+      address: data.address
+    }));
   }
 
   /** 동의 항목 체크 **/
@@ -102,17 +123,24 @@ export const Payment = () => {
       return false;
     }
 
+    if(data.way === "") {
+      SwalComp({type: "warning", text: "결제 방식을 선택하세요"});
+      return false;
+    }
+
     if(!consent.category1 || !consent.category2 || !consent.category3) {
       SwalComp({type: "warning", text: "필수 동의 항목을 체크해주세요"});
       return false;
     }
+
 
     const name = orderProducts[0].product_title.length > 10 ? orderProducts[0].product_title.slice(0,9) + "..." : orderProducts[0].product_title;
     const count = orderProducts.length > 1 ? ` 외 ${orderProducts.length-1}종` :  "";
     const paymentId = `how-${uuidv4()}`
     const orderName = name + count;
     const totalAmount = paymentPrice.total - paymentPrice.point;
-    const payMethod = data.way;
+    // const payMethod = data.way;
+    const payMethod = "CARD";
     const customer = {
       fullName: data.name,
       phoneNumber: data.phone,
@@ -121,18 +149,30 @@ export const Payment = () => {
 
     const orderInfo = {
       totalAmount,
-      orderProducts
+      orderProducts,
+      name: data.name,
+      phone: data.phone,
+      zipCode: data.zip_code,
+      address: data.address,
+      detailAddress: data.detail_address
     }
+    const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
+    setPaymentInfo({ orderName, totalAmount });
+    requestPaymentEvent(paymentInfo, orderInfo).then(res => {
+      console.log("requestPaymentEvent res ==== ", res);
+      if(res.data === "ok") {
+        SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
+          if(resp) {
+            navi("/mypage/userDashboard/buyList");
+          } else {
+            navi("/");
+          }
+        });
+      } else {
 
-    // const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
-    // setPaymentInfo({ orderName, totalAmount });
-    // const result = await requestPaymentEvent(paymentInfo, orderInfo);
-    // if(result === "ok") {
-    //   // Payment API
-    //   // 결제 완료
-    //   // ok → 주문 내역
-    //   // cancel → home
-    // }
+      }
+    });
+
 
   }
 
@@ -177,7 +217,8 @@ export const Payment = () => {
           ... prev,
           price: parseInt(price),
           shipping: shippingPrice(parseInt(price)),
-          total: parseInt(price) + shippingPrice(price)
+          total: parseInt(price)
+          // total: parseInt(price) + shippingPrice(price)
         }));
 
       }
@@ -218,7 +259,8 @@ export const Payment = () => {
   }, [addressCheck, member]);
 
   useEffect(() => {
-    setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon + shippingPrice(prev.price)}));
+    setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon}));
+    // setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon + shippingPrice(prev.price)}));
   }, [data.point])
 
   return (
@@ -259,12 +301,12 @@ export const Payment = () => {
               <input id="direct" name="addressOption" onChange={handleCheck} type="radio" checked={addressCheck.direct}/>
               <label htmlFor="direct">직접 입력</label>
             </div>
-            <button onClick={handleOrderHistory}>배송지 내역 조회</button>
+            {/*<button onClick={handleOrderHistory}>배송지 내역 조회</button>*/}
           </div>
           <div className={styles.address}>
             <div className={styles.postcode}>
               <input type="text" placeholder="우편번호" value={data.zip_code} readOnly/>
-              <button>주소 찾기</button>
+              <button onClick={handleAddress}>주소 찾기</button>
             </div>
           </div>
           <div className={styles.address}>
@@ -366,11 +408,14 @@ export const Payment = () => {
 
       </div>
 
-
-      {/*{ postcode &&*/}
-      {/*  <Postcode onComplete={ completeHandler } />*/}
-      {/*}*/}
-
+      {
+        isModalOpen &&
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          <div className={styles.modalBox}>
+            <DaumPostcode onComplete={ completeHandler } style={{height: '95%'}} />
+          </div>
+        </Modal>
+      }
     </div>
   );
 }

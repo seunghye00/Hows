@@ -96,10 +96,15 @@ public class OrderDTO {
 
     public OrderDTO() {}
 
-    public OrderDTO(int member_seq, int order_price) {
+    public OrderDTO(int member_seq, int order_price, String orderer_name, String orderer_phone, String orderer_zip_code, String orderer_address, String orderer_detail_address) {
         this.member_seq = member_seq;
-        this.order_price = order_price;
         this.order_code = "O1";
+        this.order_price = order_price;
+        this.orderer_name = orderer_name;
+        this.orderer_phone = orderer_phone;
+        this.orderer_zip_code = orderer_zip_code;
+        this.orderer_address = orderer_address;
+        this.orderer_detail_address = orderer_detail_address;
     }
 
     public OrderDTO(int order_seq, int member_seq, String order_code, Timestamp order_date, int order_price, String orderer_name, String orderer_phone, String orderer_zip_code, String orderer_address, String orderer_detail_address) {

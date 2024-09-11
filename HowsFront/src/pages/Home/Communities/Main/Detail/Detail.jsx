@@ -8,15 +8,15 @@ import { Modal } from '../../../../../components/Modal/Modal'
 import Swal from 'sweetalert2'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
 import { PiSiren } from 'react-icons/pi'
-import axios from 'axios'
 import { useParams } from 'react-router-dom' // for accessing the board_seq from URL
 import img from './../../../../../assets/images/cry.jpg'
 import img1 from './../../../../../assets/images/마이페이지_프로필사진.jpg'
-import { host } from '../../../../../config/config'
 import {
     getPostData,
     getImageData,
     getTagData,
+    toggleLike,
+    toggleBookmark,
 } from '../../../../../api/community' // API 함수 불러오기
 
 export const Detail = () => {
@@ -45,9 +45,9 @@ export const Detail = () => {
                 const tags = await getTagData(board_seq)
                 setTagsData(tags.data.tags)
 
-                console.log('게시글 데이터:', postData.data)
-                console.log('이미지 데이터:', images.data.images)
-                console.log('태그 데이터:', tags.data.tags)
+                // 좋아요 북마크 초기화
+                setLikeCount(postData.data.LIKE_COUNT)
+                setBookmarkCount(postData.data.BOOKMARK_COUNT)
             } catch (error) {
                 console.error('데이터를 가져오는 중 오류 발생:', error)
             }
@@ -57,14 +57,33 @@ export const Detail = () => {
     }, [board_seq])
 
     // 좋아요, 북마크 상태 변경
-    const toggleLike = () => {
-        setIsLiked(!isLiked)
-        setLikeCount(isLiked ? likeCount - 1 : likeCount + 1)
+    const toggleLikeHandler = async () => {
+        try {
+            const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+            const response = await toggleLike(board_seq, member_id)
+
+            // 서버에서 반환된 최신 좋아요 상태를 반영
+            const { isLiked, like_count } = response.data
+            setIsLiked(isLiked) // 서버가 반환한 좋아요 상태로 설정 (추가되면 true, 취소되면 false)
+            setLikeCount(like_count) // 서버에서 최신 like_count 반환
+            console.log(isLiked + ' 좋아요 현재 값 확인') // 확인용 로그
+        } catch (error) {
+            console.error('좋아요 처리 중 오류 발생:', error)
+        }
     }
 
-    const toggleBookmark = () => {
-        setIsBookmarked(!isBookmarked)
-        setBookmarkCount(isBookmarked ? bookmarkCount - 1 : bookmarkCount + 1)
+    const toggleBookmarkHandler = async () => {
+        try {
+            const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+            const response = await toggleBookmark(board_seq, member_id)
+
+            // 서버에서 반환된 최신 북마크 상태를 반영
+            const { isBookmarked, bookmark_count } = response.data
+            setIsBookmarked(isBookmarked) // 서버가 반환한 북마크 상태로 설정
+            setBookmarkCount(bookmark_count) // 서버에서 최신 bookmark_count 반환
+        } catch (error) {
+            console.error('북마크 처리 중 오류 발생:', error)
+        }
     }
 
     // 링크 복사 기능
@@ -96,15 +115,15 @@ export const Detail = () => {
                     {/* 게시글 상단 */}
                     <div className={styles.postActions}>
                         <div className={styles.likesViewBook}>
-                            <div onClick={toggleLike}>
+                            <div onClick={toggleLikeHandler}>
                                 <i
                                     className={
                                         isLiked ? 'bx bxs-heart' : 'bx bx-heart'
                                     }
                                 ></i>
-                                {postData.LIKE_COUNT}
+                                {likeCount} {/* 상태로 관리되는 likeCount */}
                             </div>
-                            <div onClick={toggleBookmark}>
+                            <div onClick={toggleBookmarkHandler}>
                                 <i
                                     className={
                                         isBookmarked
@@ -112,11 +131,13 @@ export const Detail = () => {
                                             : 'bx bx-bookmark'
                                     }
                                 ></i>
-                                {postData.BOOKMARK_COUNT}
+                                {bookmarkCount}
+                                {/* 상태로 관리되는 bookmarkCount */}
                             </div>
                             <div>
-                                <i className="bx bx-show"></i>{' '}
-                                {postData.VIEW_COUNT}
+                                <i className="bx bx-show"></i>
+                                {viewCount}
+                                {/* 상태로 관리되는 viewCount */}
                             </div>
                         </div>
                         <div className={styles.subMitLink}>

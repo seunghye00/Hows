@@ -9,6 +9,7 @@ import { api } from "./../../../../config/config";
 import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
 import { Modal } from "../../../../components/Modal/Modal"
+import { useMemberStore } from "../../../../store/store";
 
 export const Main = () => {
     const navi = useNavigate();
@@ -16,8 +17,10 @@ export const Main = () => {
 
     const [user, setUser] = useState([]);
     const { member_id } = useParams(); // URL에서 member_id 가져오기
+    const { memberSeq, setMemberSeq } = useMemberStore();
     const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
     const [selectedImage, setSelectedImage] = useState(profile); // 선택한 이미지 초기값
+    const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
 
 
     useEffect(() => {
@@ -26,9 +29,52 @@ export const Main = () => {
             api.get(`/member/selectInfo`, { params: { member_id } }).then((resp) => {
                 console.log("데이터 : ", resp.data);
                 setUser(resp.data);
+                // 사용자 정보에서 프로필 이미지 설정
+                setSelectedImage(resp.data.member_avatar || profile); // 기본 이미지로 초기화
+
+            });
+            api.get(`/guestbook/findMemberSeq`, { params: { member_id } }).then((resp) => {
+                console.log("member_seq : ", resp.data);
+                setMemberSeq(resp.data); // zustand에 memberSeq 저장
             });
         }
-    }, [member_id]);
+    }, [member_id, setMemberSeq]);
+
+    // 서버로 이미지 업로드 함수
+    const uploadProfileImage = (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('member_seq', memberSeq);
+
+        api.post('/member/uploadProfileImage', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(resp => {
+                console.log('이미지 업로드 성공:', resp.data);
+                // 업로드 후 상태 업데이트
+                setSelectedImage(resp.data); // 서버에서 반환된 이미지 URL로 업데이트
+            })
+            .catch(error => {
+                console.error('이미지 업로드 실패:', error);
+            });
+    };
+
+    // 프로필 사진 삭제
+    const deleteProfileImage = () => {
+        api.delete('/member/deleteProfileImage', {
+            params: { member_seq: memberSeq }
+        })
+            .then(resp => {
+                console.log('이미지 삭제 성공:', resp.data);
+                setSelectedImage(profile); // 기본 이미지로 변경
+            })
+            .catch(error => {
+                console.error('이미지 삭제 실패:', error);
+            });
+    };
+
 
 
 
@@ -118,20 +164,22 @@ export const Main = () => {
                         document.getElementById("fileInput").click(); // 파일 input 클릭
                     }}>수정</button>
                     <button className={styles.delBtn} onClick={() => {
-                        setSelectedImage(profile); // 기본 이미지로 변경
+                        deleteProfileImage(); // 서버에 이미지 삭제 요청
+                        // setSelectedImage(profile); // 기본 이미지로 변경
                         setIsModalOpen(false);
                     }}>삭제</button>
                     <input
                         id="fileInput"
                         type="file"
-                        style={{ display: "none" }} // 숨김
+                        style={{ display: "none" }}
                         accept="image/*"
                         onChange={(e) => {
                             const file = e.target.files[0];
                             if (file) {
                                 const reader = new FileReader();
                                 reader.onloadend = () => {
-                                    setSelectedImage(reader.result); // 선택한 이미지 업데이트
+                                    setSelectedImage(reader.result); // 선택한 이미지 미리보기
+                                    uploadProfileImage(file); // 이미지 서버로 전송
                                 };
                                 reader.readAsDataURL(file);
                             }

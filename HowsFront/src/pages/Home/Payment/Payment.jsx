@@ -5,6 +5,8 @@ import {addCommas, shippingPrice, SwalComp, validateName, validatePhone} from ".
 import {requestPaymentEvent} from "../../../api/payment";
 import { v4 as uuidv4 } from 'uuid';
 import {Link} from "react-router-dom";
+import {api} from "../../../config/config";
+import {userInfo} from "../../../api/member";
 
 export const Payment = () => {
 
@@ -60,7 +62,8 @@ export const Payment = () => {
     }
   }
 
-  const handleHistory = () => {
+  /** 주문 내역 조회 **/
+  const handleOrderHistory = () => {
 
   }
 
@@ -133,6 +136,16 @@ export const Payment = () => {
 
   }
 
+  /** 회원 정보 셋팅 **/
+  const memberSet = () => {
+    userInfo().then(res =>{
+      const { member_seq, name, phone, email, zip_code, address, detail_address, point } = res.data;
+      const memberData = { member_seq, name, phone, email, zip_code, address, detail_address, point }
+      setMember(memberData);
+      setData(prev => ({ ...prev, ...memberData, point: 0 }));
+    });
+  }
+
   /** 쿠폰 선택시 할인 가격 계산 **/
   useEffect(() => {
     let discount = "";
@@ -170,19 +183,8 @@ export const Payment = () => {
       }
     }
 
-    // 1. 회원 정보 ( 주소, 이름, 전화번호 )
-    const memberData = {
-      member_seq: 1,
-      name: "종호두",
-      phone: "01087654321",
-      email: "test@gmail.com",
-      zip_code: "35062",
-      address: "충청남도 천안호두시 과자동",
-      detail_address: "호두마을 100-1",
-      point: 5000
-    }
-    setMember(memberData);
-    setData(prev => ({ ...prev, ...memberData, point: 0 }));
+    // 멤버 정보 셋팅
+    memberSet();
 
     // 2. 회원이 소유한 쿠폰 리스트
     const couponData = [
@@ -257,7 +259,7 @@ export const Payment = () => {
               <input id="direct" name="addressOption" onChange={handleCheck} type="radio" checked={addressCheck.direct}/>
               <label htmlFor="direct">직접 입력</label>
             </div>
-            <button onClick={handleHistory}>배송지 내역 조회</button>
+            <button onClick={handleOrderHistory}>배송지 내역 조회</button>
           </div>
           <div className={styles.address}>
             <div className={styles.postcode}>

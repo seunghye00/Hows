@@ -120,17 +120,18 @@ public class MemberController {
 
 	// 비밀번호 변경
 	@PutMapping("/updatePw")
-	public ResponseEntity<Integer> updatePw(@AuthenticationPrincipal UserDetails user,
+	public ResponseEntity<Integer> updatePw(
+			@AuthenticationPrincipal UserDetails user,
 			@RequestBody Map<String, String> request) {
 
-		String loginId = user.getUsername();
+		String member_id = user.getUsername();
 		String pw = pwEncoder.encode(request.get("pw"));
 
-		HashMap<String, String> map = new HashMap<>();
-		map.put("member_id", loginId);
-		map.put("pw", pw);
+//		HashMap<String, String> map = new HashMap<>();
+//		map.put("member_id", member_id);
+//		map.put("pw", pw);
 
-		int result = memServ.updatePw(map);
+		int result = memServ.updatePw(member_id, pw);
 
 		return ResponseEntity.ok(result);
 	}

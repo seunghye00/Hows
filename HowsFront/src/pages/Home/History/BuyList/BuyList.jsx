@@ -1,58 +1,47 @@
 import styles from "./BuyList.module.css";
-import { addCommas } from "../../../../commons/commons";
-import { TextBox } from "../TextBox/TextBox";
+import {useEffect, useState} from "react";
+import {api} from "../../../../config/config";
+import {formatDate} from "../../../../commons/commons";
+import {useNavigate} from "react-router-dom";
 
 export const BuyList = ({ data }) => {
-    // if (!data || data.length === 0) {
-    //     return <TextBox text="구매내역" />
-    // }
 
-    const list = [
-        {
-            product_seq: 1,
-            product_title: '푹신푹신 침대',
-            product_quantity: 1,
-            product_total_price: 10000
-        },
-        {
-            product_seq: 2,
-            product_title: '너무너무 졸려요',
-            product_quantity: 100,
-            product_total_price: 9990000
-        },
-        {
-            product_seq: 3,
-            product_title: '배도 고프구요',
-            product_quantity: 5,
-            product_total_price: 3000
-        },
-    ]
+    const navi = useNavigate();
 
+    const [myOrder, setMyOrder] = useState([]);
 
+    useEffect(() => {
+        // 주문 내역
+        api.get(`/history/order`).then(res => {
+            setMyOrder(res.data);
+        });
+    }, []);
 
     return (
         <div className={styles.container}>
             <div className={styles.countProducts}>
-                <span>{list.length}</span>
+                <span>{myOrder.length}</span>
                 <span>개의 상품</span>
             </div>
             {
-                list.map((item, i) => {
-                    return (
-                        <div className={styles.item} key={item.product_seq}>
-                            <div className={styles.itemImage}>
-                                <img src={item.product_image} alt="상품이미지" />
-                            </div>
-                            <div className={styles.itemInfo}>
-                                <p>{item.product_title}</p>
-                                <div className={styles.itemCount}>
-                                    <span>수량 : {item.product_quantity}</span>
-                                    <span>{item.product_total_price}원</span>
-                                    {/* <span>{addCommas(item.product_total_price)}원</span> */}
-                                </div>
-                            </div>
-                        </div>
-                    )
+                myOrder.map(items => {
+                    return items.myOrderList.map(item => {
+                        return (
+                          <div className={styles.item} key={item.order_list_seq}>
+                              <div className={styles.itemImage}>
+                                  <img src={item.product_thumbnail} alt="상품이미지"/>
+                              </div>
+                              <div className={styles.itemInfo}>
+                                  <p onClick={() => navi(`/products/${item.product_seq}`)}>{item.product_title}</p>
+                                  <div className={styles.itemCount}>
+                                      <span>{formatDate(items.myOrder.order_date)}</span>
+                                      <span>수량 : {item.order_list_count}</span>
+                                      <span>{item.order_list_price}원</span>
+                                  </div>
+                              </div>
+                          </div>
+                        )
+                    });
                 })
             }
 

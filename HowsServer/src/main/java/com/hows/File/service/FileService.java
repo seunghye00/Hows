@@ -42,7 +42,7 @@ public class FileService {
 			String oriName = file.getOriginalFilename();
 			String sysName = UUID.randomUUID().toString();
 
-			// F1: 프로필(멤버), F2: 커뮤니티, F3: 상품, F4: 리뷰, F5: 배너
+			// F1: 프로필(멤버), F2: 커뮤니티, F3: 상품, F4: 리뷰, F5: 배너, F6: 공지
 			// 각자 컨트롤러에 맞는 code 고정하고 사용
 			// String code = "F1";
 

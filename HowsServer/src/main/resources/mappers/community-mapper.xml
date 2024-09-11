@@ -109,4 +109,57 @@
 	    where 
 	        bt.board_image_seq in (select board_image_seq from board_image where board_seq = #{board_seq})
 	</select>
+	
+	<!-- 사용자가 해당 게시글에 좋아요를 눌렀는지 확인 -->
+	<select id="checkIfUserLikedBoard" resultType="int">
+	    select count(*) 
+	    from board_like
+	    where member_id = #{member_id} and board_seq = #{board_seq}
+	</select>
+	
+	<!-- 게시글에 좋아요 추가 -->
+	<insert id="addLike">
+	    insert into board_like (board_like_seq, member_id, board_seq)
+	    values (board_like_seq.nextval, #{member_id}, #{board_seq})
+	</insert>
+	
+	<!-- 게시글에서 좋아요 취소 -->
+	<delete id="removeLike">
+	    delete from board_like
+	    where member_id = #{member_id} and board_seq = #{board_seq}
+	</delete>
+	
+	<!-- 게시글의 좋아요 수 가져오기 -->
+	<select id="getLikeCount" resultType="int">
+	    select count(*) 
+	    from board_like
+	    where board_seq = #{board_seq}
+	</select>
+	
+	<!-- 사용자가 해당 게시글에 북마크를 눌렀는지 확인 -->
+	<select id="checkIfUserBookmarkedBoard" resultType="int">
+	    select count(*) 
+	    from board_book_mark
+	    where member_id = #{member_id} and board_seq = #{board_seq}
+	</select>
+	
+	<!-- 게시글에 북마크 추가 -->
+	<insert id="addBookmark">
+	    insert into board_book_mark (board_book_mark_seq, member_id, board_seq)
+	    values (board_book_mark_seq.nextval, #{member_id}, #{board_seq})
+	</insert>
+	
+	<!-- 게시글에서 북마크 취소 -->
+	<delete id="removeBookmark">
+	    delete from board_book_mark
+	    where member_id = #{member_id} and board_seq = #{board_seq}
+	</delete>
+	
+	<!-- 게시글의 북마크 수 가져오기 -->
+	<select id="getBookmarkCount" resultType="int">
+	    select count(*) 
+	    from board_book_mark
+	    where board_seq = #{board_seq}
+	</select>
+
 </mapper>

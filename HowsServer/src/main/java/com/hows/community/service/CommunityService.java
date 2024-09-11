@@ -53,4 +53,44 @@ public class CommunityService {
    public List<Map<String, Object>> selectTagsAndProductInfo(int board_seq){
 	   return communityDAO.selectTagsAndProductInfo(board_seq);
    }
+   
+   // 사용자가 이미 좋아요를 눌렀는지 확인
+   public boolean checkIfUserLikedBoard(String memberId, int boardSeq) {
+       return communityDAO.checkIfUserLikedBoard(memberId, boardSeq);
+   }
+
+   // 좋아요 추가
+   public void addLike(String memberId, int boardSeq) {
+	   communityDAO.addLike(memberId, boardSeq);
+   }
+
+   // 좋아요 취소
+   public void removeLike(String memberId, int boardSeq) {
+	   communityDAO.removeLike(memberId, boardSeq);
+   }
+
+   // 게시글의 총 좋아요 수 가져오기
+   public int getLikeCount(int boardSeq) {
+       return communityDAO.getLikeCount(boardSeq);
+   }
+   
+	// 사용자가 이미 북마크를 눌렀는지 확인
+	public boolean checkIfUserBookmarkedBoard(String memberId, int boardSeq) {
+	    return communityDAO.checkIfUserBookmarkedBoard(memberId, boardSeq);
+	}
+	
+	// 북마크 추가
+	public void addBookmark(String memberId, int boardSeq) {
+	    communityDAO.addBookmark(memberId, boardSeq);
+	}
+	
+	// 북마크 취소
+	public void removeBookmark(String memberId, int boardSeq) {
+	    communityDAO.removeBookmark(memberId, boardSeq);
+	}
+	
+	// 게시글의 총 북마크 수 가져오기
+	public int getBookmarkCount(int boardSeq) {
+	    return communityDAO.getBookmarkCount(boardSeq);
+	}
 }

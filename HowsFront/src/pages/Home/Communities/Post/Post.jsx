@@ -15,6 +15,12 @@ import img1 from '../../../../assets/images/수납.png'
 import img2 from '../../../../assets/images/조명.png'
 import img3 from '../../../../assets/images/주방용품.png'
 import img4 from '../../../../assets/images/테스트.jpg'
+import {
+    submitPost,
+    getHousingTypes,
+    getSpaceTypes,
+    getAreaSizes,
+} from '../../../../api/community' // 수정된 import 부분
 
 const ItemType = 'IMAGE'
 
@@ -287,20 +293,14 @@ export const Post = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const housingTypesResponse = await axios.get(
-                    `${host}/option/housing-types`
-                )
-                setHousingTypes(housingTypesResponse.data)
+                const housingTypes = await getHousingTypes()
+                setHousingTypes(housingTypes)
 
-                const spaceTypesResponse = await axios.get(
-                    `${host}/option/space-types`
-                )
-                setSpaceTypes(spaceTypesResponse.data)
+                const spaceTypes = await getSpaceTypes()
+                setSpaceTypes(spaceTypes)
 
-                const areaSizesResponse = await axios.get(
-                    `${host}/option/area-sizes`
-                )
-                setAreaSizes(areaSizesResponse.data)
+                const areaSizes = await getAreaSizes()
+                setAreaSizes(areaSizes)
             } catch (error) {
                 console.error(error)
             }
@@ -355,15 +355,8 @@ export const Post = () => {
                 formData.append('image_orders', index + 1)
             )
 
-            const response = await axios.post(
-                `${host}/community/write-with-images`,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                }
-            )
+            // 분리된 api 모듈 사용
+            const response = await submitPost(formData)
 
             if (response.status === 200) {
                 Swal.fire({

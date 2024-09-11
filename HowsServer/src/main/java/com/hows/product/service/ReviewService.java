@@ -32,9 +32,18 @@ public class ReviewService {
 
 	// 관리자
 	// 리뷰 신고목록 조회 (관리자)
-	public List<Map<String, Object>> getReportedReviews() throws Exception {
-		return reviewDAO.getReportedReviews();
-	}
+	public List<Map<String, Object>> getReportedReviews(int page, int itemsPerPage) throws Exception {
+        // 페이징을 위한 startRow, endRow 계산
+        int startRow = (page - 1) * itemsPerPage + 1;
+        int endRow = page * itemsPerPage;
+
+        return reviewDAO.getReportedReviews(startRow, endRow);
+    }
+
+    // 전체 신고 리뷰 카운트 조회
+    public int getReportedReviewsCount() throws Exception {
+        return reviewDAO.getReportedReviewsCount();
+    }
 
 	// 리뷰 신고내역 조회 (관리자)
 	public List<ReviewReportDTO> getReviewReport(int review_seq) throws Exception {

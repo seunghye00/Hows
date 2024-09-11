@@ -1,5 +1,6 @@
 package com.hows.product.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -129,11 +130,22 @@ public class ProductController {
 	}
 
 	// 관리자
-	// 리뷰 신고목록 조회 (관리자)
+	// 리뷰 신고 목록 조회 (관리자)
 	@GetMapping("/reportedReviews")
-	public ResponseEntity<List<Map<String, Object>>> getReportedReviews() throws Exception {
-		List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews();
-		return ResponseEntity.ok(reportedReviews);
+	public ResponseEntity<Map<String, Object>> getReportedReviews(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int itemsPerPage) throws Exception {
+		// 전체 신고 리뷰 카운트
+		int totalCount = reviewServ.getReportedReviewsCount();
+
+		// 페이징된 리뷰 신고 목록 조회
+		List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews(page, itemsPerPage);
+
+		// 페이징 정보와 리뷰 목록을 함께 반환
+		Map<String, Object> response = new HashMap<>();
+		response.put("totalCount", totalCount);
+		response.put("reviews", reportedReviews);
+
+		return ResponseEntity.ok(response);
 	}
 
 	// 리뷰 신고내역 조회 (관리자)
@@ -147,13 +159,13 @@ public class ProductController {
 	// 신고 리뷰 삭제(관리자)
 	@DeleteMapping("/deleteReview/{review_seq}")
 	public ResponseEntity<Integer> deleteReview(@PathVariable int review_seq) throws Exception {
-	    int result = reviewServ.deleteReview(review_seq);
-	    
-	    if (result > 0) {
-	        return ResponseEntity.ok(result); // 성공 시 200 OK와 삭제된 행 수 반환
-	    } else {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 삭제 실패 시 404 NOT FOUND
-	    }
+		int result = reviewServ.deleteReview(review_seq);
+
+		if (result > 0) {
+			return ResponseEntity.ok(result); // 성공 시 200 OK와 삭제된 행 수 반환
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 삭제 실패 시 404 NOT FOUND
+		}
 	}
 
 	// 상품 삭제

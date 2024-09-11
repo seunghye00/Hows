@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { DetailPage } from './DetailPage/DetailPage';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { host } from '../../../../../config/config';
+import { api, host } from '../../../../../config/config';
 import { addCommas } from '../../../../../commons/commons';
 import StarRating from '../../../../../components/StarRating/StarRating';
 
@@ -15,7 +15,7 @@ export const Detail = () => {
     const [list, setList] = useState({});
     
     const [quantity, setQuantity] = useState(1); // 기본 수량을 1로 설정
-    const [totalPrice, setTotalPrice] = useState(0);
+    const [totalPrice, setTotalPrice] = useState(0); // 가격
 
     const [liked, setLiked] = useState(false); // 좋아요 상태 관리
     const [likeCount, setLikeCount] = useState(0); // 좋아요 개수 상태 관리
@@ -110,6 +110,28 @@ export const Detail = () => {
         }
     };
 
+    const handleCart = () => {
+        console.log(product_seq)
+        console.log(list.product_title) //상품명
+        console.log(list.product_thumbnail) //대표이미지
+        console.log(quantity) //수량 
+        console.log(totalPrice) //가격
+
+        const data = {
+            product_seq:product_seq,
+            product_title:list.product_title,
+            product_image:list.product_thumbnail,
+            cart_quantity:quantity,
+            cart_price:totalPrice,
+        }
+
+        // console.log(data);
+        api.post(`/cart`,data).then(resp=>{
+            console.log(resp)
+        })
+
+    }
+
     return (
         <div className={styles.contailer}>
             <div className={styles.contents}>
@@ -147,8 +169,8 @@ export const Detail = () => {
                             </div>
                         </div>
                         <div>
-                            <div>장바구니</div>
-                            <div>바로구매</div>
+                            <div onClick={handleCart}>장바구니</div>
+                            <div >바로구매</div>
                         </div>
                     </div>
                 </div>

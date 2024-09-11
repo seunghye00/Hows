@@ -21,13 +21,23 @@ export const addProduct = formData => {
 
 // 관리자!
 // 신고 리뷰 조회 (관리자)
-export const reportedReviews = () => {
-    return axios.get(`${baseUrl}/reportedReviews`)
+export const reportedReviews = (startRow, endRow) => {
+    return axios.get(`${baseUrl}/reportedReviews`, {
+        params: {
+            startRow: startRow,
+            endRow: endRow,
+        },
+    })
 }
 
 // 신고 내역 조회 (관리자)
 export const reviewReport = review_seq => {
     return axios.get(`${baseUrl}/reviewReport/${review_seq}`)
+}
+
+// 신고 리뷰 삭제 (관리자)
+export const deleteReview = review_seq => {
+    return axios.delete(`${baseUrl}/deleteReview/${review_seq}`)
 }
 
 // 상품 삭제 요청 함수

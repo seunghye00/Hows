@@ -1,9 +1,11 @@
 package com.hows.product.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +32,7 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productServ;
-	
+
 	@Autowired
 	private ReviewService reviewServ;
 
@@ -128,44 +130,69 @@ public class ProductController {
 	}
 
 	// 관리자
-	// 리뷰 신고목록 조회
-	@GetMapping("/reportedReviews")
-	public ResponseEntity<List<Map<String, Object>>> getReportedReviews() throws Exception {
-	    List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews();
-	    return ResponseEntity.ok(reportedReviews);
-	}
+	// 리뷰 신고 목록 조회 (관리자)
+    @GetMapping("/reportedReviews")
+    public ResponseEntity<Map<String, Object>> getReportedReviews(
+            @RequestParam(defaultValue = "1") int page,    // 기본값: 1페이지
+            @RequestParam(defaultValue = "10") int itemsPerPage // 기본값: 페이지당 10개
+    ) throws Exception {
+        // 전체 신고 리뷰 카운트
+        int totalCount = reviewServ.getReportedReviewsCount();
 
-	// 리뷰 신고내역 조회
+        // 페이징된 리뷰 신고 목록 조회
+        List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews(page, itemsPerPage);
+
+        // 페이징 정보와 리뷰 목록을 함께 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCount", totalCount);   // 전체 리뷰 개수
+        response.put("reviews", reportedReviews); // 신고 리뷰 목록
+
+        return ResponseEntity.ok(response);
+    }
+
+	// 리뷰 신고내역 조회 (관리자)
 	@GetMapping("/reviewReport/{review_seq}")
 	public ResponseEntity<List<ReviewReportDTO>> getReviewReport(@PathVariable int review_seq) throws Exception {
-	    List<ReviewReportDTO> reviewReports = reviewServ.getReviewReport(review_seq);
-	    System.out.println("컨트롤러 : " +reviewReports);
-	    return ResponseEntity.ok(reviewReports);
+		List<ReviewReportDTO> reviewReports = reviewServ.getReviewReport(review_seq);
+		System.out.println("컨트롤러 : " + reviewReports);
+		return ResponseEntity.ok(reviewReports);
 	}
-	
+
+	// 신고 리뷰 삭제(관리자)
+	@DeleteMapping("/deleteReview/{review_seq}")
+	public ResponseEntity<Integer> deleteReview(@PathVariable int review_seq) throws Exception {
+	    int result = reviewServ.deleteReview(review_seq);
+	    
+	    if (result > 0) {
+	        return ResponseEntity.ok(result); // 성공 시 200 OK와 삭제된 행 수 반환
+	    } else {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 삭제 실패 시 404 NOT FOUND
+	    }
+	}
+
 	// 상품 삭제
 	@DeleteMapping
 	@Transactional
 	public ResponseEntity<String> deleteBanner(@RequestParam String seqs) throws Exception {
 		String[] productSeqs = seqs.split(","); // seqs를 배열로 변환
-		for(String productSeq : productSeqs) {
+		for (String productSeq : productSeqs) {
 			try {
 				int product_seq = Integer.parseInt(productSeq);
 				if (!productServ.deleteProduct(product_seq)) {
 					throw new RuntimeException("상품 삭제 실패: ");
 				}
-                List<String> sysNames = fileServ.getSysNames(product_seq);
-                // 해당 상품에 포함된 파일 전부 삭제
-                for (String sysName : sysNames) {
-                	 String result = fileServ.deleteFile(sysName, "F3");
-                     if (result.equals("fail")) {
-                         throw new RuntimeException("파일 삭제 실패: " + sysName);
-                     }
-                }               
-            } catch (Exception e) {
-                // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
-                throw new RuntimeException("상품 삭제 실패", e);
-            }
+				List<String> sysNames = fileServ.getSysNames(product_seq);
+				// 해당 상품에 포함된 파일 전부 삭제
+				for (String sysName : sysNames) {
+					String result = fileServ.deleteFile(sysName, "F3");
+					if (result.equals("fail")) {
+						throw new RuntimeException("파일 삭제 실패: " + sysName);
+					}
+				}
+			} catch (Exception e) {
+				// 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+				throw new RuntimeException("상품 삭제 실패", e);
+			}
 		}
 		return ResponseEntity.ok("success");
 	}

@@ -24,8 +24,6 @@ export const List = () => {
         // 컴포넌트가 처음 렌더링될 때 전체 상품 목록과 카테고리 목록을 비동기 호출
         Promise.all([categoryList(), productList()])
             .then(([categoryData, productData]) => {
-                console.log('Categories:', categoryData)
-                console.log('Products:', productData)
                 setCategories(categoryData.data)
                 setProducts(productData.data)
                 setFilteredProducts(productData.data) // 처음에는 필터링 없이 전체 상품 목록을 표시
@@ -50,7 +48,7 @@ export const List = () => {
             )
         }
         setFilteredProducts(filtered)
-    }, [selectedCategory, searchQuery, products]) // 카테고리 or 상품 목록 or 검색어가 변경될 때마다 실행
+    }, [selectedCategory, searchQuery]) // 카테고리 or 상품 목록 or 검색어가 변경될 때마다 실행
 
     // 카테고리 선택 변경 핸들러
     const handleChangeCategory = e => {
@@ -71,7 +69,6 @@ export const List = () => {
 
     // 개별 체크박스 변경 핸들러
     const handleCheckboxChange = productSeq => {
-        console.log(productSeq)
         const updatedProducts = filteredProducts.map(product =>
             product.product_seq === productSeq
                 ? { ...product, checked: !product.checked } // 선택된 상품의 체크 상태 토글
@@ -96,8 +93,6 @@ export const List = () => {
 
     // 체크된 상품 삭제 핸들러
     const handleDeleteBanner = () => {
-        console.log(filteredProducts)
-
         // 체크된 상품이 존재하는 지 확인
         const selectedProducts = filteredProducts.filter(
             product => product.checked
@@ -116,7 +111,7 @@ export const List = () => {
             text: '정말로 삭제하시겠습니까?',
         }).then(result => {
             if (result.isConfirmed) {
-                // 배너 삭제 요청
+                // 상품 삭제 요청
                 deleteProducts(
                     selectedProducts.map(product => product.product_seq)
                 )
@@ -125,9 +120,12 @@ export const List = () => {
                             type: 'success',
                             text: '선택한 상품이 삭제되었습니다.',
                         })
-                        setProducts(
-                            products.filter(product => !product.checked)
+                        // 상품 목록에서 선택된 상품을 제거한 새로운 목록으로 업데이트
+                        const updatedProducts = filteredProducts.filter(
+                            product => !product.checked
                         )
+                        setFilteredProducts(updatedProducts) // products 상태 업데이트
+                        // 전체 선택 체크박스를 해제
                         setSelectAll(false)
                     })
                     .catch(error => {
@@ -135,6 +133,8 @@ export const List = () => {
                             type: 'error',
                             text: '상품 삭제에 실패했습니다.',
                         })
+                        // 전체 선택 체크박스를 해제
+                        setSelectAll(false)
                         console.error('삭제 실패 :', error)
                     })
             }

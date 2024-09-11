@@ -10,6 +10,8 @@ import com.hows.product.dao.ReviewDAO;
 import com.hows.product.dto.ReviewDTO;
 import com.hows.product.dto.ReviewReportDTO;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class ReviewService {
 
@@ -29,15 +31,33 @@ public class ReviewService {
 	}
 
 	// 관리자
-	// 리뷰 신고 목록 조회
-	public List<Map<String, Object>> getReportedReviews() throws Exception {
-		return reviewDAO.getReportedReviews();
-	}
+	// 리뷰 신고목록 조회 (관리자)
+	public List<Map<String, Object>> getReportedReviews(int page, int itemsPerPage) throws Exception {
+        // 페이징을 위한 startRow, endRow 계산
+        int startRow = (page - 1) * itemsPerPage + 1;
+        int endRow = page * itemsPerPage;
 
-	// 리뷰 신고 내역 조회
+        return reviewDAO.getReportedReviews(startRow, endRow);
+    }
+
+    // 전체 신고 리뷰 카운트 조회
+    public int getReportedReviewsCount() throws Exception {
+        return reviewDAO.getReportedReviewsCount();
+    }
+
+	// 리뷰 신고내역 조회 (관리자)
 	public List<ReviewReportDTO> getReviewReport(int review_seq) throws Exception {
 		List<ReviewReportDTO> reviewReports = reviewDAO.getReviewReport(review_seq);
 		System.out.println("서비스 : " + review_seq + ": " + reviewReports);
 		return reviewReports;
 	}
+
+	// 신고 리뷰 삭제 (관리자)
+	@Transactional
+    public int deleteReview(int review_seq) throws Exception {
+        // 신고 기록 삭제
+        reviewDAO.deleteReviewReport(review_seq);
+        // 리뷰 삭제
+        return reviewDAO.deleteReview(review_seq);
+    }
 }

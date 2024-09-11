@@ -57,7 +57,6 @@ public class ProductController {
 	@GetMapping("/detail/{product_seq}")
 	public ResponseEntity<ProductDTO> getProductByDetail(@PathVariable String product_seq) throws Exception {
 		ProductDTO detaile = productServ.getProductByDetail(product_seq);
-
 		return ResponseEntity.ok(detaile);
 	}
 

@@ -324,6 +324,7 @@ create table product (
     product_title varchar2(100) not null,
     product_contents varchar2(4000) not null,
     price number not null,
+    quantity number not null,
     product_category_code char(2) not null
 );
 
@@ -398,19 +399,6 @@ create table review_report (
 );
 
 create sequence review_report_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
--- 재고
-create table inventory (
-    inventory_seq number primary key,
-    quantity number not null,
-    product_seq number not null
-);
-
-create sequence inventory_seq
 start with 1
 increment by 1
 nomaxvalue

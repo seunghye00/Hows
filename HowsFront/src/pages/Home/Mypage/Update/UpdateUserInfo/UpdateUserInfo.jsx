@@ -7,6 +7,7 @@ import { host } from '../../../../../config/config'
 import { api } from "../../../../../config/config";
 import { format } from "date-fns";
 import { useAuthStore } from "../../../../../store/store";
+import { userInfo } from "../../../../../api/member";
 
 export const UpdateUserInfo = () => {
 
@@ -34,7 +35,7 @@ export const UpdateUserInfo = () => {
 
     useEffect(() => {
         // 회원정보 가져오기
-        api.get(`/member/selectInfo`).then((resp) => {
+        userInfo().then((resp) => {
             setUser(resp.data);
         });
     }, []);

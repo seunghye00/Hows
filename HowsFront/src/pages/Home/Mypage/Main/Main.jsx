@@ -29,7 +29,7 @@ export const Main = () => {
     useEffect(() => {
         // url에서 가져온 member_id로 해당 페이지 member_id의 데이터 가져오기
         if (member_id) {
-            selectInfo(member_id).then((resp) => {
+            userInfo(member_id).then((resp) => {
                 console.log("데이터 : ", resp.data);
                 setUser(resp.data);
                 // 사용자 정보에서 프로필 이미지 설정

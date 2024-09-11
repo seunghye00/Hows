@@ -307,6 +307,20 @@ public class CommunityController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	    }
 	}
+
+	// 게시글 신고처리
+	@PostMapping("/report")
+	public ResponseEntity<Void> sendReport(@RequestBody Map<String, Object> reportData) {
+        int boardSeq = Integer.parseInt((String) reportData.get("board_seq"));
+        String reportCode = (String) reportData.get("report_code");
+        String memberId = (String) reportData.get("member_id");
+        communityServ.sendReport(boardSeq, reportCode, memberId);
+        System.out.println(boardSeq + "_확인");
+        System.out.println(reportCode + "_확인");
+
+        return ResponseEntity.ok().build();
+	}
+	
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	@GetMapping("/reportedCommunity")

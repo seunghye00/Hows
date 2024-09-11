@@ -23,28 +23,6 @@
     /* 이미지 섹션과 태그 섹션 사이 간격 */
 }
 
-.postActions {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-    font-weight: 500;
-    justify-content: space-between;
-    color: var(--hows-gray-600);
-    margin-bottom: 20px;
-}
-
-.likesViewBook {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.subMitLink {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
 .mainContent {
     font-weight: 500;
     margin-bottom: 20px;
@@ -113,21 +91,4 @@
     align-items: center;
     font-size: 14px;
     color: var(--hows-gray-600);
-}
-
-.reportModal {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    width: 400px;
-}
-
-.reportModal h3 {
-    text-align: center;
-}
-
-.reportlist {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
 }

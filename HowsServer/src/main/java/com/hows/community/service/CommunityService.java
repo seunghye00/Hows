@@ -105,6 +105,10 @@ public class CommunityService {
 	public int getViewCount(int board_seq) {
 	    return communityDAO.getViewCount(board_seq);  // 현재 조회수 반환
 	}
+	// 게시물 신고 
+	public void sendReport(int boardSeq, String reportCode, String memberId) {
+	     communityDAO.sendReport(boardSeq, reportCode, memberId);  // 현재 조회수 반환
+	}
 	
 	// 관리자
 	// 게시물 신고 조회 (관리자)

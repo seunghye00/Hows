@@ -7,7 +7,6 @@ import {
     toggleLike,
     toggleBookmark,
 } from '../../../../../../api/community' // API 호출 함수 불러오기
-import { host } from '../../../../../../config/config'
 import { Button } from '../../../../../../components/Button/Button'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination } from 'swiper/modules'
@@ -16,6 +15,7 @@ import 'swiper/css'
 import 'swiper/css/pagination'
 import InfiniteScroll from 'react-infinite-scroll-component'
 import { toggleFollow, userInfo } from '../../../../../../api/member'
+import Swal from 'sweetalert2'
 
 export const Content = () => {
     const [contentList, setContentList] = useState([]) // 전체 콘텐츠 리스트
@@ -31,6 +31,10 @@ export const Content = () => {
     // 로그인한 사용자의 member_seq 가져오기
     useEffect(() => {
         const fetchMemberInfo = async () => {
+            if (!member_id) {
+                console.log('member_id가 없습니다. API 호출을 중단합니다.')
+                return // member_id가 없으면 API 호출을 하지 않음
+            }
             try {
                 const response = await userInfo(member_id) // API 호출
                 setMemberSeq(response.data.member_seq) // 멤버 데이터 상태에 저장
@@ -129,7 +133,13 @@ export const Content = () => {
     const toggleLikeHandler = async board_seq => {
         const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
         if (!member_id || !isAuth) {
-            navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
             return
         }
         try {
@@ -152,7 +162,13 @@ export const Content = () => {
     const toggleBookmarkHandler = async board_seq => {
         const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
         if (!member_id || !isAuth) {
-            navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
             return
         }
         try {
@@ -178,7 +194,13 @@ export const Content = () => {
     // 팔로우 상태 업데이트 함수
     const handleFollow = async targetMemberSeq => {
         if (!isAuth || !memberSeq) {
-            navigate('/signIn')
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
             return
         }
         try {

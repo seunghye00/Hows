@@ -36,6 +36,10 @@ export const ProfileSection = ({ profileData }) => {
     // 로그인한 사용자의 member_seq 가져오기
     useEffect(() => {
         const fetchMemberInfo = async () => {
+            if (!member_id) {
+                console.log('member_id가 없습니다. API 호출을 중단합니다.')
+                return // member_id가 없으면 API 호출을 하지 않음
+            }
             try {
                 const response = await userInfo(member_id) // API 호출
                 setMemberSeq(response.data.member_seq) // 멤버 데이터 상태에 저장

@@ -88,6 +88,16 @@ export const getColors = async () => {
         throw error
     }
 }
+//  신고 옵션 가져오기
+export const getReport = async () => {
+    try {
+        const response = await api.get('/option/report')
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
 // 게시글 및 이미지/태그 저장
 export const submitPost = async formData => {
     try {
@@ -109,6 +119,21 @@ export const submitPost = async formData => {
 export const viewCounting = async board_seq => {
     const response = await api.post(`/community/${board_seq}/increment-view`)
     return response.data // 서버에서 반환된 최신 조회수 (int)
+}
+
+// 게시글 신고
+export const sendReport = async (board_seq, report_code, member_id) => {
+    try {
+        const response = await api.post('/community/report', {
+            board_seq,
+            report_code,
+            member_id,
+        })
+        return response.data
+    } catch (error) {
+        console.error('신고 요청 중 오류 발생:', error)
+        throw error
+    }
 }
 
 // 관리자

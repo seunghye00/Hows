@@ -180,6 +180,11 @@
 	    where board_seq = #{board_seq}
 	</select>
 	
+	<!-- 게시글 신고  -->
+	<insert id="sendReport">
+	    insert into board_report 
+	    values (board_report_seq.nextval, #{report_code}, default, #{member_id}, #{board_seq})
+	</insert>
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->
 	<select id="reportedCommunity" resultType="map">

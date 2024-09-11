@@ -2,13 +2,12 @@ import styles from './Detail.module.css'
 import React, { useState, useEffect } from 'react'
 import { ProfileSection } from './ProfileSection/ProfileSection'
 import { ImageSwiper } from './ImageSwiper/ImageSwiper'
-import { Button } from '../../../../../components/Button/Button'
-import { Modal } from '../../../../../components/Modal/Modal'
+import { ReportModal } from './ReportModal/ReportModal'
+import { PostActions } from './PostActions/PostActions'
 import Swal from 'sweetalert2'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
 import { PiSiren } from 'react-icons/pi'
-import { useNavigate } from 'react-router-dom'
-import { useParams } from 'react-router-dom' // for accessing the board_seq from URL
+import { useNavigate, useParams } from 'react-router-dom'
 import img from './../../../../../assets/images/cry.jpg'
 import {
     getPostData,
@@ -17,22 +16,26 @@ import {
     toggleLike,
     toggleBookmark,
     viewCounting,
+    getReport,
+    sendReport,
 } from '../../../../../api/community' // API 함수 불러오기
 import { useAuthStore } from '../../../../../store/store'
 
 export const Detail = () => {
     const navigate = useNavigate() // 페이지 이동을 위한 navigate 함수
     const { isAuth } = useAuthStore() // 로그인 여부 확인
-    const { board_seq } = useParams() // get board_seq from the route params
-    const [postData, setPostData] = useState(null) // State to store post data
-    const [imagesData, setImagesData] = useState(null) // State to store images
-    const [tagsData, setTagsData] = useState(null) // State to store tags
-    const [isLiked, setIsLiked] = useState(false)
-    const [likeCount, setLikeCount] = useState(0)
-    const [isBookmarked, setIsBookmarked] = useState(false)
-    const [viewCount, setViewCount] = useState(0)
-    const [bookmarkCount, setBookmarkCount] = useState(0)
-    const [isModalOpen, setIsModalOpen] = useState(false)
+    const { board_seq } = useParams() // 경로 매개변수에서 board_seq 가져오기
+    const [postData, setPostData] = useState(null) // 게시글 데이터를 저장할 상태
+    const [imagesData, setImagesData] = useState(null) // 이미지 데이터를 저장할 상태
+    const [tagsData, setTagsData] = useState(null) // 태그 데이터를 저장할 상태
+    const [reportsData, setReportsData] = useState(null) // 신고 데이터를 저장할 상태
+    const [isLiked, setIsLiked] = useState(false) // 좋아요 상태를 확인하는 상태
+    const [likeCount, setLikeCount] = useState(0) // 좋아요 수를 저장할 상태
+    const [isBookmarked, setIsBookmarked] = useState(false) // 북마크 상태를 확인하는 상태
+    const [viewCount, setViewCount] = useState(0) // 조회수를 저장할 상태
+    const [bookmarkCount, setBookmarkCount] = useState(0) // 북마크 수를 저장할 상태
+    const [isModalOpen, setIsModalOpen] = useState(false) // 모달이 열려있는지 여부를 저장할 상태
+    const [selectedReports, setSelectedReports] = useState(null) // 선택된 신고 항목을 저장할 상태
 
     // 게시글 정보 및 이미지, 태그 정보 받아오기
     useEffect(() => {
@@ -57,6 +60,10 @@ export const Detail = () => {
                 const tags = await getTagData(board_seq)
                 setTagsData(tags.data.tags)
 
+                // 신고 데이터 가져오기
+                const reports = await getReport()
+                setReportsData(reports)
+
                 // 좋아요, 북마크 상태 업데이트 (서버에서 받아온 데이터 사용)
                 setIsLiked(postData.data.isLiked) // 서버에서 받아온 좋아요 상태
                 setIsBookmarked(postData.data.isBookmarked) // 서버에서 받아온 북마크 상태
@@ -74,7 +81,13 @@ export const Detail = () => {
     const toggleLikeHandler = async () => {
         const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
         if (!member_id || !isAuth) {
-            navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
             return
         }
         try {
@@ -93,7 +106,13 @@ export const Detail = () => {
     const toggleBookmarkHandler = async () => {
         const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
         if (!member_id || !isAuth) {
-            navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
             return
         }
         try {
@@ -121,6 +140,58 @@ export const Detail = () => {
             })
         })
     }
+    const handleOpenReportModal = () => {
+        const member_id = sessionStorage.getItem('member_id') || null
+
+        if (!member_id || !isAuth) {
+            // 로그인되지 않은 경우 SweetAlert 경고 후 로그인 페이지로 이동
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
+        } else {
+            // 로그인된 경우에만 모달 열기
+            setIsModalOpen(true)
+        }
+    }
+
+    // 신고하기 버튼 클릭 시 호출되는 전송 함수
+    const handleReportSubmit = async () => {
+        const member_id = sessionStorage.getItem('member_id') || null
+
+        if (!selectedReports) {
+            setIsModalOpen(false) // 모달 닫기
+            Swal.fire({
+                icon: 'warning',
+                title: '신고 사유를 선택해주세요.',
+                showConfirmButton: true,
+            })
+            return
+        }
+
+        try {
+            setIsModalOpen(false) // 모달 닫기
+            await sendReport(board_seq, selectedReports, member_id) // 신고 API 호출
+            Swal.fire({
+                icon: 'success',
+                title: '신고가 접수되었습니다.',
+                text: '신고가 성공적으로 접수되었습니다.',
+                showConfirmButton: false,
+                timer: 1500,
+            })
+        } catch (error) {
+            setIsModalOpen(false) // 모달 닫기
+            Swal.fire({
+                icon: 'error',
+                title: '오류 발생',
+                text: '신고 처리 중 오류가 발생했습니다.',
+                showConfirmButton: true,
+            })
+        }
+    }
 
     return (
         <div className={styles.container}>
@@ -135,51 +206,17 @@ export const Detail = () => {
                     </div>
 
                     {/* 게시글 상단 */}
-                    <div className={styles.postActions}>
-                        <div className={styles.likesViewBook}>
-                            <div onClick={toggleLikeHandler}>
-                                <i
-                                    className={
-                                        isLiked ? 'bx bxs-heart' : 'bx bx-heart'
-                                    }
-                                ></i>
-                                {likeCount} {/* 상태로 관리되는 likeCount */}
-                            </div>
-                            <div onClick={toggleBookmarkHandler}>
-                                <i
-                                    className={
-                                        isBookmarked
-                                            ? 'bx bxs-bookmark'
-                                            : 'bx bx-bookmark'
-                                    }
-                                ></i>
-                                {bookmarkCount}
-                                {/* 상태로 관리되는 bookmarkCount */}
-                            </div>
-                            <div>
-                                <i className="bx bx-show"></i>
-                                {viewCount}
-                                {/* 상태로 관리되는 viewCount */}
-                            </div>
-                        </div>
-                        <div className={styles.subMitLink}>
-                            <div
-                                className={styles.Link}
-                                onClick={copyLinkToClipboard}
-                            >
-                                <i className="bx bx-link"></i>
-                            </div>
-                            <div onClick={() => setIsModalOpen(true)}>
-                                <PiSiren />
-                                신고하기
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 게시글 콘텐츠 */}
-                    <div className={styles.mainContent}>
-                        <p>{postData.BOARD_CONTENTS}</p>
-                    </div>
+                    <PostActions
+                        isLiked={isLiked}
+                        likeCount={likeCount}
+                        toggleLikeHandler={toggleLikeHandler}
+                        isBookmarked={isBookmarked}
+                        bookmarkCount={bookmarkCount}
+                        toggleBookmarkHandler={toggleBookmarkHandler}
+                        viewCount={viewCount}
+                        copyLinkToClipboard={copyLinkToClipboard}
+                        handleOpenReportModal={handleOpenReportModal}
+                    />
                 </>
             )}
 
@@ -196,34 +233,15 @@ export const Detail = () => {
                 ></input>
             </div>
 
-            {/* 신고 모달 */}
-            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                <div className={styles.reportModal}>
-                    <h3>신고 사유를 선택해주세요</h3>
-                    <ul className={styles.reportlist}>
-                        <li>
-                            <label>
-                                <input type="checkbox" /> 도배 및 중복 게시물
-                            </label>
-                        </li>
-                        <li>
-                            <label>
-                                <input type="checkbox" /> 폭력적인 게시물
-                            </label>
-                        </li>
-                        <li>
-                            <label>
-                                <input type="checkbox" /> 불쾌한 내용
-                            </label>
-                        </li>
-                    </ul>
-                    <Button
-                        size="w"
-                        title="신고하기"
-                        onClick={() => setIsModalOpen(false)}
-                    />
-                </div>
-            </Modal>
+            {/* 신고 영역 */}
+            <ReportModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                reportsData={reportsData}
+                selectedReports={selectedReports}
+                setSelectedReports={setSelectedReports}
+                handleReportSubmit={handleReportSubmit}
+            />
             <ScrollTop />
         </div>
     )

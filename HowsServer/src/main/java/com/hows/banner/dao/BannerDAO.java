@@ -22,7 +22,7 @@ public class BannerDAO {
 		return mybatis.insert("Banner.insert", dto) > 0;
 	}
 
-	public void deleteBySeq(int banner_seq) {
-		mybatis.delete("Banner.delete", banner_seq);
+	public boolean deleteBySeq(int banner_seq) {
+		return mybatis.delete("Banner.delete", banner_seq) > 0;
 	}
 }

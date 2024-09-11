@@ -73,12 +73,14 @@ public class BannerController {
 		for(String bannerSeq : bannerSeqs) {
 			try {
 				int banner_seq = Integer.parseInt(bannerSeq);
+				if(!bannServ.deleteBanner(banner_seq)) {
+					throw new RuntimeException("배너 삭제 실패");
+				}
                 String sysName = fileServ.getSysName(banner_seq);
                 String result = fileServ.deleteFile(sysName, "F5");
                 if (result.equals("fail")) {
                     throw new RuntimeException("파일 삭제 실패: " + sysName);
                 }
-                bannServ.deleteBanner(banner_seq);
             } catch (Exception e) {
                 // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
                 throw new RuntimeException("배너 삭제 실패", e);

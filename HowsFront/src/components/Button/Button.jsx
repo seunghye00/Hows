@@ -1,8 +1,13 @@
 import styles from './Button.module.css'
 
-export const Button = ({ size, title, onClick }) => {
+export const Button = ({ size, title, onClick, isChecked }) => {
     return (
-        <button className={styles[size]} onClick={onClick}>
+        <button
+            className={`${styles[size]} ${
+                isChecked === 'Y' ? styles.checked : ''
+            }`}
+            onClick={onClick}
+        >
             {title}
         </button>
     )

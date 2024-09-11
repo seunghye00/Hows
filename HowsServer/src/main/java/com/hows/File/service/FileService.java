@@ -1,6 +1,7 @@
 package com.hows.File.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -88,8 +89,13 @@ public class FileService {
 		return result;
 	}
 
-	// 배너 SEQ로 파일 sysname 조회
+	// banner_seq로 파일 sysname 조회
 	public String getSysName(int bannerSeq) {
 		return fileDAO.getSysName(bannerSeq);
+	}
+	
+	// parent_seq로 파일 sysname 조회
+	public List<String> getSysNames(int parentSeq) {
+		return fileDAO.getSysNames(parentSeq);
 	}
 }

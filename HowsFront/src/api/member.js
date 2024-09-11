@@ -3,28 +3,36 @@ import { api, host } from '../config/config'
 
 const baseUrl = `${host}/member`
 
-/* ============[마이페이지 회원정보 수정]=========== */
-// 닉네임 중복 확인
-export const checkNickname = nickname => {
-    return api.post(`/member/checkNickname`, { nickname })
+// 로그인
+export const loginUser = (user) => {
+    return axios.post(`${host}/auth`, user);
 }
 
-/* ============[마이페이지 비밀번호 변경]=========== */
-// 현재 비밀번호 확인
-export const checkCurrentPw = currentPw => {
-    return api.post(`/member/checkPw`, { pw: currentPw })
+// [비밀번호 찾기] 사용자 인증 확인
+export const verifyUser = (member_id, email) => {
+    const params = { member_id, email };
+    return axios.post(`${host}/auth/sendTempPw`, params);
 }
 
-// 서버로 새 비밀번호 전송
+// [마이페이지 회원정보 수정] 닉네임 중복 확인
+export const checkNickname = (nickname) => {
+    return api.post(`/member/checkNickname`, { nickname });
+};
+
+// [마이페이지 비밀번호 변경] 현재 비밀번호 확인
+export const checkCurrentPw = (currentPw) => {
+    return api.post(`/member/checkPw`, { pw: currentPw });
+};
+
+// [마이페이지 비밀번호 변경] 서버로 새 비밀번호 전송
 export const updatePw = pw => {
     return api.put(`/member/updatePw`, { pw })
 }
 
-/* ============[마이페이지]=========== */
-// 특정 멤버의 member_seq 가져오기
-export const findMemberSeq = member_id => {
-    return api.get('/guestbook/findMemberSeq', { params: { member_id } })
-}
+// [마이페이지] 특정 멤버의 member_seq 가져오기
+export const findMemberSeq = (member_id) => {
+    return api.get("/guestbook/findMemberSeq", { params: { member_id } });
+};
 
 // 프로필 이미지 업로드
 export const uploadProfileImage = (file, memberSeq) => {

@@ -34,6 +34,10 @@
 		#{product_title}, #{product_contents}, #{price},
 		#{product_category_code})
 	</insert>
+	
+	<delete id="deleteProduct">
+		delete from product where product_seq = #{productSeq}
+	</delete>
 
 	<update id="updateThumbNail">
 		update product set product_thumbnail = #{url} where product_seq = #{seq}

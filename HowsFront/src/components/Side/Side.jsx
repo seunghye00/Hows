@@ -78,18 +78,9 @@ export const Side = () => {
             title: '상품 관리',
             subMenu: [
                 {
-                    title: '목록 관리',
+                    title: '상품 목록',
                     icon: 'bx bx-list-ul', // 아이콘 추가
-                    subMenu: [
-                        {
-                            title: '상품 목록 조회',
-                            path: '/admin/product/viewList',
-                        },
-                        {
-                            title: '상품 정보 수정',
-                            path: '/admin/product/modifyList',
-                        },
-                    ],
+                    path: '/admin/product/list',
                 },
                 {
                     title: '주문 관리',

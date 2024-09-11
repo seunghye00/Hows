@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -140,6 +141,33 @@ public class ProductController {
 	    List<ReviewReportDTO> reviewReports = reviewServ.getReviewReport(review_seq);
 	    System.out.println(reviewReports);
 	    return ResponseEntity.ok(reviewReports);
+	}
+	
+	// 상품 삭제
+	@DeleteMapping
+	@Transactional
+	public ResponseEntity<String> deleteBanner(@RequestParam String seqs) throws Exception {
+		String[] productSeqs = seqs.split(","); // seqs를 배열로 변환
+		for(String productSeq : productSeqs) {
+			try {
+				int product_seq = Integer.parseInt(productSeq);
+				if (!productServ.deleteProduct(product_seq)) {
+					throw new RuntimeException("상품 삭제 실패: ");
+				}
+                List<String> sysNames = fileServ.getSysNames(product_seq);
+                // 해당 상품에 포함된 파일 전부 삭제
+                for (String sysName : sysNames) {
+                	 String result = fileServ.deleteFile(sysName, "F3");
+                     if (result.equals("fail")) {
+                         throw new RuntimeException("파일 삭제 실패: " + sysName);
+                     }
+                }               
+            } catch (Exception e) {
+                // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+                throw new RuntimeException("상품 삭제 실패", e);
+            }
+		}
+		return ResponseEntity.ok("success");
 	}
 
 	@ExceptionHandler(Exception.class)

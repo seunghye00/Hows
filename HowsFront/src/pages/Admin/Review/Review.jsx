@@ -3,7 +3,12 @@ import styles from './Review.module.css'
 import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
-import { reportedReviews, reviewReport } from '../../../api/product'
+import Swal from 'sweetalert2'
+import {
+    reportedReviews,
+    reviewReport,
+    deleteReview,
+} from '../../../api/product'
 import { formatDate } from '../../../commons/commons'
 import test from '../../../assets/images/푸바오.png'
 
@@ -41,6 +46,49 @@ export const Review = () => {
         }
     }
 
+    // 리뷰 삭제 핸들러 함수
+    const handleDeleteReview = async review_seq => {
+        Swal.fire({
+            title: '리뷰 삭제',
+            text: '정말로 이 리뷰를 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+        }).then(async result => {
+            if (result.isConfirmed) {
+                try {
+                    const resp = await deleteReview(review_seq) // 서버에 삭제 요청
+                    if (resp.status === 200) {
+                        Swal.fire({
+                            title: '삭제 완료',
+                            text: '리뷰가 성공적으로 삭제되었습니다.',
+                            icon: 'success',
+                        })
+                        // 성공적으로 삭제된 경우 목록을 업데이트
+                        setReviews(prevReviews =>
+                            prevReviews.filter(
+                                review => review.REVIEW_SEQ !== review_seq
+                            )
+                        )
+                    } else {
+                        Swal.fire({
+                            title: '삭제 실패',
+                            text: '리뷰 삭제에 실패했습니다.',
+                            icon: 'error',
+                        })
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: '오류 발생',
+                        text: '리뷰 삭제 중 오류가 발생했습니다.',
+                        icon: 'error',
+                    })
+                }
+            }
+        })
+    }
+
     // 리뷰 클릭 시 (상품 제목 클릭 시) 모달 열기
     const selectReview = review => {
         console.log(review)
@@ -66,8 +114,8 @@ export const Review = () => {
     const handleSearch = query => {
         const results = reviews.filter(
             review =>
-                review.productTitle.includes(query) ||
-                review.reviewer.includes(query)
+                review.PRODUCT_TITLE.includes(query) ||
+                review.NICKNAME.includes(query)
         )
         setSearchResults(results)
     }
@@ -125,7 +173,13 @@ export const Review = () => {
                             </span>
                         </div>
                         <div className={styles.reviewItem}>
-                            <Button size="s" title="삭제" />
+                            <Button
+                                size="s"
+                                title="삭제"
+                                onClick={() =>
+                                    handleDeleteReview(review.REVIEW_SEQ)
+                                }
+                            />
                         </div>
                     </div>
                 ))}

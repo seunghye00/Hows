@@ -6,6 +6,7 @@ import { useAuthStore } from './../../store/store'
 import profile from '../../assets/images/마이페이지_프로필사진.jpg'
 import { throttle } from 'lodash'
 import { api } from './../../config/config' // API 요청을 위한 경로
+import Swal from "sweetalert2";
 
 export const Header = () => {
     const navigate = useNavigate()
@@ -52,16 +53,35 @@ export const Header = () => {
         }
     }
 
+    // const handleLogout = () => {
+    //     const confirmLogout = window.confirm('정말 로그아웃을 하시겠습니까?')
+    //     if (confirmLogout) {
+    //         logout()
+    //         sessionStorage.removeItem('token')
+    //         sessionStorage.removeItem('member_id')
+    //         setIsAuth(false)
+    //         navigate('/')
+    //     }
+    // }
     const handleLogout = () => {
-        const confirmLogout = window.confirm('정말 로그아웃을 하시겠습니까?')
-        if (confirmLogout) {
-            logout()
-            sessionStorage.removeItem('token')
-            sessionStorage.removeItem('member_id')
-            setIsAuth(false)
-            navigate('/')
-        }
-    }
+        Swal.fire({
+            title: '확인',
+            text: '정말 로그아웃을 하시겠습니까?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: '확인',
+            cancelButtonText: '취소',
+        }).then((result) => {
+            if (result.isConfirmed) {
+                logout();
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('member_id');
+                setIsAuth(false);
+                navigate('/');
+            }
+        });
+    };
+
 
     useEffect(() => {
         const token = sessionStorage.getItem('token')
@@ -106,9 +126,8 @@ export const Header = () => {
         <div className="header">
             <div className={styles.headerWrap}>
                 <div
-                    className={`${styles.headerCont} ${
-                        isFixed ? styles.fixed : ''
-                    }`}
+                    className={`${styles.headerCont} ${isFixed ? styles.fixed : ''
+                        }`}
                 >
                     <div className={styles.mainNavi}>
                         <div className={styles.menuBox}>
@@ -119,31 +138,28 @@ export const Header = () => {
                             </div>
                             <div className={styles.naviMenuList}>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShop'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowShop'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowShop')}
                                 >
                                     <a>HowShop</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowStory'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowStory'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowStory')}
                                 >
                                     <a>HowStory</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShare'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowShare'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowShare')}
                                 >
                                     <a>HowShare</a>

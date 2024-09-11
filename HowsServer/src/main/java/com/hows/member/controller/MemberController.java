@@ -118,7 +118,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	// 비밀번호 변경
+	// [로그인]비밀번호 찾기 / [마이페이지]비밀번호 변경
 	@PutMapping("/updatePw")
 	public ResponseEntity<Integer> updatePw(
 			@AuthenticationPrincipal UserDetails user,
@@ -126,11 +126,6 @@ public class MemberController {
 
 		String member_id = user.getUsername();
 		String pw = pwEncoder.encode(request.get("pw"));
-
-//		HashMap<String, String> map = new HashMap<>();
-//		map.put("member_id", member_id);
-//		map.put("pw", pw);
-
 		int result = memServ.updatePw(member_id, pw);
 
 		return ResponseEntity.ok(result);
@@ -200,8 +195,6 @@ public class MemberController {
 	    }
 	}
 
-	
-
 	// 회원탈퇴
 	@DeleteMapping("/deleteUser/{member_id}")
 	public ResponseEntity<Integer> deleteUser(@PathVariable("member_id") String member_id) {
@@ -209,6 +202,16 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
+	// 마이페이지 게시물 출력
+	@GetMapping("/selectPost")
+	public ResponseEntity<List<MemberDTO>> selectPost(@RequestParam String member_id){
+		
+		
+		return ResponseEntity.ok(null);
+	}
+	
+	
+	
 	// ========================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	@GetMapping("/all")

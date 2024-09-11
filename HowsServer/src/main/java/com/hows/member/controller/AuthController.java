@@ -4,19 +4,18 @@ package com.hows.member.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hows.common.CustomUserDetails;
 import com.hows.common.util.JwtUtil;
 import com.hows.member.dto.MemberDTO;
 import com.hows.member.dto.SignInResponseDTO;
@@ -70,37 +69,53 @@ public class AuthController {
 		return ResponseEntity.ok(foundId);
 	}
 	
-	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
-	@PostMapping("/verifyUser")
-	public ResponseEntity<Boolean> verifyUser(@RequestParam String member_id, @RequestParam String email){
-		
-		Map<String, String> map = new HashMap<>();
-		map.put("member_id", member_id);
-		map.put("email", email);
-		
-		Boolean result = memServ.verifyUser(map);
-		return ResponseEntity.ok(result);
-	}
+//	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
+//	@PostMapping("/verifyUser")
+//	public ResponseEntity<Boolean> verifyUser(@RequestParam String member_id, @RequestParam String email){
+//		
+//		Map<String, String> map = new HashMap<>();
+//		map.put("member_id", member_id);
+//		map.put("email", email);
+//		
+//		Boolean result = memServ.verifyUser(map);
+//		return ResponseEntity.ok(result);
+//	}
 	
 	// 비밀번호 찾기 - 비밀번호 변경
-	@PostMapping("/changePw")
-	public ResponseEntity<Integer> changePw(@RequestParam Map<String, String> request){
+//	@PostMapping("/changePw")
+//	public ResponseEntity<Integer> changePw(@RequestParam Map<String, String> request){
+//		String member_id = request.get("member_id");
+//		String pw = pwEncoder.encode(request.get("pw"));
+//	    String email = request.get("email");
+//
+//	    Map<String, String> map = new HashMap<>();
+//	    map.put("member_id", member_id);
+//	    map.put("pw", pw);
+//	    map.put("email", email);
+//
+//	    int result = memServ.changePw(map);
+//	    if (result > 0) {
+//	        return ResponseEntity.ok(result);
+//	    } else {
+//	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+//	    }
+//	}
+
+	
+	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증 및 임시 비밀번호 발급
+	@PostMapping("/sendTempPw")
+    public ResponseEntity<Boolean> sendTemporaryPassword(@RequestBody Map<String,String> request) {
+		
 		String member_id = request.get("member_id");
-		String pw = pwEncoder.encode(request.get("pw"));
 	    String email = request.get("email");
+		
+	    System.out.println(member_id);
 
-	    Map<String, String> map = new HashMap<>();
-	    map.put("member_id", member_id);
-	    map.put("pw", pw);
-	    map.put("email", email);
-
-	    int result = memServ.changePw(map);
-	    if (result > 0) {
-	        return ResponseEntity.ok(result);
-	    } else {
-	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
-	    }
-	}
+		System.out.println(email);
+		
+        Boolean result = memServ.sendTempPw(member_id, email);
+        return ResponseEntity.ok(result);
+    }
 	
 
 	

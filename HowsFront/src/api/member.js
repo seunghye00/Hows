@@ -8,6 +8,12 @@ export const loginUser = (user) => {
     return axios.post(`${host}/auth`, user);
 }
 
+// [비밀번호 찾기] 사용자 인증 확인
+export const verifyUser = (member_id, email) => {
+    const params = { member_id, email };
+    return axios.post(`${host}/auth/sendTempPw`, params);
+}
+
 // [마이페이지 회원정보 수정] 닉네임 중복 확인
 export const checkNickname = (nickname) => {
     return api.post(`/member/checkNickname`, { nickname });

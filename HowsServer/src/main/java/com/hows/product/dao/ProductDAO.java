@@ -43,4 +43,5 @@ public class ProductDAO {
 		params.put("seq", product_seq);
 		return myBatis.update("Product.updateThumbNail", params);
 	}
+	
 }

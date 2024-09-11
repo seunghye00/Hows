@@ -22,7 +22,7 @@ public class BannerService {
 		return bannDAO.addBanner(dto);
 	}
 
-	public void deleteBanner(int banner_seq) {
-		bannDAO.deleteBySeq(banner_seq);
+	public boolean deleteBanner(int banner_seq) {
+		return bannDAO.deleteBySeq(banner_seq);
 	}
 }

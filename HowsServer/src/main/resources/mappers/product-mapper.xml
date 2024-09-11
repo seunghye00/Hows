@@ -38,6 +38,10 @@
 	    INSERT INTO review (review_seq, rating, review_contents, review_date, product_seq, member_id)
 	    VALUES (review_seq.nextval, #{rating}, #{review_contents}, SYSDATE, #{product_seq}, #{member_id})
 	</insert>
+	
+	<delete id="deleteProduct">
+		delete from product where product_seq = #{productSeq}
+	</delete>
 
 
 </mapper>

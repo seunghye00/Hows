@@ -7,7 +7,7 @@ import {
     productList,
     deleteProducts,
 } from '../../../../../api/product'
-import { addCommas } from '../../../../../commons/commons'
+import { addCommas, SwalComp } from '../../../../../commons/commons'
 import { useNavigate } from 'react-router-dom'
 
 export const List = () => {
@@ -71,6 +71,7 @@ export const List = () => {
 
     // 개별 체크박스 변경 핸들러
     const handleCheckboxChange = productSeq => {
+        console.log(productSeq)
         const updatedProducts = filteredProducts.map(product =>
             product.product_seq === productSeq
                 ? { ...product, checked: !product.checked } // 선택된 상품의 체크 상태 토글
@@ -95,8 +96,12 @@ export const List = () => {
 
     // 체크된 상품 삭제 핸들러
     const handleDeleteBanner = () => {
+        console.log(filteredProducts)
+
         // 체크된 상품이 존재하는 지 확인
-        const selectedProducts = products.filter(product => product.checked)
+        const selectedProducts = filteredProducts.filter(
+            product => product.checked
+        )
         if (selectedProducts.length === 0) {
             SwalComp({
                 type: 'warning',
@@ -162,7 +167,11 @@ export const List = () => {
                     title={'등록'}
                     onClick={() => navi('/admin/product/addProduct')}
                 />{' '}
-                <Button size={'s'} title={'삭제'} />
+                <Button
+                    size={'s'}
+                    title={'삭제'}
+                    onClick={handleDeleteBanner}
+                />
                 <Button size={'s'} title={'수정'} />
                 <Button size={'s'} title={'상태 변경'} />
                 {selectAll ? (

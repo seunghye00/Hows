@@ -84,6 +84,26 @@ public class MemberService implements UserDetailsService {
 	public int updateInfo(MemberDTO dto) {
 		return memDao.updateInfo(dto);
 	}
+	
+	// 프로필 사진 변경
+	public int updateProfileImage(int memberSeq, String imageUrl) {
+		Map<String, Object> map = new HashMap<>();
+	    map.put("member_seq", memberSeq);
+	    map.put("member_avatar", imageUrl);
+		
+	    return memDao.updateProfileImage(map);
+	}
+	
+	// 현재 프로필 사진 URL 가져오기
+	public String getProfileImageUrl(int member_seq) {
+	    return memDao.getProfileImageUrl(member_seq); // member 테이블에서 member_avatar 가져오는 쿼리
+	}
+
+	// 프로필 삭제 시 member_avatar => null 
+	 public void updateProfileImageToNull(int member_seq) {
+		 memDao.updateProfileImageToNull(member_seq);
+	    }
+
 
 	// 비밀번호 변경시 기존 비밀번호 확인
 	public String getPasswordById(HashMap<String, String> map) {

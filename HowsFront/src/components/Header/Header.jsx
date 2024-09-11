@@ -187,37 +187,47 @@ export const Header = () => {
                                             />
                                         </div>
                                         {profileMenu && (
-                                            <div className={styles.profileMenu}>
-                                                <div
-                                                    className={
-                                                        styles.profileMenuItem
-                                                    }
-                                                    onClick={() => {
-                                                        // navigate('/mypage')
-                                                        handleMyPageClick()
-                                                        handleItemClick()
-                                                    }}
-                                                >
-                                                    마이페이지
-                                                </div>
-                                                <div
-                                                    className={
-                                                        styles.profileMenuItem
-                                                    }
-                                                    onClick={() => {
-                                                        handleLogout()
-                                                        handleItemClick()
-                                                    }}
-                                                >
-                                                    로그아웃
-                                                </div>
-                                            </div>
+                                          <div className={styles.profileMenu}>
+                                              <div
+                                                className={
+                                                    styles.profileMenuItem
+                                                }
+                                                onClick={() => {
+                                                    // navigate('/mypage')
+                                                    handleMyPageClick()
+                                                    handleItemClick()
+                                                }}
+                                              >
+                                                  마이페이지
+                                              </div>
+                                              <div
+                                                className={
+                                                    styles.profileMenuItem
+                                                }
+                                                onClick={() => {
+                                                    navigate('/history');
+                                                }}
+                                              >
+                                                  My History
+                                              </div>
+                                              <div
+                                                className={
+                                                    styles.profileMenuItem
+                                                }
+                                                onClick={() => {
+                                                    handleLogout()
+                                                    handleItemClick()
+                                                }}
+                                              >
+                                                  로그아웃
+                                              </div>
+                                          </div>
                                         )}
                                     </div>
                                 ) : (
-                                    <a onClick={() => navigate('/signIn')}>
-                                        <i className="bx bxs-user-circle"></i>
-                                    </a>
+                                  <a onClick={() => navigate('/signIn')}>
+                                      <i className="bx bxs-user-circle"></i>
+                                  </a>
                                 )}
                             </div>
                         </div>

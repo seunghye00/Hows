@@ -1,5 +1,6 @@
 package com.hows.order.dao;
 
+import java.util.HashMap;
 import java.util.List;
 
 import com.hows.order.dto.OrderListDTO;
@@ -19,6 +20,16 @@ public class OrderDAO {
     /** 주문 목록 **/
     public List<OrderDTO> orderList() {
         return mybatis.selectList("Order.orderList");
+    }
+
+    /** My 주문 목록 **/
+    public List<OrderDTO> myOrder(int memberSeq) {
+        return mybatis.selectList("Order.myOrder", memberSeq);
+    }
+
+    /** 주문 목록 조회 **/
+    public List<HashMap<String, Object>> myOrderList(int orderSeq) {
+        return mybatis.selectList("Order.myOrderList", orderSeq);
     }
 
     /** 주문 등록 **/

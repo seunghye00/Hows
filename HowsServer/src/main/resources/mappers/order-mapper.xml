@@ -4,9 +4,42 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="Order">
+
+	<resultMap id="myOrderMap" type="java.util.HashMap">
+		<result property="order_list_seq" column="order_list_seq"/>
+		<result property="order_seq" column="order_seq"/>
+		<result property="product_seq" column="product_seq"/>
+		<result property="order_list_count" column="order_list_count"/>
+		<result property="order_list_price" column="order_list_price"/>
+		<result property="product_thumbnail" column="product_thumbnail"/>
+		<result property="product_title" column="product_title"/>
+	</resultMap>
+
+
 	<select id="orderList" resultType="com.hows.order.dto.OrderDTO">
 		SELECT *
 		FROM orders
+	</select>
+
+	<select id="myOrder" resultType="com.hows.order.dto.OrderDTO">
+		SELECT
+			*
+		FROM
+			orders
+		WHERE
+			member_seq = #{member_seq}
+	</select>
+
+	<select id="myOrderList" resultMap="myOrderMap">
+		SELECT
+			ol.*,
+			p.product_thumbnail,
+			p.product_title
+		FROM
+			order_list ol
+			join product p on p.product_seq = ol.product_seq
+		WHERE
+			order_seq = #{order_seq}
 	</select>
 
 	<select id="orderListByStatus" resultType="com.hows.order.dto.OrderInfoListDTO">

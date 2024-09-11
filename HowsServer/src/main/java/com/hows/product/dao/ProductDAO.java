@@ -43,5 +43,10 @@ public class ProductDAO {
 		params.put("seq", product_seq);
 		return myBatis.update("Product.updateThumbNail", params);
 	}
+
+	// 상품 삭제
+	public boolean deleteProduct(int productSeq) {
+		return myBatis.delete("Product.deleteProduct", productSeq) > 0;
+	}
 	
 }

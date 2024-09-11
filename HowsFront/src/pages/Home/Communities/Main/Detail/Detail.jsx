@@ -92,10 +92,7 @@ export const Detail = () => {
                     <div className={styles.imageSection}>
                         <ImageSwiper images={imagesData} tags={tagsData} />
                     </div>
-                    {/* 상품 태그 섹션 */}
-                    <div className={styles.productTagSection}>
-                        <ProductTagSwiper tags={postData} />
-                    </div>
+
                     {/* 게시글 상단 */}
                     <div className={styles.postActions}>
                         <div className={styles.likesViewBook}>

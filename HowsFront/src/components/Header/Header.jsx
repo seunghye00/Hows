@@ -181,6 +181,14 @@ export const Header = () => {
                         <div
                           className={styles.profileMenuItem}
                           onClick={() => {
+                            navigate('/history');
+                          }}
+                        >
+                          사용 내역
+                        </div>
+                        <div
+                          className={styles.profileMenuItem}
+                          onClick={() => {
                             handleLogout();
                             handleItemClick();
                           }}

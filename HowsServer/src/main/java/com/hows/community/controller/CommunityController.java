@@ -31,6 +31,8 @@ import com.hows.community.dto.CommunityDTO; // CommunityDTO import
 import com.hows.community.dto.ImageDTO; // ImageDTO import
 import com.hows.community.dto.TagDTO; // TagDTO import
 import com.hows.community.service.CommunityService; // CommunityService import
+import com.hows.member.dto.MemberDTO;
+import com.hows.member.service.MemberService;
 
 @RestController
 @RequestMapping("/community")
@@ -41,6 +43,9 @@ public class CommunityController {
 	@Autowired
 	private FileService fileServ;
 
+	@Autowired
+	private MemberService memServ;
+	
 	// 게시글 및 이미지/태그 저장 (트랜잭션 적용)
 	// 게시글 및 이미지/태그 저장 (트랜잭션 적용)
     @PostMapping("/write-with-images")
@@ -121,31 +126,59 @@ public class CommunityController {
 
 	// 커뮤니티 게시글 불러오는 메서드
 	@GetMapping
-	public ResponseEntity<List<Map<String, Object>>> selectAll() {
-        List<Map<String, Object>> list = communityServ.selectAll();
-        List<Map<String, Object>> listImg = communityServ.selectAllImg();
+	public ResponseEntity<List<Map<String, Object>>> selectAll(
+	        @RequestParam(value = "member_id", required = false) String memberId) {
 
-        Map<Integer, List<String>> imageMap = new HashMap<>();
-        for (Map<String, Object> imgData : listImg) {
-            BigDecimal boardSeqDecimal = (BigDecimal) imgData.get("BOARD_SEQ");
-            Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-            String imageUrl = (String) imgData.get("IMAGE_URL");
+	    // 게시글 리스트 가져오기
+	    List<Map<String, Object>> list = communityServ.selectAll();
+	    List<Map<String, Object>> listImg = communityServ.selectAllImg();
 
-            if (imageUrl != null) {
-                imageMap.putIfAbsent(boardSeq, new ArrayList<>());
-                imageMap.get(boardSeq).add(imageUrl);
-            }
-        }
+	    // 이미지 맵핑
+	    Map<Integer, List<String>> imageMap = new HashMap<>();
+	    for (Map<String, Object> imgData : listImg) {
+	        BigDecimal boardSeqDecimal = (BigDecimal) imgData.get("BOARD_SEQ");
+	        Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+	        String imageUrl = (String) imgData.get("IMAGE_URL");
 
-        for (Map<String, Object> boardData : list) {
-            BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
-            Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-            List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
-            boardData.put("images", images);
-        }
+	        if (imageUrl != null) {
+	            imageMap.putIfAbsent(boardSeq, new ArrayList<>());
+	            imageMap.get(boardSeq).add(imageUrl);
+	        }
+	    }
 
-        return ResponseEntity.ok(list);
-    }
+	    // 각 게시글에 이미지 및 좋아요/북마크 상태 추가
+	    for (Map<String, Object> boardData : list) {
+	        BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
+	        Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+	        List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
+	        boardData.put("images", images);
+
+	        if (memberId != null) {
+	            // 로그인한 사용자의 SEQ 가져오기
+	            MemberDTO fromMemberInfo = memServ.selectInfo(memberId);
+	            int fromMemberSeq = fromMemberInfo.getMember_seq(); // 로그인한 사용자의 member_seq
+
+	            // 게시글 작성자의 MEMBER_SEQ 가져오기
+	            BigDecimal toMemberSeqDecimal = (BigDecimal) boardData.get("MEMBER_SEQ");
+	            Integer toMemberSeq = toMemberSeqDecimal != null ? toMemberSeqDecimal.intValue() : null;
+
+	            // 회원일 경우 좋아요 및 북마크 상태 추가
+	            boolean isFollowing = memServ.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
+	            boolean isLiked = communityServ.checkIfUserLikedBoard(memberId, boardSeq);
+	            boolean isBookmarked = communityServ.checkIfUserBookmarkedBoard(memberId, boardSeq);
+	            boardData.put("isLiked", isLiked);
+	            boardData.put("isFollowing", isFollowing);
+	            boardData.put("isBookmarked", isBookmarked);
+	        } else {
+	            // 비회원일 경우 기본 값 설정
+	            boardData.put("isLiked", false);
+	            boardData.put("isFollowing", false);
+	            boardData.put("isBookmarked", false);
+	        }
+	    }
+
+	    return ResponseEntity.ok(list);
+	}
     
     //커뮤니티 좋아요
     @PostMapping("{board_seq}/like")
@@ -222,12 +255,29 @@ public class CommunityController {
     }
     
 	// 커뮤니티 디테일
-	@GetMapping("/{board_seq}")
-	public ResponseEntity<Map<String, Object>> selectAllSeq(@PathVariable int board_seq) {
-		Map<String, Object> boardDetail = communityServ.selectAllSeq(board_seq);
+    @GetMapping("/{board_seq}")
+    public ResponseEntity<Map<String, Object>> selectAllSeq(
+        @PathVariable int board_seq,
+        @RequestParam(value = "member_id", required = false) String memberId) {
 
-		return ResponseEntity.ok(boardDetail);
-	}
+        // 게시글 정보 가져오기
+        Map<String, Object> boardDetail = communityServ.selectAllSeq(board_seq);
+
+        // 비회원일 경우 좋아요 및 북마크 기본 값 설정
+        boolean isLiked = false;
+        boolean isBookmarked = false;
+
+        if (memberId != null) {
+            // 회원일 경우 좋아요 및 북마크 상태 확인
+            isLiked = communityServ.checkIfUserLikedBoard(memberId, board_seq);
+            isBookmarked = communityServ.checkIfUserBookmarkedBoard(memberId, board_seq);
+        }
+
+        boardDetail.put("isLiked", isLiked);
+        boardDetail.put("isBookmarked", isBookmarked);
+
+        return ResponseEntity.ok(boardDetail);
+    }
 
 	@GetMapping("/images/{board_seq}")
 	public ResponseEntity<Map<String, Object>> selectImagesAndTags(@PathVariable int board_seq) {
@@ -242,6 +292,21 @@ public class CommunityController {
 		return ResponseEntity.ok(result);
 	}
 
+	// 조회수 증가 메서드
+	@PostMapping("/{board_seq}/increment-view")
+	public ResponseEntity<Integer> incrementViewCount(@PathVariable int board_seq) {
+	    try {
+	        // 조회수 증가 로직 호출
+	        communityServ.incrementViewCount(board_seq);
+	        
+	        // 업데이트된 조회수를 가져오기
+	        int updatedViewCount = communityServ.getViewCount(board_seq);
+	        
+	        return ResponseEntity.ok(updatedViewCount); // 조회수를 클라이언트에 반환
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	@GetMapping("/reportedCommunity")

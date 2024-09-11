@@ -131,7 +131,26 @@
 		member where member_id = #{member_id}
 	</select>
 
+    <!-- 팔로우 상태 확인 -->
+    <select id="checkIfUserFollowing" resultType="boolean">
+        select count(*) 
+        from follow
+        where from_member_seq = #{from_member_seq}
+        and to_member_seq = #{to_member_seq}
+    </select>
 
+    <!-- 팔로우 추가 -->
+    <insert id="addFollow">
+        insert into follow (follow_seq, from_member_seq, to_member_seq)
+        values (follow_seq.nextval, #{from_member_seq}, #{to_member_seq})
+    </insert>
+
+    <!-- 팔로우 취소 -->
+    <delete id="removeFollow">
+        delete from follow
+        where from_member_seq = #{from_member_seq}
+        and to_member_seq = #{to_member_seq}
+    </delete>
 
 	<!-- ===========================================[ 관리자 ] -->
 	<!-- 전체 회원조회 (관리자) -->

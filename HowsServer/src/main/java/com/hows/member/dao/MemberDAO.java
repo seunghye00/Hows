@@ -108,6 +108,21 @@ public class MemberDAO {
         return mybatis.selectOne("Member.findMemberSeq", member_id);
      }
 
+    // 팔로우 상태 확인
+    public boolean checkIfUserFollowing(int fromMemberSeq, int toMemberSeq) {
+        return mybatis.selectOne("Member.checkIfUserFollowing", Map.of("from_member_seq", fromMemberSeq, "to_member_seq", toMemberSeq));
+    }
+
+    // 팔로우 추가
+    public void addFollow(int fromMemberSeq, int toMemberSeq) {
+        mybatis.insert("Member.addFollow", Map.of("from_member_seq", fromMemberSeq, "to_member_seq", toMemberSeq));
+    }
+
+    // 팔로우 취소
+    public void removeFollow(int fromMemberSeq, int toMemberSeq) {
+        mybatis.delete("Member.removeFollow", Map.of("from_member_seq", fromMemberSeq, "to_member_seq", toMemberSeq));
+    } 
+	 
 	// =======================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	public List<MemberDTO> selectAll(Map<String, Object> params) {

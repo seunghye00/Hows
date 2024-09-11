@@ -2,24 +2,27 @@ import styles from './Detail.module.css'
 import React, { useState, useEffect } from 'react'
 import { ProfileSection } from './ProfileSection/ProfileSection'
 import { ImageSwiper } from './ImageSwiper/ImageSwiper'
-import { ProductTagSwiper } from './ProductTagSwiper/ProductTagSwiper'
 import { Button } from '../../../../../components/Button/Button'
 import { Modal } from '../../../../../components/Modal/Modal'
 import Swal from 'sweetalert2'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
 import { PiSiren } from 'react-icons/pi'
+import { useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom' // for accessing the board_seq from URL
 import img from './../../../../../assets/images/cry.jpg'
-import img1 from './../../../../../assets/images/마이페이지_프로필사진.jpg'
 import {
     getPostData,
     getImageData,
     getTagData,
     toggleLike,
     toggleBookmark,
+    viewCounting,
 } from '../../../../../api/community' // API 함수 불러오기
+import { useAuthStore } from '../../../../../store/store'
 
 export const Detail = () => {
+    const navigate = useNavigate() // 페이지 이동을 위한 navigate 함수
+    const { isAuth } = useAuthStore() // 로그인 여부 확인
     const { board_seq } = useParams() // get board_seq from the route params
     const [postData, setPostData] = useState(null) // State to store post data
     const [imagesData, setImagesData] = useState(null) // State to store images
@@ -35,17 +38,28 @@ export const Detail = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // API 요청 함수 호출
-                const postData = await getPostData(board_seq)
+                // 세션에서 member_id 가져오기 (비회원일 경우 null로 처리)
+                const member_id = sessionStorage.getItem('member_id') || null
+
+                // 조회수 증가 후 최신 조회수 반영
+                const updatedViewCount = await viewCounting(board_seq)
+                setViewCount(updatedViewCount) // 최신 조회수를 상태로 업데이트
+
+                // 게시글 데이터 가져오기
+                const postData = await getPostData(board_seq, member_id)
                 setPostData(postData.data)
 
+                // 이미지 데이터 가져오기
                 const images = await getImageData(board_seq)
                 setImagesData(images.data.images)
 
+                // 태그 데이터 가져오기
                 const tags = await getTagData(board_seq)
                 setTagsData(tags.data.tags)
 
-                // 좋아요 북마크 초기화
+                // 좋아요, 북마크 상태 업데이트 (서버에서 받아온 데이터 사용)
+                setIsLiked(postData.data.isLiked) // 서버에서 받아온 좋아요 상태
+                setIsBookmarked(postData.data.isBookmarked) // 서버에서 받아온 북마크 상태
                 setLikeCount(postData.data.LIKE_COUNT)
                 setBookmarkCount(postData.data.BOOKMARK_COUNT)
             } catch (error) {
@@ -58,8 +72,12 @@ export const Detail = () => {
 
     // 좋아요, 북마크 상태 변경
     const toggleLikeHandler = async () => {
+        const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+        if (!member_id || !isAuth) {
+            navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
+            return
+        }
         try {
-            const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
             const response = await toggleLike(board_seq, member_id)
 
             // 서버에서 반환된 최신 좋아요 상태를 반영
@@ -73,8 +91,12 @@ export const Detail = () => {
     }
 
     const toggleBookmarkHandler = async () => {
+        const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+        if (!member_id || !isAuth) {
+            navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
+            return
+        }
         try {
-            const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
             const response = await toggleBookmark(board_seq, member_id)
 
             // 서버에서 반환된 최신 북마크 상태를 반영

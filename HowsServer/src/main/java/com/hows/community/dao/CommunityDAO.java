@@ -126,6 +126,16 @@ public class CommunityDAO {
         return mybatis.selectOne("Community.getBookmarkCount", board_seq);
     }
     
+    // 특정 게시글의 북마크 개수 가져오기
+    public void updateViewCount(int board_seq) {
+        mybatis.update("Community.updateViewCount", board_seq);
+    }
+    
+	// 조회수 가져오기 서비스 메서드
+	public int getViewCount(int board_seq) {
+		return mybatis.selectOne("Community.getViewCount", board_seq);
+	}
+    
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	public List<Map<String, Object>> reportedCommunity(int startRow, int endRow) throws Exception {

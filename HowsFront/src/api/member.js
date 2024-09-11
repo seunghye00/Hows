@@ -5,15 +5,15 @@ const baseUrl = `${host}/member`
 
 /* ============[마이페이지 회원정보 수정]=========== */
 // 닉네임 중복 확인
-export const checkNickname = (nickname) => {
-    return api.post(`/member/checkNickname`, { nickname });
-};
+export const checkNickname = nickname => {
+    return api.post(`/member/checkNickname`, { nickname })
+}
 
 /* ============[마이페이지 비밀번호 변경]=========== */
 // 현재 비밀번호 확인
-export const checkCurrentPw = (currentPw) => {
-    return api.post(`/member/checkPw`, { pw: currentPw });
-};
+export const checkCurrentPw = currentPw => {
+    return api.post(`/member/checkPw`, { pw: currentPw })
+}
 
 // 서버로 새 비밀번호 전송
 export const updatePw = pw => {
@@ -22,56 +22,59 @@ export const updatePw = pw => {
 
 /* ============[마이페이지]=========== */
 // 특정 멤버의 member_seq 가져오기
-export const findMemberSeq = (member_id) => {
-    return api.get("/guestbook/findMemberSeq", { params: { member_id } });
-};
+export const findMemberSeq = member_id => {
+    return api.get('/guestbook/findMemberSeq', { params: { member_id } })
+}
 
 // 프로필 이미지 업로드
 export const uploadProfileImage = (file, memberSeq) => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('member_seq', memberSeq);
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('member_seq', memberSeq)
 
-    return api.post("/member/uploadProfileImage", formData);
-};
+    return api.post('/member/uploadProfileImage', formData)
+}
 
 // 프로필 이미지 삭제
-export const deleteProfileImage = (memberSeq) => {
-    return api.delete("/member/deleteProfileImage", {
-        params: { member_seq: memberSeq }
-    });
-};
+export const deleteProfileImage = memberSeq => {
+    return api.delete('/member/deleteProfileImage', {
+        params: { member_seq: memberSeq },
+    })
+}
 
 // Guestbook 추가
-export const insertGuestbook = (requestBody) => {
-    return api.post(`/guestbook/insert`, requestBody);
+export const insertGuestbook = requestBody => {
+    return api.post(`/guestbook/insert`, requestBody)
 }
 
 // 특정 member_seq에 대한 guestbook 목록 조회
-export const getGuestbookList = (memberSeq) => {
-    return api.get(`/guestbook/list`, { params: { member_seq: memberSeq } });
+export const getGuestbookList = memberSeq => {
+    return api.get(`/guestbook/list`, { params: { member_seq: memberSeq } })
 }
 
 // 특정 guestbook_seq에 대한 삭제 요청
-export const deleteGuestbook = (guestbook_seq) => {
-    return api.delete(`/guestbook/${guestbook_seq}`);
+export const deleteGuestbook = guestbook_seq => {
+    return api.delete(`/guestbook/${guestbook_seq}`)
 }
 
 /** 유저 정보  **/
-export const userInfo = (member_id) => {
-    console.log(member_id);
+export const userInfo = member_id => {
+    console.log(member_id)
     if (member_id) {
         return api.get(`/member/selectInfo`, { params: { member_id } })
     } else {
-        return api.get(`/member/selectInfo`);
+        return api.get(`/member/selectInfo`)
     }
 }
 
+// 팔로우/언팔로우 처리 API 호출 함수
+export const toggleFollow = async data => {
+    return api.post(`${baseUrl}/follow`, data) // API 요청으로 팔로우/언팔로우 처리
+}
 
 export const adminstart = () => {
     // 여기서 밑 부터 관리자 기능!
 }
-
 /************************************  [ 관리자 기능 ] /************************************/
 
 // 전체 회원 조회

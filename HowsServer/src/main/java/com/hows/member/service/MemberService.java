@@ -124,7 +124,21 @@ public class MemberService implements UserDetailsService {
 	public int findMemberSeq(String member_id) {
 		return memDao.findMemberSeq(member_id);
 	}
+	
+    // 팔로우 상태 확인
+    public boolean checkIfUserFollowing(int fromMemberSeq, int toMemberSeq) {
+        return memDao.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
+    }
 
+    // 팔로우 추가
+    public void addFollow(int fromMemberSeq, int toMemberSeq) {
+    	memDao.addFollow(fromMemberSeq, toMemberSeq);
+    }
+
+    // 팔로우 취소
+    public void removeFollow(int fromMemberSeq, int toMemberSeq) {
+    	memDao.removeFollow(fromMemberSeq, toMemberSeq);
+    }
 	// ========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	public List<MemberDTO> selectAll(Map<String, Object> params) {

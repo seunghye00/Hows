@@ -40,4 +40,17 @@ public class CommunityService {
    public List<Map<String, Object>> selectAllImg() {
 	   return communityDAO.selectAllImg();
    }
+   	
+   // 게시글 디테일 
+   public Map<String, Object> selectAllSeq(int board_seq) {
+	   return communityDAO.selectAllSeq(board_seq);
+   }
+   // 게시글 디테일 이미지 
+   public List<Map<String, Object>> selectImages(int board_seq){
+	   return communityDAO.selectImages(board_seq);
+   }
+   // 게시글 디테일 상품태그
+   public List<Map<String, Object>> selectTagsAndProductInfo(int board_seq){
+	   return communityDAO.selectTagsAndProductInfo(board_seq);
+   }
 }

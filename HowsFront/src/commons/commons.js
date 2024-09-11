@@ -91,3 +91,15 @@ export const SwalComp = ({ type, text }) => {
             })
     }
 }
+
+/** 정규 표현식 [ 이름 ]  **/
+export const validateName = (name) => {
+    let regex = /^[가-힣]{2,5}$/;
+    return regex.test(name);
+}
+
+/** 정규 표현식 [ 전화번호 ]  **/
+export const validatePhone = (phone) => {
+    let regex = /^01([0|1|6|7|8|9])([0-9]{8})$/;
+    return regex.test(phone);
+}

@@ -1,17 +1,24 @@
 package com.hows.cart.controller;
 
-import com.hows.cart.dto.CartDTO;
-import com.hows.cart.service.CartService;
-import com.hows.common.CustomUserDetails;
+import java.util.HashMap;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.hows.cart.dto.CartDTO;
+import com.hows.cart.service.CartService;
+import com.hows.common.CustomUserDetails;
 
 @RestController
 @RequestMapping("/cart")
@@ -33,8 +40,9 @@ public class CartController {
     }
 
     @PostMapping
-    public ResponseEntity<String> addCart(@RequestBody CartDTO cartDTO) throws Exception {
-        String result = cartServ.addCart(cartDTO);
+    public ResponseEntity<String> addCart(@AuthenticationPrincipal CustomUserDetails user, @RequestBody CartDTO cartDTO) throws Exception {
+        cartDTO.setMember_seq(user.getMemberSeq());
+    	String result = cartServ.addCart(cartDTO);
         return ResponseEntity.ok(result);
     }
 

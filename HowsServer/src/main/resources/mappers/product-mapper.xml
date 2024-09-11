@@ -68,8 +68,8 @@
         product p ON r.product_seq = p.product_seq
     JOIN 
         member m ON r.member_id = m.member_id
-    LEFT JOIN 
-        review_report rr ON r.review_seq = rr.review_seq  <!-- 신고 기록 조인 -->
+    JOIN 
+         review_report rr ON r.review_seq = rr.review_seq <!-- 신고 기록이 있는 리뷰만 조회 -->
     GROUP BY 
         r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
     ORDER BY 
@@ -93,6 +93,19 @@
         WHERE 
         	rr.review_seq = #{review_seq}
 	</select>
+	
+	<!-- 신고 리뷰 및 관련 신고 기록 삭제 (관리자) -->
+    <!-- 리뷰에 대한 신고 기록 삭제 -->
+    <delete id="deleteReviewReport" parameterType="int">
+        DELETE FROM review_report
+        WHERE review_seq = #{review_seq}
+    </delete>
+
+    <!-- 리뷰 삭제 -->
+    <delete id="deleteReview" parameterType="int">
+        DELETE FROM review
+        WHERE review_seq = #{review_seq}
+    </delete>
 
 
 </mapper>

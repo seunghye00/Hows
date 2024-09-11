@@ -442,7 +442,12 @@ create table orders (
     member_seq number not null,
     order_code char(2) not null,
     order_date timestamp default sysdate not null,
-    order_price number not null
+    order_price number not null,
+    orderer_name varchar2(30) not null,
+    orderer_phone varchar2(11) not null,
+    orderer_zip_code varchar2(10) not null,
+    orderer_address varchar2(255) not null,
+    orderer_detail_address varchar2(255) not null
 );
 
 create sequence order_seq

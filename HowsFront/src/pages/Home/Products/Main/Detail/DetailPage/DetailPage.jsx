@@ -144,7 +144,7 @@ export const DetailPage = () => {
                                 <div className={styles.modalBox}>
                                     <h2>리뷰 쓰기</h2>
                                     <div>
-                                        <span>별점 평가</span>
+                                        <span>만족도 </span> &nbsp; &nbsp;
                                         <StarRating 
                                             rating={data.rating} // 현재 별점 상태 전달
                                             onRatingChange={handleRatingChange} // 별점 변경 시 호출
@@ -153,15 +153,25 @@ export const DetailPage = () => {
 
                                     <h2>리뷰 작성</h2>
                                     <div className={styles.reviewModal}>
-                                        <textarea
-                                            name="review_contents" 
-                                            placeholder="리뷰 내용을 입력하세요"
-                                            value={data.review_contents}
-                                            onChange={handleInputChange}  
-                                        ></textarea>
+                                        <input type='text' 
+                                            name='review_contents' 
+                                            placeholder='리뷰 내용을 입력하세요.' 
+                                            value={data.review_contents} 
+                                            onChange={handleInputChange}
+                                            className={styles.reviewContent}>
+                                        </input>
 
                                         {/* 이미지 업로드 */}
-                                        <input type="file" accept="image/*" onChange={handleImageChange} multiple />
+                                        <div className={styles.filesBox}>
+                                            <label className={styles.fileBtn} for="files">
+                                                <div>
+                                                    <span> 사진 첨부하기 </span>
+                                                    <i class='bx bxs-file-image'/>
+                                                </div>
+                                            </label>
+                                            <input type="file" accept="image/*" id='files' className={styles.files} onChange={handleImageChange} multiple/>
+                                        </div>
+                                        <span className={styles.filesTitle}>첨부파일은 최대 4개까지만 가능합니다</span>
 
                                         <button onClick={handleSubmit}>리뷰 제출</button> 
                                     </div>

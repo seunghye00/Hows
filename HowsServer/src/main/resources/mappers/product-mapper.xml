@@ -31,7 +31,7 @@
 			select product_seq.currval from dual
 		</selectKey>
 		insert into product values (product_seq.nextval, ' ',
-		#{product_title}, #{product_contents}, #{price},
+		#{product_title}, #{product_contents}, #{price}, #{quantity},
 		#{product_category_code})
 	</insert>
 	

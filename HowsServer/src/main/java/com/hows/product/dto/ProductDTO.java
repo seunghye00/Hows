@@ -6,19 +6,21 @@ public class ProductDTO {
 	private String product_title;
 	private String product_contents;
 	private int price;
+	private int quantity;
 	private String product_category_code;
 	
 	public ProductDTO() {
 		super();
 	}
 	public ProductDTO(int product_seq, String product_thumbnail, String product_title, String product_contents,
-			int price, String product_category_code) {
+			int price, int quantity, String product_category_code) {
 		super();
 		this.product_seq = product_seq;
 		this.product_thumbnail = product_thumbnail;
 		this.product_title = product_title;
 		this.product_contents = product_contents;
 		this.price = price;
+		this.quantity = quantity;
 		this.product_category_code = product_category_code;
 	}
 	public int getProduct_seq() {
@@ -50,6 +52,12 @@ public class ProductDTO {
 	}
 	public void setPrice(int price) {
 		this.price = price;
+	}
+	public int getQuantity() {
+		return quantity;
+	}
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 	public String getProduct_category_code() {
 		return product_category_code;

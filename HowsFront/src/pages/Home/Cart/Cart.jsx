@@ -204,7 +204,7 @@ export const Cart = () => {
                     <img src={item.product_thumbnail} alt="상품이미지"/>
                   </div>
                   <div className={styles.itemInfo}>
-                    <p>{item.product_title}</p>
+                    <p onClick={() => navi(`/products/${item.product_seq}`)}>{item.product_title}</p>
                     <div className={styles.itemCount}>
                       <span> 수량 : </span>
                       <button onClick={() => handleCount(item.cart_seq, "-")}>-</button>

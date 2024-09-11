@@ -81,11 +81,12 @@
 .container .mainBox .header .userInfo .top .linkBtns > button {
   border: none;
   background: none;
-  color: var(--hows-point-color-darker);
-  font-size: 20px;
+  color: var(--hows-point-color-dark);
+  font-size: 18px;
+  font-weight: 600;
   cursor: pointer;
-  text-decoration: underline;
-  margin-left: 15px;
+  margin-left: 13px;
+  /* text-decoration: underline; */
 }
 /* 아이디, 팔로우, 팔로워 */
 .container .mainBox .header .userInfo .middle {
@@ -182,21 +183,24 @@
   height: 150px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
   align-items: center;
 }
 
 .modalBox > h2 {
-  margin-bottom: 25px;
   font-size: 28px;
 }
 
-.modalBox > button {
+.modalBox > p {
+  margin-bottom: 10px;
+}
+
+.modalBox button {
   border: none;
   background: none;
   font-size: 20px;
   font-weight: 600;
-  padding: 5px;
+  padding: 0 10px;
 }
 
 .modalBox .modBtn {

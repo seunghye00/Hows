@@ -1,7 +1,7 @@
 import styles from "./Main.module.css";
 import { Post } from "./Post/Post";
 import { Routes, Route, Navigate, useNavigate, useLocation, useParams } from "react-router-dom";
-import img from "../../../../assets/images/마이페이지_가로배너.jpg";
+import banner from "../../../../assets/images/마이페이지_가로배너.jpg";
 import profile from "../../../../assets/images/마이페이지_프로필사진.jpg";
 
 import { useEffect, useState } from "react";
@@ -20,7 +20,9 @@ export const Main = () => {
     const { memberSeq, setMemberSeq } = useMemberStore();
     const [isModalOpen, setIsModalOpen] = useState(false); // 모달 상태
     const [selectedImage, setSelectedImage] = useState(profile); // 선택한 이미지 초기값
-    const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
+    // const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
+    const [modalContent, setModalContent] = useState(""); // 모달 창에 표시할 내용을 구분하는 상태
+
 
 
     useEffect(() => {
@@ -46,11 +48,7 @@ export const Main = () => {
         formData.append('file', file);
         formData.append('member_seq', memberSeq);
 
-        api.post('/member/uploadProfileImage', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
+        api.post('/member/uploadProfileImage', formData)
             .then(resp => {
                 console.log('이미지 업로드 성공:', resp.data);
                 // 업로드 후 상태 업데이트
@@ -80,12 +78,32 @@ export const Main = () => {
 
     return (
         <div className={styles.container}>
-            <div className={styles.bannerImg}>
-                <img src={img}></img>
+            {/* 배너 이미지: 사용자 본인일 때만 변경 가능 */}
+            <div
+                className={styles.bannerImg}
+                onClick={() => {
+                    if (sessionStorage.getItem('member_id') === user.member_id) {
+                        setModalContent("banner");
+                        setIsModalOpen(true);
+                    }
+                }}
+                style={{ cursor: sessionStorage.getItem('member_id') === user.member_id ? 'pointer' : 'default' }}
+            >
+                <img src={banner}></img>
             </div>
             <div className={styles.mainBox}>
                 <div className={styles.header}>
-                    <div className={styles.profile} onClick={() => setIsModalOpen(true)}>
+                    {/* 프로필 이미지: 사용자 본인일 때만 변경 가능 */}
+                    <div
+                        className={styles.profile}
+                        onClick={() => {
+                            if (sessionStorage.getItem('member_id') === user.member_id) {
+                                setModalContent("profile");
+                                setIsModalOpen(true);
+                            }
+                        }}
+                        style={{ cursor: sessionStorage.getItem('member_id') === user.member_id ? 'pointer' : 'default' }}
+                    >
                         <img src={selectedImage} alt="Profile" />
                     </div>
                     <div className={styles.userInfo}>
@@ -156,36 +174,52 @@ export const Main = () => {
                 </div>
             </div>
 
-            {/* 모달 컴포넌트 추가 */}
+            {/* 모달 컴포넌트 */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <div className={styles.modalBox}>
-                    <h2>프로필 사진 변경</h2>
-                    <button className={styles.modBtn} onClick={() => {
-                        document.getElementById("fileInput").click(); // 파일 input 클릭
-                    }}>수정</button>
-                    <button className={styles.delBtn} onClick={() => {
-                        deleteProfileImage(); // 서버에 이미지 삭제 요청
-                        // setSelectedImage(profile); // 기본 이미지로 변경
-                        setIsModalOpen(false);
-                    }}>삭제</button>
-                    <input
-                        id="fileInput"
-                        type="file"
-                        style={{ display: "none" }}
-                        accept="image/*"
-                        onChange={(e) => {
-                            const file = e.target.files[0];
-                            if (file) {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                    setSelectedImage(reader.result); // 선택한 이미지 미리보기
-                                    uploadProfileImage(file); // 이미지 서버로 전송
-                                };
-                                reader.readAsDataURL(file);
-                            }
-                            setIsModalOpen(false); // 모달 닫기
-                        }}
-                    />
+                    {modalContent === "profile" && (
+                        <>
+                            <h2>프로필 사진 변경</h2>
+                            <div>
+                                <button className={styles.modBtn} onClick={() => {
+                                    document.getElementById("fileInput").click(); // 파일 input 클릭
+                                }}>수정</button>
+                                <button className={styles.delBtn} onClick={() => {
+                                    deleteProfileImage(); // 서버에 이미지 삭제 요청
+                                    setIsModalOpen(false);
+                                }}>삭제</button>
+                            </div>
+                            <input
+                                id="fileInput"
+                                type="file"
+                                style={{ display: "none" }}
+                                accept="image/*"
+                                onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => {
+                                            // setSelectedImage(reader.result); // 선택한 이미지 미리보기
+                                            uploadProfileImage(file); // 이미지 서버로 전송
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                    setIsModalOpen(false); // 모달 닫기
+                                }}
+                            />
+                        </>
+                    )}
+
+                    {modalContent === "banner" && (
+                        <>
+                            <h2>배너 사진 변경</h2>
+                            <p>사진은 1470 * 260 사이즈를 권장합니다</p>
+                            <div>
+                                <button className={styles.modBtn}>수정</button>
+                                <button className={styles.delBtn} onClick={() => setIsModalOpen(false)}>삭제</button>
+                            </div>
+                        </>
+                    )}
                 </div>
             </Modal>
         </div >

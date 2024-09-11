@@ -78,11 +78,15 @@ public class MemberController {
 
 	// 마이페이지 회원정보 출력
 	@GetMapping("/selectInfo")
-	public ResponseEntity<MemberDTO> selectInfo(@AuthenticationPrincipal UserDetails user) {
+	public ResponseEntity<MemberDTO> selectInfo(
+			 @RequestParam(required = false) String member_id,
+			@AuthenticationPrincipal UserDetails user) {
 
 		System.out.println("요청한 사용자의 ID : " + user.getUsername());
 
-		String member_id = user.getUsername();
+		if (member_id == null || member_id.isEmpty()) {
+	        member_id = user.getUsername(); // member_id가 없을 경우 JWT에서 ID 가져오기
+	    }
 
 		MemberDTO result = memServ.selectInfo(member_id);
 		return ResponseEntity.ok(result);
@@ -171,7 +175,11 @@ public class MemberController {
 	        System.out.println("삭제할 sysname : " + sysName);
 	        
 	        if (sysName != null) {
-	            // 2. fileService를 통해 GCS에서 파일 삭제
+	        	// 1-1. URL에서 마지막 슬래시 뒤의 파일명만 추출
+	            String fileName = sysName.substring(sysName.lastIndexOf("/") + 1);
+	            System.out.println("삭제할 파일명 : " + fileName);
+	        	
+	        	// 2. fileService를 통해 GCS에서 파일 삭제
 	            String result = fileServ.deleteFile(sysName, "F1");
 	            System.out.println("삭제 결과 : " + result);
 

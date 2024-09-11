@@ -25,6 +25,7 @@ export const List = () => {
         Promise.all([categoryList(), productList()])
             .then(([categoryData, productData]) => {
                 setCategories(categoryData.data)
+                console.log(productData.data)
                 setProducts(productData.data)
                 setFilteredProducts(productData.data) // 처음에는 필터링 없이 전체 상품 목록을 표시
             })
@@ -255,9 +256,15 @@ export const List = () => {
                                                   )
                                               }
                                           />
-                                          <div>{product.product_title}</div>
+                                          <div className={styles.name}>
+                                              {product.product_title}
+                                          </div>
                                       </div>
                                       <div>\ {addCommas(product.price)}</div>
+                                      <div className={styles.num}>
+                                          남은 수량 :{' '}
+                                          {addCommas(product.quantity)}개
+                                      </div>
                                   </div>
                               </div>
                           ))}

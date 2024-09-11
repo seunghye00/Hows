@@ -329,57 +329,51 @@ export const Post = () => {
         }
 
         try {
-            // 게시글 먼저 저장
-            const postResponse = await axios.post(`${host}/community`, {
-                housing_type_code: selectedHousingType,
-                space_type_code: selectedSpaceType,
-                area_size_code: selectedAreaSize,
-                board_contents: postContent,
-                member_id: 'qwer1234',
+            const formData = new FormData()
+
+            // 게시글 정보 추가
+            formData.append('housing_type_code', selectedHousingType)
+            formData.append('space_type_code', selectedSpaceType)
+            formData.append('area_size_code', selectedAreaSize)
+            formData.append('board_contents', postContent)
+            formData.append('member_id', 'qwer1234')
+
+            // 이미지 및 태그 정보 추가
+            images.forEach((image, index) => {
+                formData.append('files', image.file)
+
+                const tags = image.tags.map(tag => ({
+                    product_seq: tag.product.product_seq,
+                    left_position: tag.position.left,
+                    top_position: tag.position.top,
+                }))
+                formData.append('tags', JSON.stringify(tags))
             })
 
-            const board_seq = postResponse.data // 서버로부터 받은 board_seq
+            // 이미지 순서 배열 추가 (배열 자체로 추가)
+            images.forEach((_, index) =>
+                formData.append('image_orders', index + 1)
+            )
 
-            if (board_seq) {
-                // 이미지 및 태그 저장
-                const formData = new FormData()
-
-                images.forEach((image, index) => {
-                    formData.append('file', image.file) // 이미지를 파일로 전송
-                    formData.append('board_seq', board_seq) // 게시글 시퀀스
-                    formData.append('image_order', index + 1)
-
-                    // 각 이미지에 대한 태그 정보 추가
-                    const tags = image.tags.map(tag => ({
-                        product_seq: tag.product.product_seq,
-                        left_position: tag.position.left,
-                        top_position: tag.position.top,
-                    }))
-
-                    // 태그 데이터를 JSON 문자열로 변환 후 추가
-                    formData.append('tags', JSON.stringify(tags))
-                })
-
-                const imageResponse = await axios.post(
-                    `${host}/community/images`,
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    }
-                )
-
-                if (imageResponse.status === 200) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '게시글 작성 완료',
-                        text: '게시글과 이미지가 성공적으로 작성되었습니다.',
-                    })
-                    navigate('/communities')
-                } else {
-                    throw new Error('이미지 및 태그 저장 실패')
+            const response = await axios.post(
+                `${host}/community/write-with-images`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
                 }
+            )
+
+            if (response.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '게시글 작성 완료',
+                    text: '게시글과 이미지가 성공적으로 작성되었습니다.',
+                })
+                navigate('/communities')
+            } else {
+                throw new Error('이미지 및 태그 저장 실패')
             }
         } catch (error) {
             console.error('게시글 작성 오류:', error)

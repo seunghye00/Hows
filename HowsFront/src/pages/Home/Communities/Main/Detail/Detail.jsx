@@ -13,33 +13,47 @@ import { useParams } from 'react-router-dom' // for accessing the board_seq from
 import img from './../../../../../assets/images/cry.jpg'
 import img1 from './../../../../../assets/images/마이페이지_프로필사진.jpg'
 import { host } from '../../../../../config/config'
+import {
+    getPostData,
+    getImageData,
+    getTagData,
+} from '../../../../../api/community' // API 함수 불러오기
 
 export const Detail = () => {
     const { board_seq } = useParams() // get board_seq from the route params
     const [postData, setPostData] = useState(null) // State to store post data
+    const [imagesData, setImagesData] = useState(null) // State to store images
+    const [tagsData, setTagsData] = useState(null) // State to store tags
     const [isLiked, setIsLiked] = useState(false)
     const [likeCount, setLikeCount] = useState(0)
     const [isBookmarked, setIsBookmarked] = useState(false)
     const [viewCount, setViewCount] = useState(0)
     const [bookmarkCount, setBookmarkCount] = useState(0)
     const [isModalOpen, setIsModalOpen] = useState(false)
-    const [comments, setComments] = useState([])
 
-    // 게시글 정보 받아오기
+    // 게시글 정보 및 이미지, 태그 정보 받아오기
     useEffect(() => {
-        const fetchPostData = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axios.get(
-                    `${host}/community/${board_seq}`
-                )
-                setPostData(response.data)
-                console.log(response.data + '데이터 값 확인')
+                // API 요청 함수 호출
+                const postData = await getPostData(board_seq)
+                setPostData(postData.data)
+
+                const images = await getImageData(board_seq)
+                setImagesData(images.data.images)
+
+                const tags = await getTagData(board_seq)
+                setTagsData(tags.data.tags)
+
+                console.log('게시글 데이터:', postData.data)
+                console.log('이미지 데이터:', images.data.images)
+                console.log('태그 데이터:', tags.data.tags)
             } catch (error) {
-                console.error('Error fetching post data:', error)
+                console.error('데이터를 가져오는 중 오류 발생:', error)
             }
         }
 
-        fetchPostData()
+        fetchData() // 함수 실행
     }, [board_seq])
 
     // 좋아요, 북마크 상태 변경
@@ -53,8 +67,7 @@ export const Detail = () => {
         setBookmarkCount(isBookmarked ? bookmarkCount - 1 : bookmarkCount + 1)
     }
 
-    // 링크 복사 기능 구현
-    // 링크 복사 기능 구현
+    // 링크 복사 기능
     const copyLinkToClipboard = () => {
         const dummyLink = window.location.href // 현재 URL
         navigator.clipboard.writeText(dummyLink).then(() => {
@@ -77,7 +90,7 @@ export const Detail = () => {
                     <ProfileSection profileData={postData} />
                     {/* 이미지 섹션 */}
                     <div className={styles.imageSection}>
-                        <ImageSwiper images={postData} />
+                        <ImageSwiper images={imagesData} tags={tagsData} />
                     </div>
                     {/* 상품 태그 섹션 */}
                     <div className={styles.productTagSection}>

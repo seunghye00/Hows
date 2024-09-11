@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,55 +37,69 @@ public class CommunityController {
     @Autowired
     private FileService fileServ;
 
-    // 게시글 저장
-    @PostMapping
-    public ResponseEntity<Integer> insertWrite(@RequestBody CommunityDTO dto) {
-        int board_seq = communityServ.insertWrite(dto);
-        System.out.println(board_seq + " 현재 시퀀스 값");
-        return ResponseEntity.ok(board_seq);
-    }
-
-    // 이미지 및 태그 저장
-    @PostMapping("/images")
-    public ResponseEntity<Void> insertImagesAndTags(
-        @RequestPart("file") MultipartFile file,  // FormData에서 이미지 파일을 받음
-        @RequestParam("board_seq") int board_seq,
-        @RequestParam("image_order") int image_order,
-        @RequestParam("tags") String tagsJson // 태그 데이터를 JSON 문자열로 받음
+    // 게시글 및 이미지/태그 저장 (트랜잭션 적용)
+    @PostMapping("/write-with-images")
+    @Transactional // 트랜잭션 적용
+    public ResponseEntity<Void> insertWriteWithImages(
+        @RequestParam("housing_type_code") String housingTypeCode,
+        @RequestParam("space_type_code") String spaceTypeCode,
+        @RequestParam("area_size_code") String areaSizeCode,
+        @RequestParam("board_contents") String boardContents,
+        @RequestParam("member_id") String memberId,
+        @RequestPart("files") MultipartFile[] files,  // FormData에서 여러 이미지 파일을 받음
+        @RequestParam("image_orders") int[] imageOrders,  // 이미지 순서를 배열로 받음
+        @RequestParam("tags") String[] tagsJson  // 태그 데이터를 JSON 문자열 배열로 받음
     ) {
         try {
-            // 1. FileService를 통해 GCS에 이미지 업로드
-            String code = "F2"; // 커뮤니티 코드 (필요에 따라 변경 가능)
-            String uploadResult = fileServ.upload(file, board_seq, code); 
-            System.out.println(uploadResult + " 업로드 결과 확인");
+            // 1. CommunityDTO 객체 생성 및 게시글 저장
+            CommunityDTO dto = new CommunityDTO();
+            dto.setHousing_type_code(housingTypeCode);
+            dto.setSpace_type_code(spaceTypeCode);
+            dto.setArea_size_code(areaSizeCode);
+            dto.setBoard_contents(boardContents);
+            dto.setMember_id(memberId);
+            
+            int boardSeq = communityServ.insertWrite(dto); // 게시글 저장
+            System.out.println(boardSeq + " 게시글 시퀀스");
 
-            // 2. 이미지가 성공적으로 업로드되었다면 sysname을 image_url에 저장
-            if (!uploadResult.equals("fail")) {
-                ImageDTO imageDTO = new ImageDTO();
-                imageDTO.setBoard_seq(board_seq);
-                imageDTO.setImage_url(uploadResult); // GCS에 저장된 이미지 URL을 DB에 저장
-                imageDTO.setImage_order(image_order);
+            // 2. 이미지 및 태그 저장 로직
+            for (int i = 0; i < files.length; i++) {
+                MultipartFile file = files[i];
+                int imageOrder = imageOrders[i];
+                String tags = tagsJson[i];
 
-                // 3. 이미지 정보 DB에 저장
-                int board_image_seq = communityServ.insertImage(imageDTO);
-                System.out.println("저장된 이미지 시퀀스: " + board_image_seq);
+                // 이미지 업로드
+                String code = "F2"; 
+                String uploadResult = fileServ.upload(file, boardSeq, code); 
+                System.out.println(uploadResult + " 업로드 결과 확인");
 
-                // 4. 태그 데이터 처리 (tagsJson을 JSON으로 파싱)
-                List<TagDTO> tags = parseTagsFromJson(tagsJson, board_image_seq);
-                if (tags != null && !tags.isEmpty()) {
-                    for (TagDTO tag : tags) {
-                        tag.setBoard_image_seq(board_image_seq);
-                        communityServ.insertTag(tag); // 태그 DB에 저장
+                if (!uploadResult.equals("fail")) {
+                    // 이미지 DB 저장
+                    ImageDTO imageDTO = new ImageDTO();
+                    imageDTO.setBoard_seq(boardSeq);
+                    imageDTO.setImage_url(uploadResult);
+                    imageDTO.setImage_order(imageOrder);
+                    int boardImageSeq = communityServ.insertImage(imageDTO);
+
+                    // 태그 데이터 처리
+                    List<TagDTO> tagsList = parseTagsFromJson(tags, boardImageSeq);
+                    if (tagsList != null && !tagsList.isEmpty()) {
+                        for (TagDTO tag : tagsList) {
+                            tag.setBoard_image_seq(boardImageSeq);
+                            communityServ.insertTag(tag);
+                        }
                     }
+                } else {
+                    throw new IOException("이미지 업로드 실패");
                 }
             }
+
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            throw new RuntimeException("게시글 작성 또는 이미지 업로드 실패", e);
         }
     }
-
     // 태그 데이터를 JSON에서 List<TagDTO>로 파싱하는 메서드
     private List<TagDTO> parseTagsFromJson(String tagsJson, int board_image_seq) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -130,9 +144,23 @@ public class CommunityController {
     @GetMapping("/{board_seq}")
     public ResponseEntity<Map<String, Object>> selectAllSeq(@PathVariable int board_seq) {
     	Map<String, Object> boardDetail = communityServ.selectAllSeq(board_seq);
+    	
         return ResponseEntity.ok(boardDetail);
     }
+    
+    @GetMapping("/images/{board_seq}")
+    public ResponseEntity<Map<String, Object>> selectImagesAndTags(@PathVariable int board_seq) {
+        List<Map<String, Object>> images = communityServ.selectImages(board_seq);
+        List<Map<String, Object>> tags = communityServ.selectTagsAndProductInfo(board_seq);
 
+        // 이미지와 태그 데이터를 하나의 맵으로 합침
+        Map<String, Object> result = new HashMap<>();
+        result.put("images", images);
+        result.put("tags", tags);
+
+        return ResponseEntity.ok(result);
+    }
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> exceptionHandler(Exception e) {
         e.printStackTrace();

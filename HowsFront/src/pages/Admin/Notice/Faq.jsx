@@ -3,6 +3,7 @@ import { FaChevronDown, FaTimes } from 'react-icons/fa'
 import styles from './Faq.module.css'
 import { Button } from '../../../components/Button/Button'
 import { selectAllFaq, insertFaq, modifyFaq, deleteFaq } from '../../../api/faq'
+import Swal from 'sweetalert2'
 
 const Faq = () => {
     const [faqList, setFaqList] = useState([]) // FAQ 리스트
@@ -61,9 +62,23 @@ const Faq = () => {
                 setIsAdd(false)
                 setEditIndex(null)
                 setExpandedFaqIndex(null)
+                Swal.fire({
+                    title: '등록 완료',
+                    text: 'FAQ가 성공적으로 등록되었습니다.',
+                    icon: 'success',
+                    confirmButtonText: '확인',
+                })
                 fetchFaqList() // 등록 후 목록을 다시 불러옴
             })
-            .catch(error => console.error('FAQ 등록 실패:', error))
+            .catch(error => {
+                console.error('FAQ 등록 실패:', error)
+                Swal.fire({
+                    title: '등록 실패',
+                    text: 'FAQ 등록 중 오류가 발생했습니다.',
+                    icon: 'error',
+                    confirmButtonText: '확인',
+                })
+            })
     }
 
     // FAQ 취소
@@ -80,17 +95,39 @@ const Faq = () => {
 
     // 수정 모드 저장
     const saveEditMode = () => {
-        const confirmSave = window.confirm('이 FAQ를 저장하시겠습니까?')
-        if (!confirmSave) return
+        Swal.fire({
+            title: '수정 확인',
+            text: '이 FAQ를 저장하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '저장',
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                const updatedFaq = faqList[editIndex]
 
-        const updatedFaq = faqList[editIndex]
-
-        modifyFaq(updatedFaq.faq_seq, updatedFaq)
-            .then(() => {
-                setEditIndex(null)
-                fetchFaqList() // 수정 후 목록을 다시 불러옴
-            })
-            .catch(error => console.error('FAQ 수정 실패:', error))
+                modifyFaq(updatedFaq.faq_seq, updatedFaq)
+                    .then(() => {
+                        setEditIndex(null)
+                        Swal.fire({
+                            title: '수정 완료',
+                            text: 'FAQ가 성공적으로 수정되었습니다.',
+                            icon: 'success',
+                            confirmButtonText: '확인',
+                        })
+                        fetchFaqList() // 수정 후 목록을 다시 불러옴
+                    })
+                    .catch(error => {
+                        console.error('FAQ 수정 실패:', error)
+                        Swal.fire({
+                            title: '수정 실패',
+                            text: 'FAQ 수정 중 오류가 발생했습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인',
+                        })
+                    })
+            }
+        })
     }
 
     // 수정 모드 취소
@@ -100,18 +137,42 @@ const Faq = () => {
 
     // FAQ 삭제
     const deleteFaqItem = index => {
-        const confirmDelete = window.confirm('이 FAQ를 삭제하시겠습니까?')
-        if (!confirmDelete) return
-
         const faq_seq = faqList[index].faq_seq
 
-        deleteFaq(faq_seq)
-            .then(() => {
-                const updatedFaqList = faqList.filter((_, i) => i !== index)
-                setFaqList(updatedFaqList)
-                fetchFaqList() // 삭제 후 목록을 다시 불러옴
-            })
-            .catch(error => console.error('FAQ 삭제 실패:', error))
+        Swal.fire({
+            title: '삭제 확인',
+            text: '이 FAQ를 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+        }).then(result => {
+            if (result.isConfirmed) {
+                deleteFaq(faq_seq)
+                    .then(() => {
+                        const updatedFaqList = faqList.filter(
+                            (_, i) => i !== index
+                        )
+                        setFaqList(updatedFaqList)
+                        Swal.fire({
+                            title: '삭제 완료',
+                            text: 'FAQ가 성공적으로 삭제되었습니다.',
+                            icon: 'success',
+                            confirmButtonText: '확인',
+                        })
+                        fetchFaqList() // 삭제 후 목록을 다시 불러옴
+                    })
+                    .catch(error => {
+                        console.error('FAQ 삭제 실패:', error)
+                        Swal.fire({
+                            title: '삭제 실패',
+                            text: 'FAQ 삭제 중 오류가 발생했습니다.',
+                            icon: 'error',
+                            confirmButtonText: '확인',
+                        })
+                    })
+            }
+        })
     }
 
     return (

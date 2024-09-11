@@ -5,7 +5,7 @@ import { Main } from './Main/Main'
 import { Banner } from './Banner/Banner'
 import { Member } from './Member/Member'
 import { Blacklist } from './Member/Blacklist'
-import { Board } from './Board/Board'
+import { Community } from './Community/Community'
 import { Comment } from './Comment/Comment'
 import { Reply } from './Reply/Reply'
 import { Review } from './Review/Review'
@@ -47,11 +47,11 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/board"
+                    path="/community"
                     element={
                         <>
                             <Title title={'게시판 관리'} />
-                            <Board />
+                            <Community />
                         </>
                     }
                 />

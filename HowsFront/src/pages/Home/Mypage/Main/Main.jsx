@@ -11,12 +11,13 @@ import {
 import banner from '../../../../assets/images/마이페이지_가로배너.jpg'
 import profile from '../../../../assets/images/마이페이지_프로필사진.jpg'
 
-import { useEffect, useState } from 'react'
-import { api } from './../../../../config/config'
-import { Scrap } from './Scrap/Scrap'
-import { Guestbook } from './Guestbook/Guestbook'
-import { Modal } from '../../../../components/Modal/Modal'
-import { useMemberStore } from '../../../../store/store'
+import { useEffect, useState } from "react";
+import { api } from "./../../../../config/config";
+import { Scrap } from "./Scrap/Scrap";
+import { Guestbook } from "./Guestbook/Guestbook";
+import { Modal } from "../../../../components/Modal/Modal"
+import { useMemberStore } from "../../../../store/store";
+import { deleteProfileImage, findMemberSeq, selectInfo, uploadProfileImage, userInfo } from "../../../../api/member";
 
 export const Main = () => {
     const navi = useNavigate()
@@ -33,30 +34,25 @@ export const Main = () => {
     useEffect(() => {
         // url에서 가져온 member_id로 해당 페이지 member_id의 데이터 가져오기
         if (member_id) {
-            api.get(`/member/selectInfo`, { params: { member_id } }).then(
-                resp => {
-                    console.log('데이터 : ', resp.data)
-                    setUser(resp.data)
-                    // 사용자 정보에서 프로필 이미지 설정
-                    setSelectedImage(resp.data.member_avatar || profile) // 기본 이미지로 초기화
-                }
-            )
-            api.get(`/guestbook/findMemberSeq`, { params: { member_id } }).then(
-                resp => {
-                    console.log('member_seq : ', resp.data)
-                    setMemberSeq(resp.data) // zustand에 memberSeq 저장
-                }
-            )
+            userInfo(member_id).then((resp) => {
+                console.log("데이터 : ", resp.data);
+                setUser(resp.data);
+                // 사용자 정보에서 프로필 이미지 설정
+                setSelectedImage(resp.data.member_avatar || profile); // 기본 이미지로 초기화
+
+            }).catch(err => {
+                console.log(err);
+            })
+            findMemberSeq(member_id).then((resp) => {
+                console.log("member_seq : ", resp.data);
+                setMemberSeq(resp.data); // zustand에 memberSeq 저장
+            });
         }
     }, [member_id, setMemberSeq])
 
     // 서버로 이미지 업로드 함수
-    const uploadProfileImage = file => {
-        const formData = new FormData()
-        formData.append('file', file)
-        formData.append('member_seq', memberSeq)
-
-        api.post('/member/uploadProfileImage', formData)
+    const handleUploadProfileImage = (file) => {
+        uploadProfileImage(file, memberSeq)
             .then(resp => {
                 console.log('이미지 업로드 성공:', resp.data)
                 // 업로드 후 상태 업데이트
@@ -68,10 +64,8 @@ export const Main = () => {
     }
 
     // 프로필 사진 삭제
-    const deleteProfileImage = () => {
-        api.delete('/member/deleteProfileImage', {
-            params: { member_seq: memberSeq },
-        })
+    const handleDeleteProfileImage = () => {
+        deleteProfileImage(memberSeq)
             .then(resp => {
                 console.log('이미지 삭제 성공:', resp.data)
                 setSelectedImage(profile) // 기본 이미지로 변경
@@ -80,6 +74,7 @@ export const Main = () => {
                 console.error('이미지 삭제 실패:', error)
             })
     }
+
 
     return (
         <div className={styles.container}>
@@ -254,25 +249,13 @@ export const Main = () => {
                         <>
                             <h2>프로필 사진 변경</h2>
                             <div>
-                                <button
-                                    className={styles.modBtn}
-                                    onClick={() => {
-                                        document
-                                            .getElementById('fileInput')
-                                            .click() // 파일 input 클릭
-                                    }}
-                                >
-                                    수정
-                                </button>
-                                <button
-                                    className={styles.delBtn}
-                                    onClick={() => {
-                                        deleteProfileImage() // 서버에 이미지 삭제 요청
-                                        setIsModalOpen(false)
-                                    }}
-                                >
-                                    삭제
-                                </button>
+                                <button className={styles.modBtn} onClick={() => {
+                                    document.getElementById("fileInput").click(); // 파일 input 클릭
+                                }}>수정</button>
+                                <button className={styles.delBtn} onClick={() => {
+                                    handleDeleteProfileImage(); // 서버에 이미지 삭제 요청
+                                    setIsModalOpen(false);
+                                }}>삭제</button>
                             </div>
                             <input
                                 id="fileInput"
@@ -285,9 +268,9 @@ export const Main = () => {
                                         const reader = new FileReader()
                                         reader.onloadend = () => {
                                             // setSelectedImage(reader.result); // 선택한 이미지 미리보기
-                                            uploadProfileImage(file) // 이미지 서버로 전송
-                                        }
-                                        reader.readAsDataURL(file)
+                                            handleUploadProfileImage(file); // 이미지 서버로 전송
+                                        };
+                                        reader.readAsDataURL(file);
                                     }
                                     setIsModalOpen(false) // 모달 닫기
                                 }}

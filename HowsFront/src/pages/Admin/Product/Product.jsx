@@ -5,7 +5,7 @@ import { Delivery } from './Delivery/Delivery'
 import { Return } from './Return/Return'
 import { AddProduct } from './List/AddProduct/AddProduct'
 import { ModifyProduct } from './List/ModifyProduct/ModifyProduct'
-import { List } from './List/List/List'
+import { List } from './List/List'
 
 export const Product = () => {
     return (

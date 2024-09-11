@@ -27,10 +27,8 @@ export const requestPaymentEvent = async(payment, orderInfo) => {
 
   // 결제 실패
   if(response.code != null) {
-    if(response.code.toString() === "FAILURE_TYPE_PG") {
-      return SwalComp({ type:"error", text: "결제를 취소하였습니다" });
-    }
-    return SwalComp({ type:"error", text: response.message });
+    if(response.code.toString() === "FAILURE_TYPE_PG") return response.message
+    else return SwalComp({ type:"error", text: response.message });
   }
 
   // 주문 데이터 저장

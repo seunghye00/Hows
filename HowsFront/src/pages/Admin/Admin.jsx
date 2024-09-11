@@ -12,6 +12,7 @@ import { Review } from './Review/Review'
 import { Notice } from './Notice/Notice'
 import Faq from './Notice/Faq'
 import { Product } from './Product/Product'
+import { WriteNotice } from './Notice/WriteNotice'
 
 export const Admin = () => {
     return (
@@ -28,6 +29,7 @@ export const Admin = () => {
                     }
                 />
                 <Route path="/admin/product/*" element={<Product />} />
+                <Route path="/admin/notice/*" element={<WriteNotice />} />
                 <Route
                     path="/member"
                     element={

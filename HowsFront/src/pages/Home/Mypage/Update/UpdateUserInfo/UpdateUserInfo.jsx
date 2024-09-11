@@ -86,13 +86,16 @@ export const UpdateUserInfo = () => {
         }
 
         // 중복확인 요청
-        api.post(`/member/checkNickname`, { nickname: formData.nickname })
-            .then(resp => {
-                console.log("nickname : ", resp.data);
-                setNicknameAvailable(resp.data);
-                setNicknameChecked(!resp.data);
-                setCheckNicknameStatus(resp.data ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
-            });
+        checkNickname(formData.nickname).then((resp) => {
+            console.log("nickname : ", resp.data);
+            setNicknameAvailable(resp.data);
+            setNicknameChecked(!resp.data);
+            setCheckNicknameStatus(
+                resp.data
+                    ? "이미 사용 중인 닉네임입니다."
+                    : "사용 가능한 닉네임입니다."
+            );
+        });
     }
 
 

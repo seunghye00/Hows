@@ -4,11 +4,14 @@ import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
 import test from '../../../assets/images/푸바오.png'
+import { useNavigate } from 'react-router-dom'
 
 export const Notice = () => {
     const [searchResults, setSearchResults] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedNotice, setSelectedNotice] = useState(null)
+
+    const navigate = useNavigate()
 
     // 공지사항 데이터 (임시 데이터)
     const notices = [
@@ -64,7 +67,11 @@ export const Notice = () => {
                         placeholder="제목 또는 작성자 검색"
                         onSearch={handleSearch}
                     />
-                    <Button size="s" title="등록하기" />
+                    <Button
+                        size="s"
+                        title="등록하기"
+                        onClick={() => navigate('/admin/notice/writeNotice')}
+                    />
                 </div>
             </div>
 

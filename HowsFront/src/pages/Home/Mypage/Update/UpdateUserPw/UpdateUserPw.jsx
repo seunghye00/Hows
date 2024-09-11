@@ -1,4 +1,4 @@
-import { updatePw } from "../../../../../api/member";
+import { checkCurrentPw, updatePw } from "../../../../../api/member";
 import { api } from "../../../../../config/config";
 import styles from "./UpdateUserPw.module.css";
 import { useState } from "react";

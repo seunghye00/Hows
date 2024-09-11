@@ -10,7 +10,7 @@ import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
 import { Modal } from "../../../../components/Modal/Modal"
 import { useMemberStore } from "../../../../store/store";
-import { deleteProfileImage, findMemberSeq, selectInfo, uploadProfileImage } from "../../../../api/member";
+import { deleteProfileImage, findMemberSeq, selectInfo, uploadProfileImage, userInfo } from "../../../../api/member";
 
 export const Main = () => {
     const navi = useNavigate();
@@ -35,7 +35,9 @@ export const Main = () => {
                 // 사용자 정보에서 프로필 이미지 설정
                 setSelectedImage(resp.data.member_avatar || profile); // 기본 이미지로 초기화
 
-            });
+            }).catch(err => {
+                console.log(err);
+            })
             findMemberSeq(member_id).then((resp) => {
                 console.log("member_seq : ", resp.data);
                 setMemberSeq(resp.data); // zustand에 memberSeq 저장

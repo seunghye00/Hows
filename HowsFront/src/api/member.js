@@ -43,9 +43,10 @@ export const deleteProfileImage = (memberSeq) => {
 };
 
 /** 유저 정보  **/
-export const userInfo = (params) => {
-    if(params) {
-        return api.get(`/member/selectInfo`, { params } )
+export const userInfo = (member_id) => {
+    console.log(member_id);
+    if (member_id) {
+        return api.get(`/member/selectInfo`, { params: { member_id } })
     } else {
         return api.get(`/member/selectInfo`);
     }

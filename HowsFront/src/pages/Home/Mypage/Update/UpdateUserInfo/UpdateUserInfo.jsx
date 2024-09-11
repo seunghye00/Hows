@@ -7,7 +7,7 @@ import { host } from '../../../../../config/config'
 import { api } from "../../../../../config/config";
 import { format } from "date-fns";
 import { useAuthStore } from "../../../../../store/store";
-import { userInfo } from "../../../../../api/member";
+import { checkNickname, userInfo } from "../../../../../api/member";
 
 export const UpdateUserInfo = () => {
 

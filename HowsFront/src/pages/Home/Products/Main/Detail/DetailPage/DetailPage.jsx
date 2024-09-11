@@ -3,30 +3,47 @@ import styles from './DetailPage.module.css'
 import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
 import StarRating from '../../../../../../components/StarRating/StarRating';
 import { Modal } from '../../../../../../components/Modal/Modal';
-import axios from 'axios';
-import { host } from '../../../../../../config/config';
+import { api, host } from '../../../../../../config/config';
 import { useParams } from 'react-router-dom';
+import { useAuthStore } from '../../../../../../store/store';
+import axios from 'axios';
 
 export const DetailPage = () => {
+    const { isAuth } = useAuthStore() // 로그인 여부 확인
     const { product_seq } = useParams();
+    const memberId = sessionStorage.getItem("member_id"); // 세션에서 member_id 가져오기
 
+
+    // ===== 상태 =====
     const [data, setData] = useState({
         rating: 0,                  // 별점 상태
         review_contents: '',        // 리뷰 내용
         product_seq: product_seq,   // 상품 번호를 URL에서 가져온 현재 product_seq 로 설정
         image_url: '',              // 이미지 URL
     });
+    
+    const [activeTab, setActiveTab] = useState('info'); // 탭 메뉴
+    const [isModalOpen, setIsModalOpen] = useState(false); // 모달창
+    const [ reviews,setReviews ] = useState([]); // 리뷰 목록
+    const [averageRating, setAverageRating] = useState(0); // 평균 별점
+    const [ratingsCount, setRatingsCount] = useState({
+        5: 0,
+        4: 0,
+        3: 0,
+        2: 0,
+        1: 0
+    }); // 각 점수에 몇 명이 있는지 저장하는 상태
 
-    // 탭 메뉴 상태 
-    const [activeTab, setActiveTab] = useState('info'); 
+    // ===== 상태 =====
+
+
+    // 탭 메뉴  
     const handleTabChange = (tabName) => setActiveTab(tabName);
-
-    // 모달창 상태
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // 모달창 열기 및 닫기
     const handleOpenModal = () => setIsModalOpen(true);
     const handleCloseModal = () => setIsModalOpen(false);
+
 
     // 별점 변경 시 호출되는 함수
     const handleRatingChange = (newRating) => {
@@ -64,7 +81,6 @@ export const DetailPage = () => {
         }
     };
     
-    
     // 모든 필드를 입력했는지 검사
     const isFormValid = () => {
         const { rating, review_contents, images } = data;
@@ -85,7 +101,7 @@ export const DetailPage = () => {
             rating: data.rating,
             review_contents: data.review_contents,
             product_seq: data.product_seq,
-            member_id: 'hahaha123'  // 임시 사용자 ID
+            member_id: memberId 
         });
         formData.append('reviewData', reviewData);
     
@@ -95,9 +111,13 @@ export const DetailPage = () => {
                 formData.append('images', image); 
             });
         }
+
+        data.images.forEach((_, index) =>
+            formData.append('image_orders', index + 1)
+        )
     
         // 서버로 전송
-        axios.post(`${host}/product/reviewAdd`, formData, {
+        api.post(`/product/reviewAdd`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         }).then((response) => {
             console.log('성공', response.data);
@@ -109,6 +129,41 @@ export const DetailPage = () => {
             handleCloseModal();
         });
     };
+
+
+
+    // 리뷰 출력 및 별점 평균 계산
+    useEffect(() => {
+        console.log("Product Seq:" + product_seq);
+        
+        axios.get(`${host}/product/getReviewList/${product_seq}`).then(resp => {
+            console.log("리뷰 데이터: ", resp.data);
+
+            // 서버에서 데이터를 성공적으로 받아온 경우 처리
+            if (resp.data && resp.data.reviewList && resp.data.reviewList.length > 0) {
+                setReviews(resp.data.reviewList);
+
+                // 리뷰의 RATING 값을 이용해 평균 별점 계산
+                const totalRating = resp.data.reviewList.reduce((acc, review) => acc + review.RATING, 0);
+                const average = totalRating / resp.data.reviewList.length;
+                setAverageRating(average); // 평균 별점 상태로 저장
+
+                // 각 별점(1~5)에 몇 명이 해당하는지 카운팅
+                const newRatingsCount = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+                resp.data.reviewList.forEach(review => {
+                    const rating = review.RATING;
+                    if (rating >= 1 && rating <= 5) {
+                        newRatingsCount[rating]++; // 해당 별점에 해당하는 인원수 증가
+                    }
+                });
+                setRatingsCount(newRatingsCount); // 각 점수별 인원수를 상태로 저장
+            }
+        })
+        .catch(error => {
+            console.error('리뷰 목록 오류', error);
+        });
+    }, [product_seq]); // product_seq가 변경될 때마다 실행
+
     
     
 
@@ -136,8 +191,15 @@ export const DetailPage = () => {
                     {/* 상품 리뷰 내용 */}
                     <div className={styles.reviewsBox}>
                         <div className={styles.reviewsHeader}>
-                            <div>리뷰 11,111</div>
-                            <div onClick={handleOpenModal}>리뷰쓰기</div>
+                            <div>리뷰 {reviews.length} </div>
+                            
+                            {isAuth ? (
+                                // 로그인 상태일 때
+                                <div onClick={handleOpenModal}>리뷰쓰기</div>
+                            ) : (
+                                // 로그인이 되어 있지 않을 때
+                                <div>로그인 후 리뷰를 작성할 수 있습니다.</div>
+                            )}
 
                             {/* 모달창 */}
                             <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
@@ -180,23 +242,23 @@ export const DetailPage = () => {
 
                         </div>
                         <div className={styles.reviewsStarRating}>
-                            <div><StarRating/>&nbsp;&nbsp;<span>4.8</span></div>
+                            <div><StarRating rating={averageRating} />&nbsp;&nbsp;<span>{averageRating.toFixed(1)}</span></div>
                             <div>
                                 <ul>
                                     <li>
-                                        5점&nbsp;&nbsp;1,000명
+                                        5점&nbsp;&nbsp;{ratingsCount[5]}명
                                     </li>
                                     <li>
-                                        4점&nbsp;&nbsp;500명
+                                        4점&nbsp;&nbsp;{ratingsCount[4]}명
                                     </li>
                                     <li>
-                                        3점&nbsp;&nbsp;50명
+                                        3점&nbsp;&nbsp;{ratingsCount[3]}명
                                     </li>
                                     <li>
-                                        2점&nbsp;&nbsp;10명
+                                        2점&nbsp;&nbsp;{ratingsCount[2]}명
                                     </li>
                                     <li>
-                                        1점&nbsp;&nbsp;1명
+                                        1점&nbsp;&nbsp;{ratingsCount[1]}명
                                     </li>
                                 </ul>
                             </div>
@@ -207,86 +269,28 @@ export const DetailPage = () => {
                                 <div>최신순</div>
                             </div>
                             <div className={styles.reviewBox}>
-                                <div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>작성자</div>
-                                            <div><StarRating/></div>
+                                {reviews.length > 0 ? (
+                                    reviews.map((review, index) => (
+                                        <div key={review.REVIEW_SEQ || index}>
+                                            <div>
+                                                <div> <img src={img} alt='img'/> </div>
+                                                <div>
+                                                    <div>작성자 : {review.MEMBER_ID} </div>
+                                                    <div><StarRating rating={review.RATING} /></div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <div> <img src={img} alt='img'/> </div>
+                                                <div>
+                                                    <div>{review.REVIEW_DATE ? review.REVIEW_DATE : '날짜 없음'}</div> 
+                                                    <div>{review.REVIEW_CONTENTS}</div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>제목 - 후기후기후기후기후기</div>
-                                            <div>내용 - 후기후기후기후기후기</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>작성자</div>
-                                            <div><StarRating/></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>제목 - 후기후기후기후기후기</div>
-                                            <div>내용 - 후기후기후기후기후기</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>작성자</div>
-                                            <div><StarRating/></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>제목 - 후기후기후기후기후기</div>
-                                            <div>내용 - 후기후기후기후기후기</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>작성자</div>
-                                            <div><StarRating/></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>제목 - 후기후기후기후기후기</div>
-                                            <div>내용 - 후기후기후기후기후기</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>작성자</div>
-                                            <div><StarRating/></div>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <div> <img src={img} alt='img'/> </div>
-                                        <div>
-                                            <div>제목 - 후기후기후기후기후기</div>
-                                            <div>내용 - 후기후기후기후기후기</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                    ))
+                                ) : (
+                                    <div>리뷰가 없습니다.</div> // 리뷰가 없을 때 처리
+                                )}
                             </div>
                         </div>
                     </div>

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.hows.product.dao.ReviewDAO;
+import com.hows.product.dto.ImageDTO;
 import com.hows.product.dto.ReviewDTO;
 import com.hows.product.dto.ReviewReportDTO;
 
@@ -19,7 +20,7 @@ public class ReviewService {
 	private ReviewDAO reviewDAO;
 
 	// 리뷰 저장
-	public int saveReview(int rating, String reviewContents, int productSeq, String memberId) {
+	public int saveReview(int rating, String reviewContents, int productSeq, String memberId) throws Exception {
 		ReviewDTO review = new ReviewDTO();
 		review.setRating(rating);
 		review.setReview_contents(reviewContents);
@@ -27,9 +28,28 @@ public class ReviewService {
 		review.setMember_id(memberId);
 
 		reviewDAO.insertReview(review);
+		
+		review.setReview_seq(reviewDAO.selectLastReviewSeq());
+		
 		return review.getReview_seq();
 	}
+	
+	// 리뷰 목록 출력
+	public List<Map<String, Object>>  getReviewList(int product_seq) throws Exception{
+		System.out.println("getReviewList serv");
+		
+		return reviewDAO.getReviewList(product_seq);
+	}
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	// 관리자
 	// 리뷰 신고목록 조회 (관리자)
 	public List<Map<String, Object>> getReportedReviews(int page, int itemsPerPage) throws Exception {
@@ -60,4 +80,12 @@ public class ReviewService {
         // 리뷰 삭제
         return reviewDAO.deleteReview(review_seq);
     }
+	
+	public void insertReviewImage(ImageDTO imageDTO) throws Exception {
+		reviewDAO.insertReviewImage(imageDTO);
+	}
+	
+	public int selectLastReviewSeq() throws Exception {
+		return reviewDAO.selectLastReviewSeq();
+	}
 }

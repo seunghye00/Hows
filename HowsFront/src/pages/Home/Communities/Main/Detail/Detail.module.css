@@ -34,13 +34,31 @@
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
+    align-items: center;
 }
 
-.commentInput input {
+.commentInfo {
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 5px;
+    color: var(--hows-gray-600);
+    align-items: flex-start;
+}
+
+.commetIcon {}
+
+.replyArea {
     width: calc(100% - 60px);
     padding: 10px 20px;
     border-radius: 8px;
     border: 1px solid var(--hows-gray-600);
+    resize: none;
+    box-sizing: border-box;
+    font-size: 16px;
+    overflow-y: auto;
+    letter-spacing: .7px;
+    color: var(--hows-gray-700);
 }
 
 .writerProfile {
@@ -91,4 +109,15 @@
     align-items: center;
     font-size: 14px;
     color: var(--hows-gray-600);
+}
+
+.commentCont {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.emptyComment {
+    text-align: center;
+    color: var(--hows-gray-300);
 }

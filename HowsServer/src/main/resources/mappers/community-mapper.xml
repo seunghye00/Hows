@@ -42,7 +42,7 @@
 	       m.member_seq,
 	       m.member_avatar, 
 	       count(distinct bl.board_like_seq) as like_count,
-	       (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments,
+	       (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments_count,
 	       b.board_contents
 		from board b
 		join member m on b.member_id = m.member_id
@@ -71,7 +71,7 @@
 	           m.member_avatar,
 	           m.member_seq, 
 	           count(distinct bl.board_like_seq) as like_count,
-	           (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments,
+	           (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments_count,
 	           count(distinct bm.board_book_mark_seq) as bookmark_count
 	    from board b
 	    join member m on b.member_id = m.member_id

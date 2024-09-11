@@ -4,6 +4,7 @@ import { ProfileSection } from './ProfileSection/ProfileSection'
 import { ImageSwiper } from './ImageSwiper/ImageSwiper'
 import { ReportModal } from './ReportModal/ReportModal'
 import { PostActions } from './PostActions/PostActions'
+import { Comment } from './Comment/Comment'
 import Swal from 'sweetalert2'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
 import { PiSiren } from 'react-icons/pi'
@@ -19,7 +20,9 @@ import {
     getReport,
     sendReport,
 } from '../../../../../api/community' // API 함수 불러오기
+import { sendComments, getComments } from '../../../../../api/comment' // API 함수 불러오기
 import { useAuthStore } from '../../../../../store/store'
+import { BiMessageRounded } from 'react-icons/bi'
 
 export const Detail = () => {
     const navigate = useNavigate() // 페이지 이동을 위한 navigate 함수
@@ -36,13 +39,15 @@ export const Detail = () => {
     const [bookmarkCount, setBookmarkCount] = useState(0) // 북마크 수를 저장할 상태
     const [isModalOpen, setIsModalOpen] = useState(false) // 모달이 열려있는지 여부를 저장할 상태
     const [selectedReports, setSelectedReports] = useState(null) // 선택된 신고 항목을 저장할 상태
+    const [comments, setComments] = useState([]) // 댓글 목록
+    const [comment, setComment] = useState('') // 새로운 댓글 내용
+    const member_id = sessionStorage.getItem('member_id') || null // 세션에서 member_id 가져오기
 
     // 게시글 정보 및 이미지, 태그 정보 받아오기
     useEffect(() => {
         const fetchData = async () => {
             try {
                 // 세션에서 member_id 가져오기 (비회원일 경우 null로 처리)
-                const member_id = sessionStorage.getItem('member_id') || null
 
                 // 조회수 증가 후 최신 조회수 반영
                 const updatedViewCount = await viewCounting(board_seq)
@@ -69,6 +74,10 @@ export const Detail = () => {
                 setIsBookmarked(postData.data.isBookmarked) // 서버에서 받아온 북마크 상태
                 setLikeCount(postData.data.LIKE_COUNT)
                 setBookmarkCount(postData.data.BOOKMARK_COUNT)
+
+                // 댓글 데이터 가져오기
+                const commentsData = await getComments(board_seq)
+                setComments(commentsData) // 댓글 목록 상태 업데이트
             } catch (error) {
                 console.error('데이터를 가져오는 중 오류 발생:', error)
             }
@@ -79,7 +88,6 @@ export const Detail = () => {
 
     // 좋아요, 북마크 상태 변경
     const toggleLikeHandler = async () => {
-        const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
         if (!member_id || !isAuth) {
             Swal.fire({
                 icon: 'warning',
@@ -104,7 +112,6 @@ export const Detail = () => {
     }
 
     const toggleBookmarkHandler = async () => {
-        const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
         if (!member_id || !isAuth) {
             Swal.fire({
                 icon: 'warning',
@@ -141,8 +148,6 @@ export const Detail = () => {
         })
     }
     const handleOpenReportModal = () => {
-        const member_id = sessionStorage.getItem('member_id') || null
-
         if (!member_id || !isAuth) {
             // 로그인되지 않은 경우 SweetAlert 경고 후 로그인 페이지로 이동
             Swal.fire({
@@ -160,8 +165,6 @@ export const Detail = () => {
 
     // 신고하기 버튼 클릭 시 호출되는 전송 함수
     const handleReportSubmit = async () => {
-        const member_id = sessionStorage.getItem('member_id') || null
-
         if (!selectedReports) {
             setIsModalOpen(false) // 모달 닫기
             Swal.fire({
@@ -193,6 +196,67 @@ export const Detail = () => {
         }
     }
 
+    // 댓글 작성 처리 함수
+    const handleCommentSubmit = async () => {
+        if (!member_id) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            })
+            return
+        }
+
+        if (!comment.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: '댓글 내용을 입력해주세요.',
+                showConfirmButton: true,
+            })
+            return
+        }
+        // 콘솔로 값 출력해서 확인
+        console.log('board_seq:', board_seq)
+        console.log('member_id:', member_id)
+        console.log('comment:', comment)
+        try {
+            await sendComments(board_seq, member_id, comment.trim())
+            onCommentSubmit() // 댓글 제출 후 목록 새로고침
+            setComment('') // 댓글 필드 초기화
+        } catch (error) {
+            console.error('댓글 작성 중 오류 발생:', error)
+            Swal.fire({
+                icon: 'error',
+                title: '댓글 작성 중 오류가 발생했습니다.',
+                showConfirmButton: true,
+            })
+        }
+    }
+
+    // 댓글 제출 후 목록 새로고침
+    const onCommentSubmit = async () => {
+        try {
+            const response = await getComments(board_seq)
+            setComments(response.data.comments)
+        } catch (error) {
+            console.error('댓글 목록 갱신 실패:', error)
+        }
+    }
+
+    // 엔터키로 댓글 작성 가능
+    const handleKeyPress = e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault()
+            handleCommentSubmit()
+        }
+    }
+
+    const handleDeleteComment = async comment_seq => {
+        // 댓글 삭제 처리 로직
+        // await deleteComment(comment_seq)
+        // onCommentSubmit() // 삭제 후 목록 새로고침
+    }
+
     return (
         <div className={styles.container}>
             {/* postData가 null이 아닐 때만 렌더링 */}
@@ -217,20 +281,65 @@ export const Detail = () => {
                         copyLinkToClipboard={copyLinkToClipboard}
                         handleOpenReportModal={handleOpenReportModal}
                     />
+                    <div className={styles.commentInfo}>
+                        <div className={styles.commetIcon}>
+                            <BiMessageRounded />
+                        </div>
+                        <div className={styles.commentCount}>
+                            {postData.COMMENTS_COUNT}
+                        </div>
+                    </div>
                 </>
             )}
-
             {/* 댓글 작성 영역 */}
             <div className={styles.commentInput}>
                 <div className={styles.writerProfile}>
-                    <img src={img} alt="" />
+                    <img src={postData?.MEMBER_AVATAR} alt="profile" />
                 </div>
-                <input
-                    placeholder="댓글을 입력하세요"
-                    type="text"
+                <textarea
+                    placeholder="댓글을 입력하세요 (최대 300자)"
+                    value={comment}
+                    onChange={e => {
+                        if (e.target.value.length <= 300)
+                            setComment(e.target.value)
+                    }}
+                    onInput={e => {
+                        e.target.style.height = 'auto' // 높이를 자동으로 설정하여 이전 설정을 초기화
+                        e.target.style.height = `${Math.min(
+                            e.target.scrollHeight,
+                            72
+                        )}px` // 내용에 따라 높이를 조정, 최대 72px로 제한
+                    }}
+                    onKeyPress={e => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault() // 줄바꿈 방지
+                            handleCommentSubmit() // 댓글 전송 함수 호출
+                        }
+                    }}
                     name="comment_contents"
                     className={styles.replyArea}
-                ></input>
+                />
+            </div>
+
+            <div className={styles.commentCont}>
+                {comments && comments.length > 0 ? (
+                    comments.map(comment => (
+                        <Comment
+                            key={comment.comment_seq}
+                            commentData={comment}
+                            onLike={id =>
+                                console.log(`${id}번 댓글 좋아요 클릭`)
+                            }
+                            onEdit={id => console.log(`${id}번 댓글 수정 클릭`)}
+                            onDelete={handleDeleteComment}
+                            onReport={id =>
+                                console.log(`${id}번 댓글 신고 클릭`)
+                            }
+                        />
+                    ))
+                ) : (
+                    <p className={styles.emptyComment}>댓글이 없습니다.</p>
+                )}
             </div>
 
             {/* 신고 영역 */}

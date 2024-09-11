@@ -141,6 +141,33 @@ export const List = () => {
         })
     }
 
+    const handleTryModify = () => {
+        // 체크된 상품이 존재하는 지 확인
+        const selectedProducts = filteredProducts.filter(
+            product => product.checked
+        )
+        if (selectedProducts.length === 0) {
+            SwalComp({
+                type: 'warning',
+                text: '수정할 상품을 선택해주세요.',
+            })
+            return
+        } else if (selectedProducts.length > 1) {
+            SwalComp({
+                type: 'warning',
+                text: '수정할 상품을 한 개만 선택해주세요.',
+            })
+            return
+        }
+        navi('/admin/product/modifyProduct', {
+            state: selectedProducts[0].product_seq,
+        })
+    }
+
+    const handleChangeQuantity = () => {
+        console.log('수량 변경')
+    }
+
     return (
         <>
             <div className={styles.btns}>
@@ -172,8 +199,12 @@ export const List = () => {
                     title={'삭제'}
                     onClick={handleDeleteBanner}
                 />
-                <Button size={'s'} title={'수정'} />
-                <Button size={'s'} title={'상태 변경'} />
+                <Button size={'s'} title={'수정'} onClick={handleTryModify} />
+                <Button
+                    size={'s'}
+                    title={'수량 변경'}
+                    onClick={handleChangeQuantity}
+                />
                 {selectAll ? (
                     <Button
                         size={'s'}

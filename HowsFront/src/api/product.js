@@ -45,3 +45,8 @@ export const deleteProducts = productSeqs => {
     const seqs = productSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
     return axios.delete(`${baseUrl}`, { params: { seqs } })
 }
+
+// 상품 정보 조회 함수
+export const getProductInfo = product_seq => {
+    return axios.get(`${baseUrl}/detail/${product_seq}`)
+}

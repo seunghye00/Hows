@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 
 import { api } from "../../../../../config/config";
 import { format } from 'date-fns';
+import { deleteGuestbook, findMemberSeq, getGuestbookList, insertGuestbook } from "../../../../../api/member";
 
 
 export const Guestbook = () => {
@@ -20,7 +21,7 @@ export const Guestbook = () => {
     // 페이지 로드 시 member_seq 받아오기
     useEffect(() => {
         if (member_id) {
-            api.get(`/guestbook/findMemberSeq`, { params: { member_id } }).then((resp) => {
+            findMemberSeq(member_id).then((resp) => {
                 console.log("member_seq : ", resp.data);
                 setMemberSeq(resp.data); // zustand에 memberSeq 저장
             });
@@ -37,7 +38,7 @@ export const Guestbook = () => {
         };
 
         // 데이터를 서버에 저장한 후 전체 목록 다시 불러오기
-        api.post(`/guestbook/insert`, requestBody).then((resp) => {
+        insertGuestbook(requestBody).then((resp) => {
             if (resp.data > 0) {
                 api.get(`/guestbook/list`, { params: { member_seq: memberSeq } }).then((resp) => {
                     setOutputs(resp.data);
@@ -51,14 +52,14 @@ export const Guestbook = () => {
     // 전체 출력 
     useEffect(() => {
         if (memberSeq) {
-            api.get(`/guestbook/list`, { params: { member_seq: memberSeq } }).then((resp) => {
+            getGuestbookList(memberSeq).then((resp) => {
                 setOutputs(resp.data);
             });
         }
     }, [memberSeq]);
 
     const handleDelBtn = (guestbook_seq) => {
-        api.delete(`/guestbook/${guestbook_seq}`).then(resp => {
+        deleteGuestbook(guestbook_seq).then(resp => {
             setOutputs(outputs.filter(output => output.guestbook_seq !== guestbook_seq));
         }).catch(error => {
             console.error("삭제 실패:", error);

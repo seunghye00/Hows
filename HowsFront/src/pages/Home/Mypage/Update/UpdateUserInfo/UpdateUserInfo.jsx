@@ -7,6 +7,7 @@ import { host } from '../../../../../config/config'
 import { api } from "../../../../../config/config";
 import { format } from "date-fns";
 import { useAuthStore } from "../../../../../store/store";
+import { checkNickname, userInfo } from "../../../../../api/member";
 
 export const UpdateUserInfo = () => {
 
@@ -34,7 +35,7 @@ export const UpdateUserInfo = () => {
 
     useEffect(() => {
         // 회원정보 가져오기
-        api.get(`/member/selectInfo`).then((resp) => {
+        userInfo().then((resp) => {
             setUser(resp.data);
         });
     }, []);
@@ -86,13 +87,16 @@ export const UpdateUserInfo = () => {
         }
 
         // 중복확인 요청
-        api.post(`/member/checkNickname`, { nickname: formData.nickname })
-            .then(resp => {
-                console.log("nickname : ", resp.data);
-                setNicknameAvailable(resp.data);
-                setNicknameChecked(!resp.data);
-                setCheckNicknameStatus(resp.data ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
-            });
+        checkNickname(formData.nickname).then((resp) => {
+            console.log("nickname : ", resp.data);
+            setNicknameAvailable(resp.data);
+            setNicknameChecked(!resp.data);
+            setCheckNicknameStatus(
+                resp.data
+                    ? "이미 사용 중인 닉네임입니다."
+                    : "사용 가능한 닉네임입니다."
+            );
+        });
     }
 
 

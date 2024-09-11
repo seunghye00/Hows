@@ -25,8 +25,12 @@
 }
 
 .category span {
-    text-decoration: underline;
     cursor: pointer;
+}
+
+.category span.active {
+    text-decoration: underline;
+    color: var(--hows-point-color-darkest);
 }
 
 .table {

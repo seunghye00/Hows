@@ -36,3 +36,24 @@ export const getImageData = board_seq => {
 export const getTagData = board_seq => {
     return api.get(`/community/images/${board_seq}`)
 }
+
+// 관리자
+// 신고 게시물 조회
+export const reportedCommunity = (startRow, endRow) => {
+    return api.get(`/community/reportedCommunity`, {
+        params: {
+            startRow: startRow,
+            endRow: endRow,
+        },
+    })
+}
+
+// 신고 내역 조회
+export const CommunityReport = board_seq => {
+    return api.get(`/community/communityReport/${board_seq}`)
+}
+
+// 신고 게시판 삭제 (관리자)
+export const deleteCommunity = board_seq => {
+    return api.delete(`/community/deleteCommunity/${board_seq}`)
+}

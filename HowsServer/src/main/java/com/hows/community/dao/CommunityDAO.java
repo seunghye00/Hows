@@ -95,7 +95,7 @@ public class CommunityDAO {
     
     // 사용자가 특정 게시글에 북마크를 했는지 확인
     public boolean checkIfUserBookmarkedBoard(String member_id, int board_seq) {
-        Map<String, Object> params = new HashMap<>();
+    	Map<String, Object> params = new HashMap<>();
         params.put("member_id", member_id);
         params.put("board_seq", board_seq);
         
@@ -124,6 +124,25 @@ public class CommunityDAO {
     // 특정 게시글의 북마크 개수 가져오기
     public int getBookmarkCount(int board_seq) {
         return mybatis.selectOne("Community.getBookmarkCount", board_seq);
+    }
+    
+    // 특정 게시글의 북마크 개수 가져오기
+    public void updateViewCount(int board_seq) {
+        mybatis.update("Community.updateViewCount", board_seq);
+    }
+    
+	// 조회수 가져오기 서비스 메서드
+	public int getViewCount(int board_seq) {
+		return mybatis.selectOne("Community.getViewCount", board_seq);
+	}
+	
+    // 특정 게시글의 북마크 개수 가져오기
+    public void sendReport(int board_seq, String reportCode, String memberId) {
+    	Map<String, Object> params = new HashMap<>();
+        params.put("board_seq", board_seq);
+        params.put("report_code", reportCode);
+        params.put("member_id", memberId);
+        mybatis.insert("Community.sendReport", params);
     }
     
 	// 관리자

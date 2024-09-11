@@ -75,6 +75,14 @@ export const userInfo = member_id => {
     }
 }
 
+// 팔로우/언팔로우 처리 API 호출 함수
+export const toggleFollow = async data => {
+    return api.post(`${baseUrl}/follow`, data) // API 요청으로 팔로우/언팔로우 처리
+}
+
+export const adminstart = () => {
+    // 여기서 밑 부터 관리자 기능!
+}
 /************************************  [ 관리자 기능 ] /************************************/
 
 // 전체 회원 조회

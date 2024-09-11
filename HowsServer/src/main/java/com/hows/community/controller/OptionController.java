@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.hows.community.dto.AreaSizeDTO;
 import com.hows.community.dto.ColorDTO;
 import com.hows.community.dto.HousingTypeDTO;
+import com.hows.community.dto.ReportDTO;
 import com.hows.community.dto.SpaceTypeDTO;
 import com.hows.community.service.OptionService;
 
@@ -40,6 +41,12 @@ public class OptionController {
     public List<AreaSizeDTO> getAreaSize() {
         return optionServ.getAreaSize();
     }
+    
+    @GetMapping("/report")
+    public List<ReportDTO> getReport() {
+        return optionServ.getReport();
+    }
+    
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> exceptionHandler(Exception e) {
        e.printStackTrace();

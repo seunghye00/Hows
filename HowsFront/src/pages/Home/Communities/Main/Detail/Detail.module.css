@@ -23,28 +23,6 @@
     /* 이미지 섹션과 태그 섹션 사이 간격 */
 }
 
-.postActions {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-    font-weight: 500;
-    justify-content: space-between;
-    color: var(--hows-gray-600);
-    margin-bottom: 20px;
-}
-
-.likesViewBook {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.subMitLink {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
 .mainContent {
     font-weight: 500;
     margin-bottom: 20px;
@@ -56,13 +34,31 @@
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
+    align-items: center;
 }
 
-.commentInput input {
+.commentInfo {
+    font-size: 24px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 5px;
+    color: var(--hows-gray-600);
+    align-items: flex-start;
+}
+
+.commetIcon {}
+
+.replyArea {
     width: calc(100% - 60px);
     padding: 10px 20px;
     border-radius: 8px;
     border: 1px solid var(--hows-gray-600);
+    resize: none;
+    box-sizing: border-box;
+    font-size: 16px;
+    overflow-y: auto;
+    letter-spacing: .7px;
+    color: var(--hows-gray-700);
 }
 
 .writerProfile {
@@ -115,19 +111,13 @@
     color: var(--hows-gray-600);
 }
 
-.reportModal {
+.commentCont {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    width: 400px;
 }
 
-.reportModal h3 {
+.emptyComment {
     text-align: center;
-}
-
-.reportlist {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    color: var(--hows-gray-300);
 }

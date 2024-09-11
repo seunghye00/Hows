@@ -310,6 +310,8 @@ export const Post = () => {
 
     // 게시글 작성 완료 처리 핸들러
     const handleSubmitPost = async () => {
+        const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+
         if (!postContent || images.length === 0) {
             Swal.fire({
                 icon: 'warning',
@@ -336,7 +338,7 @@ export const Post = () => {
             formData.append('space_type_code', selectedSpaceType)
             formData.append('area_size_code', selectedAreaSize)
             formData.append('board_contents', postContent)
-            formData.append('member_id', 'qwer1234')
+            formData.append('member_id', member_id)
 
             // 이미지 및 태그 정보 추가
             images.forEach((image, index) => {

@@ -1,126 +1,66 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from './Review.module.css'
-import test from '../../../assets/images/푸바오.png'
 import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
+import { reportedReviews, reviewReport } from '../../../api/product'
+import { formatDate } from '../../../commons/commons'
+import test from '../../../assets/images/푸바오.png'
 
 export const Review = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
     const [isReportModalOpen, setIsReportModalOpen] = useState(false)
     const [selectedReview, setSelectedReview] = useState({})
     const [searchResults, setSearchResults] = useState([])
+    const [reviews, setReviews] = useState([]) // 서버에서 불러온 신고 리뷰 목록
+    const [reportData, setReportData] = useState([]) // 신고 내역 데이터
 
-    // 신고당한 리뷰 데이터 (임시)
-    const reviews = [
-        {
-            id: 1,
-            productTitle: '이것은 상품!',
-            reviewer: '민바오',
-            date: '2024-08-31',
-            reportCount: 1,
-            text: '이것은 신고당한 리뷰입니다. 매우 불쾌한 리뷰였어요.',
-        },
-        {
-            id: 2,
-            productTitle: '다른 상품!',
-            reviewer: '홍길동',
-            date: '2024-09-01',
-            reportCount: 2,
-            text: '이 리뷰도 신고당했습니다.',
-        },
-        {
-            id: 2,
-            productTitle: '다른 상품!',
-            reviewer: '홍길동',
-            date: '2024-09-01',
-            reportCount: 2,
-            text: '이 리뷰도 신고당했습니다.',
-        },
-        {
-            id: 2,
-            productTitle: '다른 상품!',
-            reviewer: '홍길동',
-            date: '2024-09-01',
-            reportCount: 2,
-            text: '이 리뷰도 신고당했습니다.',
-        },
-        {
-            id: 2,
-            productTitle: '다른 상품!',
-            reviewer: '홍길동',
-            date: '2024-09-01',
-            reportCount: 2,
-            text: '이 리뷰도 신고당했습니다.',
-        },
-        {
-            id: 2,
-            productTitle: '다른 상품!',
-            reviewer: '홍길동',
-            date: '2024-09-01',
-            reportCount: 2,
-            text: '이 리뷰도 신고당했습니다.',
-        },
-        {
-            id: 2,
-            productTitle: '다른 상품!',
-            reviewer: '홍길동',
-            date: '2024-09-01',
-            reportCount: 2,
-            text: '이 리뷰도 신고당했습니다.',
-        },
-        {
-            id: 2,
-            productTitle: '다른 상품!',
-            reviewer: '홍길동',
-            date: '2024-09-01',
-            reportCount: 2,
-            text: '이 리뷰도 신고당했습니다.',
-        },
-        {
-            id: 2,
-            productTitle: '다른 상품!',
-            reviewer: '홍길동',
-            date: '2024-09-01',
-            reportCount: 2,
-            text: '이 리뷰도 신고당했습니다.',
-        },
-        {
-            id: 2,
-            productTitle: '다른 상품!',
-            reviewer: '홍길동',
-            date: '2024-09-01',
-            reportCount: 2,
-            text: '이 리뷰도 신고당했습니다.',
-        },
-    ]
+    // 신고당한 리뷰 목록을 서버에서 가져오는 함수
+    useEffect(() => {
+        loadReportedReviews()
+    }, [])
 
-    // 신고 내역 임시 데이터
-    const reportData = {
-        reporter: '서갈',
-        reason: '과도한 욕설',
-        date: '2024-09-05',
+    const loadReportedReviews = async () => {
+        try {
+            const resp = await reportedReviews()
+            console.log(resp.data)
+            setReviews(resp.data) // 서버에서 받은 리뷰 목록을 상태에 저장
+        } catch (error) {
+            console.error('리뷰 목록을 불러오는데 실패했습니다.', error)
+        }
+    }
+
+    // 특정 리뷰에 대한 신고 내역을 서버에서 가져오는 함수
+    const loadReviewReport = async review_seq => {
+        try {
+            const resp = await reviewReport(review_seq)
+            console.log(resp.data)
+            setReportData(resp.data) // 서버에서 받은 신고 내역을 상태에 저장
+        } catch (error) {
+            console.error('신고 내역을 불러오는데 실패했습니다.', error)
+        }
     }
 
     // 리뷰 클릭 시 (상품 제목 클릭 시) 모달 열기
     const selectReview = review => {
+        console.log(review)
         setSelectedReview(review) // 선택한 리뷰 데이터 설정
         setIsReviewModalOpen(true) // 리뷰 모달 열기
     }
 
     // 신고 내역 클릭 시 (누적 신고 횟수 클릭 시) 모달 열기
-    const selectReport = () => {
-        setIsReportModalOpen(true) // 신고 모달 열기
+    const selectReport = review_seq => {
+        if (review_seq !== undefined && review_seq !== null) {
+            loadReviewReport(review_seq) // 신고 내역 로드
+            setIsReportModalOpen(true) // 신고 모달 열기
+        } else {
+            console.error('Invalid review_seq:', review_seq) // 오류 로그 출력
+        }
     }
 
     // 모달 닫기
-    const closeReviewModal = () => {
-        setIsReviewModalOpen(false) // 리뷰 모달 닫기
-    }
-
-    const closeReportModal = () => {
-        setIsReportModalOpen(false) // 신고 모달 닫기
-    }
+    const closeReviewModal = () => setIsReviewModalOpen(false)
+    const closeReportModal = () => setIsReportModalOpen(false)
 
     // 검색 기능 구현
     const handleSearch = query => {
@@ -157,29 +97,31 @@ export const Review = () => {
                 </div>
 
                 {displayReviews.map((review, index) => (
-                    <div className={styles.reviewRow} key={review.id}>
+                    <div
+                        className={styles.reviewRow}
+                        key={review.review_seq || index}
+                    >
                         <div className={styles.reviewItem}>{index + 1}</div>
-                        {/* 상품 제목 클릭 시 리뷰 모달 열기 */}
                         <div
                             className={styles.reviewItem}
                             onClick={() => selectReview(review)}
                         >
                             <span className={styles.span}>
-                                {review.productTitle}
+                                {review.PRODUCT_TITLE}
                             </span>
                         </div>
                         <div className={styles.reviewItem}>
-                            {review.reviewer}
+                            {review.NICKNAME}
                         </div>
-                        <div className={styles.reviewItem}>{review.date}</div>
-
-                        {/* 누적 신고 횟수 클릭 시 신고 내역 모달 열기 */}
+                        <div className={styles.reviewItem}>
+                            {formatDate(review.REVIEW_DATE)}
+                        </div>
                         <div
                             className={styles.reviewItem}
-                            onClick={selectReport}
+                            onClick={() => selectReport(review.REVIEW_SEQ)}
                         >
                             <span className={styles.reportcount}>
-                                {review.reportCount}
+                                {review.REPORT_COUNT}
                             </span>
                         </div>
                         <div className={styles.reviewItem}>
@@ -195,8 +137,13 @@ export const Review = () => {
                     <div className={styles.modalContent}>
                         <h3>신고당한 리뷰</h3>
                         <div className={styles.reviewDetail}>
-                            <img src={test} alt="리뷰 이미지" />
-                            <div>{selectedReview.text}</div>
+                            {/* 리뷰 이미지 */}
+                            <img
+                                src={selectedReview.imageUrl || test}
+                                alt="리뷰 이미지"
+                            />
+                            {/* 리뷰 내용 */}
+                            <div>{selectedReview.REVIEW_CONTENTS}</div>
                         </div>
                         <Button
                             size="s"
@@ -218,11 +165,18 @@ export const Review = () => {
                                 <div>신고 사유</div>
                                 <div>신고 날짜</div>
                             </div>
-                            <div className={styles.tableRow}>
-                                <div>{reportData.reporter}</div>
-                                <div>{reportData.reason}</div>
-                                <div>{reportData.date}</div>
-                            </div>
+                            {reportData.map(report => (
+                                <div
+                                    key={report.review_report_seq}
+                                    className={styles.tableRow}
+                                >
+                                    <div>{report.member_id}</div>
+                                    <div>{report.report_code}</div>
+                                    <div>
+                                        {formatDate(report.review_report_date)}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                         <Button
                             size="s"
@@ -232,6 +186,7 @@ export const Review = () => {
                     </div>
                 </div>
             )}
+
             <div className={styles.pagination}>
                 <Paging />
             </div>

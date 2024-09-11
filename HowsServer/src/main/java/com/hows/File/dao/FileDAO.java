@@ -1,5 +1,7 @@
 package com.hows.File.dao;
 
+import java.util.List;
+
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -33,5 +35,10 @@ public class FileDAO {
 	// 배너 SEQ로 파일 sysname 조회
 	public String getSysName(int bannerSeq) {
 		return mybatis.selectOne("File.getSysName", bannerSeq);
+	}
+
+	// parent_seq로 파일 sysname 조회
+	public List<String> getSysNames(int parentSeq) {
+		return mybatis.selectList("File.getSysNames", parentSeq);
 	}
 }

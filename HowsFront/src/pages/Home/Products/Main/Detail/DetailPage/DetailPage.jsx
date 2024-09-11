@@ -3,11 +3,15 @@ import styles from './DetailPage.module.css'
 import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
 import StarRating from '../../../../../../components/StarRating/StarRating';
 import { Modal } from '../../../../../../components/Modal/Modal';
-import axios from 'axios';
-import { host } from '../../../../../../config/config';
+import { api, host } from '../../../../../../config/config';
 import { useParams } from 'react-router-dom';
+import { useAuthStore } from '../../../../../../store/store';
+import axios from 'axios';
 
 export const DetailPage = () => {
+    const memberId = sessionStorage.getItem("member_id"); // 세션에서 member_id 가져오기
+    const { isAuth } = useAuthStore() // 로그인 여부 확인
+
     const { product_seq } = useParams();
 
     const [data, setData] = useState({
@@ -85,7 +89,7 @@ export const DetailPage = () => {
             rating: data.rating,
             review_contents: data.review_contents,
             product_seq: data.product_seq,
-            member_id: 'hahaha123'  // 임시 사용자 ID
+            member_id: memberId 
         });
         formData.append('reviewData', reviewData);
     
@@ -97,7 +101,7 @@ export const DetailPage = () => {
         }
     
         // 서버로 전송
-        axios.post(`${host}/product/reviewAdd`, formData, {
+        api.post(`/product/reviewAdd`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         }).then((response) => {
             console.log('성공', response.data);
@@ -109,6 +113,13 @@ export const DetailPage = () => {
             handleCloseModal();
         });
     };
+
+    //리뷰 출력
+    // useEffect(()=>{
+    //     axios.get(`${host}/product/getReviewList`, product_seq).then(resp=>{
+    //         console.log(resp + "리뷰 출력!")
+    //     })
+    // },[])
     
     
 

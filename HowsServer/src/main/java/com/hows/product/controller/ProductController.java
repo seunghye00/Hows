@@ -138,7 +138,7 @@ public class ProductController {
 	@GetMapping("/reviewReport/{review_seq}")
 	public ResponseEntity<List<ReviewReportDTO>> getReviewReport(@PathVariable int review_seq) throws Exception {
 	    List<ReviewReportDTO> reviewReports = reviewServ.getReviewReport(review_seq);
-	    System.out.println(reviewReports);
+	    System.out.println("컨트롤러 : " +reviewReports);
 	    return ResponseEntity.ok(reviewReports);
 	}
 

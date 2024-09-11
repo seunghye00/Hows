@@ -5,6 +5,7 @@ import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
 import { reportedReviews, reviewReport } from '../../../api/product'
 import { formatDate } from '../../../commons/commons'
+import test from '../../../assets/images/푸바오.png'
 
 export const Review = () => {
     const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
@@ -42,14 +43,19 @@ export const Review = () => {
 
     // 리뷰 클릭 시 (상품 제목 클릭 시) 모달 열기
     const selectReview = review => {
+        console.log(review)
         setSelectedReview(review) // 선택한 리뷰 데이터 설정
         setIsReviewModalOpen(true) // 리뷰 모달 열기
     }
 
     // 신고 내역 클릭 시 (누적 신고 횟수 클릭 시) 모달 열기
     const selectReport = review_seq => {
-        loadReviewReport(review_seq) // 신고 내역 로드
-        setIsReportModalOpen(true) // 신고 모달 열기
+        if (review_seq !== undefined && review_seq !== null) {
+            loadReviewReport(review_seq) // 신고 내역 로드
+            setIsReportModalOpen(true) // 신고 모달 열기
+        } else {
+            console.error('Invalid review_seq:', review_seq) // 오류 로그 출력
+        }
     }
 
     // 모달 닫기
@@ -91,7 +97,10 @@ export const Review = () => {
                 </div>
 
                 {displayReviews.map((review, index) => (
-                    <div className={styles.reviewRow} key={review.review_seq}>
+                    <div
+                        className={styles.reviewRow}
+                        key={review.review_seq || index}
+                    >
                         <div className={styles.reviewItem}>{index + 1}</div>
                         <div
                             className={styles.reviewItem}
@@ -109,7 +118,7 @@ export const Review = () => {
                         </div>
                         <div
                             className={styles.reviewItem}
-                            onClick={() => selectReport(review.review_seq)}
+                            onClick={() => selectReport(review.REVIEW_SEQ)}
                         >
                             <span className={styles.reportcount}>
                                 {review.REPORT_COUNT}
@@ -128,11 +137,13 @@ export const Review = () => {
                     <div className={styles.modalContent}>
                         <h3>신고당한 리뷰</h3>
                         <div className={styles.reviewDetail}>
+                            {/* 리뷰 이미지 */}
                             <img
                                 src={selectedReview.imageUrl || test}
                                 alt="리뷰 이미지"
                             />
-                            <div>{selectedReview.text}</div>
+                            {/* 리뷰 내용 */}
+                            <div>{selectedReview.REVIEW_CONTENTS}</div>
                         </div>
                         <Button
                             size="s"
@@ -154,11 +165,16 @@ export const Review = () => {
                                 <div>신고 사유</div>
                                 <div>신고 날짜</div>
                             </div>
-                            {reportData.map((report, index) => (
-                                <div key={index} className={styles.tableRow}>
+                            {reportData.map(report => (
+                                <div
+                                    key={report.review_report_seq}
+                                    className={styles.tableRow}
+                                >
                                     <div>{report.member_id}</div>
                                     <div>{report.report_code}</div>
-                                    <div>{report.review_report_date}</div>
+                                    <div>
+                                        {formatDate(report.review_report_date)}
+                                    </div>
                                 </div>
                             ))}
                         </div>

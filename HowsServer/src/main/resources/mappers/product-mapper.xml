@@ -55,6 +55,7 @@
         r.review_seq,                  <!-- 리뷰 번호 -->
         p.product_title,               <!-- 상품 제목 -->
         m.nickname,        			   <!-- 리뷰 작성자 (닉네임) -->
+        r.review_contents,              <!-- 리뷰 내용 추가 -->
         TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 변환 -->
         COUNT(rr.review_report_seq) AS report_count  <!-- 신고 횟수 -->
     FROM 
@@ -66,7 +67,7 @@
     LEFT JOIN 
         review_report rr ON r.review_seq = rr.review_seq  <!-- 신고 기록 조인 -->
     GROUP BY 
-        r.review_seq, p.product_title, m.nickname, r.review_date
+        r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
     ORDER BY 
         r.review_seq
 	</select>

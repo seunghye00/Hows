@@ -30,6 +30,11 @@ export const reviewReport = review_seq => {
     return axios.get(`${baseUrl}/reviewReport/${review_seq}`)
 }
 
+// 신고 리뷰 삭제 (관리자)
+export const deleteReview = review_seq => {
+    return axios.delete(`${baseUrl}/deleteReview/${review_seq}`)
+}
+
 // 상품 삭제 요청 함수
 export const deleteProducts = productSeqs => {
     const seqs = productSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환

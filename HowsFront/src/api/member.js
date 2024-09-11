@@ -8,6 +8,16 @@ export const updatePw = pw => {
     return api.put(`/member/updatePw`, { pw })
 }
 
+/** 유저 정보  **/
+export const userInfo = (params) => {
+    if(params) {
+        return api.get(`/member/selectInfo`, { params } )
+    } else {
+        return api.get(`/member/selectInfo`);
+    }
+}
+
+
 export const adminstart = () => {
     // 여기서 밑 부터 관리자 기능!
 }

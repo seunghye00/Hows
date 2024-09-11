@@ -75,7 +75,7 @@ export const Board = () => {
             <div className={styles.boardlist}>
                 <div className={styles.boardHeader}>
                     <div className={styles.headerItem}>NO</div>
-                    <div className={styles.headerItem}>제목</div>
+                    <div className={styles.headerItem}>게시글</div>
                     <div className={styles.headerItem}>작성자</div>
                     <div className={styles.headerItem}>작성날짜</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>

@@ -10,12 +10,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hows.File.service.FileService;
 import com.hows.product.dto.ProductDTO;
 import com.hows.product.service.ProductService;
+import com.hows.product.service.ReviewService;
 
 @RestController
 @RequestMapping("/product")
@@ -23,6 +27,8 @@ public class ProductController {
 	
 	@Autowired
 	private ProductService productServ;
+	@Autowired
+	private ReviewService reviewServ;
 	
 	@Autowired
 	private FileService fileServ;
@@ -48,6 +54,40 @@ public class ProductController {
 		
 		return ResponseEntity.ok(detaile);
 	}
+	
+	// ==================
+	// 리뷰 등록
+	@PostMapping("/reviewAdd")
+	@Transactional
+	public ResponseEntity<String> submitReview(
+	    @RequestParam("images") MultipartFile[] images,  // 여러 이미지 파일
+	    @RequestParam("reviewData") String reviewData   // 리뷰 데이터 (JSON)
+	) throws Exception{
+	    ObjectMapper mapper = new ObjectMapper();
+	    try {
+	        // JSON 형식의 리뷰 데이터를 파싱
+	        JsonNode jsonNode = mapper.readTree(reviewData);
+	        int rating = jsonNode.get("rating").asInt();
+	        String reviewText = jsonNode.get("review_contents").asText();
+	        int productSeq = jsonNode.get("product_seq").asInt();  // 상품 번호
+	        String memberId = jsonNode.get("member_id").asText();
+
+	        // 리뷰 저장
+	        int reviewSeq = reviewServ.saveReview(rating, reviewText, productSeq, memberId);
+
+	        // 이미지 파일 처리 (GCS 업로드 후 이미지 URL 저장)
+	        if (images != null && images.length > 0) {
+	            for (MultipartFile img : images) {
+	                String imageUrl = fileServ.upload(img, productSeq, "F4");  // 상품 번호와 함께 업로드
+	            }
+	        }
+	     } catch (Exception e) {
+	       // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+	       throw new RuntimeException("상품 등록 실패", e);
+	     }
+		 return ResponseEntity.ok().build();
+	}
+	
 	
 	// 상품 추가
 	@PostMapping

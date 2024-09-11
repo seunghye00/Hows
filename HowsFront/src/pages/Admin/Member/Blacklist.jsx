@@ -188,9 +188,10 @@ export const Blacklist = () => {
                                 <Button
                                     size="s"
                                     title="해제"
-                                    onClick={() =>
+                                    onClick={e => {
+                                        e.stopPropagation()
                                         updateBlacklist(member.member_id)
-                                    }
+                                    }}
                                 />
                             </div>
                         </div>

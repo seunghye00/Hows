@@ -37,8 +37,9 @@ export const getTagData = board_seq => {
     return api.get(`/community/images/${board_seq}`)
 }
 
-// 관리자
-// 신고 게시물 조회
+/************************************  [ 관리자 기능 ] /************************************/
+
+// 신고 게시물 조회 (관리자)
 export const reportedCommunity = (startRow, endRow) => {
     return api.get(`/community/reportedCommunity`, {
         params: {
@@ -48,7 +49,7 @@ export const reportedCommunity = (startRow, endRow) => {
     })
 }
 
-// 신고 내역 조회
+// 신고 내역 조회 (관리자)
 export const CommunityReport = board_seq => {
     return api.get(`/community/communityReport/${board_seq}`)
 }

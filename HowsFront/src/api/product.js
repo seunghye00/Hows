@@ -19,7 +19,8 @@ export const addProduct = formData => {
     return axios.post(`${baseUrl}`, formData)
 }
 
-// 관리자!
+/************************************  [ 관리자 기능 ] /************************************/
+
 // 신고 리뷰 조회 (관리자)
 export const reportedReviews = (startRow, endRow) => {
     return axios.get(`${baseUrl}/reportedReviews`, {

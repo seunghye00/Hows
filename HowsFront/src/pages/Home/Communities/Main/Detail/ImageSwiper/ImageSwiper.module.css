@@ -71,6 +71,7 @@
     display: flex;
     gap: 10px;
     align-items: center;
+    cursor: pointer;
 }
 
 .productImgBox {
@@ -95,4 +96,17 @@
 .product_title {
     font-size: 24px;
     font-weight: 600;
+}
+
+.product_txt {
+    word-break: keep-all;
+    word-wrap: break-word;
+    font-size: 14px;
+    color: var(--hows-gray-500);
+}
+
+.product_price {
+    font-size: 16px;
+    font-weight: 700;
+
 }

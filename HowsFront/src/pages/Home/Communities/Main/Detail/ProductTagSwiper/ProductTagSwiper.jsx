@@ -4,24 +4,14 @@ import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 import { useNavigate } from 'react-router-dom'
-import img from './../../../../../../assets/images/꼬래.png'
 import styles from './ProductTagSwiper.module.css'
 
-export const ProductTagSwiper = () => {
+export const ProductTagSwiper = ({ tagsData }) => {
     const navigate = useNavigate()
 
-    const products = [
-        { product_seq: 1, name: 'Product1', imgSrc: img },
-        { product_seq: 2, name: 'Product2', imgSrc: img },
-        { product_seq: 3, name: 'Product3', imgSrc: img },
-        { product_seq: 4, name: 'Product4', imgSrc: img },
-        { product_seq: 5, name: 'Product5', imgSrc: img },
-        { product_seq: 6, name: 'Product6', imgSrc: img },
-        { product_seq: 7, name: 'Product7', imgSrc: img },
-    ]
-
+    // 상품 상세 페이지 이동
     const goToProductDetail = product_seq => {
-        navigate(`/product/${product_seq}`)
+        navigate(`/products/${product_seq}`)
     }
 
     return (
@@ -36,17 +26,15 @@ export const ProductTagSwiper = () => {
                 }}
                 className={styles.productTagSwiper}
             >
-                {products.map((product, index) => (
+                {tagsData.map((tag, index) => (
                     <SwiperSlide key={index}>
                         <div
                             className={styles.productTagBox}
-                            onClick={() =>
-                                goToProductDetail(product.product_seq)
-                            }
+                            onClick={() => goToProductDetail(tag.PRODUCT_SEQ)}
                         >
                             <img
-                                src={product.imgSrc}
-                                alt={product.name}
+                                src={tag.PRODUCT_THUMBNAIL}
+                                alt={tag.PRODUCT_TITLE}
                                 className={styles.productImage}
                             />
                         </div>

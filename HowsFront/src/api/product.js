@@ -20,3 +20,8 @@ export const addProduct = formData => {
 }
 
 // 신고 리뷰 조회 (관리자)
+
+// 상품 삭제 요청 함수
+export const deleteProducts = () => {
+    return axios.delete(`${baseUrl}`)
+}

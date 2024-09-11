@@ -2,7 +2,11 @@ import styles from './List.module.css'
 import { Search } from '../../../../../components/Search/Search'
 import { Button } from '../../../../../components/Button/Button'
 import { useEffect, useState } from 'react'
-import { categoryList, productList } from '../../../../../api/product'
+import {
+    categoryList,
+    productList,
+    deleteProducts,
+} from '../../../../../api/product'
 import { addCommas } from '../../../../../commons/commons'
 import { useNavigate } from 'react-router-dom'
 
@@ -89,6 +93,49 @@ export const List = () => {
         setSearchQuery(e)
     }
 
+    // 체크된 상품 삭제 핸들러
+    const handleDeleteBanner = () => {
+        // 체크된 상품이 존재하는 지 확인
+        const selectedProducts = products.filter(product => product.checked)
+        if (selectedProducts.length === 0) {
+            SwalComp({
+                type: 'warning',
+                text: '삭제할 상품을 선택해주세요.',
+            })
+            return
+        }
+
+        // 삭제 확인
+        SwalComp({
+            type: 'question',
+            text: '정말로 삭제하시겠습니까?',
+        }).then(result => {
+            if (result.isConfirmed) {
+                // 배너 삭제 요청
+                deleteProducts(
+                    selectedProducts.map(product => product.product_seq)
+                )
+                    .then(() => {
+                        SwalComp({
+                            type: 'success',
+                            text: '선택한 상품이 삭제되었습니다.',
+                        })
+                        setProducts(
+                            products.filter(product => !product.checked)
+                        )
+                        setSelectAll(false)
+                    })
+                    .catch(error => {
+                        SwalComp({
+                            type: 'error',
+                            text: '상품 삭제에 실패했습니다.',
+                        })
+                        console.error('삭제 실패 :', error)
+                    })
+            }
+        })
+    }
+
     return (
         <>
             <div className={styles.btns}>
@@ -118,11 +165,20 @@ export const List = () => {
                 <Button size={'s'} title={'삭제'} />
                 <Button size={'s'} title={'수정'} />
                 <Button size={'s'} title={'상태 변경'} />
-                <Button
-                    size={'s'}
-                    title={'전체 선택'}
-                    onClick={handleSelectAllChange}
-                />{' '}
+                {selectAll ? (
+                    <Button
+                        size={'s'}
+                        title={'전체 해제'}
+                        isChecked={'Y'}
+                        onClick={handleSelectAllChange}
+                    />
+                ) : (
+                    <Button
+                        size={'s'}
+                        title={'전체 선택'}
+                        onClick={handleSelectAllChange}
+                    />
+                )}
             </div>
             <div className={styles.container}>
                 <div

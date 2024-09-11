@@ -4,7 +4,6 @@ import { BiCamera } from 'react-icons/bi'
 import { categoryList, addProduct } from '../../../../../api/product'
 import { useEffect, useState } from 'react'
 import { SwalComp } from '../../../../../commons/commons'
-import Swal from 'sweetalert2'
 import { FaCheckSquare, FaRegSquare } from 'react-icons/fa' // 체크박스 아이콘
 import { EditorComp } from '../../../../../components/Editor/Editor'
 import { useNavigate } from 'react-router-dom'
@@ -52,11 +51,9 @@ export const AddProduct = () => {
 
         const newFiles = files.filter(file => file.type.startsWith('image/'))
         if (newFiles.length !== files.length) {
-            Swal.fire({
-                title: '경고 !',
+            SwalComp({
+                type: 'warning',
                 text: '이미지 파일만 선택 가능합니다.',
-                icon: 'warning',
-                confirmButtonText: '확인',
             })
             return
         }
@@ -97,11 +94,9 @@ export const AddProduct = () => {
     // 작성 완료
     const handleSubmit = () => {
         if (selectedImage === 10) {
-            Swal.fire({
-                title: '경고 !',
+            SwalComp({
+                type: 'warning',
                 text: '대표 사진을 등록해주세요.',
-                icon: 'warning',
-                confirmButtonText: '확인',
             })
             return
         }
@@ -112,11 +107,9 @@ export const AddProduct = () => {
             !product.product_contents ||
             !product.price
         ) {
-            Swal.fire({
-                title: '경고 !',
+            SwalComp({
+                type: 'warning',
                 text: '모든 필드를 입력해주세요.',
-                icon: 'warning',
-                confirmButtonText: '확인',
             })
             return
         }
@@ -137,31 +130,35 @@ export const AddProduct = () => {
         // 서버에 데이터를 전송하는 로직
         addProduct(formData)
             .then(resp => {
-                Swal.fire({
-                    title: '성공!',
+                SwalComp({
+                    type: 'success',
                     text: '상품이 추가되었습니다.',
-                    icon: 'success',
-                    confirmButtonText: '확인',
-                })
-
-                // navi('/admin/product/viewList')
+                }).then(navi('/admin/product/viewList'))
             })
             .catch(error => {
                 console.error('업로드 실패 :', error)
-                Swal.fire({
-                    title: '업로드 실패',
-                    text: '배너 업로드에 실패했습니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
+                SwalComp({
+                    type: 'error',
+                    text: '상품 업로드에 실패했습니다.',
                 })
             })
+    }
+
+    const handleCancel = () => {
+        SwalComp({ type: 'confirm', text: '작성을 취소하시겠습니까 ?' }).then(
+            result => {
+                if (result.isConfirmed) {
+                    navi('/admin/product/list')
+                }
+            }
+        )
     }
 
     return (
         <>
             <div className={styles.btns}>
                 <Button size={'s'} title={'완료'} onClick={handleSubmit} />
-                <Button size={'s'} title={'취소'} />
+                <Button size={'s'} title={'취소'} onClick={handleCancel} />
             </div>
             <div className={styles.container}>
                 <div className={styles.imgs}>

@@ -1,5 +1,5 @@
-import styles from "./BuyList.module.css"
-import { addCommas } from "../../../../../commons/commons";
+import styles from "./BuyList.module.css";
+import { addCommas } from "../../../../commons/commons";
 import { TextBox } from "../TextBox/TextBox";
 
 export const BuyList = ({ data }) => {

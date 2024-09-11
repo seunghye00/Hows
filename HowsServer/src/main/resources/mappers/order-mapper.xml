@@ -45,7 +45,12 @@
 			#{member_seq},
 			#{order_code},
 			default,
-			#{order_price}
+			#{order_price},
+			#{orderer_name},
+			#{orderer_phone},
+			#{orderer_zip_code},
+			#{orderer_address},
+			#{orderer_detail_address}
 		)
 	</insert>
 

@@ -21,11 +21,6 @@ export const updatePw = pw => {
 }
 
 /* ============[마이페이지]=========== */
-// 특정 멤버의 정보 가져오기
-export const selectInfo = (member_id) => {
-    return api.get("/member/selectInfo", { params: { member_id } });
-};
-
 // 특정 멤버의 member_seq 가져오기
 export const findMemberSeq = (member_id) => {
     return api.get("/guestbook/findMemberSeq", { params: { member_id } });
@@ -47,10 +42,14 @@ export const deleteProfileImage = (memberSeq) => {
     });
 };
 
-
-
-
-
+/** 유저 정보  **/
+export const userInfo = (params) => {
+    if(params) {
+        return api.get(`/member/selectInfo`, { params } )
+    } else {
+        return api.get(`/member/selectInfo`);
+    }
+}
 
 
 export const adminstart = () => {

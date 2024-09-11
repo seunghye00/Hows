@@ -4,7 +4,6 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="Community">
-
     <!-- 게시글 작성 -->
     <insert id="insertWrite" parameterType="com.hows.community.dto.CommunityDTO">
         <selectKey keyProperty="board_seq" resultType="int" order="BEFORE">
@@ -50,6 +49,7 @@
 		left join reply r on c.comment_seq = r.comment_seq
 		group by b.board_seq, b.view_count, m.nickname, m.member_avatar, b.board_contents
 	</select>
+	
 	<!-- 게시글 이미지 출력 -->
 	<select id="selectAllImg" resultType="map">
 		select board_seq, image_url
@@ -57,5 +57,56 @@
 		where board_seq in (select board_seq from board)
 	</select>
 	
+	<!-- 게시글 디테일 조회 -->
+	<select id="selectAllSeq" resultType="map">
+		select b.board_seq,
+		       b.board_contents,
+		       b.view_count,
+		       to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date,
+		       b.member_id,
+		       m.nickname, 
+		       m.member_avatar, 
+		       count(distinct bl.board_like_seq) as like_count,
+		       (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments,
+		       count(distinct bm.board_book_mark_seq) as bookmark_count
+		from board b
+		join member m on b.member_id = m.member_id
+		left join board_like bl on b.board_seq = bl.board_seq
+		left join comments c on b.board_seq = c.board_seq
+		left join reply r on c.comment_seq = r.comment_seq
+		left join board_book_mark bm on b.board_seq = bm.board_seq
+		where b.board_seq = 1
+		group by b.board_seq, b.board_contents, b.view_count, b.board_write_date, b.member_id, m.nickname, m.member_avatar
+	</select>
 	
+	<!-- 게시글 디테일 이미지 조회 -->
+	<select id="selectImages" resultType="map">
+	    select 
+	       *
+	    from 
+	        board_image
+	    where 
+	        board_seq = #{board_seq}
+	</select>
+	
+	<!-- 게시글 디테일 상품 정보 태그  -->
+	<select id="selectTagsAndProductInfo" resultType="map">
+	    select 
+	        bt.board_tag_seq, 
+	        bt.board_image_seq, 
+	        bt.left_position, 
+	        bt.top_position, 
+	        p.product_seq, 
+	        p.product_thumbnail, 
+	        p.product_title, 
+	        p.product_contents, 
+	        p.price, 
+	        p.product_category_code
+	    from 
+	        board_tag bt
+	    join 
+	        product p on bt.product_seq = p.product_seq
+	    where 
+	        bt.board_image_seq in (select board_image_seq from board_image where board_seq = #{board_seq})
+	</select>
 </mapper>

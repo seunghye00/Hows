@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -132,16 +133,83 @@ public class CommunityController {
 			}
 		}
 
-		for (Map<String, Object> boardData : list) {
-			BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
-			Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-			List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
-			boardData.put("images", images);
-		}
+        return ResponseEntity.ok(result);
+    }
+    
+    //커뮤니티 좋아요
+    @PostMapping("{board_seq}/like")
+    public ResponseEntity<Map<String, Object>> toggleLike(
+            @PathVariable int board_seq,
+            @RequestBody Map<String, Object> requestBody // member_id를 body에서 받음
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String userId = (String) requestBody.get("member_id"); // member_id 가져오기
+            System.out.println(userId + " 진입 확인");
+            
+            // 1. 사용자가 이미 좋아요를 눌렀는지 확인
+            boolean isLiked = communityServ.checkIfUserLikedBoard(userId, board_seq);
 
-		return ResponseEntity.ok(list);
-	}
+            if (isLiked) {
+                // 2. 이미 좋아요를 눌렀다면 좋아요 취소
+                communityServ.removeLike(userId, board_seq);
+                response.put("isLiked", false);  // 좋아요가 취소되었으므로 false
+                response.put("message", "좋아요가 취소되었습니다.");
+            } else {
+                // 3. 좋아요 추가
+                communityServ.addLike(userId, board_seq);
+                response.put("isLiked", true);  // 좋아요가 추가되었으므로 true
+                response.put("message", "좋아요가 추가되었습니다.");
+            }
 
+            // 4. 좋아요 수 업데이트 후 반환
+            int likeCount = communityServ.getLikeCount(board_seq);
+            response.put("like_count", likeCount);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("error", "좋아요 처리 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
+    //커뮤니티 북마크
+    @PostMapping("{board_seq}/bookmark")
+    public ResponseEntity<Map<String, Object>> toggleBookmark(
+            @PathVariable int board_seq,
+            @RequestBody Map<String, Object> requestBody // member_id를 body에서 받음
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String userId = (String) requestBody.get("member_id"); // member_id 가져오기
+            System.out.println(userId + " 북마크 진입 확인");
+
+            // 1. 사용자가 이미 북마크를 눌렀는지 확인
+            boolean isBookmarked = communityServ.checkIfUserBookmarkedBoard(userId, board_seq);
+
+            if (isBookmarked) {
+                // 2. 이미 북마크를 눌렀다면 북마크 취소
+                communityServ.removeBookmark(userId, board_seq);
+                response.put("isBookmarked", false);  // 북마크가 취소되었으므로 false
+                response.put("message", "북마크가 취소되었습니다.");
+            } else {
+                // 3. 북마크 추가
+                communityServ.addBookmark(userId, board_seq);
+                response.put("isBookmarked", true);  // 북마크가 추가되었으므로 true
+                response.put("message", "북마크가 추가되었습니다.");
+            }
+
+            // 4. 북마크 수 업데이트 후 반환
+            int bookmarkCount = communityServ.getBookmarkCount(board_seq);
+            response.put("bookmark_count", bookmarkCount);
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("error", "북마크 처리 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+    
 	// 커뮤니티 디테일
 	@GetMapping("/{board_seq}")
 	public ResponseEntity<Map<String, Object>> selectAllSeq(@PathVariable int board_seq) {

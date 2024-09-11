@@ -1,7 +1,5 @@
 import styles from "./Delivery.module.css"
-import { Search } from './../../../../../components/Search/Search';
 import React, { useState } from 'react'
-import { Button } from './../../../../../components/Button/Button';
 
 export const Delivery = () => {
     const [searchResults, setSearchResults] = useState([]) // 검색 결과 상태

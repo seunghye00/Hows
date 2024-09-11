@@ -305,3 +305,11 @@
     font-size: 18px;
     font-weight: 900;
 }
+
+.modalBox {
+    width: 450px;
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

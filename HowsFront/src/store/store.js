@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 
 /**
  *  상태관리 사용 함수 작성
@@ -6,25 +6,23 @@ import { create } from "zustand";
  *  해당기능.js 파일 만들어서 관리
  */
 
-export const useStore = create((set) => {
-
-})
+export const useStore = create(set => {})
 
 /* 유나 */
 // 회원
-export const useMemberStore = create((set) => ({
+export const useMemberStore = create(set => ({
     memberSeq: 0,
     memberId: null,
 
-    setMemberSeq: (seq) => set({ memberSeq: seq }),
-    setMemberId: (id) => set({ memberId: id })
-}));
+    setMemberSeq: seq => set({ memberSeq: seq }),
+    setMemberId: id => set({ memberId: id }),
+}))
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create(set => ({
     token: null,
     isAuth: false,
 
-    login: (token) => set({ token, isAuth: true }),
+    login: token => set({ token, isAuth: true }),
     logout: () => set({ token: null, isAuth: false }),
-    setIsAuth: (auth) => set({ isAuth: auth })
-}));
+    setIsAuth: auth => set({ isAuth: auth }),
+}))

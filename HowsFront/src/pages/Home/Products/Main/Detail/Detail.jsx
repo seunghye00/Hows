@@ -14,17 +14,25 @@ import { useAuthStore } from '../../../../../store/store';
 export const Detail = () => {
     const {product_seq} = useParams();
     const { isAuth } = useAuthStore() // 로그인 여부 확인
+    const memberId = sessionStorage.getItem("member_id"); // 세션에서 member_id 가져오기
     const navi = useNavigate(); //페이지 전환을 위한 훅
-    const [list, setList] = useState({}); //목록
+
+
+    // ===== 상태 =====
+    const [list, setList] = useState({}); // 상품 정보
     
     const [quantity, setQuantity] = useState(1); // 기본 수량을 1로 설정
     const [totalPrice, setTotalPrice] = useState(0); // 가격
 
     const [liked, setLiked] = useState(false); // 좋아요 상태 관리
     const [likeCount, setLikeCount] = useState(0); // 좋아요 개수 상태 관리
-    const memberId = sessionStorage.getItem("member_id"); // 세션에서 member_id 가져오기
-    console.log("1"+memberId)
+
+    const [averageRating, setAverageRating] = useState(0); // 평균 별점 상태 추가
+    // ===== 상태 =====
+
+    console.log("memberId"+memberId)
     
+
     useEffect(()=>{
         // 상품 상세 정보
         axios.get(`${host}/product/detail/${product_seq}`).then(resp=>{
@@ -41,11 +49,30 @@ export const Detail = () => {
                 console.error('좋아요 개수 불러오기 실패:', error);
             });
 
-        // 사용자가 이미 좋아요를 눌렀는지 확인 (임시 test)
-        axios.get(`${host}/likes/check`, { params: { product_seq, member_id: memberId } })
-            .then((resp) => {
-                setLiked(resp.data); // 서버에서 받은 좋아요 상태
-            }).catch((error) => {console.error('좋아요 상태 확인 실패', error);});
+        // 리뷰 목록을 가져와 평균 별점 계산
+        axios.get(`${host}/product/getReviewList/${product_seq}`).then((resp) => {
+            const reviewList = resp.data.reviewList;
+            if (reviewList && reviewList.length > 0) {
+                const totalRating = reviewList.reduce((acc, review) => acc + review.RATING, 0);
+                const average = totalRating / reviewList.length;
+                setAverageRating(average); // 평균 별점 상태 업데이트
+            }
+        }).catch((error) => {
+            console.error('리뷰 목록 오류:', error);
+        });
+
+        // 사용자가 이미 좋아요를 눌렀는지 확인 (로그인 상태일 경우만)
+        if (memberId) {
+            axios.get(`${host}/likes/check`, { params: { product_seq, member_id: memberId } })
+                .then((resp) => {
+                    setLiked(resp.data); // 서버에서 받은 좋아요 상태
+                })
+                .catch((error) => {
+                    console.error('좋아요 상태 확인 실패:', error);
+                });
+        } else {
+            console.log('사용자가 로그인하지 않았습니다.');
+        }
     },[product_seq])
 
 
@@ -174,7 +201,7 @@ export const Detail = () => {
                     <div className={styles.product_contents}>
                         <div>{addCommas(list.price || 0)}&nbsp;원</div>
                         <div>
-                            <StarRating rating={list.rating || 0} />  {/* 상품 별점 */}
+                            <StarRating rating={averageRating || 0} /> {/* 상품 별점 표시 */}
                         </div>
                         <div>배송</div>
                         <div>3,000원 &nbsp;&nbsp; <span>5만원 이상 무료배송</span></div>

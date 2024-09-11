@@ -42,6 +42,21 @@ export const deleteProfileImage = (memberSeq) => {
     });
 };
 
+// Guestbook 추가
+export const insertGuestbook = (requestBody) => {
+    return api.post(`/guestbook/insert`, requestBody);
+}
+
+// 특정 member_seq에 대한 guestbook 목록 조회
+export const getGuestbookList = (memberSeq) => {
+    return api.get(`/guestbook/list`, { params: { member_seq: memberSeq } });
+}
+
+// 특정 guestbook_seq에 대한 삭제 요청
+export const deleteGuestbook = (guestbook_seq) => {
+    return api.delete(`/guestbook/${guestbook_seq}`);
+}
+
 /** 유저 정보  **/
 export const userInfo = (member_id) => {
     console.log(member_id);

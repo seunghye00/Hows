@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -209,22 +210,6 @@ public class CommunityController {
         }
     }
     
-    
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> exceptionHandler(Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.badRequest().body("fail");
-    }
-		for (Map<String, Object> boardData : list) {
-			BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
-			Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-			List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
-			boardData.put("images", images);
-		}
-
-		return ResponseEntity.ok(list);
-	}
-
 	// 커뮤니티 디테일
 	@GetMapping("/{board_seq}")
 	public ResponseEntity<Map<String, Object>> selectAllSeq(@PathVariable int board_seq) {

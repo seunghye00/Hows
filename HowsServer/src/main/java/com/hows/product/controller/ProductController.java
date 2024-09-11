@@ -1,5 +1,6 @@
 package com.hows.product.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -129,12 +130,25 @@ public class ProductController {
 	}
 
 	// 관리자
-	// 리뷰 신고목록 조회 (관리자)
-	@GetMapping("/reportedReviews")
-	public ResponseEntity<List<Map<String, Object>>> getReportedReviews() throws Exception {
-		List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews();
-		return ResponseEntity.ok(reportedReviews);
-	}
+	// 리뷰 신고 목록 조회 (관리자)
+    @GetMapping("/reportedReviews")
+    public ResponseEntity<Map<String, Object>> getReportedReviews(
+            @RequestParam(defaultValue = "1") int page,    // 기본값: 1페이지
+            @RequestParam(defaultValue = "10") int itemsPerPage // 기본값: 페이지당 10개
+    ) throws Exception {
+        // 전체 신고 리뷰 카운트
+        int totalCount = reviewServ.getReportedReviewsCount();
+
+        // 페이징된 리뷰 신고 목록 조회
+        List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews(page, itemsPerPage);
+
+        // 페이징 정보와 리뷰 목록을 함께 반환
+        Map<String, Object> response = new HashMap<>();
+        response.put("totalCount", totalCount);   // 전체 리뷰 개수
+        response.put("reviews", reportedReviews); // 신고 리뷰 목록
+
+        return ResponseEntity.ok(response);
+    }
 
 	// 리뷰 신고내역 조회 (관리자)
 	@GetMapping("/reviewReport/{review_seq}")

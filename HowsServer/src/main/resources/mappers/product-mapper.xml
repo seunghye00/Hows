@@ -5,39 +5,89 @@
 
 <mapper namespace="Product">
 
-	<select id="getProducts" resultType="com.hows.product.dto.ProductDTO">
-		SELECT * 
-        FROM PRODUCT ORDER BY product_seq
+	<select id="getProducts"
+		resultType="com.hows.product.dto.ProductDTO">
+		SELECT *
+		FROM PRODUCT ORDER BY product_seq
 	</select>
 
-	<select id="getProductByCategory" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
-        SELECT * 
-        FROM PRODUCT
-        WHERE product_category_code = #{product_category_code}
-    </select>
-    
-    <select id="getProductDetaile" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
-    	SELECT * 
+	<select id="getProductByCategory" parameterType="String"
+		resultType="com.hows.product.dto.ProductDTO">
+		SELECT *
+		FROM PRODUCT
+		WHERE product_category_code = #{product_category_code}
+	</select>
+
+	<select id="getProductDetaile" parameterType="String"
+		resultType="com.hows.product.dto.ProductDTO">
+		SELECT *
 		FROM PRODUCT
 		WHERE product_seq = #{product_seq}
-    </select>
-    
-    <insert id="insert">
-    	<selectKey keyProperty="product_seq" resultType="int" order="AFTER">
-        	select product_seq.currval from dual
-   	 	</selectKey>
-    	insert into product values (product_seq.nextval, ' ', #{product_title}, #{product_contents}, #{price}, #{product_category_code})
-    </insert>
-    
-    <update id="updateThumbNail">
-    	update product set product_thumbnail = #{url} where product_seq = #{seq}
-    </update>
-    
-    <!-- 리뷰등록 -->
-	<insert id="insertReview" parameterType="com.hows.product.dto.ReviewDTO">
-	    INSERT INTO review (review_seq, rating, review_contents, review_date, product_seq, member_id)
-	    VALUES (review_seq.nextval, #{rating}, #{review_contents}, SYSDATE, #{product_seq}, #{member_id})
+	</select>
+
+	<insert id="insert">
+		<selectKey keyProperty="product_seq" resultType="int"
+			order="AFTER">
+			select product_seq.currval from dual
+		</selectKey>
+		insert into product values (product_seq.nextval, ' ',
+		#{product_title}, #{product_contents}, #{price},
+		#{product_category_code})
 	</insert>
+
+	<update id="updateThumbNail">
+		update product set product_thumbnail = #{url} where product_seq = #{seq}
+	</update>
+
+	<!-- 리뷰등록 -->
+	<insert id="insertReview"
+		parameterType="com.hows.product.dto.ReviewDTO">
+		INSERT INTO review (review_seq, rating, review_contents, review_date,
+		product_seq, member_id)
+		VALUES (review_seq.nextval, #{rating}, #{review_contents}, SYSDATE,
+		#{product_seq}, #{member_id})
+	</insert>
+	
+	<!-- 관리자 -->
+	<!-- 리뷰 신고목록 조회 (관리자) -->
+	<select id="getReportedReviews" resultType="map">
+    SELECT 
+        r.review_seq,                  <!-- 리뷰 번호 -->
+        p.product_title,               <!-- 상품 제목 -->
+        m.nickname,        			   <!-- 리뷰 작성자 (닉네임) -->
+        TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 변환 -->
+        COUNT(rr.review_report_seq) AS report_count  <!-- 신고 횟수 -->
+    FROM 
+        review r
+    JOIN 
+        product p ON r.product_seq = p.product_seq
+    JOIN 
+        member m ON r.member_id = m.member_id
+    LEFT JOIN 
+        review_report rr ON r.review_seq = rr.review_seq  <!-- 신고 기록 조인 -->
+    GROUP BY 
+        r.review_seq, p.product_title, m.nickname, r.review_date
+    ORDER BY 
+        r.review_seq
+	</select>
+
+	<!-- 리뷰 신고내역 조회 (관리자) -->
+	<select id="selectReviewReport" resultType="com.hows.product.dto.ReviewReportDTO">
+    	SELECT 
+        	rr.review_report_seq,
+        	rp.report_description AS report_code,  <!-- 신고 사유를 report_code 자리에 가져옴 -->
+        	rr.review_report_date,
+        	rr.review_seq,
+        	m.nickname AS member_id  <!-- member_id 대신 nickname을 가져옴 -->
+        FROM 
+        	review_report rr
+        JOIN 
+        	member m ON rr.member_id = m.member_id
+        JOIN 
+        	report rp ON rr.report_code = rp.report_code  <!-- report 테이블 조인하여 report_description 가져옴 -->
+        WHERE 
+        	rr.review_seq = #{review_seq}
+	</select>
 
 
 </mapper>

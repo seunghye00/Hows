@@ -38,4 +38,9 @@ public class ProductService {
 	public int updateThumbNail(int product_seq, String url) {
 		return productDAO.updateThumbNail(product_seq, url);
 	}
+
+	// 상품 삭제
+	public boolean deleteProduct(int productSeq) {
+		return productDAO.deleteProduct(productSeq);
+	}
 }

@@ -38,10 +38,21 @@
 .cols {
     border: 1px solid #ddd;
     padding: 10px;
+    max-height: 330px;
+}
+
+.cols:hover {
+    cursor: pointer;
+    border: 2px solid var(--hows-point-color-lightest);
+}
+
+.cols.checked {
+    border: 2px solid var(--hows-point-color-lightest);
 }
 
 .cols img {
     width: 100%;
+    height: 300px;
 }
 
 .info {

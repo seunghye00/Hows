@@ -27,7 +27,8 @@ public class ReviewDAO {
     }
 
     // 리뷰 신고 내역 조회
-    public List<ReviewReportDTO> getReviewReport(int reviewSeq) throws Exception {
-        return myBatis.selectList("Product.selectReviewReport", reviewSeq);
+    public List<ReviewReportDTO> getReviewReport(int review_seq) throws Exception {
+    	System.out.println("DAO : " + myBatis.selectList("Product.selectReviewReport", review_seq));
+        return myBatis.selectList("Product.selectReviewReport", review_seq);
     }
 }

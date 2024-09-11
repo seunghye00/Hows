@@ -54,27 +54,31 @@
 	
 	<!-- 관리자 -->
 	<!-- 리뷰 신고목록 조회 (관리자) -->
-	<select id="getReportedReviews" resultType="map">
-    SELECT 
-        r.review_seq,                  <!-- 리뷰 번호 -->
-        p.product_title,               <!-- 상품 제목 -->
-        m.nickname,        			   <!-- 리뷰 작성자 (닉네임) -->
-        r.review_contents,              <!-- 리뷰 내용 추가 -->
-        TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 변환 -->
-        COUNT(rr.review_report_seq) AS report_count  <!-- 신고 횟수 -->
-    FROM 
-        review r
-    JOIN 
-        product p ON r.product_seq = p.product_seq
-    JOIN 
-        member m ON r.member_id = m.member_id
-    JOIN 
-         review_report rr ON r.review_seq = rr.review_seq <!-- 신고 기록이 있는 리뷰만 조회 -->
-    GROUP BY 
-        r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
-    ORDER BY 
-        r.review_seq
-	</select>
+<select id="getReportedReviews" resultType="map">
+    SELECT *
+    FROM (
+        SELECT 
+            r.review_seq,                  <!-- 리뷰 번호 -->
+            p.product_title,               <!-- 상품 제목 -->
+            m.nickname,        			   <!-- 리뷰 작성자 (닉네임) -->
+            r.review_contents,             <!-- 리뷰 내용 추가 -->
+            TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 변환 -->
+            COUNT(rr.review_report_seq) AS report_count,  <!-- 신고 횟수 -->
+            ROW_NUMBER() OVER (ORDER BY r.review_seq DESC) AS row_num  <!-- 각 행에 순번 부여 -->
+        FROM 
+            review r
+        JOIN 
+            product p ON r.product_seq = p.product_seq
+        JOIN 
+            member m ON r.member_id = m.member_id
+        JOIN 
+            review_report rr ON r.review_seq = rr.review_seq  <!-- 신고 기록 조인 -->
+        GROUP BY 
+            r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
+    )
+    WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
+</select>
+
 
 	<!-- 리뷰 신고내역 조회 (관리자) -->
 	<select id="selectReviewReport" resultType="com.hows.product.dto.ReviewReportDTO">
@@ -95,17 +99,26 @@
 	</select>
 	
 	<!-- 신고 리뷰 및 관련 신고 기록 삭제 (관리자) -->
-    <!-- 리뷰에 대한 신고 기록 삭제 -->
-    <delete id="deleteReviewReport" parameterType="int">
-        DELETE FROM review_report
-        WHERE review_seq = #{review_seq}
-    </delete>
-
-    <!-- 리뷰 삭제 -->
-    <delete id="deleteReview" parameterType="int">
-        DELETE FROM review
-        WHERE review_seq = #{review_seq}
-    </delete>
-
-
+	<delete id="deleteReview" parameterType="int">
+    <!-- 먼저 리뷰에 대한 신고 기록 삭제 -->
+    	DELETE FROM review_report
+    	WHERE review_seq = #{review_seq}	
+	</delete>
+	
+	<!-- 그 다음에 리뷰 삭제 -->
+	<delete id="deleteReviewReport">
+    DELETE FROM review
+    WHERE review_seq = #{review_seq}
+	</delete>
+	
+	<!-- 페이지네비를 위한 신고 리뷰 카운트 (관리자) -->
+	<select id="getReportedReviewsCount" resultType="int">
+    SELECT 
+        COUNT(DISTINCT r.review_seq)  -- 중복된 리뷰는 하나로 계산
+    FROM 
+        review r
+    JOIN 
+        review_report rr ON r.review_seq = rr.review_seq
+	</select>
+	
 </mapper>

@@ -19,17 +19,33 @@ export const Review = () => {
     const [searchResults, setSearchResults] = useState([])
     const [reviews, setReviews] = useState([]) // 서버에서 불러온 신고 리뷰 목록
     const [reportData, setReportData] = useState([]) // 신고 내역 데이터
+    const [totalReviews, setTotalReviews] = useState(0) // 전체 신고 리뷰 수
+    const [page, setPage] = useState(1) // 현재 페이지 상태
+    const [itemsPerPage] = useState(10) // 페이지당 항목 수
+
+    // 페이징에 따른 startRow와 endRow 계산
+    const startRow = (page - 1) * itemsPerPage + 1
+    const endRow = page * itemsPerPage
 
     // 신고당한 리뷰 목록을 서버에서 가져오는 함수
     useEffect(() => {
         loadReportedReviews()
-    }, [])
+    }, [page])
 
     const loadReportedReviews = async () => {
         try {
-            const resp = await reportedReviews()
-            console.log(resp.data)
-            setReviews(resp.data) // 서버에서 받은 리뷰 목록을 상태에 저장
+            console.log(
+                `현재 페이지: ${page}, 시작 행: ${startRow}, 끝 행: ${endRow}, 페이지당 항목 수: ${itemsPerPage}`
+            )
+
+            // 페이징된 리뷰 목록을 가져옴
+            const resp = await reportedReviews(startRow, endRow)
+
+            // 콘솔에 서버에서 받은 데이터 출력
+            console.log('서버에서 받은 데이터:', resp.data)
+
+            setReviews(resp.data.reviews) // 서버에서 받은 리뷰 목록을 상태에 저장
+            setTotalReviews(resp.data.totalCount) // 전체 리뷰 수 저장
         } catch (error) {
             console.error('리뷰 목록을 불러오는데 실패했습니다.', error)
         }
@@ -58,7 +74,7 @@ export const Review = () => {
         }).then(async result => {
             if (result.isConfirmed) {
                 try {
-                    const resp = await deleteReview(review_seq) // 서버에 삭제 요청
+                    const resp = await deleteReview(review_seq)
                     if (resp.status === 200) {
                         Swal.fire({
                             title: '삭제 완료',
@@ -100,9 +116,9 @@ export const Review = () => {
     const selectReport = review_seq => {
         if (review_seq !== undefined && review_seq !== null) {
             loadReviewReport(review_seq) // 신고 내역 로드
-            setIsReportModalOpen(true) // 신고 모달 열기
+            setIsReportModalOpen(true)
         } else {
-            console.error('Invalid review_seq:', review_seq) // 오류 로그 출력
+            console.error('Invalid review_seq:', review_seq)
         }
     }
 
@@ -118,6 +134,11 @@ export const Review = () => {
                 review.NICKNAME.includes(query)
         )
         setSearchResults(results)
+    }
+
+    // 페이지 변경 처리
+    const handlePageChange = pageNumber => {
+        setPage(pageNumber) // 페이지 상태 업데이트
     }
 
     // 검색 결과가 있으면 그 결과를, 없으면 전체 리스트를 보여줌
@@ -149,7 +170,9 @@ export const Review = () => {
                         className={styles.reviewRow}
                         key={review.review_seq || index}
                     >
-                        <div className={styles.reviewItem}>{index + 1}</div>
+                        <div className={styles.reviewItem}>
+                            {startRow + index}
+                        </div>
                         <div
                             className={styles.reviewItem}
                             onClick={() => selectReview(review)}
@@ -185,18 +208,26 @@ export const Review = () => {
                 ))}
             </div>
 
+            {/* 페이징 컴포넌트 */}
+            <div className={styles.pagination}>
+                <Paging
+                    page={page}
+                    count={totalReviews} // 전체 리뷰 수
+                    perpage={itemsPerPage} // 페이지당 항목 수
+                    setPage={handlePageChange} // 페이지 변경 함수
+                />
+            </div>
+
             {/* 리뷰 모달창 */}
             {isReviewModalOpen && (
                 <div className={styles.reviewModal}>
                     <div className={styles.modalContent}>
                         <h3>신고당한 리뷰</h3>
                         <div className={styles.reviewDetail}>
-                            {/* 리뷰 이미지 */}
                             <img
                                 src={selectedReview.imageUrl || test}
                                 alt="리뷰 이미지"
                             />
-                            {/* 리뷰 내용 */}
                             <div>{selectedReview.REVIEW_CONTENTS}</div>
                         </div>
                         <Button
@@ -240,10 +271,6 @@ export const Review = () => {
                     </div>
                 </div>
             )}
-
-            <div className={styles.pagination}>
-                <Paging />
-            </div>
         </div>
     )
 }

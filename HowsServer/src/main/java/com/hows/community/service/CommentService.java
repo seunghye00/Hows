@@ -20,10 +20,20 @@ public class CommentService {
 	}
 	
 	// 게시글 댓글 목록 출력
-    public List<Map<String, Object>> getCommentsBoardSeq(int board_seq) {
-        return commentDAO.getCommentsBoardSeq(board_seq); // 댓글 목록을 DB에서 조회
+//    public List<Map<String, Object>> getCommentsBoardSeq(int board_seq) {
+//        return commentDAO.getCommentsBoardSeq(board_seq); // 댓글 목록을 DB에서 조회
+//    }
+
+    // 게시글 댓글 목록 출력 (페이지네이션 적용)
+    public List<Map<String, Object>> getCommentsBoardSeqWithPagination(int boardSeq, int page, int itemsPerPage) {
+        // startRow와 endRow 계산
+        int startRow = (page - 1) * itemsPerPage + 1;
+        int endRow = page * itemsPerPage;
+
+        // DAO에 startRow와 endRow를 전달하여 댓글 목록 조회
+        return commentDAO.getCommentsBoardSeqWithPagination(boardSeq, startRow, endRow);
     }
-    
+	
 	// 게시글 댓글 수정 
     public void updateComment(int commentSeq, String commentContents) {
         commentDAO.updateComment(commentSeq, commentContents);
@@ -62,4 +72,9 @@ public class CommentService {
 	public void sendCommentReport(int commentSeq, String reportCode, String memberId) {
 		commentDAO.sendCommentReport(commentSeq, reportCode, memberId); // 현재 조회수 반환
 	}
+	
+    // 전체 댓글 수 가져오기
+    public int getTotalCommentsCount(int boardSeq) {
+        return commentDAO.getTotalCommentsCount(boardSeq);
+    }
 }

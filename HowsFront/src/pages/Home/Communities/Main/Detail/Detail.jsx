@@ -7,9 +7,8 @@ import { PostActions } from './PostActions/PostActions'
 import { Comment } from './Comment/Comment'
 import Swal from 'sweetalert2'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
-import { PiSiren } from 'react-icons/pi'
+import { Paging } from '../../../../../components/Pagination/Paging'
 import { useNavigate, useParams } from 'react-router-dom'
-import img from './../../../../../assets/images/cry.jpg'
 import {
     getPostData,
     getImageData,
@@ -49,13 +48,14 @@ export const Detail = () => {
     const [comment, setComment] = useState('') // 새로운 댓글 내용
     const member_id = sessionStorage.getItem('member_id') || null // 세션에서 member_id 가져오기
     const [selectedCommentSeq, setSelectedCommentSeq] = useState(null) // 선택된 댓글 시퀀스 추가
+    const [page, setPage] = useState(1) // 현재 페이지 상태
+    const [itemsPerPage] = useState(5) // 페이지당 항목 수 (5개)
+    const [totalCommentsCount, setTotalCommentsCount] = useState(0) // 전체 댓글 수
 
     // 게시글 정보 및 이미지, 태그 정보 받아오기
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // 세션에서 member_id 가져오기 (비회원일 경우 null로 처리)
-
                 // 조회수 증가 후 최신 조회수 반영
                 const updatedViewCount = await viewCounting(board_seq)
                 setViewCount(updatedViewCount) // 최신 조회수를 상태로 업데이트
@@ -83,15 +83,21 @@ export const Detail = () => {
                 setBookmarkCount(postData.data.BOOKMARK_COUNT)
 
                 // 댓글 데이터 가져오기
-                const commentsData = await getComments(board_seq, member_id)
-                setComments(commentsData) // 댓글 목록 상태 업데이트
+                const commentsData = await getComments(
+                    board_seq,
+                    member_id,
+                    page,
+                    itemsPerPage
+                )
+                setComments(commentsData.comments) // 댓글 목록 상태 업데이트
+                setTotalCommentsCount(commentsData.totalCount) // 전체 댓글 수 업데이트
             } catch (error) {
                 console.error('데이터를 가져오는 중 오류 발생:', error)
             }
         }
 
         fetchData() // 함수 실행
-    }, [board_seq])
+    }, [board_seq, page]) // 페이지 또는 게시글 번호가 변경될 때마다 호출
 
     // 좋아요, 북마크 상태 변경
     const toggleLikeHandler = async () => {
@@ -323,6 +329,12 @@ export const Detail = () => {
             })
         }
     }
+
+    // 페이지네이션
+    const handlePageChange = newPage => {
+        setPage(newPage)
+    }
+
     return (
         <div className={styles.container}>
             {/* postData가 null이 아닐 때만 렌더링 */}
@@ -406,6 +418,14 @@ export const Detail = () => {
                 )}
             </div>
 
+            {/* 페이지네이션 컴포넌트 */}
+            <Paging
+                page={page}
+                count={totalCommentsCount}
+                setPage={handlePageChange} // 페이지 변경 함수
+                perpage={itemsPerPage}
+            />
+
             {/* 신고 영역 */}
             <ReportModal
                 isModalOpen={isModalOpen}
@@ -415,6 +435,7 @@ export const Detail = () => {
                 setSelectedReports={setSelectedReports}
                 handleReportSubmit={handleReportSubmit}
             />
+
             <ScrollTop />
         </div>
     )

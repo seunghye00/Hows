@@ -22,9 +22,19 @@ public class CommentDAO {
         
         mybatis.insert("Comment.writeComment", params);
     }
-	// 게시글 댓글 목록 불러오기
-    public List<Map<String, Object>> getCommentsBoardSeq(int boardSeq) {
-       return mybatis.selectList("Comment.getCommentsBoardSeq",boardSeq);
+//	// 게시글 댓글 목록 불러오기
+//    public List<Map<String, Object>> getCommentsBoardSeq(int boardSeq) {
+//       return mybatis.selectList("Comment.getCommentsBoardSeq",boardSeq);
+//    }
+
+    // 게시글 댓글 목록 불러오기 (페이지네이션 적용)
+    public List<Map<String, Object>> getCommentsBoardSeqWithPagination(int boardSeq, int startRow, int endRow) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("board_seq", boardSeq);
+        params.put("startRow", startRow);
+        params.put("endRow", endRow);
+
+        return mybatis.selectList("Comment.getCommentsBoardSeqWithPagination", params);
     }
     
 	// 게시글 댓글 수정 
@@ -85,5 +95,10 @@ public class CommentDAO {
         params.put("report_code", reportCode);
         params.put("member_id", memberId);
         mybatis.insert("Comment.sendCommentReport", params);
+    }
+    
+    // 전체 댓글 수 가져오기
+    public int getTotalCommentsCount(int boardSeq) {
+        return mybatis.selectOne("Comment.getTotalCommentsCount", boardSeq);
     }
 }

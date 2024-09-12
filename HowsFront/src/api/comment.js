@@ -15,12 +15,40 @@ export const sendComments = async (board_seq, member_id, comment_contents) => {
     }
 }
 // 댓글 목록 출력 API 호출 함수
-export const getComments = async (board_seq, member_id) => {
+// export const getComments = async (board_seq, member_id) => {
+//     try {
+//         console.log('보드 시퀀스:', board_seq, '멤버 아이디:', member_id) // 요청 전 파라미터 확인
+
+//         const response = await api.get(`/comment/getComments`, {
+//             params: { board_seq: board_seq, member_id: member_id },
+//         })
+//         console.log('응답 데이터:', response.data) // 응답 데이터 확인
+//         return response.data
+//     } catch (error) {
+//         console.error('댓글 불러오기 중 오류 발생:', error)
+//         throw error
+//     }
+// }
+
+// 댓글 목록 출력 API 호출 함수 (페이지네이션 반영)
+export const getComments = async (board_seq, member_id, page, itemsPerPage) => {
     try {
-        console.log('보드 시퀀스:', board_seq, '멤버 아이디:', member_id) // 요청 전 파라미터 확인
+        console.log(
+            '보드 시퀀스:',
+            board_seq,
+            '멤버 아이디:',
+            member_id,
+            '페이지:',
+            page
+        )
 
         const response = await api.get(`/comment/getComments`, {
-            params: { board_seq: board_seq, member_id: member_id },
+            params: {
+                board_seq: board_seq,
+                member_id: member_id,
+                page: page,
+                itemsPerPage: itemsPerPage,
+            },
         })
         console.log('응답 데이터:', response.data) // 응답 데이터 확인
         return response.data
@@ -29,7 +57,6 @@ export const getComments = async (board_seq, member_id) => {
         throw error
     }
 }
-
 // 댓글 수정 API 호출 함수
 export const updateComment = async (comment_seq, updatedContent) => {
     try {

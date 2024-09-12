@@ -158,8 +158,6 @@ export const Detail = () => {
         }
     };
     
-    console.log(quantity + "야")
-    console.log(totalPrice + "호")
     
     // 구매하기
     const handleGet = () => {

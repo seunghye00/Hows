@@ -48,19 +48,26 @@
 		select max(review_seq) from review
 	</select>
 	
-	<!-- 리뷰 목록 출력 -->
-	<select id="getReviewList"
-			resultType="map">
+	<!-- 리뷰 목록 출력 (페이징) -->
+	<select id="getReviewList" resultType="map">
 		SELECT 
-		    p.PRODUCT_SEQ,
-		    r.REVIEW_SEQ,
-		    r.RATING,
-		    r.REVIEW_CONTENTS,
-		    to_char(r.REVIEW_DATE, 'YYYY-MM-DD HH24:MI:SS') as REVIEW_DATE,
-		    r.MEMBER_ID
-		from REVIEW r 
-		join product p on p.product_seq = r.product_seq
-		where p.product_seq = #{product_seq} <!-- 현재 상품에 해당하는 리뷰 -->
+		    r.*, 
+		    (SELECT COUNT(*) 
+		     FROM REVIEW 
+		     WHERE product_seq = #{product_seq}) AS total_count
+		FROM (
+		    SELECT 
+		        r.PRODUCT_SEQ,
+		        r.REVIEW_SEQ,
+		        r.RATING,
+		        r.REVIEW_CONTENTS,
+		        TO_CHAR(r.REVIEW_DATE, 'YYYY-MM-DD HH24:MI:SS') AS REVIEW_DATE,
+		        r.MEMBER_ID,
+		        ROW_NUMBER() OVER (ORDER BY r.REVIEW_DATE DESC) AS rn
+		    FROM REVIEW r 
+		    WHERE r.product_seq = #{product_seq}
+		) r
+		WHERE r.rn BETWEEN #{startRow} AND #{endRow}
 	</select>
 	
 	

@@ -26,6 +26,7 @@ import {
     deleteComment,
     sendCommentReport,
 } from '../../../../../api/comment' // API 함수 불러오기
+import { userInfo } from '../../../../../api/member' // API 함수 불러오기
 import { useAuthStore } from '../../../../../store/store'
 import { BiMessageRounded } from 'react-icons/bi'
 
@@ -51,6 +52,7 @@ export const Detail = () => {
     const [page, setPage] = useState(1) // 현재 페이지 상태
     const [itemsPerPage] = useState(5) // 페이지당 항목 수 (5개)
     const [totalCommentsCount, setTotalCommentsCount] = useState(0) // 전체 댓글 수
+    const [userProfile, setUserProfile] = useState('') // 유저 프로필 정보 상태
 
     // 게시글 정보 및 이미지, 태그 정보 받아오기
     useEffect(() => {
@@ -91,6 +93,10 @@ export const Detail = () => {
                 )
                 setComments(commentsData.comments) // 댓글 목록 상태 업데이트
                 setTotalCommentsCount(commentsData.totalCount) // 전체 댓글 수 업데이트
+
+                // 유저 정보 불러오기 (세션에서 가져온 member_id로)
+                const response = await userInfo(member_id)
+                setUserProfile(response.data.member_avatar) // 유저 아바타 정보 가져오기
             } catch (error) {
                 console.error('데이터를 가져오는 중 오류 발생:', error)
             }
@@ -272,7 +278,12 @@ export const Detail = () => {
     // 댓글 제출 후 목록 새로고침
     const onCommentSubmit = async () => {
         try {
-            const response = await getComments(board_seq)
+            const response = await getComments(
+                board_seq,
+                member_id,
+                page,
+                itemsPerPage
+            )
             setComments(response)
         } catch (error) {
             console.error('댓글 목록 갱신 실패:', error)
@@ -372,7 +383,7 @@ export const Detail = () => {
             {/* 댓글 작성 영역 */}
             <div className={styles.commentInput}>
                 <div className={styles.writerProfile}>
-                    <img src={postData?.MEMBER_AVATAR} alt="profile" />
+                    <img src={userProfile} alt="profile" />
                 </div>
                 <textarea
                     placeholder="댓글을 입력하세요 (최대 300자)"

@@ -33,15 +33,6 @@ export const sendComments = async (board_seq, member_id, comment_contents) => {
 // 댓글 목록 출력 API 호출 함수 (페이지네이션 반영)
 export const getComments = async (board_seq, member_id, page, itemsPerPage) => {
     try {
-        console.log(
-            '보드 시퀀스:',
-            board_seq,
-            '멤버 아이디:',
-            member_id,
-            '페이지:',
-            page
-        )
-
         const response = await api.get(`/comment/getComments`, {
             params: {
                 board_seq: board_seq,
@@ -95,12 +86,8 @@ export const toggleLikeAPI = async (comment_seq, member_id) => {
     }
 }
 
+// 댓글 신고 처리 API 호출 함수
 export const sendCommentReport = async (commentSeq, reportCode, memberId) => {
-    console.log({
-        commentSeq,
-        reportCode,
-        memberId,
-    })
     try {
         const response = await api.post('/comment/report', {
             comment_seq: commentSeq,
@@ -110,6 +97,37 @@ export const sendCommentReport = async (commentSeq, reportCode, memberId) => {
         return response.data
     } catch (error) {
         console.error('신고 요청 중 오류 발생:', error)
+        throw error
+    }
+}
+
+// 답글 작성 처리 API
+export const sendReply = async (commentSeq, replyContent, member_id) => {
+    try {
+        const response = await api.post('/comment/reply', {
+            comment_seq: commentSeq, // 해당 댓글의 시퀀스
+            reply_content: replyContent, // 작성한 답글 내용
+            member_id: member_id, // 답글 작성자의 ID
+        })
+        return response.data // 서버 응답 데이터 반환
+    } catch (error) {
+        console.error('답글 작성 중 오류 발생:', error)
+        throw error
+    }
+}
+
+// 답글 목록 불러오는 API
+export const getReplies = async (commentSeq, member_id) => {
+    try {
+        const response = await api.get('/comment/repliesList', {
+            params: {
+                comment_seq: commentSeq,
+                member_id: member_id, // 로그인된 유저 ID를 통해 좋아요 여부 확인
+            },
+        })
+        return response.data // 서버에서 받은 답글 목록 반환
+    } catch (error) {
+        console.error('답글 목록 불러오기 중 오류 발생:', error)
         throw error
     }
 }

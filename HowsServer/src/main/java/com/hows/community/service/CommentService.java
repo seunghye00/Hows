@@ -77,4 +77,14 @@ public class CommentService {
     public int getTotalCommentsCount(int boardSeq) {
         return commentDAO.getTotalCommentsCount(boardSeq);
     }
+    
+    // 답글 작성 메소드
+    public void writeReply(int commentSeq, String replyContent, String memberId) {
+        commentDAO.writeReply(commentSeq, replyContent, memberId);
+    }
+    
+    // 특정 댓글에 달린 답글 목록 가져오기
+    public List<Map<String, Object>> getRepliesByCommentSeq(int commentSeq) {
+        return commentDAO.getRepliesByCommentSeq(commentSeq);
+    }
 }

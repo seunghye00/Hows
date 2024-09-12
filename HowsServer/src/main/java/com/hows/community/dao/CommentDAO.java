@@ -101,4 +101,20 @@ public class CommentDAO {
     public int getTotalCommentsCount(int boardSeq) {
         return mybatis.selectOne("Comment.getTotalCommentsCount", boardSeq);
     }
+    
+    // 답글 작성 SQL 호출
+    public void writeReply(int commentSeq, String replyContent, String memberId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("comment_seq", commentSeq);
+        params.put("reply_contents", replyContent);
+        params.put("member_id", memberId);
+
+        mybatis.insert("Comment.writeReply", params);
+    }
+    
+    // 댓글에 대한 답글 목록 불러오기
+    public List<Map<String, Object>> getRepliesByCommentSeq(int commentSeq) {
+        return mybatis.selectList("Comment.getRepliesByCommentSeq", commentSeq);
+    }
 }
+

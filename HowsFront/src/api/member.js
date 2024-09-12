@@ -3,10 +3,25 @@ import { api, host } from '../config/config'
 
 const baseUrl = `${host}/member`
 
+/** 유저 정보  **/
+export const userInfo = member_id => {
+    console.log(member_id)
+    if (member_id) {
+        return api.get(`/member/selectInfo`, { params: { member_id } })
+    } else {
+        return api.get(`/member/selectInfo`)
+    }
+}
+
 // 로그인
 export const loginUser = (user) => {
     return axios.post(`${host}/auth`, user);
 }
+
+// 아이디 찾기
+export const findId = (name, email) => {
+    return api.post(`/auth/findId`, { name, email });
+};
 
 // [비밀번호 찾기] 사용자 인증 확인
 export const verifyUser = (member_id, email) => {
@@ -31,7 +46,7 @@ export const updatePw = pw => {
 
 // [마이페이지] 특정 멤버의 member_seq 가져오기
 export const findMemberSeq = (member_id) => {
-    return api.get("/guestbook/findMemberSeq", { params: { member_id } });
+    return api.get(`/guestbook/findMemberSeq`, { params: { member_id } });
 };
 
 // 프로필 이미지 업로드
@@ -65,15 +80,10 @@ export const deleteGuestbook = guestbook_seq => {
     return api.delete(`/guestbook/${guestbook_seq}`)
 }
 
-/** 유저 정보  **/
-export const userInfo = member_id => {
-    console.log(member_id)
-    if (member_id) {
-        return api.get(`/member/selectInfo`, { params: { member_id } })
-    } else {
-        return api.get(`/member/selectInfo`)
-    }
-}
+// 게시글 출력
+export const selectPost = (member_id) => {
+    return api.get(`/member/selectPost`, { params: { member_id } });
+};
 
 // 팔로우/언팔로우 처리 API 호출 함수
 export const toggleFollow = async data => {

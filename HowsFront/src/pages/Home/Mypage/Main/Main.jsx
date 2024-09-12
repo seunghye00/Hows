@@ -115,7 +115,7 @@ export const Main = () => {
                         style={{
                             cursor:
                                 sessionStorage.getItem('member_id') ===
-                                user.member_id
+                                    user.member_id
                                     ? 'pointer'
                                     : 'default',
                         }}
@@ -130,25 +130,25 @@ export const Main = () => {
                             <div className={styles.linkBtns}>
                                 {sessionStorage.getItem('member_id') ===
                                     user.member_id && (
-                                    <>
-                                        <button
-                                            className={styles.infoUpdate}
-                                            onClick={() =>
-                                                navi('/mypage/update')
-                                            }
-                                        >
-                                            수정
-                                        </button>
-                                        <button
-                                            className={styles.mypage}
-                                            onClick={() =>
-                                                navi('/mypage/userDashboard')
-                                            }
-                                        >
-                                            마이페이지
-                                        </button>
-                                    </>
-                                )}
+                                        <>
+                                            <button
+                                                className={styles.infoUpdate}
+                                                onClick={() =>
+                                                    navi('/mypage/update')
+                                                }
+                                            >
+                                                수정
+                                            </button>
+                                            <button
+                                                className={styles.mypage}
+                                                onClick={() =>
+                                                    navi('/mypage/userDashboard')
+                                                }
+                                            >
+                                                마이페이지
+                                            </button>
+                                        </>
+                                    )}
                             </div>
                         </div>
                         <div className={styles.middle}>
@@ -169,12 +169,12 @@ export const Main = () => {
                         <div className={styles.bottom}>
                             {sessionStorage.getItem('member_id') !=
                                 user.member_id && ( // 본인이 아닐시에는 표시 X
-                                <>
-                                    <button className={styles.followBtn}>
-                                        팔로우 +
-                                    </button>
-                                </>
-                            )}
+                                    <>
+                                        <button className={styles.followBtn}>
+                                            팔로우 +
+                                        </button>
+                                    </>
+                                )}
                         </div>
                     </div>
                 </div>

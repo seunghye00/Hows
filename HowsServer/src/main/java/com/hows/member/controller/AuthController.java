@@ -58,7 +58,10 @@ public class AuthController {
 	
 	// 아이디 찾기
 	@PostMapping("/findId")
-	public ResponseEntity<String> findId(@RequestParam String name, @RequestParam String email){
+	public ResponseEntity<String> findId(@RequestBody Map<String, String> request){
+		
+		String name = request.get("name");
+		String email = request.get("email");
 		
 		Map<String, String> map = new HashMap<>();
 		map.put("name", name);

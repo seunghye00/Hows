@@ -8,6 +8,7 @@ import { api } from "../../../../../config/config";
 import { format } from "date-fns";
 import { useAuthStore } from "../../../../../store/store";
 import { checkNickname, userInfo } from "../../../../../api/member";
+import Swal from 'sweetalert2'
 
 export const UpdateUserInfo = () => {
 
@@ -76,9 +77,15 @@ export const UpdateUserInfo = () => {
     // 닉네임 중복확인 핸들러
     const handleCheckNickname = () => {
         // 닉네임 유효성 검사
-        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/;
+        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,10}$/;
         if (!nicknamePattern.test(formData.nickname)) {
-            alert('닉네임은 한글, 영문자, 숫자로 이루어진 2~7자를 입력해주세요.');
+            Swal.fire({
+                title: "경고!",
+                text: "닉네임은 한글, 영문자, 숫자로 이루어진 2~10자를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
+
             setNicknameErrorMessage('다시 입력해주세요');
             setNicknameAvailable(null);
             return;
@@ -136,47 +143,85 @@ export const UpdateUserInfo = () => {
     const validateFormData = formData => {
         // 닉네임 검사
         if (!formData.nickname) {
-            alert('닉네임을 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "닉네임을 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
-        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/
+        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,10}$/
         if (!nicknamePattern.test(formData.nickname)) {
-            alert(
-                '닉네임은 한글, 영문자, 숫자 포함하여 2~7자까지 입력할 수 있습니다.'
-            )
+            Swal.fire({
+                title: "경고!",
+                text: "닉네임은 한글, 영문자, 숫자로 이루어진 2~10자를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
         // 이메일 검사
         if (!formData.email) {
-            alert('이메일을 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "이메일을 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         const emailPattern = /^[^\s@]+@[^\s@]+\.(com|net|org)$/
         if (!emailPattern.test(formData.email)) {
-            alert('사용할 수 없는 형식의 이메일입니다')
+            Swal.fire({
+                title: "경고!",
+                text: "사용할 수 없는 형식의 이메일입니다.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
         // 전화번호 검사
         if (!formData.phone) {
-            alert('전화번호를 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "전화번호를 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         // 전화번호 유효성 검사: 한국 전화번호 형식 (예: 01012345678)
         const phonePattern = /^(010|011|016|017|018|019)\d{3,4}\d{4}$/
         if (formData.phone && !phonePattern.test(formData.phone)) {
-            alert('유효한 전화번호를 입력하세요. (예: 01012345678)')
+            Swal.fire({
+                title: "경고!",
+                text: "유효한 전화번호를 입력하세요. (예: 01012345678)",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
         // 주소 검사
         if (!formData.zip_code || !formData.address) {
-            alert('주소를 입력해주세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "주소를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         if (!formData.detail_address) {
-            alert('상세주소를 입력해주세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "상세주소를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
@@ -193,18 +238,33 @@ export const UpdateUserInfo = () => {
         }
 
         if (!nicknameChecked) {
-            alert("닉네임 중복 확인을 해주세요.");
+            Swal.fire({
+                title: "경고!",
+                text: "닉네임 중복 확인을 해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return;
         }
 
         // 유효성 검사를 통과하면 서버에 데이터 전송
         api.put(`/member/updateInfo`, formData).then(resp => {
             if (resp.data > 0) {
-                alert('회원정보가 성공적으로 수정되었습니다.')
+                Swal.fire({
+                    title: "성공!",
+                    text: "회원정보가 성공적으로 수정되었습니다.",
+                    icon: "success",
+                    confirmButtonText: "확인",
+                });
                 navi("/mypage/main");
             }
         }).catch(error => {
-            alert('회원정보수정 중 오류가 발생했습니다.')
+            Swal.fire({
+                title: "경고!",
+                text: "회원정보수정 중 오류가 발생했습니다.",
+                icon: "error",
+                confirmButtonText: "확인",
+            });
         })
     }
 
@@ -213,7 +273,12 @@ export const UpdateUserInfo = () => {
         if (confirmDelete) {
             api.delete(`/member/deleteUser/${user.member_id}`).then(resp => {
                 if (resp.data > 0) {
-                    alert("성공적으로 탈퇴되었습니다.");
+                    Swal.fire({
+                        title: "성공!",
+                        text: "성공적으로 탈퇴되었습니다.",
+                        icon: "success",
+                        confirmButtonText: "확인",
+                    });
                     sessionStorage.removeItem('token'); // 토큰 삭제
                     setIsAuth(false); // 인증 상태 업데이트
                     navi("/")
@@ -302,7 +367,7 @@ export const UpdateUserInfo = () => {
                 <div className={styles.nicknameBox}>
                     <span className={styles.title}>닉네임</span>
                     <span>
-                        한글, 영문자, 숫자로만 이루어진 2~7자의 닉네임을
+                        한글, 영문자, 숫자로만 이루어진 2~10자의 닉네임을
                         입력해주세요.
                     </span>
                     <div className={styles.formGrop}>

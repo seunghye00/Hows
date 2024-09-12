@@ -338,7 +338,7 @@ public class CommunityController {
 		response.put("totalCount", totalCount);
 		response.put("boards", reportedBoards);
 
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(response); 
 	}
 
 	// 게시물 내역 조회 (관리자)

@@ -29,8 +29,6 @@ public class MemberService implements UserDetailsService {
 	private MemberDAO memDao;
 	@Autowired
 	private CommunityDAO comDao;
-	@Autowired
-	private GuestbookDAO guestDao;
 	
 	@Autowired
     private SendEmailUtil emailUtil;
@@ -66,7 +64,7 @@ public class MemberService implements UserDetailsService {
 			throw new UsernameNotFoundException("User not found");
 
 		return new CustomUserDetails(dto.getMember_id(), dto.getPw(),
-				AuthorityUtils.createAuthorityList(dto.getRole_code()), dto.getMember_seq());
+				AuthorityUtils.createAuthorityList(dto.getRole_code()), dto.getMember_seq(), dto.getNickname(), dto.getMember_avatar());
 	}
 
 	// 아이디 찾기
@@ -203,10 +201,7 @@ public class MemberService implements UserDetailsService {
 	// 마이페이지 스크랩 갯수
 	
 	
-	// 마이페이지 방문글 갯수
-    public int countGuestbook(String member_id){
-    	return guestDao.countGuestbook(member_id);
-    }
+
     
     
 

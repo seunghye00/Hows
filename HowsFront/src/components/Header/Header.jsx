@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import styles from './Header.module.css'
 import logo from '../../assets/images/logo_how.png'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { useAuthStore } from './../../store/store'
+import { useAuthStore, useMemberStore } from './../../store/store'
 import profile from '../../assets/images/마이페이지_프로필사진.jpg'
 import { throttle } from 'lodash'
 import { api } from './../../config/config' // API 요청을 위한 경로
@@ -16,6 +16,7 @@ export const Header = () => {
     const { isAuth, login, logout, setIsAuth } = useAuthStore()
     const [profileMenu, setProfileMenu] = useState(false)
     const [profileImage, setProfileImage] = useState('') // 프로필 사진 상태
+    const { currentUser } = useMemberStore();
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
@@ -187,7 +188,7 @@ export const Header = () => {
                                     <div>
                                         <div className={styles.profileImg}>
                                             <img
-                                                src={profileImage || profile} // 프로필 사진이 없으면 기본 이미지 사용
+                                                src={currentUser.member_avatar || profile} // 프로필 사진이 없으면 기본 이미지 사용
                                                 alt="User"
                                                 onClick={handleProfileClick}
                                             />

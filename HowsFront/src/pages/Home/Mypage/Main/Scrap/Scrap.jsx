@@ -13,24 +13,6 @@ export const Scrap = () => {
                 <div className={styles.feed}>
                     <img src={scrap}></img>
                 </div>
-                <div className={styles.feed}>
-                    <img src={scrap}></img>
-                </div>
-                <div className={styles.feed}>
-                    <img src={scrap}></img>
-                </div>
-                <div className={styles.feed}>
-                    <img src={scrap}></img>
-                </div>
-                <div className={styles.feed}>
-                    <img src={scrap}></img>
-                </div>
-                <div className={styles.feed}>
-                    <img src={scrap}></img>
-                </div>
-                <div className={styles.feed}>
-                    <img src={scrap}></img>
-                </div>
             </div>
         </div>
     );

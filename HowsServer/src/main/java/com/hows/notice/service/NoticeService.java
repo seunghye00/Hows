@@ -20,14 +20,12 @@ public class NoticeService {
 		dao.insertNtc(dto);
 	}
 
-	// 공지사항 목록 조회
-	public List<NoticeDTO> selectNtc(int page, int itemsPerPage) {
-		int startRow = (page - 1) * itemsPerPage + 1;
-		int endRow = page * itemsPerPage;
+	// 공지사항 목록 조회 서비스
+	public List<NoticeDTO> selectNtc(int startRow, int endRow) {
 		return dao.selectNtc(startRow, endRow);
 	}
 
-	// 공지사항 전체 개수 조회
+	// 공지사항 전체 개수 조회 서비스
 	public int NtcCount() {
 		return dao.NtcCount();
 	}

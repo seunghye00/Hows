@@ -55,20 +55,18 @@ public class NoticeController {
 
 	// 공지사항 조회
 	@GetMapping("/list")
-	public ResponseEntity<Map<String, Object>> selectNtc(@RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int itemsPerPage) throws Exception {
+	public ResponseEntity<Map<String, Object>> selectNtc(@RequestParam int startRow, @RequestParam int endRow)
+			throws Exception {
 
-		int totalNotices = Nservice.NtcCount(); // 전체 공지사항 개수 조회
-		
-		System.out.println(totalNotices);
+		// 전체 공지사항 개수 조회
+		int totalNotices = Nservice.NtcCount();
 
-		List<NoticeDTO> noticeList = Nservice.selectNtc(page, itemsPerPage); // 페이징된 공지사항 목록 조회
-		
-		System.out.println(noticeList);
+		// 페이징된 공지사항 목록 조회
+		List<NoticeDTO> noticeList = Nservice.selectNtc(startRow, endRow);
 
 		// 응답 데이터 생성
 		Map<String, Object> response = new HashMap<>();
-		response.put("totalNotices", totalNotices); // 전체 개수
+		response.put("totalNotices", totalNotices); // 전체 공지사항 개수
 		response.put("noticeList", noticeList); // 페이징된 공지사항 목록
 
 		return ResponseEntity.ok(response);
@@ -114,21 +112,25 @@ public class NoticeController {
 	// 공지사항 삭제
 	@DeleteMapping("/delete/{notice_seq}")
 	public ResponseEntity<String> deleteNtc(@PathVariable int notice_seq) {
-		try {
-			// GCS에 있는 파일 삭제 (이미지 정보가 있을 경우에만)
-			String sysName = Fservice.getSysName(notice_seq); // 해당 공지사항의 이미지 sysname 조회
-			if (sysName != null) {
-				Fservice.deleteFile(sysName, "F6"); // GCS 파일 삭제
-			}
+	    try {
+	        // GCS에 있는 파일 삭제 (이미지 정보가 있을 경우에만)
+	        List<String> sysNames = Fservice.getSysNames(notice_seq); // 해당 공지사항의 이미지 sysName 목록 조회
+	        if (sysNames != null && !sysNames.isEmpty()) {
+	            for (String sysName : sysNames) {
+	                Fservice.deleteFile(sysName, "F6"); // GCS 파일 삭제
+	            }
+	        }
 
-			// 공지사항 삭제
-			Nservice.deleteNtc(notice_seq);
+	        // 공지사항 삭제
+	        Nservice.deleteNtc(notice_seq);
 
-			return ResponseEntity.ok("공지사항이 삭제되었습니다.");
+	        return ResponseEntity.ok("공지사항이 삭제되었습니다.");
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.badRequest().body("공지사항 삭제 실패: " + e.getMessage());
-		}
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.badRequest().body("공지사항 삭제 실패: " + e.getMessage());
+	    }
 	}
+
 }
+

@@ -148,6 +148,16 @@
     )
     WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
 	</select>
+	
+	<!-- 페이지네비를 위한 신고 리뷰 카운트 (관리자) -->
+	<select id="getReportedReviewsCount" resultType="int">
+    SELECT 
+        COUNT(DISTINCT r.review_seq)  -- 중복된 리뷰는 하나로 계산
+    FROM 
+        review r
+    JOIN 
+        review_report rr ON r.review_seq = rr.review_seq
+	</select>
 
 	<!-- 리뷰 신고내역 조회 (관리자) -->
 	<select id="selectReviewReport" resultType="com.hows.product.dto.ReviewReportDTO">
@@ -179,16 +189,6 @@
     DELETE FROM review
     WHERE review_seq = #{review_seq}
 	</delete>
-	
-	<!-- 페이지네비를 위한 신고 리뷰 카운트 (관리자) -->
-	<select id="getReportedReviewsCount" resultType="int">
-    SELECT 
-        COUNT(DISTINCT r.review_seq)  -- 중복된 리뷰는 하나로 계산
-    FROM 
-        review r
-    JOIN 
-        review_report rr ON r.review_seq = rr.review_seq
-	</select>
 	
 	<!-- 상품 수량 변경 -->
 	<update id="updateByQuantity">

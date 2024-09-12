@@ -116,16 +116,13 @@ public class CommunityService {
 
 	// 관리자
 	// 게시물 신고 조회 (관리자)
-	public List<Map<String, Object>> reportedCommunity(int page, int itemsPerPage) throws Exception {
-		// 페이징을 위한 startRow, endRow 계산
-		int startRow = (page - 1) * itemsPerPage + 1;
-		int endRow = page * itemsPerPage;
-		return communityDAO.reportedCommunity(startRow, endRow);
+	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) throws Exception {
+		return communityDAO.reportedCommunity(params);
 	}
 
 	// 전체 신고된 게시물 카운트 조회 (관리자)
-	public int getReportedCommunityCount() throws Exception {
-		return communityDAO.getReportedCommunityCount();
+	public int getReportedCommunityCount(Map<String, Object> params) throws Exception {
+		return communityDAO.getReportedCommunityCount(params);
 	}
 
 	// 게시물 내역 조회 (관리자)

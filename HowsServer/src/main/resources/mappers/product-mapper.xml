@@ -63,7 +63,24 @@
 		where p.product_seq = #{product_seq} <!-- 현재 상품에 해당하는 리뷰 -->
 	</select>
 	
-	
+	<!-- My 리뷰 목록 -->
+	<select id="myReview" resultType="com.hows.product.dto.ReviewDTO">
+		SELECT
+			*
+		FROM
+			review
+		WHERE
+			member_id = #{member_id}
+	</select>
+
+	<select id="myReviewImage" resultType="com.hows.product.dto.ImageDTO">
+		SELECT
+			*
+		FROM
+			review_image
+		WHERE
+			review_seq = #{review_seq}
+	</select>
 
 
 

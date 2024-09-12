@@ -34,6 +34,14 @@ public class ReviewDAO {
 		return myBatis.selectList("Product.getReviewList",product_seq);
 	}
 
+	// My 리뷰 목록
+	public List<ReviewDTO> myReview(String memberId) {
+		return myBatis.selectList("Product.myReview",memberId);
+	}
+
+	public List<ImageDTO> myReviewImage(int reviewSeq) {
+		return myBatis.selectList("Product.myReviewImage",reviewSeq);
+	}
 	
 	
 	

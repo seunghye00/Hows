@@ -29,10 +29,11 @@ export const UpdateUserInfo = () => {
     })
     const [user, setUser] = useState([]);
     const [nicknameErrorMessage, setNicknameErrorMessage] = useState('');
-    const [nicknameAvailable, setNicknameAvailable] = useState(null);
-    const [checkNicknameStatus, setCheckNicknameStatus] = useState('');
-    const [nicknameChecked, setNicknameChecked] = useState(false); // 중복확인 상태 검사
+    const [nicknameAvailable, setNicknameAvailable] = useState(null); // 중복검사 후 사용가능한지 
+    const [checkNicknameStatus, setCheckNicknameStatus] = useState(''); // 중복확인 후 메세지 상태
+    const [nicknameChecked, setNicknameChecked] = useState(false); // 중복확인 버튼 눌렸는지 
     const { setIsAuth } = useAuthStore();
+
 
     useEffect(() => {
         // 회원정보 가져오기
@@ -70,8 +71,10 @@ export const UpdateUserInfo = () => {
         }));
 
         if (name === 'nickname') {
-            setNicknameChecked(false);
+            setNicknameChecked(false); // 닉네임 input 창 onChange시, 중복확인 버튼 false로 변경
         }
+
+
     };
 
     // 닉네임 중복확인 핸들러
@@ -87,15 +90,31 @@ export const UpdateUserInfo = () => {
             });
 
             setNicknameErrorMessage('다시 입력해주세요');
-            setNicknameAvailable(null);
+            // setNicknameAvailable(null); // 중복확인 버튼 상태 초기화
+            setNicknameChecked(false); // 중복확인 버튼 상태 초기화
+
             return;
         } else {
             setNicknameErrorMessage(''); // 오류 메시지 초기화
         }
 
+        // 현재 사용 중인 닉네임과 입력된 닉네임 비교
+        if (formData.nickname === user.nickname) {
+            // Swal.fire({
+            //     title: "정보",
+            //     text: "현재 사용 중인 닉네임과 동일합니다. 중복 확인을 생략합니다.",
+            //     icon: "info",
+            //     confirmButtonText: "확인",
+            // });
+            // setNicknameAvailable(null);
+            setNicknameAvailable(true);
+            setNicknameChecked(true); // 중복 확인 상태를 true로 설정
+            return;
+        }
+
         // 중복확인 요청
         checkNickname(formData.nickname).then((resp) => {
-            console.log("nickname : ", resp.data);
+            console.log("nickname : ", resp.data); // boolean : db에 있으면 true
             setNicknameAvailable(resp.data);
             setNicknameChecked(!resp.data);
             setCheckNicknameStatus(
@@ -256,7 +275,7 @@ export const UpdateUserInfo = () => {
                     icon: "success",
                     confirmButtonText: "확인",
                 });
-                navi("/mypage/main");
+                navi("/");
             }
         }).catch(error => {
             Swal.fire({
@@ -291,8 +310,6 @@ export const UpdateUserInfo = () => {
         }
     };
 
-
-
     const signup_date = new Date(user.signup_date);
     const signup_currentDate = !isNaN(signup_date)
         ? format(signup_date, "yyyy-MM-dd")
@@ -301,7 +318,7 @@ export const UpdateUserInfo = () => {
     return (
         <div className={styles.container}>
             <div className={styles.updateInfo}>
-                <div className={styles.profileBox}>
+                {/* <div className={styles.profileBox}>
                     <div className={styles.img}>
                         <img src={profile}></img>
                     </div>
@@ -309,7 +326,7 @@ export const UpdateUserInfo = () => {
                         <button>변경</button>
                         <button>삭제</button>
                     </div>
-                </div>
+                </div> */}
                 <div className={styles.idBox}>
                     <span className={styles.title}>ID</span>
                     <input

@@ -46,8 +46,6 @@
     align-items: flex-start;
 }
 
-.commetIcon {}
-
 .replyArea {
     width: calc(100% - 60px);
     padding: 10px 20px;

@@ -341,23 +341,48 @@ export const Post = () => {
             formData.append('member_id', member_id)
 
             // 이미지 및 태그 정보 추가
-            images.forEach((image, index) => {
+            if (images.length === 1) {
+                // 이미지가 하나일 때
+                const image = images[0]
                 formData.append('files', image.file)
 
-                const tags = image.tags.map(tag => ({
-                    product_seq: tag.product.product_seq,
-                    left_position: tag.position.left,
-                    top_position: tag.position.top,
-                }))
-                formData.append('tags', JSON.stringify(tags))
-            })
-
-            // 이미지 순서 배열 추가 (배열 자체로 추가)
-            images.forEach((_, index) =>
-                formData.append('image_orders', index + 1)
-            )
+                // 태그가 없을 경우에도 빈 배열로 전송
+                const tags =
+                    image.tags.length > 0
+                        ? image.tags.map(tag => ({
+                              product_seq: tag.product.product_seq,
+                              left_position: tag.position.left,
+                              top_position: tag.position.top,
+                          }))
+                        : []
+                console.log('이미지 하나일 때 확인')
+                formData.append('tag', JSON.stringify(tags))
+                images.forEach((_, index) =>
+                    formData.append('image_orders', index + 1)
+                )
+            } else {
+                // 이미지가 여러 개일 때
+                images.forEach((image, index) => {
+                    formData.append('files', image.file)
+                    // 태그가 없을 경우에도 빈 배열로 전송
+                    const tags =
+                        image.tags.length > 0
+                            ? image.tags.map(tag => ({
+                                  product_seq: tag.product.product_seq,
+                                  left_position: tag.position.left,
+                                  top_position: tag.position.top,
+                              }))
+                            : []
+                    formData.append('tags', JSON.stringify(tags))
+                })
+                // 이미지 순서 배열 추가 (배열 자체로 추가)
+                images.forEach((_, index) =>
+                    formData.append('image_orders', index + 1)
+                )
+            }
 
             // 분리된 api 모듈 사용
+            console.log('전송되는 formData:', [...formData.entries()])
             const response = await submitPost(formData)
 
             if (response.status === 200) {

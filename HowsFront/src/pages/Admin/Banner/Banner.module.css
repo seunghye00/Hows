@@ -43,10 +43,19 @@
 
 .rows {
     flex: 1;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #ddd;
     max-height: 125px;
     min-height: 125px;
     display: flex;
+}
+
+.rows:hover {
+    cursor: pointer;
+    border: 2px solid var(--hows-point-color-lightest);
+}
+
+.rows.checked {
+    background-color: var(--hows-point-color-lightest);
 }
 
 .cols {

@@ -43,9 +43,9 @@ public class MemberDAO {
 	}
 
 	// [로그인]비밀번호 찾기 - 비밀번호 변경
-	public int changePw(Map<String, String> map) {
-		return mybatis.update("Member.changePw", map);
-	}
+//	public int changePw(Map<String, String> map) {
+//		return mybatis.update("Member.changePw", map);
+//	}
 
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
@@ -57,6 +57,16 @@ public class MemberDAO {
 		Integer count = mybatis.selectOne("Member.verifyUser", map);
 		return count != null && count > 0;
 	}
+	
+	// [로그인] 비밀번호 찾기 - 임시 비밀번호 업데이트
+	public int updateTempPassword(String member_id, String pw) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("member_id", member_id);
+        params.put("pw", pw);
+        return mybatis.update("Member.updateTempPassword", params);
+    }
+	
+	
 
 	// 회원정보 가져오기
 	public MemberDTO findById(String id) {
@@ -108,6 +118,21 @@ public class MemberDAO {
         return mybatis.selectOne("Member.findMemberSeq", member_id);
      }
 
+    // 팔로우 상태 확인
+    public boolean checkIfUserFollowing(int fromMemberSeq, int toMemberSeq) {
+        return mybatis.selectOne("Member.checkIfUserFollowing", Map.of("from_member_seq", fromMemberSeq, "to_member_seq", toMemberSeq));
+    }
+
+    // 팔로우 추가
+    public void addFollow(int fromMemberSeq, int toMemberSeq) {
+        mybatis.insert("Member.addFollow", Map.of("from_member_seq", fromMemberSeq, "to_member_seq", toMemberSeq));
+    }
+
+    // 팔로우 취소
+    public void removeFollow(int fromMemberSeq, int toMemberSeq) {
+        mybatis.delete("Member.removeFollow", Map.of("from_member_seq", fromMemberSeq, "to_member_seq", toMemberSeq));
+    } 
+	 
 	// =======================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	public List<MemberDTO> selectAll(Map<String, Object> params) {

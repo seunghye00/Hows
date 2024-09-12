@@ -150,7 +150,13 @@
 
 .itemForm > .items > .item > .itemInfo > p {
     font-size: 20px;
+    font-weight: 700;
 }
+
+.itemForm > .items > .item > .itemInfo > p:hover {
+    cursor: pointer;
+}
+
 
 .itemForm > .items > .item > .itemInfo .itemCount {
     display: flex;

@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import com.hows.community.dao.AreaSizeDAO;
 import com.hows.community.dao.ColorDAO;
 import com.hows.community.dao.HousingTypeDAO;
+import com.hows.community.dao.ReportDAO;
 import com.hows.community.dao.SpaceTypeDAO;
 import com.hows.community.dto.AreaSizeDTO;
 import com.hows.community.dto.ColorDTO;
 import com.hows.community.dto.HousingTypeDTO;
+import com.hows.community.dto.ReportDTO;
 import com.hows.community.dto.SpaceTypeDTO;
 
 @Service
@@ -28,6 +30,9 @@ public class OptionService {
     @Autowired
     private AreaSizeDAO areaSizeDAO;
     
+    @Autowired
+    private ReportDAO ReportDAO;
+    
     public List<HousingTypeDTO> getHousingTypes() {
         return housingTypeDAO.getHousingTypes();
     }
@@ -42,5 +47,8 @@ public class OptionService {
     
     public List<AreaSizeDTO> getAreaSize() {
         return areaSizeDAO.getAreaSize();
+    }
+    public List<ReportDTO> getReport() {
+        return ReportDAO.getReport();
     }
 }

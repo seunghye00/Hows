@@ -51,10 +51,10 @@
 	</select>
 
 	<!-- [로그인]비밀번호 찾기 - 비밀번호 변경 -->
-	<update id="changePw">
+<!-- 	<update id="changePw">
 		update member set pw = #{pw} where member_id =
 		#{member_id} and email = #{email}
-	</update>
+	</update> -->
 
 	<!-- 회원정보 가져오기 -->
 	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
@@ -62,17 +62,24 @@
 		member_id = #{id}
 	</select>
 
-	<!-- 아이디 찾기 -->
+	<!-- [로그인] 아이디 찾기 -->
 	<select id="findId" resultType="String">
 		select member_id from member
 		where name = #{name} and email = #{email}
 	</select>
 
-	<!-- 비밀번호 찾기 - 아이디, 이메일 존재여부 검증 -->
+	<!-- [로그인] 비밀번호 찾기 - 아이디, 이메일 존재여부 검증 -->
 	<select id="verifyUser" resultType="Integer">
 		select count(*) from member
 		where member_id = #{member_id} and email = #{email}
 	</select>
+	
+	<!-- [로그인] 비밀번호 찾기 - 임시 비밀번호 업데이트 -->
+	<update id="updateTempPassword">
+        update member set pw = #{pw} where member_id = #{member_id}
+    </update>
+	
+	
 
 	<!-- 마이페이지 회원정보 출력 -->
 	<select id="selectInfo"
@@ -131,7 +138,26 @@
 		member where member_id = #{member_id}
 	</select>
 
+    <!-- 팔로우 상태 확인 -->
+    <select id="checkIfUserFollowing" resultType="boolean">
+        select count(*) 
+        from follow
+        where from_member_seq = #{from_member_seq}
+        and to_member_seq = #{to_member_seq}
+    </select>
 
+    <!-- 팔로우 추가 -->
+    <insert id="addFollow">
+        insert into follow (follow_seq, from_member_seq, to_member_seq)
+        values (follow_seq.nextval, #{from_member_seq}, #{to_member_seq})
+    </insert>
+
+    <!-- 팔로우 취소 -->
+    <delete id="removeFollow">
+        delete from follow
+        where from_member_seq = #{from_member_seq}
+        and to_member_seq = #{to_member_seq}
+    </delete>
 
 	<!-- ===========================================[ 관리자 ] -->
 	<!-- 전체 회원조회 (관리자) -->

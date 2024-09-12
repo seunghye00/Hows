@@ -10,7 +10,7 @@ import { Comment } from './Comment/Comment'
 import { Reply } from './Reply/Reply'
 import { Review } from './Review/Review'
 import { Notice } from './Notice/Notice'
-import Faq from './Notice/Faq'
+import Faq from './Notice/FAQ/Faq'
 import { Product } from './Product/Product'
 import { WriteNotice } from './Notice/WriteNotice'
 
@@ -94,7 +94,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/faq"
+                    path="/admin/notice/faq"
                     element={
                         <>
                             <Title title={'FAQ 관리'} />

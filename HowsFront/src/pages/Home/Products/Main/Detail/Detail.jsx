@@ -7,6 +7,8 @@ import { api, host } from '../../../../../config/config';
 import { addCommas } from '../../../../../commons/commons';
 import StarRating from '../../../../../components/StarRating/StarRating';
 import { useAuthStore } from '../../../../../store/store';
+import Swal from "sweetalert2";
+import { useOrderStore } from '../../../../../store/orderStore';
 
 
 
@@ -28,10 +30,10 @@ export const Detail = () => {
     const [likeCount, setLikeCount] = useState(0); // 좋아요 개수 상태 관리
 
     const [averageRating, setAverageRating] = useState(0); // 평균 별점 상태 추가
+
+    const { setOrderProducts, setOrderPrice } = useOrderStore(); // 구매 관련
     // ===== 상태 =====
 
-    console.log("memberId"+memberId)
-    
 
     useEffect(()=>{
         // 상품 상세 정보
@@ -108,10 +110,15 @@ export const Detail = () => {
 
         if(!isAuth) {
 
-            alert('로그인을 먼저 해주세요.');
-            //로그인이 안된 경우 로그인 페이지로 리디렌션
-            navi('/signIn')
-            return null;
+            Swal.fire({
+                icon: "warning",
+                title: "로그인을 먼저 해주세요.",
+                showConfirmButton: true,
+            }).then(()=>{
+                //로그인이 안된 경우 로그인 페이지로 이동
+                navi('/signIn')
+            })
+            return ;
 
         }else{
             if (!liked) {
@@ -150,15 +157,75 @@ export const Detail = () => {
 
         }
     };
+    
+    console.log(quantity + "야")
+    console.log(totalPrice + "호")
+    
+    // 구매하기
+    const handleGet = () => {
+        if (!memberId || !isAuth) {
+            Swal.fire({
+                icon: "warning",
+                title: "로그인을 먼저 해주세요.",
+                showConfirmButton: true,
+            }).then(() => {
+                // 로그인이 안된 경우 로그인 페이지로 이동
+                navi('/signIn');
+            });
+            return;
+        }
+
+        // 상품 정보 확인
+        if (!quantity || !totalPrice) {
+            Swal.fire({
+                icon: "error",
+                title: "상품 정보를 불러오는 중 오류가 발생했습니다.",
+                text: "다시 시도해 주세요.",
+            });
+                return;
+        }
+
+        let order = [];
+        let orderPrice = 0;
+            
+        // 상품 정보 설정
+        const data = {
+            product_seq: product_seq,
+            product_title: list.product_title,
+            product_image: list.product_thumbnail,
+            product_quantity: quantity,  // 수량
+            product_total_price: totalPrice, // 가격
+        }
+        console.log(data)
+
+        // 주문 가격 계산
+        orderPrice += totalPrice;
+        order.push(data);
+
+        setOrderPrice(orderPrice);
+        setOrderProducts(order);
+        // 세션에 저장
+        sessionStorage.setItem("howsOrder", JSON.stringify(order));
+        sessionStorage.setItem("howsPrice", orderPrice);
+
+        // 결제 페이지로 이동
+        navi("/payment");
+    };
 
     // 장바구니 
     const handleCart = () => {
 
-        if(!isAuth){
-            alert('로그인을 먼저 해주세요.');
-            //로그인이 안된 경우 로그인 페이지로 리디렌션 
-            navi('/signIn')
-            return null;
+        if (!memberId || !isAuth) {
+            Swal.fire({
+                icon: "warning",
+                title: "로그인을 먼저 해주세요.",
+                showConfirmButton: true,
+            }).then(()=>{
+
+                //로그인이 안된 경우 로그인 페이지로 이동
+                navi('/signIn')
+            })
+            return ;
         }
 
         // console.log(product_seq)
@@ -176,8 +243,19 @@ export const Detail = () => {
         }
 
         api.post(`/cart`,data).then(resp=>{
-            console.log(resp)
-            alert('장바구니 등록 성공')
+            // 수량 및 가격 초기화
+            setQuantity(1);
+            setTotalPrice(list.price);
+
+            Swal.fire({
+                icon: 'success',
+                title: '장바구니 등록 성공!',
+            })            
+        }).catch(errer =>{
+            Swal.fire({
+                icon: 'errer',
+                title: '장바구니 등록 실패!',
+            })
         })
 
     }
@@ -220,7 +298,7 @@ export const Detail = () => {
                         </div>
                         <div>
                             <div onClick={handleCart}>장바구니</div>
-                            <div>바로구매</div>
+                            <div onClick={handleGet}>바로구매</div>
                         </div>
                     </div>
                 </div>

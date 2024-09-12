@@ -20,7 +20,11 @@ import {
     getReport,
     sendReport,
 } from '../../../../../api/community' // API 함수 불러오기
-import { sendComments, getComments } from '../../../../../api/comment' // API 함수 불러오기
+import {
+    sendComments,
+    getComments,
+    updateComment,
+} from '../../../../../api/comment' // API 함수 불러오기
 import { useAuthStore } from '../../../../../store/store'
 import { BiMessageRounded } from 'react-icons/bi'
 
@@ -243,20 +247,40 @@ export const Detail = () => {
         }
     }
 
-    // 엔터키로 댓글 작성 가능
-    const handleKeyPress = e => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault()
-            handleCommentSubmit()
-        }
-    }
-
     const handleDeleteComment = async comment_seq => {
         // 댓글 삭제 처리 로직
         // await deleteComment(comment_seq)
         // onCommentSubmit() // 삭제 후 목록 새로고침
     }
 
+    // 댓글 수정 처리 함수
+    const handleUpdateComment = async (comment_seq, updatedContent) => {
+        if (!updatedContent.trim()) {
+            Swal.fire({
+                icon: 'warning',
+                title: '수정할 내용을 입력해주세요.',
+                showConfirmButton: true,
+            })
+            return
+        }
+
+        try {
+            await updateComment(comment_seq, updatedContent) // 댓글 수정 API 호출
+            onCommentSubmit() // 댓글 목록 새로고침
+            Swal.fire({
+                icon: 'success',
+                title: '댓글이 성공적으로 수정되었습니다.',
+                showConfirmButton: true,
+            })
+        } catch (error) {
+            console.error('댓글 수정 중 오류 발생:', error)
+            Swal.fire({
+                icon: 'error',
+                title: '댓글 수정 중 오류가 발생했습니다.',
+                showConfirmButton: true,
+            })
+        }
+    }
     return (
         <div className={styles.container}>
             {/* postData가 null이 아닐 때만 렌더링 */}
@@ -335,6 +359,7 @@ export const Detail = () => {
                             onReport={id =>
                                 console.log(`${id}번 댓글 신고 클릭`)
                             }
+                            handleUpdateComment={handleUpdateComment} // 수정 함수 전달
                         />
                     ))
                 ) : (

@@ -26,6 +26,20 @@ export const getComments = async board_seq => {
         throw error
     }
 }
+
+// 댓글 수정 API 호출 함수
+export const updateComment = async (comment_seq, updatedContent) => {
+    try {
+        const response = await api.put(`/comment/update`, {
+            comment_seq, // 수정할 댓글의 ID
+            comment_contents: updatedContent, // 수정된 내용
+        })
+        return response.data
+    } catch (error) {
+        console.error('댓글 수정 중 오류 발생:', error)
+        throw error
+    }
+}
 /************************************  [ 관리자 기능 ] /************************************/
 
 // 신고 댓글 조회 (관리자)

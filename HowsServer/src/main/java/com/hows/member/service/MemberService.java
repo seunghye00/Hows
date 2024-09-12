@@ -71,13 +71,6 @@ public class MemberService implements UserDetailsService {
 	public String findId(Map<String, String> map) {
 		return memDao.findId(map);
 	}
-
-//	// [로그인] 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
-//	public Boolean verifyUser(Map<String, String> map) {
-//		return memDao.verifyUser(map);
-//	}
-
-	
 	
 	// [로그인] 비밀번호 찾기 - 임시 비밀번호 업데이트
 	public String updateTempPassword(String member_id, String pw) {
@@ -89,8 +82,6 @@ public class MemberService implements UserDetailsService {
         }
     }
 
-	
-	
 	// 임시 비밀번호 발급 메소드
     public Boolean sendTempPw(String member_id, String email) {
     	Boolean result = false;
@@ -111,17 +102,15 @@ public class MemberService implements UserDetailsService {
             if(update > 0) {
             	emailUtil.sendTempPw(email, tempPw);        	
             }
-            
             result = true;
             
     	}catch(Exception e){
     		e.printStackTrace();
     	}
         
-        
         return result;
     }
-    
+
     // 아이디와 이메일 검증 메소드
     public Boolean verifyUser(String member_id, String email) {
         Map<String, String> map = new HashMap<>();
@@ -129,11 +118,6 @@ public class MemberService implements UserDetailsService {
         map.put("email", email);
         return memDao.verifyUser(map);
     }
-
-    
-    
-    
-    
     
 	// 마이페이지 회원정보 출력
 	public MemberDTO selectInfo(String member_id) {
@@ -187,7 +171,21 @@ public class MemberService implements UserDetailsService {
 	public int findMemberSeq(String member_id) {
 		return memDao.findMemberSeq(member_id);
 	}
+	
+    // 팔로우 상태 확인
+    public boolean checkIfUserFollowing(int fromMemberSeq, int toMemberSeq) {
+        return memDao.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
+    }
 
+    // 팔로우 추가
+    public void addFollow(int fromMemberSeq, int toMemberSeq) {
+    	memDao.addFollow(fromMemberSeq, toMemberSeq);
+    }
+
+    // 팔로우 취소
+    public void removeFollow(int fromMemberSeq, int toMemberSeq) {
+    	memDao.removeFollow(fromMemberSeq, toMemberSeq);
+    }
 	// ========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	public List<MemberDTO> selectAll(Map<String, Object> params) {

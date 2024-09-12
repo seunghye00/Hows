@@ -1,5 +1,6 @@
 package com.hows.product.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hows.File.service.FileService;
+import com.hows.product.dto.ImageDTO;
 import com.hows.product.dto.ProductDTO;
 import com.hows.product.dto.ReviewReportDTO;
 import com.hows.product.service.ProductService;
@@ -65,8 +67,10 @@ public class ProductController {
 	// 리뷰 등록
 	@PostMapping("/reviewAdd")
 	@Transactional
-	public ResponseEntity<String> submitReview(@RequestParam("images") MultipartFile[] images, // 여러 이미지 파일
-			@RequestParam("reviewData") String reviewData // 리뷰 데이터 (JSON)
+	public ResponseEntity<String> submitReview(
+			@RequestParam("images") MultipartFile[] images, // 여러 이미지 파일
+			@RequestParam("reviewData") String reviewData, // 리뷰 데이터 (JSON)
+			@RequestParam("image_orders") int[] imageOrders
 	) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -80,19 +84,61 @@ public class ProductController {
 			// 리뷰 저장
 			int reviewSeq = reviewServ.saveReview(rating, reviewText, productSeq, memberId);
 
-			// 이미지 파일 처리 (GCS 업로드 후 이미지 URL 저장)
+			// 이미지 파일 처리 
 			if (images != null && images.length > 0) {
-				for (MultipartFile img : images) {
-					String imageUrl = fileServ.upload(img, productSeq, "F4"); // 상품 번호와 함께 업로드
+				for (int i = 0; i < images.length; i++) {
+					String imageUrl = fileServ.upload(images[i], productSeq, "F4");
+					
+					System.out.println(imageUrl + " 결과");
+					// imageUrl : GCS에 등록된 이미지 URL
+					// review_image 테이블에 등록
+					if (!imageUrl.equals("fail")) {
+						ImageDTO imageDTO = new ImageDTO(0, reviewSeq, imageUrl, imageOrders[i]);
+						reviewServ.insertReviewImage(imageDTO);
+					}
 				}
-			}
+			}else {
+                throw new IOException("이미지 업로드 실패");
+            }
 		} catch (Exception e) {
-			// 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
-			throw new RuntimeException("상품 등록 실패", e);
-		}
+            e.printStackTrace();
+            throw new RuntimeException("리뷰등록 또는 이미지 업로드 실패", e);
+        }
 		return ResponseEntity.ok().build();
 	}
-
+	
+	//리뷰 출력
+	@GetMapping("/getReviewList/{product_seq}")
+	public ResponseEntity<Map<String, Object>> getReviewList (@PathVariable int product_seq) throws Exception{
+		List<Map<String, Object>> reviewList = reviewServ.getReviewList(product_seq);
+		
+		Map<String, Object> resp = new HashMap<String, Object>();
+		resp.put("reviewList", reviewList);
+		
+		return ResponseEntity.ok(resp);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	// ==================
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	// 상품 추가
 	@PostMapping
 	@Transactional

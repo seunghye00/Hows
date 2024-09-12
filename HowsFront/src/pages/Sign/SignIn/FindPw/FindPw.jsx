@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../../../assets/images/logo_how.png";
 import { verifyUser } from "../../../../api/member";
+import Swal from "sweetalert2";
 
 export const FindPw = () => {
     const navi = useNavigate();
@@ -22,7 +23,12 @@ export const FindPw = () => {
     const handleSendEmail = () => {
         verifyUser(auth.member_id, auth.email).then((resp) => {
             if (resp.data) {
-                alert("해당 이메일로 임시 비밀번호가 전송되었습니다.");
+                Swal.fire({
+                    title: "알림",
+                    text: "해당 이메일로 임시 비밀번호가 전송되었습니다.",
+                    icon: "info",
+                    confirmButtonText: "확인",
+                });
                 navi("/signIn");
                 setIsError(false); // 인증 성공 시 오류 메시지 초기화
             } else {

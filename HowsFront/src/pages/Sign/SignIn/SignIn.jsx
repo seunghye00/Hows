@@ -9,6 +9,7 @@ import { host } from "./../../../config/config";
 import { FindId } from "./FindId/FindId";
 import { FindPw } from "./FindPw/FindPw";
 import { loginUser } from "../../../api/member";
+import Swal from "sweetalert2";
 
 export const SignIn = () => {
   const navi = useNavigate();
@@ -22,23 +23,31 @@ export const SignIn = () => {
       ...prev,
       [name]: value,
     }));
-    console.log("로그인 : ", user);
   };
 
   const handleLoginBtn = () => {
     loginUser(user)
       .then((resp) => {
-        console.log("로그인 : ", resp.data);
         const { token, member_id } = resp.data; // 서버 응답에서 token과 memberId 분해 할당
         sessionStorage.setItem("token", token);
         sessionStorage.setItem("member_id", member_id); // 사용자 ID도 저장
         login(token);
 
-        alert("로그인 성공!");
+        Swal.fire({
+          title: "성공!",
+          text: `${member_id} 님 환영합니다.`,
+          icon: "success",
+          confirmButtonText: "확인",
+        });
         navi("/");
       })
       .catch((error) => {
-        alert("로그인에 실패하였습니다.");
+        Swal.fire({
+          title: "경고!",
+          text: "로그인에 실패하였습니다.",
+          icon: "error",
+          confirmButtonText: "확인",
+        });
       });
   };
 

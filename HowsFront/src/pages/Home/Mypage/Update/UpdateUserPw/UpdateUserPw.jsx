@@ -3,6 +3,7 @@ import { api } from "../../../../../config/config";
 import styles from "./UpdateUserPw.module.css";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export const UpdateUserPw = () => {
   const navi = useNavigate();
@@ -85,22 +86,42 @@ export const UpdateUserPw = () => {
     // 유효성 검사, 비밀번호 일치 확인
     if (!isCurrentPwValid) return;
     if (!checkResult) {
-      alert("새 비밀번호와 일치하지 않습니다.");
+      Swal.fire({
+        title: "경고!",
+        text: "새 비밀번호와 일치하지 않습니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
       return;
     }
     if (!isPasswordValid) {
-      alert("비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.");
+      Swal.fire({
+        title: "경고!",
+        text: "비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
       return;
     }
 
     // 서버로 새 비밀번호 전송
     updatePw(newPw).then((resp) => {
       if (resp.data > 0) {
-        alert("비밀번호가 성공적으로 변경되었습니다.");
+        Swal.fire({
+          title: "성공!",
+          text: "비밀번호가 성공적으로 변경되었습니다.",
+          icon: "success",
+          confirmButtonText: "확인",
+        });
         // navi(`/mypage/main/${member_id}`);
         navi("/");
       } else {
-        alert("비밀번호 변경에 실패했습니다.");
+        Swal.fire({
+          title: "경고!",
+          text: "비밀번호 변경에 실패했습니다.",
+          icon: "error",
+          confirmButtonText: "확인",
+        });
       }
     });
   };

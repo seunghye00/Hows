@@ -1,9 +1,8 @@
 import styles from "../FindPw.module.css"
 import { useState } from "react";
 import logo from '../../../../../assets/images/logo_how.png'
-import axios from "axios";
-import { host } from './../../../../../config/config';
 import { useNavigate } from 'react-router-dom';
+import Swal from "sweetalert2";
 
 export const ChangePw = ({ onSubmit }) => {
 
@@ -52,11 +51,21 @@ export const ChangePw = ({ onSubmit }) => {
         e.preventDefault();
         // 유효성 검사
         if (!checkPw) {
-            alert('새 비밀번호와 일치하지 않습니다.');
+            Swal.fire({
+                title: "경고!",
+                text: "새 비밀번호와 일치하지 않습니다.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return;
         }
         if (!pwValid) {
-            alert('비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.');
+            Swal.fire({
+                title: "경고!",
+                text: "비밀번호는 영문, 숫자, 특수문자를 포함한 8자 이상이어야 합니다.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return;
         }
         // 새 비밀번호 제출

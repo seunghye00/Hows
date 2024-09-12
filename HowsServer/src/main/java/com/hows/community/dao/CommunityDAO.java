@@ -136,7 +136,7 @@ public class CommunityDAO {
 		return mybatis.selectOne("Community.getViewCount", board_seq);
 	}
 	
-    // 특정 게시글의 북마크 개수 가져오기
+    // 게시글 신고하기
     public void sendReport(int board_seq, String reportCode, String memberId) {
     	Map<String, Object> params = new HashMap<>();
         params.put("board_seq", board_seq);

@@ -17,6 +17,7 @@ import com.hows.common.util.PasswordUtil;
 import com.hows.common.util.SendEmailUtil;
 import com.hows.community.dao.CommunityDAO;
 import com.hows.grade.dto.GradeDTO;
+import com.hows.member.dao.GuestbookDAO;
 import com.hows.member.dao.MemberDAO;
 import com.hows.member.dto.MemberDTO;
 import com.hows.role.dto.RoleDTO;
@@ -28,6 +29,9 @@ public class MemberService implements UserDetailsService {
 	private MemberDAO memDao;
 	@Autowired
 	private CommunityDAO comDao;
+	@Autowired
+	private GuestbookDAO guestDao;
+	
 	@Autowired
     private SendEmailUtil emailUtil;
 	@Autowired
@@ -189,6 +193,22 @@ public class MemberService implements UserDetailsService {
     public List<Map<String, Object>> selectPostByMemberId(String member_id){
     	return comDao.selectPostByMemberId(member_id);
     }
+    
+	// 마이페이지 게시글 갯수
+    public int countPost(String member_id){
+    	return comDao.countPost(member_id);
+    }
+	
+	
+	// 마이페이지 스크랩 갯수
+	
+	
+	// 마이페이지 방문글 갯수
+    public int countGuestbook(String member_id){
+    	return guestDao.countGuestbook(member_id);
+    }
+    
+    
 
     
 	// ========================================[ 관리자 ]

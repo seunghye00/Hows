@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { host } from '../../../config/config'
 import Swal from 'sweetalert2'
+import { Modal } from './../../../components/Modal/Modal';
+import { SwalComp } from '../../../commons/commons'
 
 export const SignUp = () => {
     const navi = useNavigate()
@@ -27,11 +29,14 @@ export const SignUp = () => {
     const [emailAvailable, setEmailAvailable] = useState(null);
     const [checkIdStatus, setCheckIdStatus] = useState('');
     const [checkNicknameStatus, setCheckNicknameStatus] = useState('');
-    const [checkEmailStatus, setCheckEmailStatus] = useState('');
     const [idErrorMessage, setIdErrorMessage] = useState('');
     const [nicknameErrorMessage, setNicknameErrorMessage] = useState('');
     const [idChecked, setIdChecked] = useState(false); // 중복확인 상태 검사
     const [nicknameChecked, setNicknameChecked] = useState(false); // 중복확인 상태 검사
+
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+    const [addressCheck, setAddressCheck] = useState({ default: true, direct: false }); // 주소 체크 항목
+
 
     const handleChange = e => {
         const { name, value } = e.target
@@ -104,34 +109,23 @@ export const SignUp = () => {
             });
     }
 
-    useEffect(() => {
-        // 다음 주소 API 스크립트 로드
-        const script = document.createElement('script')
-        script.src =
-            'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
-        script.async = true
-        script.onload = () => {
-            // 스크립트가 로드되면 Postcode 사용 가능
-            // console.log('다음 주소 API가 로드되었습니다.')
-        }
-        document.head.appendChild(script)
-
-        // 클린업 함수 (옵션)
-        return () => {
-            document.head.removeChild(script)
-        }
-    }, [])
-    const handleAddressSearch = () => {
-        new window.daum.Postcode({
-            oncomplete: function (data) {
-                // 주소와 우편번호 데이터를 formData 상태에 저장
-                setFormData(prev => ({
-                    ...prev,
-                    address: data.address,
-                    zip_code: data.zonecode,
-                }))
-            },
-        }).open()
+    // 주소 찾기
+    const handleAddress = () => {
+        // SwalComp({ type: "confirm", text: "주소를 변경하시곘습니까?" }).then(res => {
+        // if (res) {
+        setAddressCheck(prev => ({ default: false, direct: true }));
+        setIsModalOpen(true);
+        // }
+        // });
+    }
+    /** postcode data set **/
+    const completeHandler = (data) => {
+        setIsModalOpen(false);
+        setFormData(prev => ({
+            ...prev,
+            zip_code: data.zonecode,
+            address: data.address
+        }));
     }
 
     // 체크박스 상태 변경 핸들러
@@ -592,7 +586,7 @@ export const SignUp = () => {
                     <button
                         type="button"
                         className={styles.addressBtn}
-                        onClick={handleAddressSearch}
+                        onClick={handleAddress}
                     >
                         주소 검색
                     </button>
@@ -611,6 +605,14 @@ export const SignUp = () => {
                     </button>
                 </div>
             </div>
+            {
+                isModalOpen &&
+                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <div className={styles.modalBox}>
+                        <DaumPostcode onComplete={completeHandler} style={{ height: '95%' }} />
+                    </div>
+                </Modal>
+            }
         </div>
     )
 }

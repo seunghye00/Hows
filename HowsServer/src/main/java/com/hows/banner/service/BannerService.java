@@ -14,15 +14,28 @@ public class BannerService {
 	@Autowired
 	private BannerDAO bannDAO;
 
+	// 사이트 메인에서 노출할 배너 목록 조회
 	public List<BannerDTO> getAllBanners() {
 		return bannDAO.getAllBanners();
 	}
+	
+	// 관리자가 조회하는 배너 전체 목록 조회
+	public List<BannerDTO> getAllBannersByAdmin() {
+		return bannDAO.getAllBannersByAdmin();
+	}
 
+	// 배너 추가
 	public boolean addBanner(BannerDTO dto) {
 		return bannDAO.addBanner(dto);
 	}
 
-	public boolean deleteBanner(int banner_seq) {
-		return bannDAO.deleteBySeq(banner_seq);
+	// 배너 삭제
+	public boolean deleteBanner(int bannerSeq) {
+		return bannDAO.deleteBySeq(bannerSeq);
+	}
+
+	// 배너 순서 변경
+	public void updateOrder(int bannerSeq, int bannerOrder) {
+		bannDAO.updateOrder(bannerSeq, bannerOrder);
 	}
 }

@@ -295,7 +295,7 @@ export const Banner = () => {
                     <div className={styles.choiceDate}>
                         <div>시작일</div>
                         <input
-                            type="datetime-local"
+                            type="date"
                             name="startDate"
                             id=""
                             onChange={handleChangeBanner}
@@ -304,7 +304,7 @@ export const Banner = () => {
                     <div className={styles.choiceDate}>
                         <div>종료일</div>
                         <input
-                            type="datetime-local"
+                            type="date"
                             name="endDate"
                             id=""
                             onChange={handleChangeBanner}

@@ -620,8 +620,8 @@ create table banner (
 banner_seq number primary key,
 file_seq number not null,
 banner_url varchar2(300) not null,
-start_date timestamp,
-end_date timestamp,
+start_date Date,
+end_date Date,
 banner_order number not null
 );
 

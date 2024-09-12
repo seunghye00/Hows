@@ -55,9 +55,8 @@
 }
 
 .rows.checked {
-    border: 2px solid var(--hows-point-color-lightest);
+    background-color: var(--hows-point-color-lightest);
 }
-
 
 .cols {
     display: flex;

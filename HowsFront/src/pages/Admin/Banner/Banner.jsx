@@ -231,8 +231,10 @@ export const Banner = () => {
                         banners.map((banner, i) => (
                             <div
                                 key={i}
-                                className={styles.rows}
-                                onChange={() =>
+                                className={`${styles.rows} ${
+                                    banner.checked ? styles.checked : ''
+                                }`}
+                                onClick={() =>
                                     handleCheckboxChange(banner.banner_seq)
                                 }
                             >

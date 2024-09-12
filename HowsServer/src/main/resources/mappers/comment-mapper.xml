@@ -38,28 +38,29 @@
 	
 	<!-- 게시글 댓글 목록 출력 (페이지네이션 적용) -->
     <select id="getCommentsBoardSeqWithPagination" resultType="map">
-        select 
-            c.comment_seq, 
-            c.comment_contents, 
-            to_char(c.comment_write_date, 'YYYY-MM-DD HH24:MI:SS') as comment_write_date,
-            c.board_seq, 
-            c.member_id,
-            m.nickname,
-            m.member_avatar,
-            count(distinct cl.comment_like_seq) as like_count
-        from comments c
-        join member m on c.member_id = m.member_id
-        left join comment_like cl on c.comment_seq = cl.comment_seq
-        where c.board_seq = #{board_seq}
-        group by c.comment_seq, 
-                 c.comment_contents, 
-                 c.comment_write_date, 
-                 c.board_seq, 
-                 c.member_id,
-                 m.nickname,
-                 m.member_avatar
-        order by c.comment_seq asc
-        limit #{offset}, #{limit}
+        select * from (
+	        select 
+	            c.comment_seq, 
+	            c.comment_contents, 
+	            to_char(c.comment_write_date, 'YYYY-MM-DD HH24:MI:SS') as comment_write_date,
+	            c.board_seq, 
+	            c.member_id,
+	            m.nickname,
+	            m.member_avatar,
+	            count(distinct cl.comment_like_seq) as like_count,
+	            row_number() over (order by c.comment_seq asc) as rn
+	        from comments c
+	        join member m on c.member_id = m.member_id
+	        left join comment_like cl on c.comment_seq = cl.comment_seq
+	        where c.board_seq = #{board_seq}
+	        group by c.comment_seq, 
+	                 c.comment_contents, 
+	                 c.comment_write_date, 
+	                 c.board_seq, 
+	                 c.member_id,
+	                 m.nickname,
+	                 m.member_avatar
+	    ) where rn between #{startRow} and #{endRow}
     </select>
 	
 	<!-- 게시글 댓글 수정 -->

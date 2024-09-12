@@ -7,6 +7,7 @@ import { api, host } from '../../../../../config/config';
 import { addCommas } from '../../../../../commons/commons';
 import StarRating from '../../../../../components/StarRating/StarRating';
 import { useAuthStore } from '../../../../../store/store';
+import Swal from "sweetalert2";
 
 
 
@@ -108,10 +109,15 @@ export const Detail = () => {
 
         if(!isAuth) {
 
-            alert('로그인을 먼저 해주세요.');
-            //로그인이 안된 경우 로그인 페이지로 리디렌션
-            navi('/signIn')
-            return null;
+            Swal.fire({
+                icon: "warning",
+                title: "로그인을 먼저 해주세요.",
+                showConfirmButton: true,
+            }).then(()=>{
+                //로그인이 안된 경우 로그인 페이지로 이동
+                navi('/signIn')
+            })
+            return ;
 
         }else{
             if (!liked) {
@@ -154,11 +160,17 @@ export const Detail = () => {
     // 장바구니 
     const handleCart = () => {
 
-        if(!isAuth){
-            alert('로그인을 먼저 해주세요.');
-            //로그인이 안된 경우 로그인 페이지로 리디렌션 
-            navi('/signIn')
-            return null;
+        if (!memberId || !isAuth) {
+            Swal.fire({
+                icon: "warning",
+                title: "로그인을 먼저 해주세요.",
+                showConfirmButton: true,
+            }).then(()=>{
+
+                //로그인이 안된 경우 로그인 페이지로 이동
+                navi('/signIn')
+            })
+            return ;
         }
 
         // console.log(product_seq)
@@ -176,8 +188,19 @@ export const Detail = () => {
         }
 
         api.post(`/cart`,data).then(resp=>{
-            console.log(resp)
-            alert('장바구니 등록 성공')
+            // 수량 및 가격 초기화
+            setQuantity(1);
+            setTotalPrice(list.price);
+
+            Swal.fire({
+                icon: 'success',
+                title: '장바구니 등록 성공!',
+            })            
+        }).catch(errer =>{
+            Swal.fire({
+                icon: 'errer',
+                title: '장바구니 등록 실패!',
+            })
         })
 
     }

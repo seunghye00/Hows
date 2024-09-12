@@ -7,6 +7,7 @@ import { api, host } from '../../../../../../config/config';
 import { useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../../store/store';
 import axios from 'axios';
+import Swal from "sweetalert2";
 
 export const DetailPage = () => {
     const { isAuth } = useAuthStore() // 로그인 여부 확인
@@ -68,9 +69,13 @@ export const DetailPage = () => {
         if (files) {
             // 파일 수를 4개로 제한
             if (files.length > 4) {
-                alert('최대 4개의 파일만 선택할 수 있습니다.');
+                Swal.fire({
+                    icon: "warning",
+                    title: "최대 4개의 파일만 선택할 수 있습니다.",
+                    showConfirmButton: true,
+                })
                 handleCloseModal(); // 모달 창 닫기
-                return;
+                return ;
             }
     
             // 파일 목록을 상태로 저장
@@ -120,11 +125,17 @@ export const DetailPage = () => {
         api.post(`/product/reviewAdd`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         }).then((response) => {
-            console.log('성공', response.data);
-            alert('리뷰 제출에 성공했습니다');
+
+            // console.log('성공', response.data);
+            Swal.fire({
+                icon: "warning",
+                title: "리뷰 제출에 성공했습니다.",
+                showConfirmButton: true,
+            })
             handleCloseModal();
+            return;
+
         }).catch((error) => {
-            console.error('실패', error);
             alert('리뷰 제출에 실패했습니다');
             handleCloseModal();
         });

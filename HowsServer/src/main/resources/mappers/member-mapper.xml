@@ -79,8 +79,6 @@
         update member set pw = #{pw} where member_id = #{member_id}
     </update>
 	
-	
-
 	<!-- 마이페이지 회원정보 출력 -->
 	<select id="selectInfo"
 		resultType="com.hows.member.dto.MemberDTO">

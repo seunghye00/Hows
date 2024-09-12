@@ -229,7 +229,15 @@ export const Banner = () => {
                         <div className={styles.empty}>데이터가 없습니다</div>
                     ) : (
                         banners.map((banner, i) => (
-                            <div key={i} className={styles.rows}>
+                            <div
+                                key={i}
+                                className={`${styles.rows} ${
+                                    banner.checked ? styles.checked : ''
+                                }`}
+                                onClick={() =>
+                                    handleCheckboxChange(banner.banner_seq)
+                                }
+                            >
                                 <div className={styles.cols}>
                                     <input
                                         type="checkbox"

@@ -106,7 +106,8 @@ export const AddProduct = () => {
             !product.product_title ||
             !product.product_category_code ||
             !product.product_contents ||
-            !product.price
+            !product.price ||
+            !product.quantity
         ) {
             SwalComp({
                 type: 'warning',
@@ -118,6 +119,7 @@ export const AddProduct = () => {
         const formData = new FormData()
         formData.append('product_title', product.product_title)
         formData.append('price', product.price)
+        formData.append('quantity', product.quantity)
         formData.append('product_category_code', product.product_category_code)
         formData.append('product_contents', product.product_contents)
 
@@ -134,7 +136,7 @@ export const AddProduct = () => {
                 SwalComp({
                     type: 'success',
                     text: '상품이 추가되었습니다.',
-                }).then(navi('/admin/product/viewList'))
+                }).then(navi('/admin/product/list'))
             })
             .catch(error => {
                 console.error('업로드 실패 :', error)

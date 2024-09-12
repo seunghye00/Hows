@@ -266,7 +266,7 @@
 
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->
-	<!-- 신고된 게시물 조회 쿼리 -->
+
 	<select id="reportedCommunity" parameterType="map"
 		resultType="map">
 		SELECT *
@@ -274,7 +274,7 @@
 		SELECT
 		b.board_seq, -- 게시판 게시물 번호
 		b.board_contents, -- 게시판 내용
-		TO_CHAR(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') AS board_write_date, -- 작성 날짜
+		TO_CHAR(b.board_write_date, 'YYYY-MM-DD') AS board_write_date, -- 작성 날짜
 		m.nickname AS member_id, -- 작성자 (닉네임)
 		COUNT(br.board_report_seq) AS report_count, -- 신고 횟수
 		ROW_NUMBER() OVER (ORDER BY b.board_seq DESC) AS row_num -- 각 행에 순번 부여
@@ -289,7 +289,6 @@
 		)
 		WHERE row_num BETWEEN #{startRow} AND #{endRow}
 	</select>
-
 
 	<!-- 게시물 신고내역 조회 (관리자) -->
 	<select id="CommunityReport"

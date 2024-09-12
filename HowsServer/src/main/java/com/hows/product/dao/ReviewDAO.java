@@ -60,7 +60,7 @@ public class ReviewDAO {
 		return myBatis.selectList("Product.getReportedReviews", params);
 	}
 
-	// 전체 신고 리뷰 카운트 조회
+	// 전체 신고 리뷰 카운트 조회 (관리자)
 	public int getReportedReviewsCount() {
 		return myBatis.selectOne("Product.getReportedReviewsCount");
 	}

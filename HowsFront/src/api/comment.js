@@ -90,7 +90,36 @@ export const sendCommentReport = async (commentSeq, reportCode, memberId) => {
 /************************************  [ 관리자 기능 ] /************************************/
 
 // 신고 댓글 조회 (관리자)
+export const getReportedComments = async (startRow, endRow) => {
+    try {
+        const response = await api.get('/comment/reportedComments', {
+            params: { startRow, endRow },
+        })
+        return response.data
+    } catch (error) {
+        console.error('신고 댓글 목록 조회 중 오류 발생:', error)
+        throw error
+    }
+}
 
 // 신고 내역 조회 (관리자)
+export const getCommentReport = async comment_seq => {
+    try {
+        const response = await api.get(`/comment/commentReport/${comment_seq}`)
+        return response.data
+    } catch (error) {
+        console.error('댓글 신고 내역 조회 중 오류 발생:', error)
+        throw error
+    }
+}
 
 // 신고 게시판 삭제 (관리자)
+export const deleteCmt = async comment_seq => {
+    try {
+        const response = await api.delete(`/comment/deleteCmt/${comment_seq}`)
+        return response.data
+    } catch (error) {
+        console.error('댓글 삭제 중 오류 발생:', error)
+        throw error
+    }
+}

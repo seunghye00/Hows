@@ -1,6 +1,6 @@
 package com.hows.banner.controller;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -35,16 +35,12 @@ public class BannerController {
 	
 	@GetMapping
 	public ResponseEntity<List<BannerDTO>> getAllBanners() throws Exception {
-		List<BannerDTO> list = bannServ.getAllBanners();
+		List<BannerDTO> list = bannServ.getAllBannersByAdmin();
 		return ResponseEntity.ok(list);
 	}
 
 	@PostMapping
 	public ResponseEntity<String> addBanner(@RequestParam("file") MultipartFile file, String startDate, String endDate, int banner_order) throws Exception {
-		
-		// 문자열을 날짜 형식으로 변환
-		Timestamp start_date = DateFormat.convertToTimestamp(startDate);
-		Timestamp end_date = DateFormat.convertToTimestamp(endDate);
 		
 		// 파일을 서버와 DB에 저장하고 반환받은 파일 정보에 대한 JSON 문자열
 		String bannerInfo = fileServ.upload(file, 0, "F5");
@@ -55,7 +51,7 @@ public class BannerController {
 		String sysName = (String) map.get("sysName");
 		String banner_url = (String) map.get("banner_url");
 
-		BannerDTO dto = new BannerDTO(0, file_seq, banner_url, start_date, end_date, banner_order);
+		BannerDTO dto = new BannerDTO(0, file_seq, banner_url, DateFormat.convertToDate(startDate), DateFormat.convertToDate(endDate), banner_order);
 		
 		if (bannServ.addBanner(dto)) {
 			return ResponseEntity.ok("success");

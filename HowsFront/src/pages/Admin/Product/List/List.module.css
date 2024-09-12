@@ -66,6 +66,10 @@
     gap: 7px;
 }
 
+.info.line .name {
+    text-decoration: line-through;
+}
+
 .name {
     height: 25px;
     max-width: 197px;
@@ -81,4 +85,11 @@
     width: 100%;
     display: flex;
     justify-content: flex-end;
+    position: relative;
+}
+
+.num span {
+    position: absolute;
+    left: 0;
+    color: var(--hows-red);
 }

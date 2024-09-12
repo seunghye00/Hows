@@ -245,7 +245,13 @@ export const List = () => {
                                       src={product.product_thumbnail}
                                       alt="대표 이미지"
                                   />
-                                  <div className={styles.info}>
+                                  <div
+                                      className={`${styles.info} ${
+                                          product.quantity === 0
+                                              ? styles.line
+                                              : ''
+                                      }`}
+                                  >
                                       <div className={styles.productTitle}>
                                           <input
                                               type="checkbox"
@@ -262,6 +268,11 @@ export const List = () => {
                                       </div>
                                       <div>\ {addCommas(product.price)}</div>
                                       <div className={styles.num}>
+                                          {product.quantity === 0 ? (
+                                              <span>품절</span>
+                                          ) : (
+                                              ''
+                                          )}
                                           남은 수량 :{' '}
                                           {addCommas(product.quantity)}개
                                       </div>

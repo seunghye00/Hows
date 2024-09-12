@@ -1,10 +1,12 @@
 import styles from "./Post.module.css";
 import post from "../../../../../assets/images/마이페이지_게시물.jpg";
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { selectPost } from "../../../../../api/member";
 
 export const Post = () => {
+
+  const navi = useNavigate();
 
   const { member_id } = useParams() // URL에서 member_id 가져오기
   const [postList, setPostList] = useState([]);
@@ -16,6 +18,9 @@ export const Post = () => {
     })
   }, [member_id]);
 
+  const handlePostClick = (board_seq) => {
+    navi(`/communities/${board_seq}`);
+  };
 
   return (
     <div className={styles.container}>
@@ -26,8 +31,9 @@ export const Post = () => {
       <div className={styles.contents} >
         {
           postList.map((item, i) => {
+            console.log("아이템 확인 :", item);
             return (
-              <div className={styles.feed} key={i}>
+              <div className={styles.feed} key={i} onClick={() => handlePostClick(item.BOARD_SEQ)}>
                 <img src={item.IMAGE_URL} alt={`Post ${i + 1}`} />
               </div>
             )

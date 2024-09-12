@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hows.File.service.FileService;
 import com.hows.blacklistreason.dto.BlacklistReasonDTO;
+import com.hows.common.CustomUserDetails;
 import com.hows.grade.dto.GradeDTO;
 import com.hows.member.dto.MemberDTO;
 import com.hows.member.service.MemberService;
@@ -80,7 +81,7 @@ public class MemberController {
 	@GetMapping("/selectInfo")
 	public ResponseEntity<MemberDTO> selectInfo(
 			 @RequestParam(required = false) String member_id,
-			@AuthenticationPrincipal UserDetails user) {
+			@AuthenticationPrincipal CustomUserDetails user) {
 
 		System.out.println("요청한 사용자의 ID : " + user.getUsername());
 
@@ -101,7 +102,7 @@ public class MemberController {
 
 	// 비밀번호 변경 시 기존 비밀번호 확인
 	@PostMapping("/checkPw")
-	public ResponseEntity<Boolean> checkPw(@AuthenticationPrincipal UserDetails user,
+	public ResponseEntity<Boolean> checkPw(@AuthenticationPrincipal CustomUserDetails user,
 			@RequestBody Map<String, String> request) {
 
 		// 사용자로부터 받은 평문 비밀번호
@@ -121,7 +122,7 @@ public class MemberController {
 	// [로그인]비밀번호 찾기 / [마이페이지]비밀번호 변경
 	@PutMapping("/updatePw")
 	public ResponseEntity<Integer> updatePw(
-			@AuthenticationPrincipal UserDetails user,
+			@AuthenticationPrincipal CustomUserDetails user,
 			@RequestBody Map<String, String> request) {
 
 		String member_id = user.getUsername();
@@ -242,11 +243,17 @@ public class MemberController {
 	    }
 	}
   
-  // 마이페이지 게시물 출력
+	// 마이페이지 게시글(이미지) 출력
 	@GetMapping("/selectPost")
-	public ResponseEntity<List<MemberDTO>> selectPost(@RequestParam String member_id){
-		return ResponseEntity.ok(null);
+	public ResponseEntity<List<Map<String, Object>> > selectPost(@RequestParam String member_id){
+		
+		System.out.println("게시글 출력요청 member_id : "+ member_id);
+		
+		List<Map<String, Object>> result = memServ.selectPostByMemberId(member_id);
+		return ResponseEntity.ok(result);
 	}
+
+	
 	
 	// ========================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)

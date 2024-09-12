@@ -185,6 +185,28 @@
 	    insert into board_report 
 	    values (board_report_seq.nextval, #{report_code}, default, #{member_id}, #{board_seq})
 	</insert>
+	
+	<!-- [마이페이지] 게시글(이미지) 출력 -->
+	<select id="selectPostByMemberId" resultType="map">
+	    select 
+	        b.board_seq,
+	        b.board_contents,
+	        to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date,
+	        b.view_count,
+	        b.member_id,
+	        m.name as member_name, 
+	        bi.image_url
+	    from 
+	        board b
+	    inner join 
+	        member m on b.member_id = m.member_id
+	    left join 
+	        board_image bi on b.board_seq = bi.board_seq
+	    where 
+	        b.member_id = #{member_id}
+	</select>
+	
+	
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->
 	<select id="reportedCommunity" resultType="map">

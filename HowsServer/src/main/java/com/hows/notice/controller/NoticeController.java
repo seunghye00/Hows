@@ -1,6 +1,8 @@
 package com.hows.notice.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import org.springframework.util.StringUtils;
 import com.hows.File.service.FileService;
 import com.hows.notice.dto.NoticeDTO;
 import com.hows.notice.service.NoticeService;
@@ -36,31 +37,12 @@ public class NoticeController {
 			@RequestParam(value = "file", required = false) MultipartFile file) {
 
 		try {
-			String imageUrl = null;
-
-			// 파일이 업로드된 경우
-			if (file != null && !file.isEmpty()) {
-				// GCS에 파일 업로드
-				String code = "F6";
-				imageUrl = Fservice.upload(file, 0, code);
-				if ("fail".equals(imageUrl)) {
-					throw new Exception("File upload failed");
-				}
-				System.out.println("GCS 업로드 성공: " + imageUrl);
-			}
-
-			// 이미지가 포함된 공지사항 내용 생성
-			String fullContents = notice_contents;
-			if (StringUtils.hasText(imageUrl)) {
-				fullContents += "<br><img src='" + imageUrl + "' alt='공지사항 이미지'>";
-			}
 
 			// NoticeDTO에 제목과 내용을 설정
 			NoticeDTO dto = new NoticeDTO();
 			dto.setNotice_title(notice_title);
-			dto.setNotice_contents(fullContents);
+			dto.setNotice_contents(notice_contents);
 
-			System.out.println("컨트롤러 : " + dto);
 			// 공지사항 생성
 			Nservice.insertNtc(dto);
 
@@ -73,10 +55,23 @@ public class NoticeController {
 
 	// 공지사항 조회
 	@GetMapping("/list")
-	public ResponseEntity<List<NoticeDTO>> selectNtc() {
-		List<NoticeDTO> noticeList = Nservice.selectNtc();
+	public ResponseEntity<Map<String, Object>> selectNtc(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int itemsPerPage) throws Exception {
+
+		int totalNotices = Nservice.NtcCount(); // 전체 공지사항 개수 조회
+		
+		System.out.println(totalNotices);
+
+		List<NoticeDTO> noticeList = Nservice.selectNtc(page, itemsPerPage); // 페이징된 공지사항 목록 조회
+		
 		System.out.println(noticeList);
-		return ResponseEntity.ok(noticeList);
+
+		// 응답 데이터 생성
+		Map<String, Object> response = new HashMap<>();
+		response.put("totalNotices", totalNotices); // 전체 개수
+		response.put("noticeList", noticeList); // 페이징된 공지사항 목록
+
+		return ResponseEntity.ok(response);
 	}
 
 	// 공지사항 상세조회
@@ -99,33 +94,17 @@ public class NoticeController {
 			@RequestParam("notice_title") String notice_title, @RequestParam("notice_contents") String notice_contents,
 			@RequestParam(value = "file", required = false) MultipartFile file) {
 		try {
-			String imageUrl = null;
-
-			// 파일이 업로드된 경우에만 GCS에 업데이트
-			if (file != null && !file.isEmpty()) {
-				// 기존 파일이 있는지 확인하고 삭제
-				String oldSysName = Fservice.getSysName(notice_seq);
-				if (oldSysName != null) {
-					Fservice.deleteFile(oldSysName, "F6");
-				}
-
-				// GCS에 새 파일 업로드
-				imageUrl = Fservice.upload(file, notice_seq, "F6");
-				if ("fail".equals(imageUrl)) {
-					throw new Exception("File upload failed");
-				}
-			}
-
-			// NoticeDTO에 제목과 내용을 설정
+			// 기존 공지사항을 수정하기 위해 notice_seq를 사용
 			NoticeDTO dto = new NoticeDTO();
+			dto.setNotice_seq(notice_seq);
 			dto.setNotice_title(notice_title);
 			dto.setNotice_contents(notice_contents);
 
-			// 수정
+			// 수정 로직 호출
 			Nservice.modifyNtc(notice_seq, dto);
+			System.out.println(modifyNtc(notice_seq, notice_title, notice_contents, file));
 
 			return ResponseEntity.ok("공지사항이 수정되었습니다.");
-
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.badRequest().body("공지사항 수정 실패: " + e.getMessage());

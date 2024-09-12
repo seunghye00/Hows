@@ -13,6 +13,7 @@ import { Notice } from './Notice/Notice'
 import Faq from './Notice/FAQ/Faq'
 import { Product } from './Product/Product'
 import { WriteNotice } from './Notice/WriteNotice'
+import { ModifyNotice } from './Notice/ModifyNotice'
 
 export const Admin = () => {
     return (
@@ -30,6 +31,7 @@ export const Admin = () => {
                 />
                 <Route path="/admin/product/*" element={<Product />} />
                 <Route path="/admin/notice/*" element={<WriteNotice />} />
+                <Route path="/admin/notice/*" element={<ModifyNotice />} />
                 <Route
                     path="/member"
                     element={

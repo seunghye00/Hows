@@ -5,7 +5,6 @@ import { SwalComp } from '../../../commons/commons'
 import { EditorComp } from '../../../components/Editor/Editor'
 import { useNavigate } from 'react-router-dom'
 import { insertNtc } from '../../../api/notice'
-import { uploadFile } from '../../../api/file'
 
 export const WriteNotice = () => {
     const [notice, setNotice] = useState({
@@ -21,126 +20,33 @@ export const WriteNotice = () => {
         setNotice(prev => ({ ...prev, [name]: value }))
     }
 
-    // 에디터 내용 변경 핸들러 (이미지가 base64로 들어오는지 체크하고 URL로 대체)
-    const handleEditorChange = async content => {
-        console.log('에디터 내용 변경됨:', content) // 에디터에서 전달된 내용을 출력
-
-        // base64 형식의 이미지가 포함된 공지사항 내용을 처리
-        if (content.includes('data:image/')) {
-            console.log('Base64 이미지가 포함된 내용을 처리합니다.')
-
-            const updatedContent = await processImagesInContent(content)
-
-            console.log('변환된 내용 (Base64 -> URL):', updatedContent) // 변환된 내용을 출력
-
-            setNotice(prev => ({
-                ...prev,
-                notice_contents: updatedContent, // Base64가 아닌 URL로 대체된 내용을 저장
-            }))
-        } else {
-            console.log(
-                'Base64 이미지가 포함되지 않은 내용을 그대로 저장합니다.'
-            )
-
-            setNotice(prev => ({
-                ...prev,
-                notice_contents: content, // Base64 이미지가 없는 경우 그대로 저장
-            }))
-        }
-    }
-
-    // base64 이미지를 URL로 대체하는 함수
-    const processImagesInContent = async content => {
-        console.log('Base64 이미지를 찾아서 처리 중:', content)
-
-        const regex = /!\[.*?\]\((data:image\/[^;]+;base64,[^)]+)\)/g // 이미지의 base64 패턴 찾기
-        let updatedContent = content
-        const matches = [...content.matchAll(regex)]
-
-        console.log('찾은 Base64 이미지들:', matches) // Base64 이미지를 찾은 결과를 출력
-
-        for (const match of matches) {
-            const base64Image = match[1]
-            console.log('처리 중인 Base64 이미지:', base64Image) // 처리 중인 Base64 이미지를 출력
-
-            const fileBlob = base64ToBlob(base64Image) // Base64 데이터를 Blob으로 변환
-
-            console.log('Blob으로 변환된 이미지:', fileBlob) // 변환된 Blob 객체를 출력
-
-            // 이미지 업로드 후 URL로 대체
-            const imageUrl = await uploadFileToServer(fileBlob)
-            if (imageUrl) {
-                console.log('이미지 업로드 성공, URL:', imageUrl) // 업로드된 이미지 URL을 출력
-                updatedContent = updatedContent.replace(
-                    `![](${base64Image})`,
-                    imageUrl
-                ) // 단순 URL로 대체
-            } else {
-                console.log('이미지 업로드 실패.') // 이미지 업로드 실패 시 출력
-            }
-        }
-
-        console.log('최종 변환된 내용:', updatedContent) // 최종 변환된 본문 내용을 출력
-        return updatedContent
-    }
-
-    // Base64 이미지를 Blob으로 변환하는 함수
-    const base64ToBlob = base64Data => {
-        const byteString = atob(base64Data.split(',')[1]) // Base64 데이터를 디코딩
-        const mimeString = base64Data.split(',')[0].split(':')[1].split(';')[0] // MIME 타입 추출
-
-        const ab = new ArrayBuffer(byteString.length)
-        const ia = new Uint8Array(ab)
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i)
-        }
-
-        return new Blob([ab], { type: mimeString })
-    }
-
-    // 서버에 파일 업로드 함수
-    const uploadFileToServer = async blob => {
-        const formData = new FormData()
-        formData.append('file', blob)
-
-        try {
-            console.log('파일 업로드 시작, Blob 정보:', blob) // 업로드 시작 로그 추가
-
-            const response = await uploadFile(formData) // 업로드 API 호출
-            console.log('서버 응답:', response)
-
-            if (response.status === 200 && response.data) {
-                const imageUrl = response.data // 여기에 명확히 URL을 할당
-                console.log('GCS 업로드 성공:', imageUrl) // 성공 시 이미지 URL 반환
-                return imageUrl // 서버에서 반환된 이미지 URL 반환
-            } else {
-                console.error('이미지 업로드 실패, 상태 코드:', response.status)
-                throw new Error('이미지 업로드 실패')
-            }
-        } catch (error) {
-            console.error('이미지 업로드 중 오류:', error.message)
-            SwalComp({ type: 'error', text: '이미지 업로드 실패' })
-            return null
-        }
+    // 에디터 내용 변경 핸들러
+    const handleEditorChange = content => {
+        setNotice(prev => ({
+            ...prev,
+            notice_contents: content, // 에디터에서 변경된 내용을 그대로 저장
+        }))
     }
 
     // 작성 완료 핸들러
     const handleSubmit = () => {
-        if (!notice.notice_title || !notice.notice_contents) {
-            SwalComp({
-                type: 'warning',
-                text: '모든 필드를 입력해주세요.',
-            })
-            return
-        }
+        const markdownContent = notice.notice_contents
+
+        // 마크다운에서 이미지 URL 추출 (예시: 첫 번째 이미지만 추출)
+        const imageRegex = /!\[.*?\]\((.*?)\)/
+        const imageUrlMatch = markdownContent.match(imageRegex)
+        const imageUrl = imageUrlMatch ? imageUrlMatch[1] : null
+
+        // 공지사항 내용을 URL로 교체
+        const contentWithoutMarkdown = markdownContent.replace(
+            imageRegex,
+            imageUrl
+        )
 
         const formData = new FormData()
         formData.append('notice_title', notice.notice_title)
-        formData.append('notice_contents', notice.notice_contents) // 이미지 URL이 포함된 내용 전달
+        formData.append('notice_contents', contentWithoutMarkdown) // URL로 대체된 내용을 DB에 저장
 
-        console.log('공지사항 업로드 시작', formData)
-
-        // 서버에 데이터를 전송하는 로직
         insertNtc(formData)
             .then(resp => {
                 SwalComp({
@@ -185,6 +91,7 @@ export const WriteNotice = () => {
                 <div className={styles.writeWrap}>
                     <EditorComp
                         onChange={handleEditorChange} // 에디터 내용 변경 핸들러
+                        contents={notice.notice_contents} // 에디터의 초기값 설정
                     />
                 </div>
             </div>

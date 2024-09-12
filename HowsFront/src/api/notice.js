@@ -10,8 +10,13 @@ export const insertNtc = formData => {
 }
 
 // 공지사항 조회
-export const selectNtc = () => {
-    return api.get('/notice/list')
+export const selectNtc = (startRow, endRow) => {
+    return api.get('/notice/list', {
+        params: {
+            startRow: startRow,
+            endRow: endRow,
+        },
+    })
 }
 
 // 공지사항 상세조회

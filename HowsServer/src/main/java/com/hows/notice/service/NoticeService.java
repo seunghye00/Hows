@@ -21,8 +21,15 @@ public class NoticeService {
 	}
 
 	// 공지사항 목록 조회
-	public List<NoticeDTO> selectNtc() {
-		return dao.selectNtc();
+	public List<NoticeDTO> selectNtc(int page, int itemsPerPage) {
+		int startRow = (page - 1) * itemsPerPage + 1;
+		int endRow = page * itemsPerPage;
+		return dao.selectNtc(startRow, endRow);
+	}
+
+	// 공지사항 전체 개수 조회
+	public int NtcCount() {
+		return dao.NtcCount();
 	}
 
 	// 공지사항 상세 조회
@@ -39,10 +46,10 @@ public class NoticeService {
 	public void deleteNtc(int notice_seq) {
 		dao.deleteNtc(notice_seq);
 	}
-	
+
 	// 조회수
 	public void viewCount(int notice_seq) {
-	    dao.viewCount(notice_seq);
+		dao.viewCount(notice_seq);
 	}
 
 }

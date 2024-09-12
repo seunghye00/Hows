@@ -2,10 +2,9 @@ package com.hows.history.service;
 
 import com.hows.order.dao.OrderDAO;
 import com.hows.order.dto.OrderDTO;
-import com.hows.order.dto.OrderListDTO;
+import com.hows.payment.dao.PaymentDAO;
 import com.hows.product.dao.ReviewDAO;
 import com.hows.product.dto.ImageDTO;
-import com.hows.product.dto.ReviewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +22,9 @@ public class HistoryService {
 
     @Autowired
     private ReviewDAO reviewDAO;
+
+    @Autowired
+    private PaymentDAO paymentDAO;
 
     /** My 주문 목록 **/
     public List<?> myOrder (int memberSeq) {
@@ -54,6 +56,10 @@ public class HistoryService {
             mapList.add(map);
         }
         return mapList;
+    }
+
+    public List<?>  myPayment(int memberSeq) {
+        return paymentDAO.myPayment(memberSeq);
     }
 
 }

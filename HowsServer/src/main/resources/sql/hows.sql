@@ -429,6 +429,7 @@ create table orders (
     order_seq number primary key,
     member_seq number not null,
     order_code char(2) not null,
+    order_name varchar2(200) not null,
     order_date timestamp default sysdate not null,
     order_price number not null,
     orderer_name varchar2(30) not null,

@@ -18,6 +18,11 @@ public class PaymentDAO {
         return mybatis.selectList("Payment.list", id);
     }
 
+    /** 내 결제 내역 **/
+    public List<?> myPayment(int memberSeq) {
+        return mybatis.selectList("Payment.myPayment", memberSeq);
+    }
+
     /** 결제 내역 추가 **/
     public int addPayment(PaymentDTO paymentDTO) {
         return mybatis.insert("Payment.addPayment", paymentDTO);

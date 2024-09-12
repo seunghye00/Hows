@@ -30,4 +30,10 @@ public class HistoryController {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("/payment")
+    public ResponseEntity<List<?>> paymentList(@AuthenticationPrincipal CustomUserDetails user) {
+        List<?> list = historyServ.myPayment(user.getMemberSeq());
+        return ResponseEntity.ok(list);
+    }
+
 }

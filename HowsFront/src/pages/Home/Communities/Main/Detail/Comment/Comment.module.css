@@ -47,6 +47,10 @@
     align-items: center;
 }
 
+.btnRight i {
+    font-weight: 500;
+}
+
 .reportComment {
     display: flex;
     align-items: center;
@@ -54,6 +58,18 @@
 
 .btnLike {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 5px;
+}
+
+.editInput {
+    width: 100%;
+    resize: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    overflow-y: auto;
+    letter-spacing: .7px;
+    color: var(--hows-gray-700);
 }

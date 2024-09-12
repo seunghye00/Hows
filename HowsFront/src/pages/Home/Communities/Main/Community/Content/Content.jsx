@@ -27,6 +27,7 @@ export const Content = () => {
     const [endMessageVisible, setEndMessageVisible] = useState(true) // 종료 메시지 상태
     const [memberSeq, setMemberSeq] = useState(null) // 로그인한 사용자의 member_seq 저장
     const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+    const isOwner = isAuth && member_id === contentList?.MEMBER_ID
 
     // 로그인한 사용자의 member_seq 가져오기
     useEffect(() => {
@@ -292,21 +293,31 @@ export const Content = () => {
                                     </div>
                                 </div>
                                 <div className={styles.followBtn}>
-                                    <Button
-                                        title={
-                                            content.isFollowing
-                                                ? '팔로잉'
-                                                : '팔로우'
-                                        }
-                                        size="s"
-                                        isChecked={
-                                            content.isFollowing ? 'Y' : 'N'
-                                        }
-                                        onClick={e => {
-                                            e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
-                                            handleFollow(content.MEMBER_SEQ) // 팔로우할 대상의 MEMBER_SEQ를 전달
-                                        }}
-                                    />
+                                    {isOwner ? (
+                                        <>
+                                            <Button
+                                                title={
+                                                    content.isFollowing
+                                                        ? '팔로잉'
+                                                        : '팔로우'
+                                                }
+                                                size="s"
+                                                isChecked={
+                                                    content.isFollowing
+                                                        ? 'Y'
+                                                        : 'N'
+                                                }
+                                                onClick={e => {
+                                                    e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
+                                                    handleFollow(
+                                                        content.MEMBER_SEQ
+                                                    ) // 팔로우할 대상의 MEMBER_SEQ를 전달
+                                                }}
+                                            />
+                                        </>
+                                    ) : (
+                                        <></>
+                                    )}
                                 </div>
                             </div>
 
@@ -363,7 +374,7 @@ export const Content = () => {
                                                         styles.commentCount
                                                     }
                                                 >
-                                                    {content.COMMENTS}
+                                                    {content.COMMENTS_COUNT}
                                                 </span>
                                             </div>
                                         </div>

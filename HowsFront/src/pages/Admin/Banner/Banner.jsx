@@ -229,7 +229,15 @@ export const Banner = () => {
                         <div className={styles.empty}>데이터가 없습니다</div>
                     ) : (
                         banners.map((banner, i) => (
-                            <div key={i} className={styles.rows}>
+                            <div
+                                key={i}
+                                className={`${styles.rows} ${
+                                    banner.checked ? styles.checked : ''
+                                }`}
+                                onClick={() =>
+                                    handleCheckboxChange(banner.banner_seq)
+                                }
+                            >
                                 <div className={styles.cols}>
                                     <input
                                         type="checkbox"
@@ -287,7 +295,7 @@ export const Banner = () => {
                     <div className={styles.choiceDate}>
                         <div>시작일</div>
                         <input
-                            type="datetime-local"
+                            type="date"
                             name="startDate"
                             id=""
                             onChange={handleChangeBanner}
@@ -296,7 +304,7 @@ export const Banner = () => {
                     <div className={styles.choiceDate}>
                         <div>종료일</div>
                         <input
-                            type="datetime-local"
+                            type="date"
                             name="endDate"
                             id=""
                             onChange={handleChangeBanner}

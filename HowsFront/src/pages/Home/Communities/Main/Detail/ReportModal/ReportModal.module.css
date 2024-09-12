@@ -16,7 +16,6 @@
 }
 
 .reportLi {
-    padding: 17px;
     display: flex;
     align-items: flex-start;
 }
@@ -26,6 +25,7 @@
     gap: 15px;
     align-items: center;
     position: relative;
+    padding: 17px;
 }
 
 .reportBox {
@@ -38,7 +38,7 @@
     box-sizing: border-box;
     background-color: transparent;
     /* 기본 배경색을 투명으로 */
-    transition: border-color 0.1s, background-color 0.1s;
+    transition: border-color .5s, background-color .5s;
     vertical-align: middle;
 }
 

@@ -4,12 +4,14 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="Comment">
+
 	<!-- 게시글 댓글 작성 -->
 	<insert id="writeComment">
 		insert into comments
 		values(comment_seq.nextval,#{comment_contents}, default, #{board_seq}, #{member_id})
 	</insert>
 	
+	<!-- 게시글 댓글 목록 출력 -->
 	<select id="getCommentsBoardSeq" resultType="map">
 		select 
 		    c.comment_seq, 
@@ -31,5 +33,11 @@
 		         c.member_id,
 		         m.nickname,
 		         m.member_avatar
+		order by c.comment_seq asc
 	</select>
+	
+	<!-- 게시글 댓글 수정 -->
+	<update id="updateComment">
+		update comments set comment_contents = #{commentContents} where comment_seq = #{commentSeq}
+	</update>
 </mapper>

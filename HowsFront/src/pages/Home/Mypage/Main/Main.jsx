@@ -18,6 +18,7 @@ import { Guestbook } from "./Guestbook/Guestbook";
 import { Modal } from "../../../../components/Modal/Modal"
 import { useMemberStore } from "../../../../store/store";
 import { deleteProfileImage, findMemberSeq, selectInfo, uploadProfileImage, userInfo } from "../../../../api/member";
+import { TextBox } from './TextBox/TextBox';
 
 export const Main = () => {
     const navi = useNavigate()
@@ -30,6 +31,14 @@ export const Main = () => {
     const [selectedImage, setSelectedImage] = useState(profile) // 선택한 이미지 초기값
     // const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
     const [modalContent, setModalContent] = useState('') // 모달 창에 표시할 내용을 구분하는 상태
+
+    const [postData, setPostData] = useState(0); // 게시물 데이터
+    const [scrapData, setScrapData] = useState(0); // 스크랩 데이터
+    const [guestbookData, setGuestbookData] = useState(0); // 방명록 데이터
+
+
+
+
 
     useEffect(() => {
         // url에서 가져온 member_id로 해당 페이지 member_id의 데이터 가져오기
@@ -74,6 +83,22 @@ export const Main = () => {
                 console.error('이미지 삭제 실패:', error)
             })
     }
+
+
+    useEffect(() => {
+        // 게시물 데이터
+        api.get(`/member/countPost`, { params: { member_id: member_id } }).then((resp) => {
+            setPostData(resp.data);
+        })
+        // 스크랩 데이터
+        // const fetchScrapData = api.get(`/`).then((resp) => {
+        //     setScrapData(resp.data);
+        // })
+        // 방명록 데이터
+        api.get(`/member/countGuestbook`, { params: { member_id: member_id } }).then((resp) => {
+            setGuestbookData(resp.data);
+        })
+    }, [])
 
 
     return (
@@ -231,13 +256,10 @@ export const Main = () => {
                 {/* 바뀌는 부분 */}
                 <div className={styles.body}>
                     <Routes>
-                        <Route
-                            path="/"
-                            element={<Navigate to="post" replace />}
-                        />
-                        <Route path="post" element={<Post />} />
-                        <Route path="scrap" element={<Scrap />} />
-                        <Route path="guestbook" element={<Guestbook />} />
+                        <Route path="/" element={<Navigate to="post" replace />} />
+                        <Route path="post" element={postData > 0 ? <Post data={postData} /> : <><Post data={postData} /> <TextBox text="게시물" /></>} />
+                        <Route path="scrap" element={scrapData > 0 ? <Scrap data={scrapData} /> : <><Scrap data={scrapData} /><TextBox text="스크랩" /></>} />
+                        <Route path="guestbook" element={guestbookData > 0 ? <Guestbook data={guestbookData} /> : <><Guestbook data={guestbookData} /><TextBox text="방문글" /></>} />
                     </Routes>
                 </div>
             </div>

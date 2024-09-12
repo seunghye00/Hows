@@ -1,0 +1,22 @@
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0 80px;
+}
+
+.container .spanBox {
+  padding: 50px;
+}
+
+.container .text {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--hows-point-color);
+}
+.container .text2 {
+  font-size: 20px;
+  font-weight: 600;
+}

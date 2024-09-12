@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { FaChevronDown, FaTimes } from 'react-icons/fa'
 import styles from './Faq.module.css'
-import { Button } from '../../../components/Button/Button'
-import { selectAllFaq, insertFaq, modifyFaq, deleteFaq } from '../../../api/faq'
+import { Button } from '../../../../components/Button/Button'
+import {
+    selectAllFaq,
+    insertFaq,
+    modifyFaq,
+    deleteFaq,
+} from '../../../../api/faq'
 import Swal from 'sweetalert2'
 
 const Faq = () => {

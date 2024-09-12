@@ -38,7 +38,7 @@
 .cols {
     border: 1px solid #ddd;
     padding: 10px;
-    max-height: 330px;
+    max-height: 345px;
 }
 
 .cols:hover {
@@ -58,9 +58,65 @@
 .info {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
 }
 
 .productTitle {
     display: flex;
     gap: 7px;
+}
+
+.info.line .name {
+    text-decoration: line-through;
+}
+
+.name {
+    height: 25px;
+    max-width: 197px;
+    white-space: nowrap;
+    /* 텍스트를 한 줄로 처리 */
+    overflow: hidden;
+    /* 넘치는 부분을 숨김 */
+    text-overflow: ellipsis;
+    /* 넘치는 텍스트를 '...'으로 표시 */
+}
+
+.num {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+}
+
+.num span {
+    position: absolute;
+    left: 0;
+    color: var(--hows-red);
+}
+
+.modalTitle {
+    text-align: center;
+}
+
+.quantity {
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.quantity input {
+    width: 85%;
+    padding: 5px;
+    font-size: 16px;
+    background-color: var(--hows-white);
+    border-radius: 8px;
+    border: 2px solid var(--hows-point-color);
+    color: var(--hows-point-color-darker);
+    font-weight: 500;
+}
+
+.modalBtns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
 }

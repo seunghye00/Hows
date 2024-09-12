@@ -23,4 +23,8 @@ public class CommentService {
     public List<Map<String, Object>> getCommentsBoardSeq(int board_seq) {
         return commentDAO.getCommentsBoardSeq(board_seq); // 댓글 목록을 DB에서 조회
     }
+	// 게시글 댓글 수정 
+    public void updateComment(int commentSeq, String commentContents) {
+        commentDAO.updateComment(commentSeq, commentContents);
+    }
 }

@@ -51,3 +51,9 @@ export const deleteProducts = productSeqs => {
 export const getProductInfo = product_seq => {
     return axios.get(`${baseUrl}/detail/${product_seq}`)
 }
+
+// 상품 수량 변경 요청 함수
+export const updateProductByQuantity = (productSeqs, quantity) => {
+    const seqs = productSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
+    return axios.put(`${baseUrl}`, null, { params: { seqs, quantity } })
+}

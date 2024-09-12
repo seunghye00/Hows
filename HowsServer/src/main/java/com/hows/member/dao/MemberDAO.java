@@ -66,8 +66,6 @@ public class MemberDAO {
         return mybatis.update("Member.updateTempPassword", params);
     }
 	
-	
-
 	// 회원정보 가져오기
 	public MemberDTO findById(String id) {
 		return mybatis.selectOne("Member.findById", id);
@@ -132,6 +130,8 @@ public class MemberDAO {
     public void removeFollow(int fromMemberSeq, int toMemberSeq) {
         mybatis.delete("Member.removeFollow", Map.of("from_member_seq", fromMemberSeq, "to_member_seq", toMemberSeq));
     } 
+
+    
 	 
 	// =======================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)

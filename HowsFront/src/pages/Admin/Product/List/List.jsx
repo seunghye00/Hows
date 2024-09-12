@@ -6,9 +6,11 @@ import {
     categoryList,
     productList,
     deleteProducts,
+    updateProductByQuantity,
 } from '../../../../api/product'
 import { addCommas, SwalComp } from '../../../../commons/commons'
 import { useNavigate } from 'react-router-dom'
+import { Modal } from '../../../../components/Modal/Modal'
 
 export const List = () => {
     // 상태 변수 초기화
@@ -18,6 +20,8 @@ export const List = () => {
     const [selectAll, setSelectAll] = useState(false) // 전체 선택 상태
     const [categories, setCategories] = useState([]) // 카테고리 목록
     const [searchQuery, setSearchQuery] = useState('') // 검색어 상태
+    const [quantity, setQuantity] = useState(0) // 수량 상태
+    const [isModalOpen, setIsModalOpen] = useState(false)
     const navi = useNavigate()
 
     useEffect(() => {
@@ -25,6 +29,7 @@ export const List = () => {
         Promise.all([categoryList(), productList()])
             .then(([categoryData, productData]) => {
                 setCategories(categoryData.data)
+                // console.log(productData.data)
                 setProducts(productData.data)
                 setFilteredProducts(productData.data) // 처음에는 필터링 없이 전체 상품 목록을 표시
             })
@@ -48,7 +53,7 @@ export const List = () => {
             )
         }
         setFilteredProducts(filtered)
-    }, [selectedCategory, searchQuery]) // 카테고리 or 상품 목록 or 검색어가 변경될 때마다 실행
+    }, [selectedCategory, searchQuery]) // 카테고리 or 검색어가 변경될 때마다 실행
 
     // 카테고리 선택 변경 핸들러
     const handleChangeCategory = e => {
@@ -135,6 +140,12 @@ export const List = () => {
                         })
                         // 전체 선택 체크박스를 해제
                         setSelectAll(false)
+                        setFilteredProducts(
+                            filteredProducts.map(product => ({
+                                ...product,
+                                checked: false,
+                            }))
+                        )
                         console.error('삭제 실패 :', error)
                     })
             }
@@ -164,8 +175,91 @@ export const List = () => {
         })
     }
 
-    const handleChangeQuantity = () => {
-        console.log('수량 변경')
+    // 수량 변경 버튼 클릭
+    const handleOpenModal = () => {
+        // 체크된 상품이 존재하는 지 확인
+        const selectedProducts = filteredProducts.filter(
+            product => product.checked
+        )
+        if (selectedProducts.length === 0) {
+            SwalComp({
+                type: 'warning',
+                text: '수량 변경할 상품을 선택해주세요.',
+            })
+            return
+        }
+        setIsModalOpen(true) // 모달 열기
+    }
+
+    // 수량 변경 핸들러
+    const handleQuantityChange = e => {
+        setQuantity(e.target.value)
+    }
+
+    // 모달창 닫기 버튼 클릭
+    const handleCloseModal = () => {
+        setIsModalOpen(false) // 모달 닫기
+    }
+
+    const handleUpdate = () => {
+        SwalComp({ type: 'confirm', text: '정말로 변경하시겠습니까 ?' }).then(
+            result => {
+                if (result.isConfirmed) {
+                    // 선택된 항목
+                    const selectedProducts = filteredProducts.filter(
+                        product => product.checked
+                    )
+                    // 상품 수량 변경 요청
+                    updateProductByQuantity(
+                        selectedProducts.map(product => product.product_seq),
+                        quantity
+                    )
+                        .then(() => {
+                            SwalComp({
+                                type: 'success',
+                                text: '선택한 상품의 수량이 변경되었습니다.',
+                            })
+
+                            // 수량 변경 후 제품 목록 업데이트
+                            const updatedProducts = filteredProducts.map(
+                                product => {
+                                    if (
+                                        selectedProducts.some(
+                                            selected =>
+                                                selected.product_seq ===
+                                                product.product_seq
+                                        )
+                                    ) {
+                                        return {
+                                            ...product,
+                                            quantity: quantity, // 새 수량으로 업데이트
+                                            checked: !product.checked,
+                                        }
+                                    }
+                                    return product
+                                }
+                            )
+                            setFilteredProducts(updatedProducts)
+                        })
+                        .catch(error => {
+                            SwalComp({
+                                type: 'error',
+                                text: '상품 수량 변경에 실패했습니다.',
+                            })
+                            // 전체 선택 체크박스를 해제
+                            setSelectAll(false)
+                            setFilteredProducts(
+                                filteredProducts.map(product => ({
+                                    ...product,
+                                    checked: false,
+                                }))
+                            )
+                            console.error('삭제 실패 :', error)
+                        })
+                    setIsModalOpen(false) // 모달 닫기
+                }
+            }
+        )
     }
 
     return (
@@ -203,7 +297,7 @@ export const List = () => {
                 <Button
                     size={'s'}
                     title={'수량 변경'}
-                    onClick={handleChangeQuantity}
+                    onClick={handleOpenModal}
                 />
                 {selectAll ? (
                     <Button
@@ -244,7 +338,13 @@ export const List = () => {
                                       src={product.product_thumbnail}
                                       alt="대표 이미지"
                                   />
-                                  <div className={styles.info}>
+                                  <div
+                                      className={`${styles.info} ${
+                                          product.quantity === 0
+                                              ? styles.line
+                                              : ''
+                                      }`}
+                                  >
                                       <div className={styles.productTitle}>
                                           <input
                                               type="checkbox"
@@ -255,14 +355,46 @@ export const List = () => {
                                                   )
                                               }
                                           />
-                                          <div>{product.product_title}</div>
+                                          <div className={styles.name}>
+                                              {product.product_title}
+                                          </div>
                                       </div>
                                       <div>\ {addCommas(product.price)}</div>
+                                      <div className={styles.num}>
+                                          {product.quantity === 0 ? (
+                                              <span>품절</span>
+                                          ) : (
+                                              ''
+                                          )}
+                                          남은 수량 :{' '}
+                                          {addCommas(product.quantity)}개
+                                      </div>
                                   </div>
                               </div>
                           ))}
                 </div>
             </div>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                <h2 className={styles.modalTitle}>상품 수량 변경</h2>
+                <div className={styles.quantity}>
+                    <input
+                        type="number"
+                        name="quantity"
+                        min={0}
+                        placeholder="수량"
+                        value={quantity}
+                        onChange={handleQuantityChange}
+                    />
+                </div>
+                <div className={styles.modalBtns}>
+                    <Button size={'s'} onClick={handleUpdate} title={'완료'} />
+                    <Button
+                        size={'s'}
+                        onClick={handleCloseModal}
+                        title={'취소'}
+                    />
+                </div>
+            </Modal>
         </>
     )
 }

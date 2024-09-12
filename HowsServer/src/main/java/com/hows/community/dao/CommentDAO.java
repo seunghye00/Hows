@@ -22,8 +22,16 @@ public class CommentDAO {
         
         mybatis.insert("Comment.writeComment", params);
     }
-    
+	// 게시글 댓글 목록 불러오기
     public List<Map<String, Object>> getCommentsBoardSeq(int boardSeq) {
        return mybatis.selectList("Comment.getCommentsBoardSeq",boardSeq);
+    }
+    
+	// 게시글 댓글 수정 
+    public void updateComment(int commentSeq, String commentContents) {
+    	Map<String, Object> params = new HashMap<>();
+        params.put("comment_seq", commentSeq);
+        params.put("comment_contents", commentContents);
+    	mybatis.update("Comment.updateComment", params);
     }
 }

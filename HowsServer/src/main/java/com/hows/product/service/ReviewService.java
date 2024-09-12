@@ -5,13 +5,12 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hows.product.dao.ReviewDAO;
 import com.hows.product.dto.ImageDTO;
 import com.hows.product.dto.ReviewDTO;
 import com.hows.product.dto.ReviewReportDTO;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class ReviewService {
@@ -34,21 +33,14 @@ public class ReviewService {
 		return review.getReview_seq();
 	}
 	
-	// 리뷰 목록 출력
-	public List<Map<String, Object>>  getReviewList(int product_seq) throws Exception{
+	// 리뷰 목록 출력 (페이징)
+	public List<Map<String, Object>>  getReviewList(int product_seq, int page, int itemsPerPage) throws Exception{
 		System.out.println("getReviewList serv");
-		
-		return reviewDAO.getReviewList(product_seq);
+		 // 페이징을 위한 startRow, endRow 계산
+        int startRow = (page - 1) * itemsPerPage + 1;
+        int endRow = page * itemsPerPage;
+		return reviewDAO.getReviewList(product_seq, startRow, endRow);
 	}
-
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	// 관리자
 	// 리뷰 신고목록 조회 (관리자)

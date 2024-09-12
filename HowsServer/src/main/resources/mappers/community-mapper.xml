@@ -206,6 +206,11 @@
 	        b.member_id = #{member_id}
 	</select>
 	
+	<!-- [마이페이지] 게시글 갯수 -->
+	<select id="countPost" resultType="int">
+	    select count(*) from board where member_id = #{member_id}
+	</select>
+	
 	
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->

@@ -1,0 +1,21 @@
+.postActions {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    justify-content: space-between;
+    color: var(--hows-gray-600);
+    margin-bottom: 20px;
+}
+
+.likesViewBook {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.subMitLink {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

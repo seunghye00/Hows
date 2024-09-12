@@ -201,16 +201,52 @@ public class MemberController {
 		int result = memServ.deleteUser(member_id);
 		return ResponseEntity.ok(result);
 	}
+	
+	// 팔로우 및 언팔로우 메서드
+	@PostMapping("/follow")
+	public ResponseEntity<Map<String, Object>> toggleFollow(
+	        @RequestBody Map<String, Object> requestBody
+	) {
+		System.out.println(requestBody.get("from_member_seq"));
+		System.out.println(requestBody.get("to_member_seq"));
+	    try {
+	        int fromMemberSeq = (int) requestBody.get("from_member_seq");
+	        int toMemberSeq = (int) requestBody.get("to_member_seq");
+	        boolean checkStatus = (boolean) requestBody.get("checkStatus");  // 클라이언트에서 전달된 checkStatus 플래그
 
-	// 마이페이지 게시물 출력
+	        // 이미 팔로우한 상태인지 확인
+	        boolean isFollowing = memServ.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
+
+	        Map<String, Object> response = new HashMap<>();
+	        
+	        if (checkStatus) {
+	            // checkStatus가 true이면 상태만 반환하고 추가/취소 작업은 하지 않음
+	            response.put("isFollowing", isFollowing);
+	            return ResponseEntity.ok(response);
+	        }
+
+	        if (isFollowing) {
+	            // 팔로우를 취소
+	        	memServ.removeFollow(fromMemberSeq, toMemberSeq);
+	            response.put("isFollowing", false);
+	            response.put("message", "팔로우가 취소되었습니다.");
+	        } else {
+	            // 팔로우 추가
+	        	memServ.addFollow(fromMemberSeq, toMemberSeq);
+	            response.put("isFollowing", true);
+	            response.put("message", "팔로우가 추가되었습니다.");
+	        }
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
+  
+  // 마이페이지 게시물 출력
 	@GetMapping("/selectPost")
 	public ResponseEntity<List<MemberDTO>> selectPost(@RequestParam String member_id){
-		
-		
 		return ResponseEntity.ok(null);
 	}
-	
-	
 	
 	// ========================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
@@ -340,6 +376,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

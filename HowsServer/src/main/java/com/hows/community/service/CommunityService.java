@@ -95,7 +95,21 @@ public class CommunityService {
 	public int insertWrite(CommunityDTO dto) {
 		return communityDAO.insertWrite(dto);
 	}
-
+	// 조회수 증가 메서드
+	public void incrementViewCount(int board_seq) {
+	    // 조회수 증가 쿼리 실행
+		communityDAO.updateViewCount(board_seq);
+	}
+	
+	// 조회수 가져오기 서비스 메서드
+	public int getViewCount(int board_seq) {
+	    return communityDAO.getViewCount(board_seq);  // 현재 조회수 반환
+	}
+	// 게시물 신고 
+	public void sendReport(int boardSeq, String reportCode, String memberId) {
+	     communityDAO.sendReport(boardSeq, reportCode, memberId);  // 현재 조회수 반환
+	}
+	
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	public List<Map<String, Object>> reportedCommunity(int page, int itemsPerPage) throws Exception {

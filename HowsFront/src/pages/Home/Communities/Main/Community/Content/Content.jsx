@@ -6,9 +6,7 @@ import {
     getCommunityPosts,
     toggleLike,
     toggleBookmark,
-    toggleFollow,
 } from '../../../../../../api/community' // API 호출 함수 불러오기
-import { host } from '../../../../../../config/config'
 import { Button } from '../../../../../../components/Button/Button'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pagination } from 'swiper/modules'
@@ -16,6 +14,8 @@ import { useAuthStore } from '../../../../../../store/store'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { toggleFollow, userInfo } from '../../../../../../api/member'
+import Swal from 'sweetalert2'
 
 export const Content = () => {
     const [contentList, setContentList] = useState([]) // 전체 콘텐츠 리스트
@@ -25,7 +25,26 @@ export const Content = () => {
     const { isAuth } = useAuthStore() // 로그인 여부 확인
     const [loaderVisible, setLoaderVisible] = useState(true) // 로딩 상태
     const [endMessageVisible, setEndMessageVisible] = useState(true) // 종료 메시지 상태
-    console.log(isAuth + '토큰 갑 확인')
+    const [memberSeq, setMemberSeq] = useState(null) // 로그인한 사용자의 member_seq 저장
+    const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+
+    // 로그인한 사용자의 member_seq 가져오기
+    useEffect(() => {
+        const fetchMemberInfo = async () => {
+            if (!member_id) {
+                console.log('member_id가 없습니다. API 호출을 중단합니다.')
+                return // member_id가 없으면 API 호출을 하지 않음
+            }
+            try {
+                const response = await userInfo(member_id) // API 호출
+                setMemberSeq(response.data.member_seq) // 멤버 데이터 상태에 저장
+            } catch (error) {
+                console.error('멤버 정보를 가져오는 중 오류 발생:', error)
+            }
+        }
+        fetchMemberInfo()
+    }, [member_id])
+
     const fetchData = async (page, limit = 20) => {
         try {
             const data = await getCommunityPosts(page, limit)
@@ -37,7 +56,6 @@ export const Content = () => {
                 return []
             }
 
-            console.log('받아온 데이터:', data) // 받아온 데이터 출력
             if (data.length < limit) {
                 setHasMore(false)
             }
@@ -52,7 +70,14 @@ export const Content = () => {
     useEffect(() => {
         const loadInitialData = async () => {
             const initialData = await fetchData(page)
-            setContentList(initialData) // 초기 데이터 설정
+            setContentList(
+                initialData.map(content => ({
+                    ...content,
+                    isLiked: content.isLiked, // 서버에서 받은 값으로 초기화
+                    isBookmarked: content.isBookmarked, // 서버에서 받은 값으로 초기화
+                    isFollowing: content.isFollowing, // 서버에서 받은 팔로우 상태
+                }))
+            ) // 초기 데이터 설정
 
             if (initialData.length < 20) {
                 setHasMore(false) // 처음부터 데이터가 limit보다 적다면 바로 스크롤 중지
@@ -103,69 +128,98 @@ export const Content = () => {
             `After loading more, page: ${nextPage}, hasMore: ${hasMore}`
         )
     }
+
     // 좋아요 상태 업데이트 함수
-    const toggleLike = async board_seq => {
-        if (!isAuth) {
-            navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
+    const toggleLikeHandler = async board_seq => {
+        const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+        if (!member_id || !isAuth) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
             return
         }
         try {
-            await axios.post(`${host}/community/${board_seq}/like`)
+            const response = await toggleLike(board_seq, member_id)
+            const { isLiked, like_count } = response.data
+
+            setContentList(prevList =>
+                prevList.map(item =>
+                    item.BOARD_SEQ === board_seq
+                        ? { ...item, isLiked, LIKE_COUNT: like_count }
+                        : item
+                )
+            )
+        } catch (error) {
+            console.error('좋아요 처리 중 오류 발생:', error)
+        }
+    }
+
+    // 북마크 상태 업데이트 함수
+    const toggleBookmarkHandler = async board_seq => {
+        const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+        if (!member_id || !isAuth) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
+            return
+        }
+        try {
+            const response = await toggleBookmark(board_seq, member_id)
+            const { isBookmarked, bookmark_count } = response.data
+
             setContentList(prevList =>
                 prevList.map(item =>
                     item.BOARD_SEQ === board_seq
                         ? {
                               ...item,
-                              isLiked: !item.isLiked,
-                              likes: item.isLiked
-                                  ? item.likes - 1
-                                  : item.likes + 1,
+                              isBookmarked,
+                              BOOKMARK_COUNT: bookmark_count,
                           }
                         : item
                 )
             )
         } catch (error) {
-            console.error('Error toggling like:', error)
-        }
-    }
-
-    // 북마크 상태 업데이트 함수
-    const toggleBookmark = async board_seq => {
-        if (!isAuth) {
-            navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
-            return
-        }
-        try {
-            await axios.post(`${host}/community/${board_seq}/bookmark`)
-            setContentList(prevList =>
-                prevList.map(item =>
-                    item.BOARD_SEQ === board_seq
-                        ? { ...item, isBookmarked: !item.isBookmarked }
-                        : item
-                )
-            )
-        } catch (error) {
-            console.error('Error toggling bookmark:', error)
+            console.error('북마크 처리 중 오류 발생:', error)
         }
     }
 
     // 팔로우 상태 업데이트 함수
-    const handleFollow = async nickname => {
-        if (!isAuth) {
-            navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
+    const handleFollow = async targetMemberSeq => {
+        if (!isAuth || !memberSeq) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
             return
         }
         try {
-            await axios.post(`${host}/user/${nickname}/follow`)
+            const response = await toggleFollow({
+                from_member_seq: memberSeq, // 로그인한 사용자의 member_seq
+                to_member_seq: targetMemberSeq, // 팔로우할 대상의 member_seq
+                checkStatus: false, // 팔로우 상태 변경
+            })
+
+            // 팔로우 상태 업데이트
             setContentList(prevList =>
                 prevList.map(item =>
-                    item.NICKNAME === nickname
-                        ? { ...item, isFollowing: !item.isFollowing }
+                    item.MEMBER_SEQ === targetMemberSeq
+                        ? { ...item, isFollowing: response.data.isFollowing }
                         : item
                 )
             )
         } catch (error) {
-            console.error('Error following user:', error)
+            console.error('팔로우 처리 중 오류 발생:', error)
         }
     }
 
@@ -245,9 +299,12 @@ export const Content = () => {
                                                 : '팔로우'
                                         }
                                         size="s"
+                                        isChecked={
+                                            content.isFollowing ? 'Y' : 'N'
+                                        }
                                         onClick={e => {
                                             e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
-                                            handleFollow(content.NICKNAME) // 팔로우
+                                            handleFollow(content.MEMBER_SEQ) // 팔로우할 대상의 MEMBER_SEQ를 전달
                                         }}
                                     />
                                 </div>
@@ -270,12 +327,18 @@ export const Content = () => {
 
                                 <div className={styles.mainContentTxt}>
                                     <div className={styles.btnBox}>
-                                        <div className={styles.btnLeft}>
+                                        <div
+                                            className={styles.btnLeft}
+                                            onClick={e => {
+                                                e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
+                                                toggleLike(content.BOARD_SEQ) // BOARD_SEQ를 전달
+                                            }}
+                                        >
                                             <div
                                                 className={styles.likeBtn}
                                                 onClick={e => {
-                                                    e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
-                                                    toggleLike(
+                                                    e.stopPropagation()
+                                                    toggleLikeHandler(
                                                         content.BOARD_SEQ
                                                     )
                                                 }}
@@ -290,7 +353,7 @@ export const Content = () => {
                                                 <span
                                                     className={styles.likeCount}
                                                 >
-                                                    {content.likes}
+                                                    {content.LIKE_COUNT}
                                                 </span>
                                             </div>
                                             <div className={styles.comment}>
@@ -308,8 +371,8 @@ export const Content = () => {
                                             <a
                                                 className={styles.bookMark}
                                                 onClick={e => {
-                                                    e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
-                                                    toggleBookmark(
+                                                    e.stopPropagation()
+                                                    toggleBookmarkHandler(
                                                         content.BOARD_SEQ
                                                     )
                                                 }}

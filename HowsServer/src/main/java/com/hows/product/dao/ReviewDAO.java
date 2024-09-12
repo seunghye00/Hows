@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.hows.product.dto.ImageDTO;
 import com.hows.product.dto.ReviewDTO;
 import com.hows.product.dto.ReviewReportDTO;
 
@@ -20,7 +21,27 @@ public class ReviewDAO {
 	public void insertReview(ReviewDTO review) {
 		myBatis.insert("Product.insertReview", review);
 	}
+	
+	// 리뷰 이미지 저장
+	public void insertReviewImage(ImageDTO imageDTO) {
+		myBatis.insert("Product.insertReviewImage", imageDTO);
+	}
+	
+	// 리뷰 목록 출력
+	public List<Map<String, Object>>  getReviewList (int product_seq) throws Exception{
+		System.out.println("getReviewList dao");
+		
+		return myBatis.selectList("Product.getReviewList",product_seq);
+	}
 
+	
+	
+	
+	
+	
+	
+	
+	
 	// 관리자
 	// 리뷰 신고목록 조회 (관리자)
 	public List<Map<String, Object>> getReportedReviews(int startRow, int endRow) throws Exception {
@@ -51,5 +72,9 @@ public class ReviewDAO {
 	// 리뷰 삭제
 	public int deleteReview(int review_seq) throws Exception {
 	    return myBatis.delete("Product.deleteReview", review_seq);
+	}
+	
+	public int selectLastReviewSeq() throws Exception {
+		return myBatis.selectOne("Product.selectLastReviewSeq");
 	}
 }

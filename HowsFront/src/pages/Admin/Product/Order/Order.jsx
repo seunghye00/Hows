@@ -11,6 +11,15 @@ export const Order = () => {
     const [orders, setOrders] = useState([])
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedOrder, setSelectedOrder] = useState(null)
+    const [viewOrder, setViewOrder] = useState({
+        order_date: '',
+        payment_price: '',
+        order_name: '',
+        order_price: 0,
+        payment_price: 0,
+        grade_title: '',
+        name: '',
+    })
     const [selectAll, setSelectAll] = useState(false)
     const [searchQuery, setSearchQuery] = useState('') // 검색어 상태
     const [status, setStatus] = useState('product')
@@ -18,7 +27,7 @@ export const Order = () => {
     useEffect(() => {
         orderList(status)
             .then(resp => {
-                // console.log(resp.data)
+                console.log(resp.data)
                 const beforeOrders = resp.data.map(order => ({
                     ...order,
                     checked: false, // 초기 체크 상태
@@ -40,14 +49,20 @@ export const Order = () => {
     const handleStartDelivery = () => {
         console.log('배송 시작')
     }
-    /*
+
+    // 주문 목록 클릭
+    const handleViewInfo = order_seq => {
+        const selectedOrder = orders.find(
+            order => order.order_seq === order_seq
+        ) // 해당 주문을 찾음
+        setViewOrder(selectedOrder) // 객체로 설정
+        setIsModalOpen(true) // 모달 열기
+    }
+
     // 모달창 닫기 버튼 클릭
     const handleCloseModal = () => {
-        setSelectedFile(null)
-        setPreview('')
         setIsModalOpen(false) // 모달 닫기
     }
-    */
 
     // 전체 선택/해제 핸들러
     const handleSelectAllChange = () => {
@@ -178,7 +193,7 @@ export const Order = () => {
                             />
                         </div>
                         <div className={styles.cols}>주문 일시</div>
-                        <div className={styles.cols}>상품명</div>
+                        <div className={styles.cols}>주문명</div>
                         <div className={styles.cols}>주문자</div>
                         <div className={styles.cols}>주문 금액</div>
                         <div className={styles.cols}>주문 상태</div>
@@ -191,7 +206,14 @@ export const Order = () => {
                         ) : (
                             orders.map((order, i) => (
                                 <div key={i} className={styles.rows}>
-                                    <div className={styles.cols}>
+                                    <div
+                                        className={styles.cols}
+                                        onClick={() =>
+                                            handleCheckboxChange(
+                                                order.orders_seq
+                                            )
+                                        }
+                                    >
                                         <input
                                             type="checkbox"
                                             checked={order.checked || false}
@@ -202,17 +224,44 @@ export const Order = () => {
                                             }
                                         />
                                     </div>
-                                    <div className={styles.cols}>
+                                    <div
+                                        className={styles.cols}
+                                        onClick={() =>
+                                            handleViewInfo(order.order_seq)
+                                        }
+                                    >
                                         {formatDate(order.order_date)}
                                     </div>
-                                    <div className={styles.cols}>상품명</div>
-                                    <div className={styles.cols}>
+                                    <div
+                                        className={styles.cols}
+                                        onClick={() =>
+                                            handleViewInfo(order.order_seq)
+                                        }
+                                    >
+                                        {order.order_name}
+                                    </div>
+                                    <div
+                                        className={styles.cols}
+                                        onClick={() =>
+                                            handleViewInfo(order.order_seq)
+                                        }
+                                    >
                                         {order.name}
                                     </div>
-                                    <div className={styles.cols}>
+                                    <div
+                                        className={styles.cols}
+                                        onClick={() =>
+                                            handleViewInfo(order.order_seq)
+                                        }
+                                    >
                                         \ {addCommas(order.order_price)}
                                     </div>
-                                    <div className={styles.cols}>
+                                    <div
+                                        className={styles.cols}
+                                        onClick={() =>
+                                            handleViewInfo(order.order_seq)
+                                        }
+                                    >
                                         {order.order_title}
                                     </div>
                                 </div>
@@ -221,6 +270,43 @@ export const Order = () => {
                     </div>
                 </div>
             </div>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                <h2 className={styles.modalTitle}>주문 상세 정보</h2>
+                <div className={styles.dateInfo}>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>주문일</div>
+                        <div>{formatDate(viewOrder.order_date)}</div>
+                    </div>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>결재일</div>
+                        <div>{formatDate(viewOrder.payment_date)}</div>
+                    </div>
+                </div>
+                <div className={styles.orderName}>
+                    <div className={styles.subTitle}>주문명</div>
+                    <div>{viewOrder.order_name}</div>
+                </div>
+                <div className={styles.priceInfo}>
+                    <div className={styles.price}>
+                        <div className={styles.subTitle}>주문 금액</div>
+                        <div>{addCommas(viewOrder.order_price)}</div>
+                    </div>
+                    <div className={styles.price}>
+                        <div className={styles.subTitle}>결재 금액</div>
+                        <div>{addCommas(viewOrder.payment_price)}</div>
+                    </div>
+                </div>
+                <div className={styles.memberInfo}>
+                    <div className={styles.member}>
+                        <div className={styles.subTitle}>회원 등급</div>
+                        <div>{viewOrder.grade_title}</div>
+                    </div>
+                    <div className={styles.member}>
+                        <div className={styles.subTitle}>회원명</div>
+                        <div>{viewOrder.name}</div>
+                    </div>
+                </div>
+            </Modal>
         </>
     )
 }

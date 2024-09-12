@@ -5,6 +5,16 @@
 
 <mapper namespace="Product">
 
+	<resultMap id="myReviewMap" type="java.util.HashMap">
+		<result property="review_seq" column="review_seq"/>
+		<result property="rating" column="rating"/>
+		<result property="review_contents" column="review_contents"/>
+		<result property="review_date" column="review_date" javaType="java.sql.Timestamp"/>
+		<result property="product_seq" column="product_seq"/>
+		<result property="product_title" column="product_title"/>
+		<result property="member_id" column="member_id"/>
+	</resultMap>
+
 	<select id="getProducts"
 		resultType="com.hows.product.dto.ProductDTO">
 		SELECT *
@@ -64,11 +74,13 @@
 	</select>
 	
 	<!-- My 리뷰 목록 -->
-	<select id="myReview" resultType="com.hows.product.dto.ReviewDTO">
+	<select id="myReview" resultMap="myReviewMap">
 		SELECT
-			*
+			r.*,
+			p.product_title
 		FROM
-			review
+			review r
+			JOIN product p ON r.product_seq = p.product_seq
 		WHERE
 			member_id = #{member_id}
 	</select>

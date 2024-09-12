@@ -9,6 +9,7 @@ import com.hows.product.dto.ReviewDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,14 +42,16 @@ public class HistoryService {
 
     /** Review 목록 **/
     public List<?> myReview (String memberId) {
-        List<ReviewDTO> list = reviewDAO.myReview(memberId);
+        List<Map<String, Object>> list = reviewDAO.myReview(memberId);
         List<Map<String, ?>> mapList = new ArrayList<>();
-        for(ReviewDTO dto : list) {
-            int reviewSeq = dto.getReview_seq();
+        for(Map<String, Object> dto : list) {
+            BigDecimal reviewSeqDecimal = (BigDecimal) dto.get("review_seq");
+            int reviewSeq = reviewSeqDecimal.intValue();
             List<ImageDTO> reviewImage = reviewDAO.myReviewImage(reviewSeq);
             Map<String, Object> map = new HashMap<>();
             map.put("myReview", dto);
             map.put("myReviewImage", reviewImage);
+            mapList.add(map);
         }
         return mapList;
     }

@@ -35,10 +35,11 @@ public class ReviewDAO {
 	}
 
 	// My 리뷰 목록
-	public List<ReviewDTO> myReview(String memberId) {
+	public List<Map<String, Object>> myReview(String memberId) {
 		return myBatis.selectList("Product.myReview",memberId);
 	}
 
+	// My 리뷰 이미지 목록
 	public List<ImageDTO> myReviewImage(int reviewSeq) {
 		return myBatis.selectList("Product.myReviewImage",reviewSeq);
 	}

@@ -1,6 +1,8 @@
 import styles from "./Review.module.css"
 import {useEffect, useState} from "react";
 import {api} from "../../../../config/config";
+import {formatDate} from "../../../../commons/commons";
+import StarRating from "../../../../components/StarRating/StarRating";
 
 export const Review = () => {
     const list = [
@@ -24,7 +26,7 @@ export const Review = () => {
 
     useEffect(() => {
         api.get(`/history/review`).then(res => {
-            console.log("res ===== ", res);
+            console.log("res ===== ", res.data);
             setMyReview(res.data);
         });
     }, []);
@@ -36,25 +38,26 @@ export const Review = () => {
                 <span>개의 리뷰</span>
             </div>
             {
-                list.map((item, i) => {
+                myReview.map(item => {
+                    const contents = item.myReview.review_contents;
                     return (
-                        <div className={styles.item} key={item.product_seq}>
-                            <div className={styles.itemImage}>
-                                <img src={item.product_image} alt="상품이미지" />
-                            </div>
-                            <div className={styles.itemInfo}>
-                                <p>{item.product_title}</p>
-                                <div className={styles.itemCount}>
-                                    <span>{item.product_category_title}</span>
-                                    <span>수량 : {item.product_quantity}</span>
-                                    {/* <span>{addCommas(item.product_total_price)}원</span> */}
-                                </div>
-                            </div>
-                        </div>
-                    )
+                      <div className={styles.item} key={item.myReview.review_seq}>
+                          <div className={styles.itemImage}>
+                              <img src={item.myReviewImage[0].image_url} alt="상품이미지"/>
+                          </div>
+                          <div className={styles.itemInfo}>
+                              <p>{contents.length > 20 ? contents.slice(0,19) : contents}</p>
+                              <div className={styles.itemCount}>
+                                  <span>{formatDate(item.myReview.review_date)}</span>
+                                  <span><StarRating rating={item.myReview.rating} /></span>
+                                  <span>상품 : <a
+                                    href={`/products/${item.myReview.product_seq}`}>{item.myReview.product_title}</a></span>
+                              </div>
+                          </div>
+                      </div>
+                    );
                 })
             }
-
         </div>
     )
 }

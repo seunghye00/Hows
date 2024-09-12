@@ -9,6 +9,7 @@ import {
 } from '../../../../api/product'
 import { addCommas, SwalComp } from '../../../../commons/commons'
 import { useNavigate } from 'react-router-dom'
+import { Modal } from '../../../../components/Modal/Modal'
 
 export const List = () => {
     // 상태 변수 초기화
@@ -18,6 +19,7 @@ export const List = () => {
     const [selectAll, setSelectAll] = useState(false) // 전체 선택 상태
     const [categories, setCategories] = useState([]) // 카테고리 목록
     const [searchQuery, setSearchQuery] = useState('') // 검색어 상태
+    const [isModalOpen, setIsModalOpen] = useState(false)
     const navi = useNavigate()
 
     useEffect(() => {
@@ -165,8 +167,14 @@ export const List = () => {
         })
     }
 
-    const handleChangeQuantity = () => {
-        console.log('수량 변경')
+    // 수량 변경 버튼 클릭
+    const handleOpenModal = () => {
+        setIsModalOpen(true) // 모달 열기
+    }
+
+    // 모달창 닫기 버튼 클릭
+    const handleCloseModal = () => {
+        setIsModalOpen(false) // 모달 닫기
     }
 
     return (
@@ -204,7 +212,7 @@ export const List = () => {
                 <Button
                     size={'s'}
                     title={'수량 변경'}
-                    onClick={handleChangeQuantity}
+                    onClick={handleOpenModal}
                 />
                 {selectAll ? (
                     <Button
@@ -281,6 +289,9 @@ export const List = () => {
                           ))}
                 </div>
             </div>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                <h2 className={styles.modalTitle}>상품 수량 변경</h2>
+            </Modal>
         </>
     )
 }

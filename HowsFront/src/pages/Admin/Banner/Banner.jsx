@@ -2,7 +2,7 @@ import styles from './Banner.module.css'
 import { Button } from '../../../components/Button/Button'
 import { bannerList, addBanner, deleteBanners } from '../../../api/banner'
 import { useEffect, useState } from 'react'
-import { formatDate } from '../../../commons/commons'
+import { formatDateForInput } from '../../../commons/commons'
 import { Modal } from '../../../components/Modal/Modal'
 import { BiCamera } from 'react-icons/bi'
 import Swal from 'sweetalert2'
@@ -18,6 +18,13 @@ export const Banner = () => {
     const [selectedFile, setSelectedFile] = useState(null)
     const [preview, setPreview] = useState('')
     const [selectAll, setSelectAll] = useState(false)
+
+    // 오늘 날짜 가져오기
+    const today = new Date()
+
+    // 내일 날짜 설정
+    const tomorrow = new Date(today)
+    tomorrow.setDate(today.getDate() + 1)
 
     useEffect(() => {
         bannerList()
@@ -261,8 +268,7 @@ export const Banner = () => {
                                     />
                                 </div>
                                 <div className={styles.cols}>
-                                    {formatDate(banner.start_date)} ~{' '}
-                                    {formatDate(banner.end_date)}
+                                    {banner.start_date} ~ {banner.end_date}
                                 </div>
                             </div>
                         ))
@@ -297,7 +303,8 @@ export const Banner = () => {
                         <input
                             type="date"
                             name="startDate"
-                            id=""
+                            min={formatDateForInput(tomorrow)}
+                            max={banner.endDate === '' ? '' : banner.endDate}
                             onChange={handleChangeBanner}
                         />
                     </div>
@@ -306,7 +313,11 @@ export const Banner = () => {
                         <input
                             type="date"
                             name="endDate"
-                            id=""
+                            min={
+                                banner.startDate === ''
+                                    ? formatDateForInput(tomorrow)
+                                    : banner.startDate
+                            }
                             onChange={handleChangeBanner}
                         />
                     </div>

@@ -93,6 +93,7 @@
     height: 100px;
     border: 1px solid black;
     margin: 10px 0;
+    width: 507px;
 }
 
 .imgLabel label {
@@ -117,6 +118,7 @@
 .selectInfo {
     display: flex;
     margin: 25px 0;
+    gap: 75px;
 }
 
 .selectInfo input {
@@ -130,6 +132,10 @@
     font-weight: 500;
 }
 
+.selectInfo input[type="date"] {
+    width: 120%;
+}
+
 .choiceDate,
 .choiceOrder {
     display: flex;
@@ -139,8 +145,7 @@
     min-width: 80px;
 }
 
-.choiceDate div,
-.choiceOrder div {
+.choiceDate div {
     padding-left: 5px;
 }
 

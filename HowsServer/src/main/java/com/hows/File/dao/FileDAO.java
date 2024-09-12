@@ -32,13 +32,8 @@ public class FileDAO {
 		return mybatis.delete("File.deleteFile", sysName);
 	}
 
-	// 배너 SEQ로 파일 sysname 조회
-	public String getSysName(int bannerSeq) {
-		return mybatis.selectOne("File.getSysName", bannerSeq);
-	}
-
-	// parent_seq로 파일 sysname 조회
+	// parent_seq로 파일 목록의 sysname 조회
 	public List<String> getSysNames(int parentSeq) {
-		return mybatis.selectList("File.getSysNames", parentSeq);
+		return mybatis.selectList("File.getSysName", parentSeq);
 	}
 }

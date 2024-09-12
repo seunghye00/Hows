@@ -72,7 +72,7 @@ public class BannerController {
 				if(!bannServ.deleteBanner(banner_seq)) {
 					throw new RuntimeException("배너 삭제 실패");
 				}
-                String sysName = fileServ.getSysName(banner_seq);
+                String sysName = fileServ.getSysNames(banner_seq).get(0);
                 String result = fileServ.deleteFile(sysName, "F5");
                 if (result.equals("fail")) {
                     throw new RuntimeException("파일 삭제 실패: " + sysName);

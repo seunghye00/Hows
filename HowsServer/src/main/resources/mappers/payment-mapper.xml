@@ -5,6 +5,17 @@
 
 <mapper namespace="Payment">
 
+    <resultMap id="myPaymentMap" type="java.util.HashMap">
+        <result property="payment_seq" column="payment_seq"/>
+        <result property="member_seq" column="member_seq"/>
+        <result property="order_seq" column="order_seq"/>
+        <result property="payment_price" column="payment_price"/>
+        <result property="payment_date" column="payment_date" javaType="java.sql.Timestamp"/>
+        <result property="payment_id" column="payment_id"/>
+        <result property="payment_title" column="payment_title"/>
+        <result property="order_name" column="order_name"/>
+    </resultMap>
+
     <select id="list" resultType="com.hows.payment.dto.PaymentDTO">
         SELECT
             *
@@ -13,6 +24,25 @@
         WHERE
             member_id = #{id}
     </select>
+
+    <select id="myPayment" resultMap="myPaymentMap">
+        SELECT
+            p.payment_seq,
+            p.member_seq,
+            p.order_seq,
+            p.payment_price,
+            p.payment_date,
+            p.payment_id,
+            pc.payment_title,
+            o.order_name
+        FROM
+            payment p
+            JOIN payment_status pc ON p.payment_code = pc.payment_code
+            JOIN orders o ON p.order_seq = o.order_seq
+        WHERE
+            p.member_seq = #{member_seq}
+    </select>
+
 
     <insert id="addPayment">
         INSERT INTO

@@ -44,10 +44,12 @@
 
 	<select id="orderListByStatus" resultType="com.hows.order.dto.OrderInfoListDTO">
 		select
-		o.order_seq, o.order_date, m.name, o.order_price, s.order_title
+		o.order_seq, o.order_date, o.order_name, m.name, g.grade_title, o.order_price, s.order_title, p.payment_price, p.payment_date
 		from orders o
-		join member m ON o.member_seq = m.member_seq
-		join order_status s ON o.order_code = s.order_code
+		join member m on o.member_seq = m.member_seq
+		join grade g on m.grade_code = g.grade_code
+		join payment p on o.order_seq = p.order_seq
+		join order_status s on o.order_code = s.order_code
 		<where>
 			<choose>
 				<when test="status == 'product'">
@@ -77,6 +79,7 @@
 			#{order_seq},
 			#{member_seq},
 			#{order_code},
+			#{order_name},
 			default,
 			#{order_price},
 			#{orderer_name},

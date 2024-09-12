@@ -5,6 +5,16 @@
 
 <mapper namespace="Product">
 
+	<resultMap id="myReviewMap" type="java.util.HashMap">
+		<result property="review_seq" column="review_seq"/>
+		<result property="rating" column="rating"/>
+		<result property="review_contents" column="review_contents"/>
+		<result property="review_date" column="review_date" javaType="java.sql.Timestamp"/>
+		<result property="product_seq" column="product_seq"/>
+		<result property="product_title" column="product_title"/>
+		<result property="member_id" column="member_id"/>
+	</resultMap>
+
 	<select id="getProducts"
 		resultType="com.hows.product.dto.ProductDTO">
 		SELECT *
@@ -51,12 +61,12 @@
 	<!-- 리뷰 목록 출력 (페이징) -->
 	<select id="getReviewList" resultType="map">
 		SELECT 
-		    r.*, 
-		    (SELECT COUNT(*) 
-		     FROM REVIEW 
+		    r.*,
+		    (SELECT COUNT(*)
+		     FROM REVIEW
 		     WHERE product_seq = #{product_seq}) AS total_count
 		FROM (
-		    SELECT 
+		    SELECT
 		        r.PRODUCT_SEQ,
 		        r.REVIEW_SEQ,
 		        r.RATING,
@@ -64,11 +74,35 @@
 		        TO_CHAR(r.REVIEW_DATE, 'YYYY-MM-DD HH24:MI:SS') AS REVIEW_DATE,
 		        r.MEMBER_ID,
 		        ROW_NUMBER() OVER (ORDER BY r.REVIEW_DATE DESC) AS rn
-		    FROM REVIEW r 
+		    FROM REVIEW r
 		    WHERE r.product_seq = #{product_seq}
 		) r
 		WHERE r.rn BETWEEN #{startRow} AND #{endRow}
 	</select>
+	
+	<!-- My 리뷰 목록 -->
+	<select id="myReview" resultMap="myReviewMap">
+		SELECT
+			r.*,
+			p.product_title
+		FROM
+			review r
+			JOIN product p ON r.product_seq = p.product_seq
+		WHERE
+			member_id = #{member_id}
+	</select>
+
+	<select id="myReviewImage" resultType="com.hows.product.dto.ImageDTO">
+		SELECT
+			*
+		FROM
+			review_image
+		WHERE
+			review_seq = #{review_seq}
+	</select>
+
+
+
 
 	<insert id="insert">
 		<selectKey keyProperty="product_seq" resultType="int"

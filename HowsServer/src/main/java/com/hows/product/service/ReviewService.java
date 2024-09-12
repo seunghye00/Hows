@@ -5,13 +5,12 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hows.product.dao.ReviewDAO;
 import com.hows.product.dto.ImageDTO;
 import com.hows.product.dto.ReviewDTO;
 import com.hows.product.dto.ReviewReportDTO;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class ReviewService {
@@ -40,15 +39,6 @@ public class ReviewService {
 		
 		return reviewDAO.getReviewList(product_seq);
 	}
-
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	// 관리자
 	// 리뷰 신고목록 조회 (관리자)

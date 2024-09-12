@@ -13,8 +13,8 @@
     position: absolute;
     display: flex;
     gap: 10px;
-    right: 30px;
-    top: 82px;
+    right: 50px;
+    top: 70px;
 }
 
 .imgs {
@@ -104,7 +104,8 @@
 }
 
 .info input:last-child {
-    flex: 1;
+    /* flex: 1; */
+    width: 90%;
 }
 
 .writeWrap {

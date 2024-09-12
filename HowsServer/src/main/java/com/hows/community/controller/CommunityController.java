@@ -10,6 +10,8 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,123 +23,371 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import com.hows.File.service.FileService; // FileService 클래스 import
+import com.hows.community.dto.BoardReportDTO;
 import com.hows.community.dto.CommunityDTO; // CommunityDTO import
 import com.hows.community.dto.ImageDTO; // ImageDTO import
 import com.hows.community.dto.TagDTO; // TagDTO import
 import com.hows.community.service.CommunityService; // CommunityService import
+import com.hows.member.dto.MemberDTO;
+import com.hows.member.service.MemberService;
+
 @RestController
 @RequestMapping("/community")
 public class CommunityController {
-    @Autowired
-    private CommunityService communityService;
+	@Autowired
+	private CommunityService communityServ;
 
-    @Autowired
-    private FileService fileService;
+	@Autowired
+	private FileService fileServ;
 
-    // 게시글 저장
-    @PostMapping
-    public ResponseEntity<Integer> insertWrite(@RequestBody CommunityDTO dto) {
-        int board_seq = communityService.insertWrite(dto);
-        System.out.println(board_seq + " 현재 시퀀스 값");
-        return ResponseEntity.ok(board_seq);
-    }
+	@Autowired
+	private MemberService memServ;
+	
+	// 게시글 및 이미지/태그 저장 (트랜잭션 적용)
+	@PostMapping("/write-with-images")
+	@Transactional // 트랜잭션 적용
+	public ResponseEntity<Void> insertWriteWithImages(
+	    @RequestParam("housing_type_code") String housingTypeCode,
+	    @RequestParam("space_type_code") String spaceTypeCode,
+	    @RequestParam("area_size_code") String areaSizeCode,
+	    @RequestParam("board_contents") String boardContents,
+	    @RequestParam("member_id") String memberId,
+	    @RequestPart("files") MultipartFile[] files,  // FormData에서 여러 이미지 파일을 받음
+	    @RequestParam("image_orders") int[] imageOrders,  // 이미지 순서를 배열로 받음
+	    @RequestParam(value = "tags", required = false) String[] tagsJson,  // 태그 데이터를 JSON 문자열 배열로 받음 (이미지 여러 개일 때)
+	    @RequestParam(value = "tag", required = false) String tagJson // 단일 태그 데이터 (이미지 하나일 때)
+	) {
+	    try {
+	        // 1. CommunityDTO 객체 생성 및 게시글 저장
+	        CommunityDTO dto = new CommunityDTO();
+	        dto.setHousing_type_code(housingTypeCode);
+	        dto.setSpace_type_code(spaceTypeCode);
+	        dto.setArea_size_code(areaSizeCode);
+	        dto.setBoard_contents(boardContents);
+	        dto.setMember_id(memberId);
+	        
+	        int boardSeq = communityServ.insertWrite(dto); // 게시글 저장
+	        System.out.println(boardSeq + " 게시글 시퀀스");
 
-    // 이미지 및 태그 저장
-    @PostMapping("/images")
-    public ResponseEntity<Void> insertImagesAndTags(
-        @RequestPart("file") MultipartFile file,  // FormData에서 이미지 파일을 받음
-        @RequestParam("board_seq") int board_seq,
-        @RequestParam("image_order") int image_order,
-        @RequestParam("tags") String tagsJson // 태그 데이터를 JSON 문자열로 받음
+	        // 2. 이미지 및 태그 저장 로직
+	        for (int i = 0; i < files.length; i++) {
+	            MultipartFile file = files[i];
+	            int imageOrder = imageOrders[i];
+	            
+	            // 이미지 업로드
+	            String code = "F2"; 
+	            String uploadResult = fileServ.upload(file, boardSeq, code); 
+	            System.out.println(uploadResult + " 업로드 결과 확인");
+
+	            if (!uploadResult.equals("fail")) {
+	                // 이미지 DB 저장
+	                ImageDTO imageDTO = new ImageDTO();
+	                imageDTO.setBoard_seq(boardSeq);
+	                imageDTO.setImage_url(uploadResult);
+	                imageDTO.setImage_order(imageOrder);
+	                int boardImageSeq = communityServ.insertImage(imageDTO);
+
+	                // 태그 데이터 처리
+	                String tags = (files.length > 1) ? tagsJson[i] : tagJson; // 이미지가 여러 개일 경우 tagsJson, 하나일 경우 tagJson 사용
+	                
+	                if (tags != null && !tags.isEmpty()) {  // 태그가 있는지 확인
+	                    List<TagDTO> tagsList = parseTagsFromJson(tags, boardImageSeq);  // 태그 데이터를 이미지 시퀀스와 함께 파싱
+	                    if (tagsList != null && !tagsList.isEmpty()) {
+	                        for (TagDTO tag : tagsList) {
+	                            tag.setBoard_image_seq(boardImageSeq);
+	                            communityServ.insertTag(tag);
+	                        }
+	                    }
+	                } else {
+	                    System.out.println("No tags for this image.");
+	                }
+	            } else {
+	                throw new IOException("이미지 업로드 실패");
+	            }
+	        }
+
+	        return ResponseEntity.ok().build();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("게시글 작성 또는 이미지 업로드 실패", e);
+	    }
+	}
+
+	// 태그 데이터를 JSON에서 List<TagDTO>로 파싱하는 메서드
+	private List<TagDTO> parseTagsFromJson(String tagsJson, int boardImageSeq) throws IOException {
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    List<TagDTO> tags = new ArrayList<>();
+
+	    if (tagsJson == null || tagsJson.isEmpty()) {
+	        System.out.println("태그 데이터가 없습니다.");
+	        return tags;  // 빈 리스트 반환
+	    }
+
+	    try {
+	        // JSON을 파싱하여 TagDTO 리스트로 변환
+	        tags = objectMapper.readValue(tagsJson, new TypeReference<List<TagDTO>>() {});
+	        System.out.println("파싱된 태그 데이터: " + tags);
+	    } catch (JsonMappingException e) {
+	        System.err.println("태그 JSON 파싱 오류: " + e.getMessage());
+	        throw new IOException("태그 데이터를 처리하는 중 오류가 발생했습니다.", e);
+	    } catch (JsonProcessingException e) {
+	        System.err.println("JSON 처리 중 오류 발생: " + e.getMessage());
+	        throw new IOException("태그 데이터를 처리하는 중 오류가 발생했습니다.", e);
+	    }
+
+	    // 각 태그에 이미지 시퀀스 추가
+	    for (TagDTO tag : tags) {
+	        tag.setBoard_image_seq(boardImageSeq);
+	    }
+
+	    return tags;
+	}
+
+
+	// 커뮤니티 게시글 불러오는 메서드
+	@GetMapping
+	public ResponseEntity<List<Map<String, Object>>> selectAll(
+	        @RequestParam(value = "member_id", required = false) String memberId) {
+
+	    // 게시글 리스트 가져오기
+	    List<Map<String, Object>> list = communityServ.selectAll();
+	    List<Map<String, Object>> listImg = communityServ.selectAllImg();
+
+	    // 이미지 맵핑
+	    Map<Integer, List<String>> imageMap = new HashMap<>();
+	    for (Map<String, Object> imgData : listImg) {
+	        BigDecimal boardSeqDecimal = (BigDecimal) imgData.get("BOARD_SEQ");
+	        Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+	        String imageUrl = (String) imgData.get("IMAGE_URL");
+
+	        if (imageUrl != null) {
+	            imageMap.putIfAbsent(boardSeq, new ArrayList<>());
+	            imageMap.get(boardSeq).add(imageUrl);
+	        }
+	    }
+
+	    // 각 게시글에 이미지 및 좋아요/북마크 상태 추가
+	    for (Map<String, Object> boardData : list) {
+	        BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
+	        Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+	        List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
+	        boardData.put("images", images);
+
+	        if (memberId != null) {
+	            // 로그인한 사용자의 SEQ 가져오기
+	            MemberDTO fromMemberInfo = memServ.selectInfo(memberId);
+	            int fromMemberSeq = fromMemberInfo.getMember_seq(); // 로그인한 사용자의 member_seq
+
+	            // 게시글 작성자의 MEMBER_SEQ 가져오기
+	            BigDecimal toMemberSeqDecimal = (BigDecimal) boardData.get("MEMBER_SEQ");
+	            Integer toMemberSeq = toMemberSeqDecimal != null ? toMemberSeqDecimal.intValue() : null;
+
+	            // 회원일 경우 좋아요 및 북마크 상태 추가
+	            boolean isFollowing = memServ.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
+	            boolean isLiked = communityServ.checkIfUserLikedBoard(memberId, boardSeq);
+	            boolean isBookmarked = communityServ.checkIfUserBookmarkedBoard(memberId, boardSeq);
+	            boardData.put("isLiked", isLiked);
+	            boardData.put("isFollowing", isFollowing);
+	            boardData.put("isBookmarked", isBookmarked);
+	        } else {
+	            // 비회원일 경우 기본 값 설정
+	            boardData.put("isLiked", false);
+	            boardData.put("isFollowing", false);
+	            boardData.put("isBookmarked", false);
+	        }
+	    }
+
+	    return ResponseEntity.ok(list);
+	}
+    
+    //커뮤니티 좋아요
+    @PostMapping("{board_seq}/like")
+    public ResponseEntity<Map<String, Object>> toggleLike(
+            @PathVariable int board_seq,
+            @RequestBody Map<String, Object> requestBody // member_id를 body에서 받음
     ) {
+        Map<String, Object> response = new HashMap<>();
         try {
-            // 1. FileService를 통해 GCS에 이미지 업로드
-            String code = "F2"; // 커뮤니티 코드 (필요에 따라 변경 가능)
-            String uploadResult = fileService.upload(file, board_seq, code); 
-            System.out.println(uploadResult + " 업로드 결과 확인");
+            String userId = (String) requestBody.get("member_id"); // member_id 가져오기
+            System.out.println(userId + " 진입 확인");
+            
+            // 1. 사용자가 이미 좋아요를 눌렀는지 확인
+            boolean isLiked = communityServ.checkIfUserLikedBoard(userId, board_seq);
 
-            // 2. 이미지가 성공적으로 업로드되었다면 sysname을 image_url에 저장
-            if (!uploadResult.equals("fail")) {
-                ImageDTO imageDTO = new ImageDTO();
-                imageDTO.setBoard_seq(board_seq);
-                imageDTO.setImage_url(uploadResult); // GCS에 저장된 이미지 URL을 DB에 저장
-                imageDTO.setImage_order(image_order);
-
-                // 3. 이미지 정보 DB에 저장
-                int board_image_seq = communityService.insertImage(imageDTO);
-                System.out.println("저장된 이미지 시퀀스: " + board_image_seq);
-
-                // 4. 태그 데이터 처리 (tagsJson을 JSON으로 파싱)
-                List<TagDTO> tags = parseTagsFromJson(tagsJson, board_image_seq);
-                if (tags != null && !tags.isEmpty()) {
-                    for (TagDTO tag : tags) {
-                        tag.setBoard_image_seq(board_image_seq);
-                        communityService.insertTag(tag); // 태그 DB에 저장
-                    }
-                }
+            if (isLiked) {
+                // 2. 이미 좋아요를 눌렀다면 좋아요 취소
+                communityServ.removeLike(userId, board_seq);
+                response.put("isLiked", false);  // 좋아요가 취소되었으므로 false
+                response.put("message", "좋아요가 취소되었습니다.");
+            } else {
+                // 3. 좋아요 추가
+                communityServ.addLike(userId, board_seq);
+                response.put("isLiked", true);  // 좋아요가 추가되었으므로 true
+                response.put("message", "좋아요가 추가되었습니다.");
             }
-            return ResponseEntity.ok().build();
+
+            // 4. 좋아요 수 업데이트 후 반환
+            int likeCount = communityServ.getLikeCount(board_seq);
+            response.put("like_count", likeCount);
+            return ResponseEntity.ok(response);
+
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            response.put("error", "좋아요 처리 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    // 태그 데이터를 JSON에서 List<TagDTO>로 파싱하는 메서드
-    private List<TagDTO> parseTagsFromJson(String tagsJson, int board_image_seq) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<TagDTO> tags = objectMapper.readValue(tagsJson, new TypeReference<List<TagDTO>>() {});
-
-        // 각 태그에 이미지 시퀀스 추가
-        for (TagDTO tag : tags) {
-            tag.setBoard_image_seq(board_image_seq);
-        }
-        return tags;
     }
     
-    // 커뮤니티 게시글 불러오는 메서드
-    @GetMapping
-    public ResponseEntity<List<Map<String, Object>>> selectAll() {
-        List<Map<String, Object>> list = communityService.selectAll();
-        List<Map<String, Object>> listImg = communityService.selectAllImg();
+    //커뮤니티 북마크
+    @PostMapping("{board_seq}/bookmark")
+    public ResponseEntity<Map<String, Object>> toggleBookmark(
+            @PathVariable int board_seq,
+            @RequestBody Map<String, Object> requestBody // member_id를 body에서 받음
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String userId = (String) requestBody.get("member_id"); // member_id 가져오기
+            System.out.println(userId + " 북마크 진입 확인");
 
-        Map<Integer, List<String>> imageMap = new HashMap<>();
-        for (Map<String, Object> imgData : listImg) {
-            BigDecimal boardSeqDecimal = (BigDecimal) imgData.get("BOARD_SEQ");
-            Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-            String imageUrl = (String) imgData.get("IMAGE_URL");
+            // 1. 사용자가 이미 북마크를 눌렀는지 확인
+            boolean isBookmarked = communityServ.checkIfUserBookmarkedBoard(userId, board_seq);
 
-            if (imageUrl != null) {
-                imageMap.putIfAbsent(boardSeq, new ArrayList<>());
-                imageMap.get(boardSeq).add(imageUrl);
+            if (isBookmarked) {
+                // 2. 이미 북마크를 눌렀다면 북마크 취소
+                communityServ.removeBookmark(userId, board_seq);
+                response.put("isBookmarked", false);  // 북마크가 취소되었으므로 false
+                response.put("message", "북마크가 취소되었습니다.");
+            } else {
+                // 3. 북마크 추가
+                communityServ.addBookmark(userId, board_seq);
+                response.put("isBookmarked", true);  // 북마크가 추가되었으므로 true
+                response.put("message", "북마크가 추가되었습니다.");
             }
-        }
 
-        for (Map<String, Object> boardData : list) {
-            BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
-            Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-            List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
-            boardData.put("images", images);
-        }
+            // 4. 북마크 수 업데이트 후 반환
+            int bookmarkCount = communityServ.getBookmarkCount(board_seq);
+            response.put("bookmark_count", bookmarkCount);
+            return ResponseEntity.ok(response);
 
-        return ResponseEntity.ok(list);
+        } catch (Exception e) {
+            response.put("error", "북마크 처리 중 오류 발생: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
     
-    // 커뮤니티 디테일
+	// 커뮤니티 디테일
     @GetMapping("/{board_seq}")
-    public ResponseEntity<Void> selectAllSeq(@PathVariable int board_seq) {
-        System.out.println("Request received for board_seq: " + board_seq);
+    public ResponseEntity<Map<String, Object>> selectAllSeq(
+        @PathVariable int board_seq,
+        @RequestParam(value = "member_id", required = false) String memberId) {
+
+        // 게시글 정보 가져오기
+        Map<String, Object> boardDetail = communityServ.selectAllSeq(board_seq);
+
+        // 비회원일 경우 좋아요 및 북마크 기본 값 설정
+        boolean isLiked = false;
+        boolean isBookmarked = false;
+
+        if (memberId != null) {
+            // 회원일 경우 좋아요 및 북마크 상태 확인
+            isLiked = communityServ.checkIfUserLikedBoard(memberId, board_seq);
+            isBookmarked = communityServ.checkIfUserBookmarkedBoard(memberId, board_seq);
+        }
+
+        boardDetail.put("isLiked", isLiked);
+        boardDetail.put("isBookmarked", isBookmarked);
+
+        return ResponseEntity.ok(boardDetail);
+    }
+
+	@GetMapping("/images/{board_seq}")
+	public ResponseEntity<Map<String, Object>> selectImagesAndTags(@PathVariable int board_seq) {
+		List<Map<String, Object>> images = communityServ.selectImages(board_seq);
+		List<Map<String, Object>> tags = communityServ.selectTagsAndProductInfo(board_seq);
+
+		// 이미지와 태그 데이터를 하나의 맵으로 합침
+		Map<String, Object> result = new HashMap<>();
+		result.put("images", images);
+		result.put("tags", tags);
+
+		return ResponseEntity.ok(result);
+	}
+
+	// 조회수 증가 메서드
+	@PostMapping("/{board_seq}/increment-view")
+	public ResponseEntity<Integer> incrementViewCount(@PathVariable int board_seq) {
+	    try {
+	        // 조회수 증가 로직 호출
+	        communityServ.incrementViewCount(board_seq);
+	        
+	        // 업데이트된 조회수를 가져오기
+	        int updatedViewCount = communityServ.getViewCount(board_seq);
+	        
+	        return ResponseEntity.ok(updatedViewCount); // 조회수를 클라이언트에 반환
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
+
+	// 게시글 신고처리
+	@PostMapping("/report")
+	public ResponseEntity<Void> sendReport(@RequestBody Map<String, Object> reportData) {
+        int boardSeq = Integer.parseInt((String) reportData.get("board_seq"));
+        String reportCode = (String) reportData.get("report_code");
+        String memberId = (String) reportData.get("member_id");
+        communityServ.sendReport(boardSeq, reportCode, memberId);
+        System.out.println(boardSeq + "_확인");
+        System.out.println(reportCode + "_확인");
+
         return ResponseEntity.ok().build();
-    }
+	}
+	
+	// 관리자
+	// 게시물 신고 조회 (관리자)
+	@GetMapping("/reportedCommunity")
+	public ResponseEntity<Map<String, Object>> reportedCommunity(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int itemsPerPage) throws Exception {
+		// 전체 신고된 게시물 카운트
+		int totalCount = communityServ.getReportedCommunityCount();
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> exceptionHandler(Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.badRequest().body("fail");
-    }
+		// 페이징된 게시물 신고 목록 조회
+		List<Map<String, Object>> reportedBoards = communityServ.reportedCommunity(page, itemsPerPage);
+		System.out.println("컨트롤러 :" + reportedBoards);
+
+		// 페이징 정보와 게시물 목록을 함께 반환
+		Map<String, Object> response = new HashMap<>();
+		response.put("totalCount", totalCount);
+		response.put("boards", reportedBoards);
+
+		return ResponseEntity.ok(response); 
+	}
+
+	// 게시물 내역 조회 (관리자)
+	@GetMapping("/communityReport/{board_seq}")
+	public ResponseEntity<List<BoardReportDTO>> CommunityReport(@PathVariable int board_seq) throws Exception {
+		List<BoardReportDTO> boardReports = communityServ.CommunityReport(board_seq);
+		return ResponseEntity.ok(boardReports);
+	}
+
+	// 신고 게시물 삭제 (관리자)
+	@DeleteMapping("/deleteCommunity/{board_seq}")
+	public ResponseEntity<Integer> deleteCommunity(@PathVariable int board_seq) throws Exception {
+		int result = communityServ.deleteCommunity(board_seq);
+
+		if (result > 0) {
+			return ResponseEntity.ok(result); // 성공 시 200 OK와 삭제된 행 수 반환
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 삭제 실패 시 404 NOT FOUND
+		}
+	}
+
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> exceptionHandler(Exception e) {
+		e.printStackTrace();
+		return ResponseEntity.badRequest().body("fail");
+	}
 }
-

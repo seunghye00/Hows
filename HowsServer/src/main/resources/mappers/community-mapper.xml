@@ -4,7 +4,6 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="Community">
-
     <!-- 게시글 작성 -->
     <insert id="insertWrite" parameterType="com.hows.community.dto.CommunityDTO">
         <selectKey keyProperty="board_seq" resultType="int" order="BEFORE">
@@ -39,22 +38,244 @@
 		select b.board_seq,
 		   b.view_count, 
 	       m.nickname, 
+	       m.member_id,
+	       m.member_seq,
 	       m.member_avatar, 
 	       count(distinct bl.board_like_seq) as like_count,
-	       (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments,
+	       (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments_count,
 	       b.board_contents
 		from board b
 		join member m on b.member_id = m.member_id
 		left join board_like bl on b.board_seq = bl.board_seq
 		left join comments c on b.board_seq = c.board_seq
 		left join reply r on c.comment_seq = r.comment_seq
-		group by b.board_seq, b.view_count, m.nickname, m.member_avatar, b.board_contents
+		group by b.board_seq, b.view_count, m.nickname, m.member_avatar, m.member_id, m.member_seq, b.board_contents
 	</select>
+	
 	<!-- 게시글 이미지 출력 -->
 	<select id="selectAllImg" resultType="map">
 		select board_seq, image_url
 			from board_image
 		where board_seq in (select board_seq from board)
+	</select>
+	
+	<!-- 게시글 디테일 조회 -->
+	<select id="selectAllSeq" resultType="map">
+	    select b.board_seq,
+	           b.board_contents,
+	           b.view_count,
+	           to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date,
+	           b.member_id,
+	           m.nickname,
+	           m.member_id, 
+	           m.member_avatar,
+	           m.member_seq, 
+	           count(distinct bl.board_like_seq) as like_count,
+	           (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments_count,
+	           count(distinct bm.board_book_mark_seq) as bookmark_count
+	    from board b
+	    join member m on b.member_id = m.member_id
+	    left join board_like bl on b.board_seq = bl.board_seq
+	    left join comments c on b.board_seq = c.board_seq
+	    left join reply r on c.comment_seq = r.comment_seq
+	    left join board_book_mark bm on b.board_seq = bm.board_seq
+	    where b.board_seq = #{board_seq}
+	    group by b.board_seq, b.board_contents, b.view_count, b.board_write_date, b.member_id, m.nickname, m.member_avatar, m.member_id, m.member_seq
+	</select>
+	
+	<!-- 게시글 디테일 이미지 조회 -->
+	<select id="selectImages" resultType="map">
+	    select 
+	       *
+	    from 
+	        board_image
+	    where 
+	        board_seq = #{board_seq}
+	</select>
+	
+	<!-- 게시글 디테일 상품 정보 태그  -->
+	<select id="selectTagsAndProductInfo" resultType="map">
+	    select 
+	        bt.board_tag_seq, 
+	        bt.board_image_seq, 
+	        bt.left_position, 
+	        bt.top_position, 
+	        p.product_seq, 
+	        p.product_thumbnail, 
+	        p.product_title, 
+	        p.product_contents, 
+	        p.price, 
+	        p.product_category_code
+	    from 
+	        board_tag bt
+	    join 
+	        product p on bt.product_seq = p.product_seq
+	    where 
+	        bt.board_image_seq in (select board_image_seq from board_image where board_seq = #{board_seq})
+	</select>
+	
+	<!-- 사용자가 해당 게시글에 좋아요를 눌렀는지 확인 -->
+	<select id="checkIfUserLikedBoard" resultType="int">
+	    select count(*) 
+	    from board_like
+	    where member_id = #{member_id} and board_seq = #{board_seq}
+	</select>
+	
+	<!-- 게시글에 좋아요 추가 -->
+	<insert id="addLike">
+	    insert into board_like (board_like_seq, member_id, board_seq)
+	    values (board_like_seq.nextval, #{member_id}, #{board_seq})
+	</insert>
+	
+	<!-- 게시글에서 좋아요 취소 -->
+	<delete id="removeLike">
+	    delete from board_like
+	    where member_id = #{member_id} and board_seq = #{board_seq}
+	</delete>
+	
+	<!-- 게시글의 좋아요 수 가져오기 -->
+	<select id="getLikeCount" resultType="int">
+	    select count(*) 
+	    from board_like
+	    where board_seq = #{board_seq}
+	</select>
+	
+	<!-- 사용자가 해당 게시글에 북마크를 눌렀는지 확인 -->
+	<select id="checkIfUserBookmarkedBoard" resultType="int">
+	    select count(*) 
+	    from board_book_mark
+	    where member_id = #{member_id} and board_seq = #{board_seq}
+	</select>
+	
+	<!-- 게시글에 북마크 추가 -->
+	<insert id="addBookmark">
+	    insert into board_book_mark (board_book_mark_seq, member_id, board_seq)
+	    values (board_book_mark_seq.nextval, #{member_id}, #{board_seq})
+	</insert>
+	
+	<!-- 게시글에서 북마크 취소 -->
+	<delete id="removeBookmark">
+	    delete from board_book_mark
+	    where member_id = #{member_id} and board_seq = #{board_seq}
+	</delete>
+	
+	<!-- 게시글의 북마크 수 가져오기 -->
+	<select id="getBookmarkCount" resultType="int">
+	    select count(*) 
+	    from board_book_mark
+	    where board_seq = #{board_seq}
+	</select>
+	
+	<!-- 게시글 좋아요 처리 -->
+	<update id="updateViewCount">
+		update board
+		set view_count = view_count + 1
+		where board_seq = #{board_seq}
+	</update>
+	
+	<!-- 현재 조회수를 가져오는 쿼리 -->
+	<select id="getViewCount" resultType="int">
+	    select view_count
+	    from board
+	    where board_seq = #{board_seq}
+	</select>
+	
+	<!-- 게시글 신고  -->
+	<insert id="sendReport">
+	    insert into board_report 
+	    values (board_report_seq.nextval, #{report_code}, default, #{member_id}, #{board_seq})
+	</insert>
+	
+	<!-- [마이페이지] 게시글(이미지) 출력 -->
+	<select id="selectPostByMemberId" resultType="map">
+	    select 
+	        b.board_seq,
+	        b.board_contents,
+	        to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date,
+	        b.view_count,
+	        b.member_id,
+	        m.name as member_name, 
+	        bi.image_url
+	    from 
+	        board b
+	    inner join 
+	        member m on b.member_id = m.member_id
+	    left join 
+	        board_image bi on b.board_seq = bi.board_seq
+	    where 
+	        b.member_id = #{member_id}
+	</select>
+	
+	<!-- [마이페이지] 게시글 갯수 -->
+	<select id="countPost" resultType="int">
+	    select count(*) from board where member_id = #{member_id}
+	</select>
+	
+	
+	<!-- 관리자 -->
+	<!-- 게시물 신고조회 (관리자) -->
+	<select id="reportedCommunity" resultType="map">
+    SELECT *
+		FROM (
+    	SELECT 
+        b.board_seq,                  -- 게시판 게시물 번호
+        b.board_contents,             -- 게시판 내용
+        TO_CHAR(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') AS board_write_date, -- 작성 날짜
+        m.nickname AS member_id,      -- 작성자 (닉네임)
+        COUNT(br.board_report_seq) AS report_count,  -- 신고 횟수
+        ROW_NUMBER() OVER (ORDER BY b.board_seq DESC) AS row_num  -- 각 행에 순번 부여
+    		FROM 
+        board b
+    JOIN 
+        member m ON b.member_id = m.member_id
+    JOIN 
+        board_report br ON b.board_seq = br.board_seq  -- 신고 기록 조인
+   	GROUP BY 
+        b.board_seq, b.board_contents, b.board_write_date, m.nickname
+		)
+    WHERE row_num BETWEEN #{startRow} AND #{endRow}
+	</select>
+
+	
+	<!-- 게시물 신고내역 조회 (관리자) -->
+	<select id="CommunityReport" resultType="com.hows.community.dto.BoardReportDTO">
+    SELECT 
+        br.board_report_seq,
+        r.report_description AS report_code,
+        br.board_report_date,
+        br.board_seq,
+        m.nickname AS member_id
+    FROM 
+        board_report br
+    JOIN 
+        report r ON br.report_code = r.report_code
+    JOIN
+        member m ON br.member_id = m.member_id
+    WHERE 
+        br.board_seq = #{board_seq}
+	</select>
+	
+	<!-- 신고 게시물 삭제 (관리자) -->
+	<!-- 먼저 게시물에 대한 신고 기록 삭제 -->
+	<delete id="deleteCommunityReport">
+    	DELETE FROM board_report
+    	WHERE board_seq = #{board_seq}
+	</delete>
+
+	<!-- 그 다음에 게시물 삭제 -->
+	<delete id="deleteCommunity" parameterType="int">
+    	DELETE FROM board
+    	WHERE board_seq = #{board_seq}
+	</delete>
+	
+	<!-- 페이지네비를 위한 신고 게시물 카운트 (관리자) -->
+	<select id="getReportedCommunityCount" resultType="int">
+    	SELECT 
+        	COUNT(DISTINCT b.board_seq)
+    	FROM 
+        	board b
+    	JOIN 
+        	board_report br ON b.board_seq = br.board_seq
 	</select>
 	
 	

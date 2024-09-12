@@ -52,6 +52,11 @@
   outline: 1px solid var(--hows-gray-200);
 }
 
+.container .findPwBox .errorText {
+  color: var(--hows-red-dark);
+  margin-bottom: 10px;
+}
+
 .container button {
   height: 50px;
   margin-bottom: 6px;

@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { host } from '../../../config/config'
-// import { useMemberStore } from '../store/store';
+import Swal from 'sweetalert2'
+import { Modal } from './../../../components/Modal/Modal';
+import { SwalComp } from '../../../commons/commons'
 
 export const SignUp = () => {
     const navi = useNavigate()
@@ -22,17 +24,19 @@ export const SignUp = () => {
         address: '',
         detail_address: '',
     })
-    // const { member, setMember } = useMemberStore(); // Zustand store 사용
     const [idAvailable, setIdAvailable] = useState(null);
     const [nicknameAvailable, setNicknameAvailable] = useState(null);
     const [emailAvailable, setEmailAvailable] = useState(null);
     const [checkIdStatus, setCheckIdStatus] = useState('');
     const [checkNicknameStatus, setCheckNicknameStatus] = useState('');
-    const [checkEmailStatus, setCheckEmailStatus] = useState('');
     const [idErrorMessage, setIdErrorMessage] = useState('');
     const [nicknameErrorMessage, setNicknameErrorMessage] = useState('');
     const [idChecked, setIdChecked] = useState(false); // 중복확인 상태 검사
     const [nicknameChecked, setNicknameChecked] = useState(false); // 중복확인 상태 검사
+
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+    const [addressCheck, setAddressCheck] = useState({ default: true, direct: false }); // 주소 체크 항목
+
 
     const handleChange = e => {
         const { name, value } = e.target
@@ -54,7 +58,12 @@ export const SignUp = () => {
         // ID 유효성 검사
         const idPattern = /^[a-zA-Z0-9]{4,12}$/;
         if (!idPattern.test(formData.member_id)) {
-            alert('아이디는 영어, 숫자로 이루어진 4~12자를 입력해주세요.');
+            Swal.fire({
+                title: "경고!",
+                text: "아이디는 영어, 숫자로 이루어진 4~12자를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             setIdErrorMessage('다시 입력해주세요');
             setIdAvailable(null);
             return;
@@ -75,9 +84,14 @@ export const SignUp = () => {
     // 닉네임 중복확인 핸들러
     const handleCheckNickname = () => {
         // 닉네임 유효성 검사
-        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/;
+        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,10}$/;
         if (!nicknamePattern.test(formData.nickname)) {
-            alert('닉네임은 한글, 영문자, 숫자로 이루어진 2~7자를 입력해주세요.');
+            Swal.fire({
+                title: "경고!",
+                text: "닉네임은 한글, 영문자, 숫자로 이루어진 2~10자를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             setNicknameErrorMessage('다시 입력해주세요');
             setNicknameAvailable(null);
             return;
@@ -95,34 +109,23 @@ export const SignUp = () => {
             });
     }
 
-    useEffect(() => {
-        // 다음 주소 API 스크립트 로드
-        const script = document.createElement('script')
-        script.src =
-            'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
-        script.async = true
-        script.onload = () => {
-            // 스크립트가 로드되면 Postcode 사용 가능
-            // console.log('다음 주소 API가 로드되었습니다.')
-        }
-        document.head.appendChild(script)
-
-        // 클린업 함수 (옵션)
-        return () => {
-            document.head.removeChild(script)
-        }
-    }, [])
-    const handleAddressSearch = () => {
-        new window.daum.Postcode({
-            oncomplete: function (data) {
-                // 주소와 우편번호 데이터를 formData 상태에 저장
-                setFormData(prev => ({
-                    ...prev,
-                    address: data.address,
-                    zip_code: data.zonecode,
-                }))
-            },
-        }).open()
+    // 주소 찾기
+    const handleAddress = () => {
+        // SwalComp({ type: "confirm", text: "주소를 변경하시곘습니까?" }).then(res => {
+        // if (res) {
+        setAddressCheck(prev => ({ default: false, direct: true }));
+        setIsModalOpen(true);
+        // }
+        // });
+    }
+    /** postcode data set **/
+    const completeHandler = (data) => {
+        setIsModalOpen(false);
+        setFormData(prev => ({
+            ...prev,
+            zip_code: data.zonecode,
+            address: data.address
+        }));
     }
 
     // 체크박스 상태 변경 핸들러
@@ -146,104 +149,190 @@ export const SignUp = () => {
     const validateFormData = formData => {
         // 아이디 검사
         if (!formData.member_id) {
-            alert('아이디를 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "아이디를 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         // 아이디 유효성 검사: 4~12글자, 영어, 숫자만 허용
         const idPattern = /^[a-zA-Z0-9]{4,12}$/
         if (!idPattern.test(formData.member_id)) {
-            alert('아이디는 영어, 숫자로 이루어진 4~12자를 입력해주세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "아이디는 영어, 숫자로 이루어진 4~12자를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
         // 비밀번호 검사
         if (!formData.pw) {
-            alert('비밀번호를 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "비밀번호를 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         // 비밀번호 확인
         if (formData.pw !== formData.pw2) {
-            alert('비밀번호가 일치하지 않습니다.')
+            Swal.fire({
+                title: "경고!",
+                text: "비밀번호가 일치하지 않습니다.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         // 비밀번호 유효성 검사: 최소 8자 이상, 영문자, 숫자, 특수문자 포함
         const pwPattern = /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[\W_]).{8,}$/
         if (!pwPattern.test(formData.pw)) {
-            alert(
-                '비밀번호는 최소 8자 이상이어야 하며, 영문자, 숫자, 특수문자를 포함해야 합니다.'
-            )
+            Swal.fire({
+                title: "경고!",
+                text: "비밀번호는 최소 8자 이상이어야 하며, 영문자, 숫자, 특수문자를 포함해야 합니다.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
         // 이름 검사
         if (!formData.name) {
-            alert('이름을 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "이름을 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         const namePattern = /^[가-힣]{2,5}$/
         if (!namePattern.test(formData.name)) {
-            alert('이름은 한글로 2글자에서 5글자까지 입력할 수 있습니다.')
+            Swal.fire({
+                title: "경고!",
+                text: "이름은 한글로 2글자에서 5글자까지 입력할 수 있습니다.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
         // 닉네임 검사
         if (!formData.nickname) {
-            alert('닉네임을 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "닉네임을 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
-        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,7}$/
+        const nicknamePattern = /^[가-힣a-zA-Z0-9]{2,10}$/
         if (!nicknamePattern.test(formData.nickname)) {
-            alert(
-                '닉네임은 한글, 영문자, 숫자 포함하여 2~7자까지 입력할 수 있습니다.'
-            )
+            Swal.fire({
+                title: "경고!",
+                text: "닉네임은 한글, 영문자, 숫자로 이루어진 2~10자를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
         // 생년월일 검사
         if (!formData.birth) {
-            alert('생년월일을 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "생년월일을 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         const birthPattern = /^\d{4}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])$/
         if (formData.birth && !birthPattern.test(formData.birth)) {
-            alert('유효한 생년월일을 입력하세요. (예: 19900101)')
+            Swal.fire({
+                title: "경고!",
+                text: "유효한 생년월일을 입력하세요. (예: 19900101)",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         // 성별 검사
         if (!formData.gender) {
-            alert('성별을 선택하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "성별을 선택하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         // 이메일 검사
         if (!formData.email) {
-            alert('이메일을 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "이메일을 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         const emailPattern = /^[^\s@]+@[^\s@]+\.(com|net|org)$/
         if (!emailPattern.test(formData.email)) {
-            alert('사용할 수 없는 형식의 이메일입니다')
+            Swal.fire({
+                title: "경고!",
+                text: "사용할 수 없는 형식의 이메일입니다.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
         // 전화번호 검사
         if (!formData.phone) {
-            alert('전화번호를 입력하세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "전화번호를 입력하세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         // 전화번호 유효성 검사: 한국 전화번호 형식 (예: 01012345678)
         const phonePattern = /^(010|011|016|017|018|019)\d{3,4}\d{4}$/
         if (formData.phone && !phonePattern.test(formData.phone)) {
-            alert('유효한 전화번호를 입력하세요. (예: 01012345678)')
+            Swal.fire({
+                title: "경고!",
+                text: "유효한 전화번호를 입력하세요. (예: 01012345678)",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
         // 주소 검사
         if (!formData.zip_code || !formData.address) {
-            alert('주소를 입력해주세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "주소를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
         if (!formData.detail_address) {
-            alert('상세주소를 입력해주세요.')
+            Swal.fire({
+                title: "경고!",
+                text: "상세주소를 입력해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return false
         }
 
@@ -262,24 +351,41 @@ export const SignUp = () => {
 
         // 중복 확인 상태 체크
         if (idAvailable === null) {
-            alert('아이디 중복 확인을 해주세요.');
+            Swal.fire({
+                title: "경고!",
+                text: "아이디 중복 확인을 해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return;
         }
         if (nicknameAvailable === null) {
-            alert('닉네임 중복 확인을 해주세요.');
+            Swal.fire({
+                title: "경고!",
+                text: "닉네임 중복 확인을 해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return;
         }
-        // if (emailAvailable === null) {
-        //     alert('이메일 중복 확인을 해주세요.');
-        //     return;
-        // }
 
+        // 중복 확인 버튼 감지
         if (!idChecked) {
-            alert("아이디 중복 확인을 해주세요.");
+            Swal.fire({
+                title: "경고!",
+                text: "아이디 중복 확인을 해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return;
         }
         if (!nicknameChecked) {
-            alert("닉네임 중복 확인을 해주세요.");
+            Swal.fire({
+                title: "경고!",
+                text: "닉네임 중복 확인을 해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
             return;
         }
 
@@ -287,12 +393,21 @@ export const SignUp = () => {
         axios
             .post(`${host}/member`, formData)
             .then(resp => {
-                console.log('회원가입 : ', resp.data)
-                alert('회원가입이 성공적으로 완료되었습니다.')
+                Swal.fire({
+                    title: "성공!",
+                    text: "회원가입이 성공적으로 완료되었습니다.",
+                    icon: "success",
+                    confirmButtonText: "확인",
+                });
                 navi("/");
             })
             .catch(error => {
-                alert('회원가입 중 오류가 발생했습니다.')
+                Swal.fire({
+                    title: "경고!",
+                    text: "회원가입 중 오류가 발생했습니다.",
+                    icon: "error",
+                    confirmButtonText: "확인",
+                });
             })
     }
 
@@ -360,7 +475,7 @@ export const SignUp = () => {
                 <div className={styles.nicknameBox}>
                     <span className={styles.title}>닉네임</span>
                     <span>
-                        한글, 영문자, 숫자로만 이루어진 2~7자의 닉네임을
+                        한글, 영문자, 숫자로만 이루어진 2~10자의 닉네임을
                         입력해주세요.
                     </span>
                     <div className={styles.formGrop}>
@@ -471,7 +586,7 @@ export const SignUp = () => {
                     <button
                         type="button"
                         className={styles.addressBtn}
-                        onClick={handleAddressSearch}
+                        onClick={handleAddress}
                     >
                         주소 검색
                     </button>
@@ -490,6 +605,14 @@ export const SignUp = () => {
                     </button>
                 </div>
             </div>
+            {
+                isModalOpen &&
+                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <div className={styles.modalBox}>
+                        <DaumPostcode onComplete={completeHandler} style={{ height: '95%' }} />
+                    </div>
+                </Modal>
+            }
         </div>
     )
 }

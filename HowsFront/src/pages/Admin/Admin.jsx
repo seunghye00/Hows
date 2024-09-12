@@ -5,13 +5,14 @@ import { Main } from './Main/Main'
 import { Banner } from './Banner/Banner'
 import { Member } from './Member/Member'
 import { Blacklist } from './Member/Blacklist'
-import { Board } from './Board/Board'
+import { Community } from './Community/Community'
 import { Comment } from './Comment/Comment'
 import { Reply } from './Reply/Reply'
 import { Review } from './Review/Review'
 import { Notice } from './Notice/Notice'
-import Faq from './Notice/Faq'
+import Faq from './Notice/FAQ/Faq'
 import { Product } from './Product/Product'
+import { WriteNotice } from './Notice/WriteNotice'
 
 export const Admin = () => {
     return (
@@ -28,6 +29,7 @@ export const Admin = () => {
                     }
                 />
                 <Route path="/admin/product/*" element={<Product />} />
+                <Route path="/admin/notice/*" element={<WriteNotice />} />
                 <Route
                     path="/member"
                     element={
@@ -47,11 +49,11 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/board"
+                    path="/community"
                     element={
                         <>
                             <Title title={'게시판 관리'} />
-                            <Board />
+                            <Community />
                         </>
                     }
                 />
@@ -92,7 +94,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/faq"
+                    path="/admin/notice/faq"
                     element={
                         <>
                             <Title title={'FAQ 관리'} />

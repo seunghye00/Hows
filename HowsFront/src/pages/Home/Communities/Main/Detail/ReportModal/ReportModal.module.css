@@ -1,0 +1,98 @@
+.reportModal {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 400px;
+}
+
+.reportModal h3 {
+    text-align: center;
+}
+
+.reportlist {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.reportLi {
+    display: flex;
+    align-items: flex-start;
+}
+
+.reportLabel {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    position: relative;
+    padding: 17px;
+}
+
+.reportBox {
+    display: inline-block;
+    position: relative;
+    width: 20px;
+    height: 20px;
+    border: 1px solid var(--hows-point-color);
+    border-radius: 50%;
+    box-sizing: border-box;
+    background-color: transparent;
+    /* 기본 배경색을 투명으로 */
+    transition: border-color .5s, background-color .5s;
+    vertical-align: middle;
+}
+
+.reportBox:before {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    top: 5px;
+    left: 5px;
+    width: 8px;
+    height: 8px;
+    background-color: transparent;
+    /* 체크되지 않은 상태에서는 투명 */
+    transition: transform 0.4s cubic-bezier(0.5, 2, 0.5, 0.5);
+}
+
+.reportRadio {
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+}
+
+.reportTxt {
+    font-size: 16px;
+    line-height: 20px;
+    vertical-align: middle;
+    margin-left: 6px;
+    color: rgb(47, 52, 56);
+}
+
+/* 라디오 버튼이 체크된 상태일 때 스타일 변경 */
+.reportRadio:checked+.reportBox {
+    background-color: var(--hows-point-color);
+    /* 선택된 상태에서 배경색 */
+}
+
+.reportRadio:checked+.reportBox:before {
+    background-color: var(--hows-white);
+    /* 체크된 상태에서 흰색 원 표시 */
+}
+
+/* 라디오 버튼을 숨기지만 클릭 가능하게 유지 */
+.reportRadio {
+    cursor: pointer;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+}

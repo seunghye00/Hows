@@ -4,20 +4,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.hows.blacklistreason.dto.BlacklistReasonDTO;
+import com.hows.common.CustomUserDetails;
+import com.hows.common.util.PasswordUtil;
+import com.hows.common.util.SendEmailUtil;
+import com.hows.community.dao.CommunityDAO;
 import com.hows.grade.dto.GradeDTO;
+import com.hows.member.dao.GuestbookDAO;
 import com.hows.member.dao.MemberDAO;
 import com.hows.member.dto.MemberDTO;
 import com.hows.role.dto.RoleDTO;
@@ -27,6 +27,15 @@ public class MemberService implements UserDetailsService {
 
 	@Autowired
 	private MemberDAO memDao;
+	@Autowired
+	private CommunityDAO comDao;
+	@Autowired
+	private GuestbookDAO guestDao;
+	
+	@Autowired
+    private SendEmailUtil emailUtil;
+	@Autowired
+	private PasswordEncoder pwEncoder;
 
 	// 회원가입
 	public void insert(MemberDTO dto) {
@@ -48,11 +57,6 @@ public class MemberService implements UserDetailsService {
 		return memDao.checkEmail(email);
 	}
 
-	// [로그인]비밀번호 찾기 - 비밀번호 변경
-	public int changePw(Map<String, String> map) {
-		return memDao.changePw(map);
-	}
-
 	// 회원정보 가져오기
 	@Override
 	public CustomUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -69,12 +73,54 @@ public class MemberService implements UserDetailsService {
 	public String findId(Map<String, String> map) {
 		return memDao.findId(map);
 	}
+	
+	// [로그인] 비밀번호 찾기 - 임시 비밀번호 업데이트
+	public String updateTempPassword(String member_id, String pw) {
+        int result = memDao.updateTempPassword(member_id, pw);
+        if (result > 0) {
+            return "비밀번호가 성공적으로 변경되었습니다.";
+        } else {
+            return "비밀번호 변경에 실패했습니다.";
+        }
+    }
 
-	// 비밀번호 찾기 - 아이디, 이메일 존재여부 검증
-	public Boolean verifyUser(Map<String, String> map) {
-		return memDao.verifyUser(map);
-	}
+	// 임시 비밀번호 발급 메소드
+    public Boolean sendTempPw(String member_id, String email) {
+    	Boolean result = false;
+    	
+    	try {
+    		// 1. 아이디와 이메일 검증
+        	if (!verifyUser(member_id, email)) {
+                return false;
+            }
+        	
+            // 2. 임시 비밀번호 생성 (PasswordUtil에서 임시 비밀번호 생성)
+            String tempPw = PasswordUtil.generateTemporaryPassword();
+            
+            // 3. 비밀번호 업데이트
+            int update = updatePw(member_id, pwEncoder.encode(tempPw)); // 비밀번호 업데이트 메소드 호출
+            
+            // 4. 메일 전송
+            if(update > 0) {
+            	emailUtil.sendTempPw(email, tempPw);        	
+            }
+            result = true;
+            
+    	}catch(Exception e){
+    		e.printStackTrace();
+    	}
+        
+        return result;
+    }
 
+    // 아이디와 이메일 검증 메소드
+    public Boolean verifyUser(String member_id, String email) {
+        Map<String, String> map = new HashMap<>();
+        map.put("member_id", member_id);
+        map.put("email", email);
+        return memDao.verifyUser(map);
+    }
+    
 	// 마이페이지 회원정보 출력
 	public MemberDTO selectInfo(String member_id) {
 		return memDao.selectInfo(member_id);
@@ -111,7 +157,10 @@ public class MemberService implements UserDetailsService {
 	}
 
 	// 비밀번호 변경
-	public int updatePw(HashMap<String, String> map) {
+	public int updatePw(String member_id, String pw) {
+		HashMap<String, String> map = new HashMap<>();
+		map.put("member_id", member_id);
+		map.put("pw", pw);
 		return memDao.updatePw(map);
 	}
 
@@ -124,7 +173,44 @@ public class MemberService implements UserDetailsService {
 	public int findMemberSeq(String member_id) {
 		return memDao.findMemberSeq(member_id);
 	}
+	
+    // 팔로우 상태 확인
+    public boolean checkIfUserFollowing(int fromMemberSeq, int toMemberSeq) {
+        return memDao.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
+    }
 
+    // 팔로우 추가
+    public void addFollow(int fromMemberSeq, int toMemberSeq) {
+    	memDao.addFollow(fromMemberSeq, toMemberSeq);
+    }
+
+    // 팔로우 취소
+    public void removeFollow(int fromMemberSeq, int toMemberSeq) {
+    	memDao.removeFollow(fromMemberSeq, toMemberSeq);
+    }
+    
+    // 마이페이지 게시글(이미지) 출력
+    public List<Map<String, Object>> selectPostByMemberId(String member_id){
+    	return comDao.selectPostByMemberId(member_id);
+    }
+    
+	// 마이페이지 게시글 갯수
+    public int countPost(String member_id){
+    	return comDao.countPost(member_id);
+    }
+	
+	
+	// 마이페이지 스크랩 갯수
+	
+	
+	// 마이페이지 방문글 갯수
+    public int countGuestbook(String member_id){
+    	return guestDao.countGuestbook(member_id);
+    }
+    
+    
+
+    
 	// ========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	public List<MemberDTO> selectAll(Map<String, Object> params) {

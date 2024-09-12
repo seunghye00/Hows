@@ -1,7 +1,5 @@
 import styles from "./Delivery.module.css"
-import { Search } from './../../../../../components/Search/Search';
 import React, { useState } from 'react'
-import { Button } from './../../../../../components/Button/Button';
 
 export const Delivery = () => {
     const [searchResults, setSearchResults] = useState([]) // 검색 결과 상태
@@ -10,7 +8,7 @@ export const Delivery = () => {
     const shippingData = [
         {
             shippng_seq: 1,
-            orders_seq: '주문번호 1234',
+            orders_seq: '1234',
             writer: '민바오',
             date: '2024-08-31',
             reportCount: 1,
@@ -18,7 +16,7 @@ export const Delivery = () => {
         },
         {
             shippng_seq: 2,
-            orders_seq: '주문번호 5678',
+            orders_seq: '5678',
             writer: '홍길동',
             date: '2024-09-01',
             reportCount: 2,
@@ -60,7 +58,7 @@ export const Delivery = () => {
                     <div className={styles.shippingRow} key={index}>
                         <div className={styles.shippingItem}>{item.shippng_seq}</div>
                         <div className={styles.shippingItem}>
-                            <span className={styles.span}>{item.orders_seq}</span>
+                            <span className={styles.span}>How's-order-number_{item.orders_seq}</span>
                         </div>
                         <div className={styles.shippingItem}>{item.shipping_status}</div>
                     </div>

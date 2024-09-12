@@ -1,0 +1,61 @@
+.container {
+    /* background-color: aliceblue; */
+    width: 100%;
+    height: auto;
+    max-width: 1300px;
+    margin: auto;
+    padding: 50px 0 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.container .pointBox {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    margin-bottom: 50px;
+    padding-right: 20px;
+}
+.container .pointBox > span {
+    font-size: 24px;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+}
+.container .pointBox > span:nth-child(2) {
+    font-weight: 600;
+    color: var(--hows-point-color);
+}
+
+/* 메뉴들 */
+.container .menus {
+    display: flex;
+    height: 60px;
+    border-bottom: 1px solid var(--hows-gray-200);
+    padding-bottom: 10px;
+}
+.container .menus > div {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: 600;
+}
+.container .menus > div > span {
+    cursor: pointer;
+    transition-duration: 0.2s;
+}
+.container .menus > div > span:hover {
+    color: var(--hows-point-color);
+}
+.container .menus > div > span.active {
+    color: var(--hows-point-color); /* 활성화된 메뉴에 적용 */
+}
+
+.container .body {
+    width: 100%;
+    height: auto;
+    padding-top: 30px;
+}

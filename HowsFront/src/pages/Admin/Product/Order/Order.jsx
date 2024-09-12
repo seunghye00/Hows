@@ -1,5 +1,6 @@
 import styles from './Order.module.css'
 import { Button } from '../../../../components/Button/Button'
+import { Search } from '../../../../components/Search/Search'
 import { orderList } from '../../../../api/order'
 import { useEffect, useState } from 'react'
 import { formatDate, addCommas } from '../../../../commons/commons'
@@ -11,6 +12,7 @@ export const Order = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [selectedOrder, setSelectedOrder] = useState(null)
     const [selectAll, setSelectAll] = useState(false)
+    const [searchQuery, setSearchQuery] = useState('') // 검색어 상태
     const [status, setStatus] = useState('product')
 
     useEffect(() => {
@@ -68,6 +70,11 @@ export const Order = () => {
         setSelectAll(allChecked)
     }
 
+    // 주문명 검색 핸들러
+    const handleSearch = e => {
+        setSearchQuery(e)
+    }
+
     // 체크된 주문 삭제 핸들러
     const handleDeleteOrder = () => {
         // 체크된 배너가 존재하는 지 확인
@@ -122,6 +129,7 @@ export const Order = () => {
     return (
         <>
             <div className={styles.btns}>
+                <Search onSearch={handleSearch} />
                 <Button
                     size={'s'}
                     onClick={handleStartDelivery}
@@ -131,16 +139,32 @@ export const Order = () => {
             </div>
             <div className={styles.container}>
                 <div className={styles.category}>
-                    <span onClick={handleChangeStatus} data-lable="product">
+                    <span
+                        onClick={handleChangeStatus}
+                        data-lable="product"
+                        className={status === 'product' ? styles.active : ''}
+                    >
                         전체
                     </span>
-                    <span onClick={handleChangeStatus} data-lable="O1">
+                    <span
+                        onClick={handleChangeStatus}
+                        data-lable="O1"
+                        className={status === 'O1' ? styles.active : ''}
+                    >
                         입금 대기
                     </span>
-                    <span onClick={handleChangeStatus} data-lable="O2">
+                    <span
+                        onClick={handleChangeStatus}
+                        data-lable="O2"
+                        className={status === 'O2' ? styles.active : ''}
+                    >
                         결제 완료
                     </span>
-                    <span onClick={handleChangeStatus} data-lable="O3">
+                    <span
+                        onClick={handleChangeStatus}
+                        data-lable="O3"
+                        className={status === 'O3' ? styles.active : ''}
+                    >
                         배송 준비
                     </span>
                 </div>

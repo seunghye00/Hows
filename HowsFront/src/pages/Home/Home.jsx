@@ -4,11 +4,11 @@ import { Cart } from './Cart/Cart'
 import { Communities } from './Communities/Communities'
 import { Products } from './Products/Products'
 import { Mypage } from './Mypage/Mypage'
-import { Main } from './Main/Main'
 import { Payment } from './Payment/Payment'
 import { SignIn } from '../Sign/SignIn/SignIn'
 import { SignUp } from '../Sign/SignUp/SignUp'
 import { FindPw } from '../Sign/SignIn/FindPw/FindPw'
+import { History} from "./History/History";
 
 export const Home = () => {
     return (
@@ -20,6 +20,7 @@ export const Home = () => {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/mypage/*" element={<Mypage />} />
                 <Route path="/payment" element={<Payment />} />
+                <Route path="/history/*" element={<History />} />
 
                 <Route path="/signIn" element={<SignIn />} />
                 <Route path="/signIn/findPw" element={<FindPw />} />

@@ -29,13 +29,6 @@
     
     <select id="getSysName" resultType="String">
         select file_sysname 
-        from files f 
-        join banner b on f.file_seq = b.file_seq
-        where b.banner_seq = #{bannerSeq}
-    </select>
-    
-    <select id="getSysNames" resultType="String">
-        select file_sysname 
         from files 
 		where parent_seq = #{parentSeq}
     </select>

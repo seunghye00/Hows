@@ -1,4 +1,4 @@
-.boardContainer {
+.communityContainer {
     flex: 9 1;
 }
 
@@ -23,12 +23,12 @@
 }
 
 /* 조회 하는 영역 */
-.boardlist {
+.communitylist {
     font-size: 17px;
     height: 85%;
 }
 
-.boardHeader {
+.communityHeader {
     display: flex;
     background-color: #555;
     padding: 10px;
@@ -45,7 +45,7 @@
     text-align: center;
 }
 
-.boardRow {
+.communityRow {
     display: flex;
     align-items: center;
     padding: 10px;
@@ -54,7 +54,7 @@
     height: 35px;
 }
 
-.boardItem {
+.communityItem {
     flex: 1;
     text-align: center;
     display: flex;

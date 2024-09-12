@@ -324,6 +324,7 @@ create table product (
     product_title varchar2(100) not null,
     product_contents varchar2(4000) not null,
     price number not null,
+    quantity number not null,
     product_category_code char(2) not null
 );
 
@@ -403,19 +404,6 @@ increment by 1
 nomaxvalue
 nocache;
 
--- 재고
-create table inventory (
-    inventory_seq number primary key,
-    quantity number not null,
-    product_seq number not null
-);
-
-create sequence inventory_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
 -----------------------------------------------------------------------------------------
 
 -- 시온 (결제)
@@ -442,7 +430,12 @@ create table orders (
     member_seq number not null,
     order_code char(2) not null,
     order_date timestamp default sysdate not null,
-    order_price number not null
+    order_price number not null,
+    orderer_name varchar2(30) not null,
+    orderer_phone varchar2(11) not null,
+    orderer_zip_code varchar2(10) not null,
+    orderer_address varchar2(255) not null,
+    orderer_detail_address varchar2(255) not null
 );
 
 create sequence order_seq
@@ -627,9 +620,10 @@ create table banner (
 banner_seq number primary key,
 file_seq number not null,
 banner_url varchar2(300) not null,
-start_date timestamp,
-end_date timestamp,
-banner_order number not null
+start_date Date,
+end_date Date,
+banner_order number not null,
+is_visible char(1) default 'N' not null
 );
 
 create sequence banner_seq
@@ -692,6 +686,7 @@ insert into file_code (file_code, file_title) values ('F2', '커뮤니티');
 insert into file_code (file_code, file_title) values ('F3', '상품');
 insert into file_code (file_code, file_title) values ('F4', '리뷰');
 insert into file_code (file_code, file_title) values ('F5', '배너');
+insert into file_code (file_code, file_title) values ('F6', '공지사항');
 
 commit;
 

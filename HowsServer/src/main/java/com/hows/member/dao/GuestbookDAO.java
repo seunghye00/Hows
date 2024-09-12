@@ -30,5 +30,13 @@ public class GuestbookDAO {
 		return mybatis.delete("Guestbook.delete", guestbook_seq);
 	}
 	
+    
+	// [마이페이지] 방문글 갯수
+    public int countGuestbook(String member_id){
+    	return mybatis.selectOne("Guestbook.countGuestbook", member_id);
+    }
+	
+
+    
 
 }

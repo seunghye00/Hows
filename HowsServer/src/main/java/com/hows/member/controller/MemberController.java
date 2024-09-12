@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.hows.File.service.FileService;
 import com.hows.blacklistreason.dto.BlacklistReasonDTO;
+import com.hows.common.CustomUserDetails;
 import com.hows.grade.dto.GradeDTO;
 import com.hows.member.dto.MemberDTO;
 import com.hows.member.service.MemberService;
@@ -78,13 +79,18 @@ public class MemberController {
 
 	// 마이페이지 회원정보 출력
 	@GetMapping("/selectInfo")
-	public ResponseEntity<MemberDTO> selectInfo(@AuthenticationPrincipal UserDetails user) {
+	public ResponseEntity<MemberDTO> selectInfo(
+			 @RequestParam(required = false) String member_id,
+			@AuthenticationPrincipal CustomUserDetails user) {
 
 		System.out.println("요청한 사용자의 ID : " + user.getUsername());
 
-		String member_id = user.getUsername();
+		if (member_id == null || member_id.isEmpty()) {
+	        member_id = user.getUsername(); // member_id가 없을 경우 JWT에서 ID 가져오기
+	    }
 
 		MemberDTO result = memServ.selectInfo(member_id);
+	    result.setPw(null); // pw 값을 null로 설정
 		return ResponseEntity.ok(result);
 	}
 
@@ -97,7 +103,7 @@ public class MemberController {
 
 	// 비밀번호 변경 시 기존 비밀번호 확인
 	@PostMapping("/checkPw")
-	public ResponseEntity<Boolean> checkPw(@AuthenticationPrincipal UserDetails user,
+	public ResponseEntity<Boolean> checkPw(@AuthenticationPrincipal CustomUserDetails user,
 			@RequestBody Map<String, String> request) {
 
 		// 사용자로부터 받은 평문 비밀번호
@@ -114,19 +120,15 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	// 비밀번호 변경
+	// [로그인]비밀번호 찾기 / [마이페이지]비밀번호 변경
 	@PutMapping("/updatePw")
-	public ResponseEntity<Integer> updatePw(@AuthenticationPrincipal UserDetails user,
+	public ResponseEntity<Integer> updatePw(
+			@AuthenticationPrincipal CustomUserDetails user,
 			@RequestBody Map<String, String> request) {
 
-		String loginId = user.getUsername();
+		String member_id = user.getUsername();
 		String pw = pwEncoder.encode(request.get("pw"));
-
-		HashMap<String, String> map = new HashMap<>();
-		map.put("member_id", loginId);
-		map.put("pw", pw);
-
-		int result = memServ.updatePw(map);
+		int result = memServ.updatePw(member_id, pw);
 
 		return ResponseEntity.ok(result);
 	}
@@ -171,7 +173,11 @@ public class MemberController {
 	        System.out.println("삭제할 sysname : " + sysName);
 	        
 	        if (sysName != null) {
-	            // 2. fileService를 통해 GCS에서 파일 삭제
+	        	// 1-1. URL에서 마지막 슬래시 뒤의 파일명만 추출
+	            String fileName = sysName.substring(sysName.lastIndexOf("/") + 1);
+	            System.out.println("삭제할 파일명 : " + fileName);
+	        	
+	        	// 2. fileService를 통해 GCS에서 파일 삭제
 	            String result = fileServ.deleteFile(sysName, "F1");
 	            System.out.println("삭제 결과 : " + result);
 
@@ -191,15 +197,84 @@ public class MemberController {
 	    }
 	}
 
-	
-
 	// 회원탈퇴
 	@DeleteMapping("/deleteUser/{member_id}")
 	public ResponseEntity<Integer> deleteUser(@PathVariable("member_id") String member_id) {
 		int result = memServ.deleteUser(member_id);
 		return ResponseEntity.ok(result);
 	}
+	
+	// 팔로우 및 언팔로우 메서드
+	@PostMapping("/follow")
+	public ResponseEntity<Map<String, Object>> toggleFollow(
+	        @RequestBody Map<String, Object> requestBody
+	) {
+		System.out.println(requestBody.get("from_member_seq"));
+		System.out.println(requestBody.get("to_member_seq"));
+	    try {
+	        int fromMemberSeq = (int) requestBody.get("from_member_seq");
+	        int toMemberSeq = (int) requestBody.get("to_member_seq");
+	        boolean checkStatus = (boolean) requestBody.get("checkStatus");  // 클라이언트에서 전달된 checkStatus 플래그
 
+	        // 이미 팔로우한 상태인지 확인
+	        boolean isFollowing = memServ.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
+
+	        Map<String, Object> response = new HashMap<>();
+	        
+	        if (checkStatus) {
+	            // checkStatus가 true이면 상태만 반환하고 추가/취소 작업은 하지 않음
+	            response.put("isFollowing", isFollowing);
+	            return ResponseEntity.ok(response);
+	        }
+
+	        if (isFollowing) {
+	            // 팔로우를 취소
+	        	memServ.removeFollow(fromMemberSeq, toMemberSeq);
+	            response.put("isFollowing", false);
+	            response.put("message", "팔로우가 취소되었습니다.");
+	        } else {
+	            // 팔로우 추가
+	        	memServ.addFollow(fromMemberSeq, toMemberSeq);
+	            response.put("isFollowing", true);
+	            response.put("message", "팔로우가 추가되었습니다.");
+	        }
+	        return ResponseEntity.ok(response);
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+	    }
+	}
+  
+	// 마이페이지 게시글(이미지) 출력
+	@GetMapping("/selectPost")
+	public ResponseEntity<List<Map<String, Object>> > selectPost(@RequestParam String member_id){
+		List<Map<String, Object>> result = memServ.selectPostByMemberId(member_id);
+		return ResponseEntity.ok(result);
+	}
+
+	// 마이페이지 게시글 갯수
+	@GetMapping("/countPost")
+	public ResponseEntity<Integer> countPost(@RequestParam String member_id){
+		int result = memServ.countPost(member_id);
+		return ResponseEntity.ok(result);
+	}
+	
+	
+	// 마이페이지 스크랩 갯수
+	
+	
+	// 마이페이지 방문글 갯수
+	@GetMapping("/countGuestbook")
+	public ResponseEntity<Integer> countGuestbook(@RequestParam String member_id){
+		
+		System.out.println("게시글 요청 member_id : "+ member_id);
+		
+		int result = memServ.countGuestbook(member_id);
+		return ResponseEntity.ok(result);
+	}
+
+	
+	
+	
 	// ========================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	@GetMapping("/all")
@@ -328,6 +403,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

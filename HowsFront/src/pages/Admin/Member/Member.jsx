@@ -6,7 +6,7 @@ import { Button } from '../../../components/Button/Button'
 import { formatDate } from '../../../commons/commons'
 import Swal from 'sweetalert2'
 import {
-    selectAll, // selectAll API 호출
+    selectAll,
     detailMember,
     updateGrade,
     updateRole,

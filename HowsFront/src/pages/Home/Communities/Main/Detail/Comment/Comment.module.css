@@ -1,0 +1,75 @@
+.commentCont {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.imgBox {
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.imgBox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.commentBox {
+    display: flex;
+    width: calc(100% - 50px);
+    flex-direction: column;
+    gap: 10px;
+    color: var(--hows-gray-700);
+}
+
+.commentName {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.commentTxt {
+    word-break: keep-all;
+    word-wrap: break-word;
+    font-size: 16px;
+}
+
+.btnBox {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btnRight {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.btnRight i {
+    font-weight: 500;
+}
+
+.reportComment {
+    display: flex;
+    align-items: center;
+}
+
+.btnLike {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.editInput {
+    width: 100%;
+    resize: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    overflow-y: auto;
+    letter-spacing: .7px;
+    color: var(--hows-gray-700);
+}

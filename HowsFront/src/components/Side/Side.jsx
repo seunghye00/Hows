@@ -49,7 +49,7 @@ export const Side = () => {
                 {
                     title: '게시글 관리',
                     icon: 'bx bx-file', // 아이콘 추가
-                    subMenu: [{ title: '신고 게시물 목록', path: 'board' }],
+                    subMenu: [{ title: '신고 게시물 목록', path: 'community' }],
                 },
                 {
                     title: '댓글 관리',
@@ -69,7 +69,7 @@ export const Side = () => {
                     icon: 'bx bx-error-circle', // 아이콘 추가
                     subMenu: [
                         { title: '공지사항 관리', path: 'notice' },
-                        { title: 'FAQ 관리', path: 'faq' },
+                        { title: 'FAQ 관리', path: '/admin/notice/faq' },
                     ],
                 },
             ],

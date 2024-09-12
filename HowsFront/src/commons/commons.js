@@ -23,6 +23,14 @@ export const formatDate = dateString => {
     return format(date, 'yyyy-MM-dd HH:mm')
 }
 
+// 날짜 변환 함수 (yyyy-MM-dd)
+export const formatDateForInput = date => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0') // 월은 0부터 시작하므로 +1
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+}
+
 /** 금액에 (,)를 추가하는 함수 **/
 export const addCommas = price => {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -90,4 +98,16 @@ export const SwalComp = ({ type, text }) => {
                 confirmButtonText: '확인',
             })
     }
+}
+
+/** 정규 표현식 [ 이름 ]  **/
+export const validateName = name => {
+    let regex = /^[가-힣]{2,5}$/
+    return regex.test(name)
+}
+
+/** 정규 표현식 [ 전화번호 ]  **/
+export const validatePhone = phone => {
+    let regex = /^01([0|1|6|7|8|9])([0-9]{8})$/
+    return regex.test(phone)
 }

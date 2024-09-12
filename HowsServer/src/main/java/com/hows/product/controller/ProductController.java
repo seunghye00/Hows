@@ -1,9 +1,12 @@
 package com.hows.product.controller;
 
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hows.File.service.FileService;
+import com.hows.product.dto.ImageDTO;
 import com.hows.product.dto.ProductDTO;
 import com.hows.product.dto.ReviewReportDTO;
 import com.hows.product.service.ProductService;
@@ -30,7 +35,7 @@ public class ProductController {
 
 	@Autowired
 	private ProductService productServ;
-	
+
 	@Autowired
 	private ReviewService reviewServ;
 
@@ -56,7 +61,6 @@ public class ProductController {
 	@GetMapping("/detail/{product_seq}")
 	public ResponseEntity<ProductDTO> getProductByDetail(@PathVariable String product_seq) throws Exception {
 		ProductDTO detaile = productServ.getProductByDetail(product_seq);
-
 		return ResponseEntity.ok(detaile);
 	}
 
@@ -64,8 +68,10 @@ public class ProductController {
 	// 리뷰 등록
 	@PostMapping("/reviewAdd")
 	@Transactional
-	public ResponseEntity<String> submitReview(@RequestParam("images") MultipartFile[] images, // 여러 이미지 파일
-			@RequestParam("reviewData") String reviewData // 리뷰 데이터 (JSON)
+	public ResponseEntity<String> submitReview(
+			@RequestParam("images") MultipartFile[] images, // 여러 이미지 파일
+			@RequestParam("reviewData") String reviewData, // 리뷰 데이터 (JSON)
+			@RequestParam("image_orders") int[] imageOrders
 	) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -79,19 +85,48 @@ public class ProductController {
 			// 리뷰 저장
 			int reviewSeq = reviewServ.saveReview(rating, reviewText, productSeq, memberId);
 
-			// 이미지 파일 처리 (GCS 업로드 후 이미지 URL 저장)
+			// 이미지 파일 처리 
 			if (images != null && images.length > 0) {
-				for (MultipartFile img : images) {
-					String imageUrl = fileServ.upload(img, productSeq, "F4"); // 상품 번호와 함께 업로드
+				for (int i = 0; i < images.length; i++) {
+					String imageUrl = fileServ.upload(images[i], productSeq, "F4");
+					
+					System.out.println(imageUrl + " 결과");
+					// imageUrl : GCS에 등록된 이미지 URL
+					// review_image 테이블에 등록
+					if (!imageUrl.equals("fail")) {
+						ImageDTO imageDTO = new ImageDTO(0, reviewSeq, imageUrl, imageOrders[i]);
+						reviewServ.insertReviewImage(imageDTO);
+					}
 				}
-			}
+			}else {
+                throw new IOException("이미지 업로드 실패");
+            }
 		} catch (Exception e) {
-			// 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
-			throw new RuntimeException("상품 등록 실패", e);
-		}
+            e.printStackTrace();
+            throw new RuntimeException("리뷰등록 또는 이미지 업로드 실패", e);
+        }
 		return ResponseEntity.ok().build();
 	}
+	
+	//리뷰 출력 (페이징)
+	@GetMapping("/getReviewList/{product_seq}")
+	public ResponseEntity<Map<String, Object>> getReviewList(
+	        @PathVariable int product_seq,
+	        @RequestParam(defaultValue = "1") int page,
+	        @RequestParam(defaultValue = "10") int itemsPerPage
+	) throws Exception {
 
+	    // 페이징된 리뷰 목록 조회
+	    List<Map<String, Object>> reviewList = reviewServ.getReviewList(product_seq, page, itemsPerPage);
+
+	    // 페이징 정보와 리뷰 목록을 함께 반환
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("reviews", reviewList);	
+	    
+	    return ResponseEntity.ok(response);
+	}
+
+	// ==================
 	// 상품 추가
 	@PostMapping
 	@Transactional
@@ -128,44 +163,86 @@ public class ProductController {
 	}
 
 	// 관리자
-	// 리뷰 신고목록 조회
+	// 리뷰 신고 목록 조회 (관리자)
 	@GetMapping("/reportedReviews")
-	public ResponseEntity<List<Map<String, Object>>> getReportedReviews() throws Exception {
-	    List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews();
-	    return ResponseEntity.ok(reportedReviews);
+	public ResponseEntity<Map<String, Object>> getReportedReviews(@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "10") int itemsPerPage) throws Exception {
+		// 전체 신고 리뷰 카운트
+		int totalCount = reviewServ.getReportedReviewsCount();
+
+		// 페이징된 리뷰 신고 목록 조회
+		List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews(page, itemsPerPage);
+
+		// 페이징 정보와 리뷰 목록을 함께 반환
+		Map<String, Object> response = new HashMap<>();
+		response.put("totalCount", totalCount);
+		response.put("reviews", reportedReviews);
+
+		return ResponseEntity.ok(response);
 	}
 
-	// 리뷰 신고내역 조회
+	// 리뷰 신고내역 조회 (관리자)
 	@GetMapping("/reviewReport/{review_seq}")
 	public ResponseEntity<List<ReviewReportDTO>> getReviewReport(@PathVariable int review_seq) throws Exception {
-	    List<ReviewReportDTO> reviewReports = reviewServ.getReviewReport(review_seq);
-	    System.out.println(reviewReports);
-	    return ResponseEntity.ok(reviewReports);
+		List<ReviewReportDTO> reviewReports = reviewServ.getReviewReport(review_seq);
+		System.out.println("컨트롤러 : " + reviewReports);
+		return ResponseEntity.ok(reviewReports);
 	}
-	
+
+	// 신고 리뷰 삭제(관리자)
+	@DeleteMapping("/deleteReview/{review_seq}")
+	public ResponseEntity<Integer> deleteReview(@PathVariable int review_seq) throws Exception {
+		int result = reviewServ.deleteReview(review_seq);
+
+		if (result > 0) {
+			return ResponseEntity.ok(result); // 성공 시 200 OK와 삭제된 행 수 반환
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 삭제 실패 시 404 NOT FOUND
+		}
+	}
+
 	// 상품 삭제
 	@DeleteMapping
 	@Transactional
 	public ResponseEntity<String> deleteBanner(@RequestParam String seqs) throws Exception {
 		String[] productSeqs = seqs.split(","); // seqs를 배열로 변환
-		for(String productSeq : productSeqs) {
+		for (String productSeq : productSeqs) {
 			try {
 				int product_seq = Integer.parseInt(productSeq);
 				if (!productServ.deleteProduct(product_seq)) {
 					throw new RuntimeException("상품 삭제 실패: ");
 				}
-                List<String> sysNames = fileServ.getSysNames(product_seq);
-                // 해당 상품에 포함된 파일 전부 삭제
-                for (String sysName : sysNames) {
-                	 String result = fileServ.deleteFile(sysName, "F3");
-                     if (result.equals("fail")) {
-                         throw new RuntimeException("파일 삭제 실패: " + sysName);
-                     }
-                }               
-            } catch (Exception e) {
-                // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
-                throw new RuntimeException("상품 삭제 실패", e);
-            }
+				List<String> sysNames = fileServ.getSysNames(product_seq);
+				// 해당 상품에 포함된 파일 전부 삭제
+				for (String sysName : sysNames) {
+					String result = fileServ.deleteFile(sysName, "F3");
+					if (result.equals("fail")) {
+						throw new RuntimeException("파일 삭제 실패: " + sysName);
+					}
+				}
+			} catch (Exception e) {
+				// 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+				throw new RuntimeException("상품 삭제 실패", e);
+			}
+		}
+		return ResponseEntity.ok("success");
+	}
+	
+	// 상품 수량 변경
+	@PutMapping
+	@Transactional
+	public ResponseEntity<String> updateBuQuantity(@RequestParam String seqs, @RequestParam int quantity) throws Exception {
+		String[] productSeqs = seqs.split(","); // seqs를 배열로 변환
+		for (String productSeq : productSeqs) {
+			try {
+				int product_seq = Integer.parseInt(productSeq);
+				if (!productServ.updateByQuantity(product_seq, quantity)) {
+					throw new RuntimeException("상품 수량 업데이트 실패: ");
+				}
+			} catch (Exception e) {
+				// 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+				throw new RuntimeException("상품 수량 업데이트 실패", e);
+			}
 		}
 		return ResponseEntity.ok("success");
 	}

@@ -15,6 +15,12 @@ import img1 from '../../../../assets/images/수납.png'
 import img2 from '../../../../assets/images/조명.png'
 import img3 from '../../../../assets/images/주방용품.png'
 import img4 from '../../../../assets/images/테스트.jpg'
+import {
+    submitPost,
+    getHousingTypes,
+    getSpaceTypes,
+    getAreaSizes,
+} from '../../../../api/community' // 수정된 import 부분
 
 const ItemType = 'IMAGE'
 
@@ -287,20 +293,14 @@ export const Post = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const housingTypesResponse = await axios.get(
-                    `${host}/option/housing-types`
-                )
-                setHousingTypes(housingTypesResponse.data)
+                const housingTypes = await getHousingTypes()
+                setHousingTypes(housingTypes)
 
-                const spaceTypesResponse = await axios.get(
-                    `${host}/option/space-types`
-                )
-                setSpaceTypes(spaceTypesResponse.data)
+                const spaceTypes = await getSpaceTypes()
+                setSpaceTypes(spaceTypes)
 
-                const areaSizesResponse = await axios.get(
-                    `${host}/option/area-sizes`
-                )
-                setAreaSizes(areaSizesResponse.data)
+                const areaSizes = await getAreaSizes()
+                setAreaSizes(areaSizes)
             } catch (error) {
                 console.error(error)
             }
@@ -310,6 +310,8 @@ export const Post = () => {
 
     // 게시글 작성 완료 처리 핸들러
     const handleSubmitPost = async () => {
+        const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+
         if (!postContent || images.length === 0) {
             Swal.fire({
                 icon: 'warning',
@@ -329,57 +331,69 @@ export const Post = () => {
         }
 
         try {
-            // 게시글 먼저 저장
-            const postResponse = await axios.post(`${host}/community`, {
-                housing_type_code: selectedHousingType,
-                space_type_code: selectedSpaceType,
-                area_size_code: selectedAreaSize,
-                board_contents: postContent,
-                member_id: 'qwer1234',
-            })
+            const formData = new FormData()
 
-            const board_seq = postResponse.data // 서버로부터 받은 board_seq
+            // 게시글 정보 추가
+            formData.append('housing_type_code', selectedHousingType)
+            formData.append('space_type_code', selectedSpaceType)
+            formData.append('area_size_code', selectedAreaSize)
+            formData.append('board_contents', postContent)
+            formData.append('member_id', member_id)
 
-            if (board_seq) {
-                // 이미지 및 태그 저장
-                const formData = new FormData()
+            // 이미지 및 태그 정보 추가
+            if (images.length === 1) {
+                // 이미지가 하나일 때
+                const image = images[0]
+                formData.append('files', image.file)
 
+                // 태그가 없을 경우에도 빈 배열로 전송
+                const tags =
+                    image.tags.length > 0
+                        ? image.tags.map(tag => ({
+                              product_seq: tag.product.product_seq,
+                              left_position: tag.position.left,
+                              top_position: tag.position.top,
+                          }))
+                        : []
+                console.log('이미지 하나일 때 확인')
+                formData.append('tag', JSON.stringify(tags))
+                images.forEach((_, index) =>
+                    formData.append('image_orders', index + 1)
+                )
+            } else {
+                // 이미지가 여러 개일 때
                 images.forEach((image, index) => {
-                    formData.append('file', image.file) // 이미지를 파일로 전송
-                    formData.append('board_seq', board_seq) // 게시글 시퀀스
-                    formData.append('image_order', index + 1)
-
-                    // 각 이미지에 대한 태그 정보 추가
-                    const tags = image.tags.map(tag => ({
-                        product_seq: tag.product.product_seq,
-                        left_position: tag.position.left,
-                        top_position: tag.position.top,
-                    }))
-
-                    // 태그 데이터를 JSON 문자열로 변환 후 추가
+                    formData.append('files', image.file)
+                    // 태그가 없을 경우에도 빈 배열로 전송
+                    const tags =
+                        image.tags.length > 0
+                            ? image.tags.map(tag => ({
+                                  product_seq: tag.product.product_seq,
+                                  left_position: tag.position.left,
+                                  top_position: tag.position.top,
+                              }))
+                            : []
                     formData.append('tags', JSON.stringify(tags))
                 })
-
-                const imageResponse = await axios.post(
-                    `${host}/community/images`,
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    }
+                // 이미지 순서 배열 추가 (배열 자체로 추가)
+                images.forEach((_, index) =>
+                    formData.append('image_orders', index + 1)
                 )
+            }
 
-                if (imageResponse.status === 200) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: '게시글 작성 완료',
-                        text: '게시글과 이미지가 성공적으로 작성되었습니다.',
-                    })
-                    navigate('/communities')
-                } else {
-                    throw new Error('이미지 및 태그 저장 실패')
-                }
+            // 분리된 api 모듈 사용
+            console.log('전송되는 formData:', [...formData.entries()])
+            const response = await submitPost(formData)
+
+            if (response.status === 200) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '게시글 작성 완료',
+                    text: '게시글과 이미지가 성공적으로 작성되었습니다.',
+                })
+                navigate('/communities')
+            } else {
+                throw new Error('이미지 및 태그 저장 실패')
             }
         } catch (error) {
             console.error('게시글 작성 오류:', error)

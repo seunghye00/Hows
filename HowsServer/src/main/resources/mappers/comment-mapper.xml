@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Comment">
+
+	<!-- 게시글 댓글 작성 -->
+	<insert id="writeComment">
+		insert into comments
+		values(comment_seq.nextval,#{comment_contents}, default, #{board_seq}, #{member_id})
+	</insert>
+	
+	<!-- 게시글 댓글 목록 출력 -->
+	<select id="getCommentsBoardSeq" resultType="map">
+		select 
+		    c.comment_seq, 
+		    c.comment_contents, 
+		    to_char(c.comment_write_date, 'YYYY-MM-DD HH24:MI:SS') as comment_write_date,
+		    c.board_seq, 
+		    c.member_id,
+		    m.nickname,
+		    m.member_avatar,
+		    count(distinct cl.comment_like_seq) as like_count
+		from comments c
+		join member m on c.member_id = m.member_id
+		left join comment_like cl on c.comment_seq = cl.comment_seq 
+		where c.board_seq = #{board_seq}
+		group by c.comment_seq, 
+		         c.comment_contents, 
+		         c.comment_write_date, 
+		         c.board_seq, 
+		         c.member_id,
+		         m.nickname,
+		         m.member_avatar
+		order by c.comment_seq asc
+	</select>
+	
+	<!-- 게시글 댓글 수정 -->
+	<update id="updateComment">
+		update comments set comment_contents = #{commentContents} where comment_seq = #{commentSeq}
+	</update>
+</mapper>

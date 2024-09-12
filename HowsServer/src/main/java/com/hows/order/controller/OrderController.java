@@ -41,7 +41,6 @@ public class OrderController {
 
 	@PostMapping
 	public ResponseEntity<Integer> addOrder(@AuthenticationPrincipal CustomUserDetails user, @RequestBody Map<String, Object> map) throws Exception {
-		// result = -1 ( 데이터 작업 X )
 		int result = orderServ.addOrder(map, user.getMemberSeq());
 		return ResponseEntity.ok(result);
 	}

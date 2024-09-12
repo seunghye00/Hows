@@ -34,4 +34,56 @@ public class CommentDAO {
         params.put("comment_contents", commentContents);
     	mybatis.update("Comment.updateComment", params);
     }
+    
+    // 게시글 댓글 삭제 
+    public void deleteComment(int comment_seq) {
+    	mybatis.delete("Comment.deleteComment", comment_seq);
+    }
+    
+    // 댓글 좋아요 삭제 
+    public void deleteLike(int comment_seq) {
+    	mybatis.delete("Comment.deleteLike", comment_seq);
+    }
+    
+    // 사용자가 특정 게시글에 좋아요를 눌렀는지 확인
+    public boolean checkIfUserLikedBoard(String member_id, int comment_seq) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("member_id", member_id);
+        params.put("comment_seq", comment_seq);
+        
+        Integer result = mybatis.selectOne("Comment.checkIfUserLikedBoard", params);
+        return result != null && result > 0;
+    }
+
+    // 게시글에 좋아요 추가
+    public void addLike(String member_id, int comment_seq) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("member_id", member_id);
+        params.put("comment_seq", comment_seq);
+        
+        mybatis.insert("Comment.addLike", params);
+    }
+
+    // 게시글에 좋아요 제거
+    public void removeLike(String member_id, int comment_seq) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("member_id", member_id);
+        params.put("comment_seq", comment_seq);
+        
+        mybatis.delete("Comment.removeLike", params);
+    }
+    
+    // 특정 댓글 좋아요 개수 가져오기
+    public int getLikeCount(int comment_seq) {
+        return mybatis.selectOne("Comment.getLikeCount", comment_seq);
+    }
+    
+    // 댓글 신고하기
+    public void sendCommentReport(int commentSeq, String reportCode, String memberId) {
+    	Map<String, Object> params = new HashMap<>();
+        params.put("comment_seq", commentSeq);
+        params.put("report_code", reportCode);
+        params.put("member_id", memberId);
+        mybatis.insert("Comment.sendCommentReport", params);
+    }
 }

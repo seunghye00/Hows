@@ -24,6 +24,8 @@ import {
     sendComments,
     getComments,
     updateComment,
+    deleteComment,
+    sendCommentReport,
 } from '../../../../../api/comment' // API 함수 불러오기
 import { useAuthStore } from '../../../../../store/store'
 import { BiMessageRounded } from 'react-icons/bi'
@@ -46,6 +48,7 @@ export const Detail = () => {
     const [comments, setComments] = useState([]) // 댓글 목록
     const [comment, setComment] = useState('') // 새로운 댓글 내용
     const member_id = sessionStorage.getItem('member_id') || null // 세션에서 member_id 가져오기
+    const [selectedCommentSeq, setSelectedCommentSeq] = useState(null) // 선택된 댓글 시퀀스 추가
 
     // 게시글 정보 및 이미지, 태그 정보 받아오기
     useEffect(() => {
@@ -80,7 +83,7 @@ export const Detail = () => {
                 setBookmarkCount(postData.data.BOOKMARK_COUNT)
 
                 // 댓글 데이터 가져오기
-                const commentsData = await getComments(board_seq)
+                const commentsData = await getComments(board_seq, member_id)
                 setComments(commentsData) // 댓글 목록 상태 업데이트
             } catch (error) {
                 console.error('데이터를 가져오는 중 오류 발생:', error)
@@ -151,6 +154,7 @@ export const Detail = () => {
             })
         })
     }
+
     const handleOpenReportModal = () => {
         if (!member_id || !isAuth) {
             // 로그인되지 않은 경우 SweetAlert 경고 후 로그인 페이지로 이동
@@ -163,14 +167,30 @@ export const Detail = () => {
             })
         } else {
             // 로그인된 경우에만 모달 열기
+            setSelectedCommentSeq() // 신고할 댓글 시퀀스 설정
             setIsModalOpen(true)
         }
     }
 
-    // 신고하기 버튼 클릭 시 호출되는 전송 함수
+    // 댓글 신고하기 버튼 클릭 시 호출되는 함수
+    const handleOpenReportModalForComment = commentSeq => {
+        if (!member_id || !isAuth) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn')
+            })
+        } else {
+            setSelectedCommentSeq(commentSeq) // 댓글 신고 시 해당 댓글 시퀀스 설정
+            setIsModalOpen(true) // 모달 열기
+        }
+    }
+
+    // 신고 제출 처리
     const handleReportSubmit = async () => {
         if (!selectedReports) {
-            setIsModalOpen(false) // 모달 닫기
             Swal.fire({
                 icon: 'warning',
                 title: '신고 사유를 선택해주세요.',
@@ -180,17 +200,23 @@ export const Detail = () => {
         }
 
         try {
-            setIsModalOpen(false) // 모달 닫기
-            await sendReport(board_seq, selectedReports, member_id) // 신고 API 호출
+            setIsModalOpen(false)
+            if (selectedCommentSeq) {
+                await sendCommentReport(
+                    selectedCommentSeq,
+                    selectedReports,
+                    member_id
+                ) // 댓글 신고
+            } else {
+                await sendReport(board_seq, selectedReports, member_id) // 게시글 신고
+            }
             Swal.fire({
                 icon: 'success',
                 title: '신고가 접수되었습니다.',
-                text: '신고가 성공적으로 접수되었습니다.',
                 showConfirmButton: false,
                 timer: 1500,
             })
         } catch (error) {
-            setIsModalOpen(false) // 모달 닫기
             Swal.fire({
                 icon: 'error',
                 title: '오류 발생',
@@ -241,16 +267,32 @@ export const Detail = () => {
     const onCommentSubmit = async () => {
         try {
             const response = await getComments(board_seq)
-            setComments(response.data.comments)
+            setComments(response)
         } catch (error) {
             console.error('댓글 목록 갱신 실패:', error)
         }
     }
 
+    // 댓글 삭제
     const handleDeleteComment = async comment_seq => {
-        // 댓글 삭제 처리 로직
-        // await deleteComment(comment_seq)
-        // onCommentSubmit() // 삭제 후 목록 새로고침
+        try {
+            await deleteComment(comment_seq) // 백엔드에서 댓글 삭제 API 호출
+            onCommentSubmit() // 삭제 후 목록 새로고침
+            Swal.fire({
+                icon: 'success',
+                title: '댓글이 삭제되었습니다.',
+                showConfirmButton: false,
+                timer: 1500,
+            })
+        } catch (error) {
+            console.error('댓글 삭제 중 오류 발생:', error)
+            Swal.fire({
+                icon: 'error',
+                title: '댓글 삭제 실패',
+                text: '오류가 발생했습니다.',
+                showConfirmButton: true,
+            })
+        }
     }
 
     // 댓글 수정 처리 함수
@@ -349,17 +391,14 @@ export const Detail = () => {
                 {comments && comments.length > 0 ? (
                     comments.map(comment => (
                         <Comment
-                            key={comment.comment_seq}
+                            key={comment.COMMENT_SEQ}
                             commentData={comment}
-                            onLike={id =>
-                                console.log(`${id}번 댓글 좋아요 클릭`)
-                            }
-                            onEdit={id => console.log(`${id}번 댓글 수정 클릭`)}
                             onDelete={handleDeleteComment}
-                            onReport={id =>
-                                console.log(`${id}번 댓글 신고 클릭`)
+                            handleOpenReportModalForComment={
+                                handleOpenReportModalForComment
                             }
                             handleUpdateComment={handleUpdateComment} // 수정 함수 전달
+                            handleDeleteComment={handleDeleteComment} // 삭제 함수 전달
                         />
                     ))
                 ) : (

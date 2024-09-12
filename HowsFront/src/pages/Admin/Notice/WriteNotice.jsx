@@ -21,10 +21,10 @@ export const WriteNotice = () => {
     const handleFileChange = e => {
         const files = Array.from(e.target.files)
 
-        if (files.length + selectedFiles.length > 10) {
+        if (files.length + selectedFiles.length > 1) {
             SwalComp({
                 type: 'warning',
-                text: '최대 10개의 파일만 업로드할 수 있습니다.',
+                text: '최대 1개의 파일만 업로드할 수 있습니다.',
             })
             return
         }
@@ -73,7 +73,7 @@ export const WriteNotice = () => {
 
     // 작성 완료
     const handleSubmit = () => {
-        if (selectedImage === 10) {
+        if (selectedImage === 1) {
             SwalComp({
                 type: 'warning',
                 text: '대표 사진을 등록해주세요.',
@@ -150,7 +150,7 @@ export const WriteNotice = () => {
                             <BiCamera size={40} />
                         </label>
                         <div className={styles.imgNum}>
-                            <span>{selectedFiles.length}</span> / 10
+                            <span>{selectedFiles.length}</span> / 1
                         </div>
                     </span>
                     {previews.map((preview, index) => (

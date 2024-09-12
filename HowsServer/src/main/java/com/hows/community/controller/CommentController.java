@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,13 +39,25 @@ public class CommentController {
 		return ResponseEntity.ok().build();
 	}
 
-	// 게시글 목록 불러오기
+	// 게시글 댓글 목록 불러오기
 	@GetMapping("/getComments")
 	public ResponseEntity<List<Map<String, Object>>> getComments(@RequestParam("board_seq") int boardSeq) {
 		List<Map<String, Object>> comments = commentServ.getCommentsBoardSeq(boardSeq); // 댓글 목록 조회 로직
 		return ResponseEntity.ok(comments); // 댓글 목록을 JSON 형식으로 반환
 	}
+	
+	// 게시글 댓글 수정 
+	@PutMapping("/update")
+    public ResponseEntity<Void> updateComment(
+    		@RequestBody CommentDTO dto) {
 
+        int commentSeq = dto.getComment_seq();
+        String commentContents = dto.getComment_contents();
+
+        commentServ.updateComment(commentSeq, commentContents); // 댓글 수정 서비스 호출
+        return ResponseEntity.ok().build();
+    }
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

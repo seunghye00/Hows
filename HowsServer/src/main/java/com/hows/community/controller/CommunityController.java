@@ -23,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hows.File.service.FileService; // FileService 클래스 import
 import com.hows.community.dto.BoardReportDTO;
@@ -47,82 +49,105 @@ public class CommunityController {
 	private MemberService memServ;
 	
 	// 게시글 및 이미지/태그 저장 (트랜잭션 적용)
-	// 게시글 및 이미지/태그 저장 (트랜잭션 적용)
-    @PostMapping("/write-with-images")
-    @Transactional // 트랜잭션 적용
-    public ResponseEntity<Void> insertWriteWithImages(
-        @RequestParam("housing_type_code") String housingTypeCode,
-        @RequestParam("space_type_code") String spaceTypeCode,
-        @RequestParam("area_size_code") String areaSizeCode,
-        @RequestParam("board_contents") String boardContents,
-        @RequestParam("member_id") String memberId,
-        @RequestPart("files") MultipartFile[] files,  // FormData에서 여러 이미지 파일을 받음
-        @RequestParam("image_orders") int[] imageOrders,  // 이미지 순서를 배열로 받음
-        @RequestParam("tags") String[] tagsJson  // 태그 데이터를 JSON 문자열 배열로 받음
-    ) {
-        try {
-            // 1. CommunityDTO 객체 생성 및 게시글 저장
-            CommunityDTO dto = new CommunityDTO();
-            dto.setHousing_type_code(housingTypeCode);
-            dto.setSpace_type_code(spaceTypeCode);
-            dto.setArea_size_code(areaSizeCode);
-            dto.setBoard_contents(boardContents);
-            dto.setMember_id(memberId);
-            
-            int boardSeq = communityServ.insertWrite(dto); // 게시글 저장
-            System.out.println(boardSeq + " 게시글 시퀀스");
+	@PostMapping("/write-with-images")
+	@Transactional // 트랜잭션 적용
+	public ResponseEntity<Void> insertWriteWithImages(
+	    @RequestParam("housing_type_code") String housingTypeCode,
+	    @RequestParam("space_type_code") String spaceTypeCode,
+	    @RequestParam("area_size_code") String areaSizeCode,
+	    @RequestParam("board_contents") String boardContents,
+	    @RequestParam("member_id") String memberId,
+	    @RequestPart("files") MultipartFile[] files,  // FormData에서 여러 이미지 파일을 받음
+	    @RequestParam("image_orders") int[] imageOrders,  // 이미지 순서를 배열로 받음
+	    @RequestParam(value = "tags", required = false) String[] tagsJson,  // 태그 데이터를 JSON 문자열 배열로 받음 (이미지 여러 개일 때)
+	    @RequestParam(value = "tag", required = false) String tagJson // 단일 태그 데이터 (이미지 하나일 때)
+	) {
+	    try {
+	        // 1. CommunityDTO 객체 생성 및 게시글 저장
+	        CommunityDTO dto = new CommunityDTO();
+	        dto.setHousing_type_code(housingTypeCode);
+	        dto.setSpace_type_code(spaceTypeCode);
+	        dto.setArea_size_code(areaSizeCode);
+	        dto.setBoard_contents(boardContents);
+	        dto.setMember_id(memberId);
+	        
+	        int boardSeq = communityServ.insertWrite(dto); // 게시글 저장
+	        System.out.println(boardSeq + " 게시글 시퀀스");
 
-            // 2. 이미지 및 태그 저장 로직
-            for (int i = 0; i < files.length; i++) {
-                MultipartFile file = files[i];
-                int imageOrder = imageOrders[i];
-                String tags = tagsJson[i];
+	        // 2. 이미지 및 태그 저장 로직
+	        for (int i = 0; i < files.length; i++) {
+	            MultipartFile file = files[i];
+	            int imageOrder = imageOrders[i];
+	            
+	            // 이미지 업로드
+	            String code = "F2"; 
+	            String uploadResult = fileServ.upload(file, boardSeq, code); 
+	            System.out.println(uploadResult + " 업로드 결과 확인");
 
-                // 이미지 업로드
-                String code = "F2"; 
-                String uploadResult = fileServ.upload(file, boardSeq, code); 
-                System.out.println(uploadResult + " 업로드 결과 확인");
+	            if (!uploadResult.equals("fail")) {
+	                // 이미지 DB 저장
+	                ImageDTO imageDTO = new ImageDTO();
+	                imageDTO.setBoard_seq(boardSeq);
+	                imageDTO.setImage_url(uploadResult);
+	                imageDTO.setImage_order(imageOrder);
+	                int boardImageSeq = communityServ.insertImage(imageDTO);
 
-                if (!uploadResult.equals("fail")) {
-                    // 이미지 DB 저장
-                    ImageDTO imageDTO = new ImageDTO();
-                    imageDTO.setBoard_seq(boardSeq);
-                    imageDTO.setImage_url(uploadResult);
-                    imageDTO.setImage_order(imageOrder);
-                    int boardImageSeq = communityServ.insertImage(imageDTO);
+	                // 태그 데이터 처리
+	                String tags = (files.length > 1) ? tagsJson[i] : tagJson; // 이미지가 여러 개일 경우 tagsJson, 하나일 경우 tagJson 사용
+	                
+	                if (tags != null && !tags.isEmpty()) {  // 태그가 있는지 확인
+	                    List<TagDTO> tagsList = parseTagsFromJson(tags, boardImageSeq);  // 태그 데이터를 이미지 시퀀스와 함께 파싱
+	                    if (tagsList != null && !tagsList.isEmpty()) {
+	                        for (TagDTO tag : tagsList) {
+	                            tag.setBoard_image_seq(boardImageSeq);
+	                            communityServ.insertTag(tag);
+	                        }
+	                    }
+	                } else {
+	                    System.out.println("No tags for this image.");
+	                }
+	            } else {
+	                throw new IOException("이미지 업로드 실패");
+	            }
+	        }
 
-                    // 태그 데이터 처리
-                    List<TagDTO> tagsList = parseTagsFromJson(tags, boardImageSeq);
-                    if (tagsList != null && !tagsList.isEmpty()) {
-                        for (TagDTO tag : tagsList) {
-                            tag.setBoard_image_seq(boardImageSeq);
-                            communityServ.insertTag(tag);
-                        }
-                    }
-                } else {
-                    throw new IOException("이미지 업로드 실패");
-                }
-            }
-
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("게시글 작성 또는 이미지 업로드 실패", e);
-        }
-    }
+	        return ResponseEntity.ok().build();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("게시글 작성 또는 이미지 업로드 실패", e);
+	    }
+	}
 
 	// 태그 데이터를 JSON에서 List<TagDTO>로 파싱하는 메서드
-	private List<TagDTO> parseTagsFromJson(String tagsJson, int board_image_seq) throws IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		List<TagDTO> tags = objectMapper.readValue(tagsJson, new TypeReference<List<TagDTO>>() {
-		});
+	private List<TagDTO> parseTagsFromJson(String tagsJson, int boardImageSeq) throws IOException {
+	    ObjectMapper objectMapper = new ObjectMapper();
+	    List<TagDTO> tags = new ArrayList<>();
 
-		// 각 태그에 이미지 시퀀스 추가
-		for (TagDTO tag : tags) {
-			tag.setBoard_image_seq(board_image_seq);
-		}
-		return tags;
+	    if (tagsJson == null || tagsJson.isEmpty()) {
+	        System.out.println("태그 데이터가 없습니다.");
+	        return tags;  // 빈 리스트 반환
+	    }
+
+	    try {
+	        // JSON을 파싱하여 TagDTO 리스트로 변환
+	        tags = objectMapper.readValue(tagsJson, new TypeReference<List<TagDTO>>() {});
+	        System.out.println("파싱된 태그 데이터: " + tags);
+	    } catch (JsonMappingException e) {
+	        System.err.println("태그 JSON 파싱 오류: " + e.getMessage());
+	        throw new IOException("태그 데이터를 처리하는 중 오류가 발생했습니다.", e);
+	    } catch (JsonProcessingException e) {
+	        System.err.println("JSON 처리 중 오류 발생: " + e.getMessage());
+	        throw new IOException("태그 데이터를 처리하는 중 오류가 발생했습니다.", e);
+	    }
+
+	    // 각 태그에 이미지 시퀀스 추가
+	    for (TagDTO tag : tags) {
+	        tag.setBoard_image_seq(boardImageSeq);
+	    }
+
+	    return tags;
 	}
+
 
 	// 커뮤니티 게시글 불러오는 메서드
 	@GetMapping

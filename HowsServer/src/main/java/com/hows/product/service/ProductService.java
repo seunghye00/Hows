@@ -43,4 +43,9 @@ public class ProductService {
 	public boolean deleteProduct(int productSeq) {
 		return productDAO.deleteProduct(productSeq);
 	}
+
+	// 상품 수량 변경
+	public boolean updateByQuantity(int productSeq, int quantity) {
+		return productDAO.updateByQuantity(productSeq, quantity);
+	}
 }

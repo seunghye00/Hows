@@ -150,6 +150,14 @@ public class CommunityDAO {
     	return mybatis.selectList("Community.selectPostByMemberId", member_id);
     }
     
+	// [마이페이지] 게시글 갯수
+    public int countPost(String member_id){
+    	return mybatis.selectOne("Community.countPost", member_id);
+    }
+
+	// [마이페이지] 스크랩 갯수
+ 
+    
     
 	// 관리자
 	// 게시물 신고 조회 (관리자)

@@ -149,10 +149,10 @@
 }
 
 /* 주소 */
-.container .signUpBox .addressBox input {
+.container .updateInfo .addressBox input {
   margin-bottom: 3px;
 }
-.container .signUpBox .addressBox .addressBtn {
+.container .updateInfo .addressBox .addressBtn {
   height: 35px;
   background-color: var(--hows-point-color-dark);
   color: var(--hows-white);
@@ -165,8 +165,15 @@
   margin-top: 5px;
   height: 50px;
 }
-.container .signUpBox .addressBox .addressBtn:hover {
+.container .updateInfo .addressBox .addressBtn:hover {
   background-color: var(--hows-point-color-darker);
+}
+.modalBox {
+  width: 450px;
+  height: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* 회원가입 버튼 */

@@ -9,6 +9,10 @@ import { format } from "date-fns";
 import { useAuthStore } from "../../../../../store/store";
 import { checkNickname, userInfo } from "../../../../../api/member";
 import Swal from 'sweetalert2'
+import DaumPostcode from "react-daum-postcode";
+import { SwalComp } from "../../../../../commons/commons";
+import { Modal } from './../../../../../components/Modal/Modal';
+
 
 export const UpdateUserInfo = () => {
 
@@ -29,13 +33,17 @@ export const UpdateUserInfo = () => {
     })
     const [user, setUser] = useState([]);
     const [nicknameErrorMessage, setNicknameErrorMessage] = useState('');
-    const [nicknameAvailable, setNicknameAvailable] = useState(null);
-    const [checkNicknameStatus, setCheckNicknameStatus] = useState('');
-    const [nicknameChecked, setNicknameChecked] = useState(false); // 중복확인 상태 검사
+    const [nicknameAvailable, setNicknameAvailable] = useState(null); // 중복검사 후 사용가능한지 / false가 사용가능
+    const [checkNicknameStatus, setCheckNicknameStatus] = useState(''); // 중복확인 후 메세지 상태
+    const [nicknameChecked, setNicknameChecked] = useState(true); // 중복확인 버튼 누르면 true 
     const { setIsAuth } = useAuthStore();
 
+    const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
+    const [addressCheck, setAddressCheck] = useState({ default: true, direct: false }); // 주소 체크 항목
+
+
+    // 회원정보 가져오기
     useEffect(() => {
-        // 회원정보 가져오기
         userInfo().then((resp) => {
             setUser(resp.data);
         });
@@ -68,9 +76,8 @@ export const UpdateUserInfo = () => {
             ...prev,
             [name]: value
         }));
-
         if (name === 'nickname') {
-            setNicknameChecked(false);
+            setNicknameChecked(false); // 닉네임 input 창 onChange시, 중복확인 버튼 false로 변경
         }
     };
 
@@ -85,17 +92,22 @@ export const UpdateUserInfo = () => {
                 icon: "warning",
                 confirmButtonText: "확인",
             });
-
             setNicknameErrorMessage('다시 입력해주세요');
-            setNicknameAvailable(null);
+            setNicknameChecked(false); // 중복확인 버튼 상태 초기화
             return;
         } else {
             setNicknameErrorMessage(''); // 오류 메시지 초기화
         }
 
+        // 현재 사용 중인 닉네임과 입력된 닉네임 비교
+        if (formData.nickname === user.nickname) {
+            setNicknameAvailable(false);
+            setNicknameChecked(true); // 중복 확인 상태를 true로 설정
+            return;
+        }
+
         // 중복확인 요청
         checkNickname(formData.nickname).then((resp) => {
-            console.log("nickname : ", resp.data);
             setNicknameAvailable(resp.data);
             setNicknameChecked(!resp.data);
             setCheckNicknameStatus(
@@ -106,36 +118,23 @@ export const UpdateUserInfo = () => {
         });
     }
 
-
-
-    useEffect(() => {
-        // 다음 주소 API 스크립트 로드
-        const script = document.createElement('script')
-        script.src =
-            'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js'
-        script.async = true
-        script.onload = () => {
-            // 스크립트가 로드되면 Postcode 사용 가능
-            console.log('다음 주소 API가 로드되었습니다.')
-        }
-        document.head.appendChild(script)
-
-        // 클린업 함수 (옵션)
-        return () => {
-            document.head.removeChild(script)
-        }
-    }, [])
-    const handleAddressSearch = () => {
-        new window.daum.Postcode({
-            oncomplete: function (data) {
-                // 주소와 우편번호 데이터를 formData 상태에 저장
-                setFormData(prev => ({
-                    ...prev,
-                    address: data.address,
-                    zip_code: data.zonecode,
-                }))
-            },
-        }).open()
+    /** 주소 찾기 **/
+    const handleAddress = () => {
+        SwalComp({ type: "confirm", text: "주소를 변경하시곘습니까?" }).then(res => {
+            if (res) {
+                setAddressCheck(prev => ({ default: false, direct: true }));
+                setIsModalOpen(true);
+            }
+        });
+    }
+    /** postcode data set **/
+    const completeHandler = (data) => {
+        setIsModalOpen(false);
+        setFormData(prev => ({
+            ...prev,
+            zip_code: data.zonecode,
+            address: data.address
+        }));
     }
 
 
@@ -231,11 +230,21 @@ export const UpdateUserInfo = () => {
 
     // 정보수정 완료 버튼
     const handleSubmit = e => {
+
         e.preventDefault(); // 기본 폼 제출 방지
+
+        if (formData.nickname === user.nickname) {
+            console.log("formData : ", formData.nickname)
+            setNicknameAvailable(false);
+            setNicknameChecked(true); // 중복 확인 상태를 true로 설정
+        }
+
+
         // 유효성 검사 실행
         if (!validateFormData(formData)) {
             return
         }
+
 
         if (!nicknameChecked) {
             Swal.fire({
@@ -247,6 +256,8 @@ export const UpdateUserInfo = () => {
             return;
         }
 
+
+
         // 유효성 검사를 통과하면 서버에 데이터 전송
         api.put(`/member/updateInfo`, formData).then(resp => {
             if (resp.data > 0) {
@@ -256,7 +267,7 @@ export const UpdateUserInfo = () => {
                     icon: "success",
                     confirmButtonText: "확인",
                 });
-                navi("/mypage/main");
+                navi("/");
             }
         }).catch(error => {
             Swal.fire({
@@ -291,8 +302,6 @@ export const UpdateUserInfo = () => {
         }
     };
 
-
-
     const signup_date = new Date(user.signup_date);
     const signup_currentDate = !isNaN(signup_date)
         ? format(signup_date, "yyyy-MM-dd")
@@ -301,7 +310,7 @@ export const UpdateUserInfo = () => {
     return (
         <div className={styles.container}>
             <div className={styles.updateInfo}>
-                <div className={styles.profileBox}>
+                {/* <div className={styles.profileBox}>
                     <div className={styles.img}>
                         <img src={profile}></img>
                     </div>
@@ -309,7 +318,7 @@ export const UpdateUserInfo = () => {
                         <button>변경</button>
                         <button>삭제</button>
                     </div>
-                </div>
+                </div> */}
                 <div className={styles.idBox}>
                     <span className={styles.title}>ID</span>
                     <input
@@ -437,7 +446,7 @@ export const UpdateUserInfo = () => {
                     <button
                         type="button"
                         className={styles.addressBtn}
-                        onClick={handleAddressSearch}
+                        onClick={handleAddress}
                     >
                         주소 검색
                     </button>
@@ -459,6 +468,15 @@ export const UpdateUserInfo = () => {
                     <button onClick={() => navi("/mypage/main")}>취소</button>
                 </div>
             </div>
+
+            {
+                isModalOpen &&
+                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <div className={styles.modalBox}>
+                        <DaumPostcode onComplete={completeHandler} style={{ height: '95%' }} />
+                    </div>
+                </Modal>
+            }
         </div >
     )
 

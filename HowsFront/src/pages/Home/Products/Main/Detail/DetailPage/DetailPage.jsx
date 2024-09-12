@@ -6,8 +6,10 @@ import { Modal } from '../../../../../../components/Modal/Modal';
 import { api, host } from '../../../../../../config/config';
 import { useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../../store/store';
+import { formatDate } from '../../../../../../commons/commons'
 import axios from 'axios';
 import Swal from "sweetalert2";
+import { Paging } from '../../../../../../components/Pagination/Paging';
 
 export const DetailPage = () => {
     const { isAuth } = useAuthStore() // 로그인 여부 확인
@@ -22,7 +24,8 @@ export const DetailPage = () => {
         product_seq: product_seq,   // 상품 번호를 URL에서 가져온 현재 product_seq 로 설정
         image_url: '',              // 이미지 URL
     });
-    
+
+
     const [activeTab, setActiveTab] = useState('info'); // 탭 메뉴
     const [isModalOpen, setIsModalOpen] = useState(false); // 모달창
     const [ reviews,setReviews ] = useState([]); // 리뷰 목록
@@ -34,7 +37,9 @@ export const DetailPage = () => {
         2: 0,
         1: 0
     }); // 각 점수에 몇 명이 있는지 저장하는 상태
-
+    const [page, setPage] = useState(1) // 현재 페이지 상태
+    const [itemsPerPage] = useState(3) // 페이지당 항목 수
+    const [totalReviews, setTotalReviews] = useState(0) // 전체 리뷰 개수 
     // ===== 상태 =====
 
 
@@ -142,13 +147,23 @@ export const DetailPage = () => {
     };
 
 
+    // 페이징에 따른 startRow와 endRow 계산
+    // const startRow = (page - 1) * itemsPerPage + 1
+    // const endRow = page * itemsPerPage
 
-    // 리뷰 출력 및 별점 평균 계산
     useEffect(() => {
-        console.log("Product Seq:" + product_seq);
-        
-        axios.get(`${host}/product/getReviewList/${product_seq}`).then(resp => {
-            console.log("리뷰 데이터: ", resp.data);
+        axios.get(`${host}/product/getReviewList/${product_seq}`, {
+            params: {page, itemsPerPage}})
+        .then(resp => {
+            if (resp.data.reviews.length > 0) {
+                // console.log(resp.data.reviews)
+
+                const totalCount = resp.data.reviews[0].TOTAL_COUNT;
+                // console.log("토탈: ", totalCount);
+
+                setReviews(resp.data.reviews); // 리뷰 데이터 설정
+                setTotalReviews(totalCount); // 전체 리뷰 개수 설정
+            }
 
             // 서버에서 데이터를 성공적으로 받아온 경우 처리
             if (resp.data && resp.data.reviewList && resp.data.reviewList.length > 0) {
@@ -173,10 +188,11 @@ export const DetailPage = () => {
         .catch(error => {
             console.error('리뷰 목록 오류', error);
         });
-    }, [product_seq]); // product_seq가 변경될 때마다 실행
+    }, [product_seq,page]); // product_seq가 변경될 때마다 실행
 
-    
-    
+    const handlePageChange = (newPage) => {
+        setPage(newPage)
+    }
 
 
     return(
@@ -286,14 +302,14 @@ export const DetailPage = () => {
                                             <div>
                                                 <div> <img src={img} alt='img'/> </div>
                                                 <div>
-                                                    <div>작성자 : {review.MEMBER_ID} </div>
+                                                    <div>{review.MEMBER_ID} </div>
                                                     <div><StarRating rating={review.RATING} /></div>
                                                 </div>
                                             </div>
                                             <div>
                                                 <div> <img src={img} alt='img'/> </div>
                                                 <div>
-                                                    <div>{review.REVIEW_DATE ? review.REVIEW_DATE : '날짜 없음'}</div> 
+                                                    <div>{review.REVIEW_DATE ? formatDate(review.REVIEW_DATE) : '날짜 없음'}</div> 
                                                     <div>{review.REVIEW_CONTENTS}</div>
                                                 </div>
                                             </div>
@@ -302,6 +318,15 @@ export const DetailPage = () => {
                                 ) : (
                                     <div>리뷰가 없습니다.</div> // 리뷰가 없을 때 처리
                                 )}
+                            </div>
+                            {/* 페이징 컴포넌트 */}
+                            <div>
+                                <Paging
+                                    page={page}
+                                    count={totalReviews} // 전체 리뷰 수
+                                    perpage={itemsPerPage} // 페이지당 항목 수
+                                    setPage={handlePageChange} // 페이지 변경 함수
+                                />
                             </div>
                         </div>
                     </div>

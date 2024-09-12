@@ -429,6 +429,7 @@ create table orders (
     order_seq number primary key,
     member_seq number not null,
     order_code char(2) not null,
+    order_name varchar2(200) not null,
     order_date timestamp default sysdate not null,
     order_price number not null,
     orderer_name varchar2(30) not null,
@@ -622,7 +623,8 @@ file_seq number not null,
 banner_url varchar2(300) not null,
 start_date Date,
 end_date Date,
-banner_order number not null
+banner_order number not null,
+is_visible char(1) default 'N' not null
 );
 
 create sequence banner_seq

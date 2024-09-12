@@ -48,5 +48,13 @@ public class ProductDAO {
 	public boolean deleteProduct(int productSeq) {
 		return myBatis.delete("Product.deleteProduct", productSeq) > 0;
 	}
+
+	// 상품 수량 변경
+	public boolean updateByQuantity(int productSeq, int quantity) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("productSeq", productSeq);
+		params.put("quantity", quantity);
+		return myBatis.update("Product.updateByQuantity", params) > 0;
+	}
 	
 }

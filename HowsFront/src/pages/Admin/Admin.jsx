@@ -19,7 +19,8 @@ export const Admin = () => {
     return (
         <div className={styles.container}>
             <Routes>
-                <Route path="/admin" element={<Main />} />
+                <Route path="/" element={<Main />} />
+                <Route path="/admin/home" element={<Main />} />
                 <Route
                     path="/admin/banner"
                     element={

@@ -93,3 +93,30 @@
     left: 0;
     color: var(--hows-red);
 }
+
+.modalTitle {
+    text-align: center;
+}
+
+.quantity {
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.quantity input {
+    width: 85%;
+    padding: 5px;
+    font-size: 16px;
+    background-color: var(--hows-white);
+    border-radius: 8px;
+    border: 2px solid var(--hows-point-color);
+    color: var(--hows-point-color-darker);
+    font-weight: 500;
+}
+
+.modalBtns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}

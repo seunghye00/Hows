@@ -27,13 +27,29 @@ public class ReviewDAO {
 		myBatis.insert("Product.insertReviewImage", imageDTO);
 	}
 	
-	// 리뷰 목록 출력
-	public List<Map<String, Object>>  getReviewList (int product_seq) throws Exception{
-		System.out.println("getReviewList dao");
-		
-		return myBatis.selectList("Product.getReviewList",product_seq);
+	// 리뷰 목록 출력 (페이징)
+	public List<Map<String, Object>> getReviewList(int product_seq, int startRow, int endRow) throws Exception {
+	    System.out.println("getReviewList dao");
+
+	    // 파라미터를 하나의 맵에 묶어서 전달
+	    Map<String, Object> params = new HashMap<>();
+	    params.put("product_seq", product_seq);
+	    params.put("startRow", startRow);
+	    params.put("endRow", endRow);
+
+	    // 파라미터를 맵으로 전달
+	    return myBatis.selectList("Product.getReviewList", params);
 	}
 
+	// My 리뷰 목록
+	public List<Map<String, Object>> myReview(String memberId) {
+		return myBatis.selectList("Product.myReview",memberId);
+	}
+
+	// My 리뷰 이미지 목록
+	public List<ImageDTO> myReviewImage(int reviewSeq) {
+		return myBatis.selectList("Product.myReviewImage",reviewSeq);
+	}
 	
 	
 	

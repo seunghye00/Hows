@@ -6,6 +6,7 @@ public class OrderDTO {
     private int order_seq;
     private int member_seq;
     private String order_code;
+    private String order_name;
     private Timestamp order_date;
     private int order_price;
     private String orderer_name;
@@ -36,6 +37,14 @@ public class OrderDTO {
 
     public void setOrder_code(String order_code) {
         this.order_code = order_code;
+    }
+
+    public String getOrder_name() {
+        return order_name;
+    }
+
+    public void setOrder_name(String order_name) {
+        this.order_name = order_name;
     }
 
     public Timestamp getOrder_date() {
@@ -96,9 +105,10 @@ public class OrderDTO {
 
     public OrderDTO() {}
 
-    public OrderDTO(int member_seq, int order_price, String orderer_name, String orderer_phone, String orderer_zip_code, String orderer_address, String orderer_detail_address) {
+    public OrderDTO(int member_seq, String order_name, int order_price, String orderer_name, String orderer_phone, String orderer_zip_code, String orderer_address, String orderer_detail_address) {
         this.member_seq = member_seq;
         this.order_code = "O1";
+        this.order_name = order_name;
         this.order_price = order_price;
         this.orderer_name = orderer_name;
         this.orderer_phone = orderer_phone;
@@ -107,10 +117,11 @@ public class OrderDTO {
         this.orderer_detail_address = orderer_detail_address;
     }
 
-    public OrderDTO(int order_seq, int member_seq, String order_code, Timestamp order_date, int order_price, String orderer_name, String orderer_phone, String orderer_zip_code, String orderer_address, String orderer_detail_address) {
+    public OrderDTO(int order_seq, int member_seq, String order_code, String order_name, Timestamp order_date, int order_price, String orderer_name, String orderer_phone, String orderer_zip_code, String orderer_address, String orderer_detail_address) {
         this.order_seq = order_seq;
         this.member_seq = member_seq;
         this.order_code = order_code;
+        this.order_name = order_name;
         this.order_date = order_date;
         this.order_price = order_price;
         this.orderer_name = orderer_name;

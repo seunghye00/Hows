@@ -30,13 +30,14 @@ public class OrderService {
     public int addOrder(Map<String, Object> map, int memberSeq) {
         try {
             int totalAmount = (int) map.get("totalAmount");
+            String orderName = (String) map.get("orderName");
             String name = (String) map.get("name");
             String phone = (String) map.get("phone");
             String zipCode = (String) map.get("zipCode");
             String address = (String) map.get("address");
             String detailAddress = (String) map.get("detailAddress");
 
-            int orderSeq = orderDAO.addOrder(new OrderDTO(memberSeq, totalAmount, name, phone, zipCode, address, detailAddress));
+            int orderSeq = orderDAO.addOrder(new OrderDTO(memberSeq, orderName, totalAmount, name, phone, zipCode, address, detailAddress));
 
             /** 주문 목록 등록 **/
             List<Map<String, ?>> param = (List<Map<String, ?>>) map.get("orderProducts");

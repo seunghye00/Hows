@@ -31,5 +31,11 @@
 		delete from guestbook where guestbook_seq = ${guestbook_seq}
 	</delete>
 
+	<!-- 방문글 갯수 -->
+	<select id="countGuestbook" resultType="int">
+    	select count(*) from guestbook where member_id = #{member_id}
+	</select>
+	
+	
 
 </mapper>

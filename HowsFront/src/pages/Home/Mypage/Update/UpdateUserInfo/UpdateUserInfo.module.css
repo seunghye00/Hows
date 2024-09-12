@@ -185,6 +185,13 @@ input[type="text"]:disabled {
 .container .updateInfo .addressBox .addressBtn:hover {
   background-color: var(--hows-point-color-darker);
 }
+.modalBox {
+  width: 450px;
+  height: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
 /* 탈퇴하기 */
 .container .updateInfo .signout {

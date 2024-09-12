@@ -247,13 +247,32 @@ public class MemberController {
 	// 마이페이지 게시글(이미지) 출력
 	@GetMapping("/selectPost")
 	public ResponseEntity<List<Map<String, Object>> > selectPost(@RequestParam String member_id){
-		
-		System.out.println("게시글 출력요청 member_id : "+ member_id);
-		
 		List<Map<String, Object>> result = memServ.selectPostByMemberId(member_id);
 		return ResponseEntity.ok(result);
 	}
 
+	// 마이페이지 게시글 갯수
+	@GetMapping("/countPost")
+	public ResponseEntity<Integer> countPost(@RequestParam String member_id){
+		int result = memServ.countPost(member_id);
+		return ResponseEntity.ok(result);
+	}
+	
+	
+	// 마이페이지 스크랩 갯수
+	
+	
+	// 마이페이지 방문글 갯수
+	@GetMapping("/countGuestbook")
+	public ResponseEntity<Integer> countGuestbook(@RequestParam String member_id){
+		
+		System.out.println("게시글 요청 member_id : "+ member_id);
+		
+		int result = memServ.countGuestbook(member_id);
+		return ResponseEntity.ok(result);
+	}
+
+	
 	
 	
 	// ========================================================[ 관리자 ]

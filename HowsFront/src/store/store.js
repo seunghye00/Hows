@@ -6,16 +6,21 @@ import { create } from 'zustand'
  *  해당기능.js 파일 만들어서 관리
  */
 
-export const useStore = create(set => {})
+export const useStore = create(set => { })
 
 /* 유나 */
 // 회원
 export const useMemberStore = create(set => ({
     memberSeq: 0,
     memberId: null,
+    currentUser: { // 현재 사용자 정보를 초기화
+        nickname: '', // 사용자 닉네임
+        profileImage: '' // 사용자 프로필 이미지
+    },
 
     setMemberSeq: seq => set({ memberSeq: seq }),
     setMemberId: id => set({ memberId: id }),
+    setCurrentUser: user => set({ currentUser: user })
 }))
 
 export const useAuthStore = create(set => ({

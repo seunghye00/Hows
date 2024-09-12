@@ -107,15 +107,22 @@ public class ProductController {
 		return ResponseEntity.ok().build();
 	}
 	
-	//리뷰 출력
+	//리뷰 출력 (페이징)
 	@GetMapping("/getReviewList/{product_seq}")
-	public ResponseEntity<Map<String, Object>> getReviewList (@PathVariable int product_seq) throws Exception{
-		List<Map<String, Object>> reviewList = reviewServ.getReviewList(product_seq);
-		
-		Map<String, Object> resp = new HashMap<String, Object>();
-		resp.put("reviewList", reviewList);
-		
-		return ResponseEntity.ok(resp);
+	public ResponseEntity<Map<String, Object>> getReviewList(
+	        @PathVariable int product_seq,
+	        @RequestParam(defaultValue = "1") int page,
+	        @RequestParam(defaultValue = "10") int itemsPerPage
+	) throws Exception {
+
+	    // 페이징된 리뷰 목록 조회
+	    List<Map<String, Object>> reviewList = reviewServ.getReviewList(product_seq, page, itemsPerPage);
+
+	    // 페이징 정보와 리뷰 목록을 함께 반환
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("reviews", reviewList);	
+	    
+	    return ResponseEntity.ok(response);
 	}
 	
 	
@@ -126,19 +133,6 @@ public class ProductController {
 	
 	
 	// ==================
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	// 상품 추가
 	@PostMapping
 	@Transactional

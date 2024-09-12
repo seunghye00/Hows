@@ -53,16 +53,6 @@ export const Header = () => {
         }
     }
 
-    // const handleLogout = () => {
-    //     const confirmLogout = window.confirm('정말 로그아웃을 하시겠습니까?')
-    //     if (confirmLogout) {
-    //         logout()
-    //         sessionStorage.removeItem('token')
-    //         sessionStorage.removeItem('member_id')
-    //         setIsAuth(false)
-    //         navigate('/')
-    //     }
-    // }
     const handleLogout = () => {
         Swal.fire({
             title: '확인',
@@ -203,47 +193,47 @@ export const Header = () => {
                                             />
                                         </div>
                                         {profileMenu && (
-                                          <div className={styles.profileMenu}>
-                                              <div
-                                                className={
-                                                    styles.profileMenuItem
-                                                }
-                                                onClick={() => {
-                                                    // navigate('/mypage')
-                                                    handleMyPageClick()
-                                                    handleItemClick()
-                                                }}
-                                              >
-                                                  마이페이지
-                                              </div>
-                                              <div
-                                                className={
-                                                    styles.profileMenuItem
-                                                }
-                                                onClick={() => {
-                                                    navigate('/history');
-                                                }}
-                                              >
-                                                  My History
-                                              </div>
-                                              <div
-                                                className={
-                                                    styles.profileMenuItem
-                                                }
-                                                onClick={() => {
-                                                    handleLogout()
-                                                    handleItemClick()
-                                                }}
-                                              >
-                                                  로그아웃
-                                              </div>
-                                          </div>
+                                            <div className={styles.profileMenu}>
+                                                <div
+                                                    className={
+                                                        styles.profileMenuItem
+                                                    }
+                                                    onClick={() => {
+                                                        // navigate('/mypage')
+                                                        handleMyPageClick()
+                                                        handleItemClick()
+                                                    }}
+                                                >
+                                                    마이페이지
+                                                </div>
+                                                <div
+                                                    className={
+                                                        styles.profileMenuItem
+                                                    }
+                                                    onClick={() => {
+                                                        navigate('/history');
+                                                    }}
+                                                >
+                                                    My History
+                                                </div>
+                                                <div
+                                                    className={
+                                                        styles.profileMenuItem
+                                                    }
+                                                    onClick={() => {
+                                                        handleLogout()
+                                                        handleItemClick()
+                                                    }}
+                                                >
+                                                    로그아웃
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                 ) : (
-                                  <a onClick={() => navigate('/signIn')}>
-                                      <i className="bx bxs-user-circle"></i>
-                                  </a>
+                                    <a onClick={() => navigate('/signIn')}>
+                                        <i className="bx bxs-user-circle"></i>
+                                    </a>
                                 )}
                             </div>
                         </div>

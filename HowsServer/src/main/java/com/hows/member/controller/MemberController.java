@@ -90,6 +90,7 @@ public class MemberController {
 	    }
 
 		MemberDTO result = memServ.selectInfo(member_id);
+	    result.setPw(null); // pw 값을 null로 설정
 		return ResponseEntity.ok(result);
 	}
 

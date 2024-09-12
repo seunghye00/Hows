@@ -15,6 +15,7 @@ import com.hows.blacklistreason.dto.BlacklistReasonDTO;
 import com.hows.common.CustomUserDetails;
 import com.hows.common.util.PasswordUtil;
 import com.hows.common.util.SendEmailUtil;
+import com.hows.community.dao.CommunityDAO;
 import com.hows.grade.dto.GradeDTO;
 import com.hows.member.dao.MemberDAO;
 import com.hows.member.dto.MemberDTO;
@@ -25,6 +26,8 @@ public class MemberService implements UserDetailsService {
 
 	@Autowired
 	private MemberDAO memDao;
+	@Autowired
+	private CommunityDAO comDao;
 	@Autowired
     private SendEmailUtil emailUtil;
 	@Autowired
@@ -49,11 +52,6 @@ public class MemberService implements UserDetailsService {
 	public boolean checkEmail(String email) {
 		return memDao.checkEmail(email);
 	}
-
-	// [로그인]비밀번호 찾기 - 비밀번호 변경
-//	public int changePw(Map<String, String> map) {
-//		return memDao.changePw(map);
-//	}
 
 	// 회원정보 가져오기
 	@Override
@@ -186,6 +184,13 @@ public class MemberService implements UserDetailsService {
     public void removeFollow(int fromMemberSeq, int toMemberSeq) {
     	memDao.removeFollow(fromMemberSeq, toMemberSeq);
     }
+    
+    // 마이페이지 게시글(이미지) 출력
+    public List<Map<String, Object>> selectPostByMemberId(String member_id){
+    	return comDao.selectPostByMemberId(member_id);
+    }
+
+    
 	// ========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	public List<MemberDTO> selectAll(Map<String, Object> params) {

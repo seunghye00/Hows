@@ -145,6 +145,12 @@ public class CommunityDAO {
         mybatis.insert("Community.sendReport", params);
     }
     
+    // [마이페이지] 게시글(이미지) 출력
+    public List<Map<String, Object>> selectPostByMemberId(String member_id){
+    	return mybatis.selectList("Community.selectPostByMemberId", member_id);
+    }
+    
+    
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	public List<Map<String, Object>> reportedCommunity(int startRow, int endRow) throws Exception {

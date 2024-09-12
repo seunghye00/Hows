@@ -622,7 +622,8 @@ file_seq number not null,
 banner_url varchar2(300) not null,
 start_date Date,
 end_date Date,
-banner_order number not null
+banner_order number not null,
+is_visible char(1) default 'N' not null
 );
 
 create sequence banner_seq

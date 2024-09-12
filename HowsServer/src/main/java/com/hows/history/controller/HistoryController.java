@@ -2,7 +2,6 @@ package com.hows.history.controller;
 
 import com.hows.common.CustomUserDetails;
 import com.hows.history.service.HistoryService;
-import com.hows.order.dto.OrderDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,6 +21,18 @@ public class HistoryController {
     @GetMapping("/order")
     public ResponseEntity<List<?>> orderList(@AuthenticationPrincipal CustomUserDetails user) {
         List<?> list = historyServ.myOrder(user.getMemberSeq());
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/review")
+    public ResponseEntity<List<?>> reviewList(@AuthenticationPrincipal CustomUserDetails user) {
+        List<?> list = historyServ.myReview(user.getUsername());
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/payment")
+    public ResponseEntity<List<?>> paymentList(@AuthenticationPrincipal CustomUserDetails user) {
+        List<?> list = historyServ.myPayment(user.getMemberSeq());
         return ResponseEntity.ok(list);
     }
 

@@ -61,9 +61,9 @@
 .container .item > .itemInfo .itemCount {
   display: flex;
   flex-direction: column;
-  margin: 0px 20px;
+  margin: 0px 18px;
   justify-content: space-between;
-  gap: 15px;
+  gap: 5px;
   font-size: 20px;
 }
 /* .container .item > .itemInfo .itemCount > span:nth-child(2) {

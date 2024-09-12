@@ -38,6 +38,49 @@
 	
 	<!-- 게시글 댓글 수정 -->
 	<update id="updateComment">
-		update comments set comment_contents = #{commentContents} where comment_seq = #{commentSeq}
+		update comments set comment_contents = #{comment_contents} where comment_seq = #{comment_seq}
 	</update>
+	
+	<!-- 게시글 댓글 삭제 -->
+	<delete id="deleteComment">
+		delete from comments where comment_seq = #{comment_seq}
+	</delete>
+	
+	<!-- 댓글 좋아요 삭제 -->
+	<delete id="deleteLike">
+		delete from comment_like where comment_seq = #{comment_seq}
+	</delete>
+	
+	<!-- 사용자가 해당 댓글에 좋아요를 눌렀는지 확인 -->
+	<select id="checkIfUserLikedBoard" resultType="int">
+	    select count(*) 
+	    from comment_like
+	    where member_id = #{member_id} and comment_seq = #{comment_seq}
+	</select>
+	
+	<!-- 댓글에 좋아요 추가 -->
+	<insert id="addLike">
+	    insert into comment_like (comment_like_seq, member_id, comment_seq)
+	    values (comment_like_seq.nextval, #{member_id}, #{comment_seq})
+	</insert>
+	
+	<!-- 댓글에서 좋아요 취소 -->
+	<delete id="removeLike">
+	    delete from comment_like
+	    where member_id = #{member_id} and comment_seq = #{comment_seq}
+	</delete>
+	
+	<!-- 댓글의 좋아요 수 가져오기 -->
+	<select id="getLikeCount" resultType="int">
+	    select count(*) 
+	    from comment_like
+	    where comment_seq = #{comment_seq}
+	</select>
+	
+	<!-- 댓글 신고  -->
+	<insert id="sendCommentReport">
+	    insert into comment_report
+	    values (comment_report_seq.nextval, #{report_code}, default, #{member_id}, #{comment_seq})
+	</insert>
+	
 </mapper>

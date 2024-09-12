@@ -37,6 +37,7 @@ export const ModifyProduct = product_seq => {
                 setProduct(resp.data)
                 setSelectedCategory(resp.data.product_category_code)
                 setPreviews([resp.data.product_thumbnail])
+                setSelectedFiles([resp.data.product_thumbnail])
                 categoryList()
                     .then(resp => {
                         setCategories(resp.data)
@@ -242,6 +243,7 @@ export const ModifyProduct = product_seq => {
                         type="number"
                         placeholder="상품 수량을 입력해주세요"
                         name="quantity"
+                        value={product.quantity}
                         onChange={handleInputProductInfo}
                     />
                     <input
@@ -260,6 +262,7 @@ export const ModifyProduct = product_seq => {
                                 product_contents: content,
                             }))
                         }
+                        contents={product.product_contents}
                     />
                 </div>
             </div>

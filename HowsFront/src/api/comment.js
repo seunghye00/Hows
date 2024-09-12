@@ -15,11 +15,14 @@ export const sendComments = async (board_seq, member_id, comment_contents) => {
     }
 }
 // 댓글 목록 출력 API 호출 함수
-export const getComments = async board_seq => {
+export const getComments = async (board_seq, member_id) => {
     try {
+        console.log('보드 시퀀스:', board_seq, '멤버 아이디:', member_id) // 요청 전 파라미터 확인
+
         const response = await api.get(`/comment/getComments`, {
-            params: { board_seq },
+            params: { board_seq: board_seq, member_id: member_id },
         })
+        console.log('응답 데이터:', response.data) // 응답 데이터 확인
         return response.data
     } catch (error) {
         console.error('댓글 불러오기 중 오류 발생:', error)
@@ -40,6 +43,50 @@ export const updateComment = async (comment_seq, updatedContent) => {
         throw error
     }
 }
+
+// 댓글 삭제 API 호출 함수
+export const deleteComment = async comment_seq => {
+    try {
+        const response = await api.delete(`/comment/delete/${comment_seq}`)
+        return response.data
+    } catch (error) {
+        console.error('댓글 삭제 중 오류 발생:', error)
+        throw error
+    }
+}
+
+// 댓글 좋아요 API 호출 함수
+export const toggleLikeAPI = async (comment_seq, member_id) => {
+    try {
+        const response = await api.post(`/comment/${comment_seq}/like`, {
+            member_id,
+        })
+        return response
+    } catch (error) {
+        console.error('좋아요 처리 중 오류 발생:', error)
+        throw error
+    }
+}
+
+export const sendCommentReport = async (commentSeq, reportCode, memberId) => {
+    console.log({
+        commentSeq,
+        reportCode,
+        memberId,
+    })
+    try {
+        const response = await api.post('/comment/report', {
+            comment_seq: commentSeq,
+            report_code: reportCode,
+            member_id: memberId,
+        })
+        return response.data
+    } catch (error) {
+        console.error('신고 요청 중 오류 발생:', error)
+        throw error
+    }
+}
+
 /************************************  [ 관리자 기능 ] /************************************/
 
 // 신고 댓글 조회 (관리자)

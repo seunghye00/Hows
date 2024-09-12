@@ -33,8 +33,16 @@ public class CartService {
     }
 
     /** 상품 삭제 **/
-    public String deleteCart(int seq) {
-        int result = cartDAO.deleteCart(seq);
+    public String deleteCart(int seq, int memberSeq, String type) {
+        int result = 0;
+        if(type.equals("cart")){
+            // seq : cart_seq
+            result = cartDAO.deleteCart(seq);
+        } else if(type.equals("saleSuccess")){
+            // seq : product_seq
+            CartDTO cartDTO = new CartDTO(seq, memberSeq);
+            result = cartDAO.saleSuccessCart(cartDTO);
+        }
         return result > 0 ? "ok" : "fail";
     }
 

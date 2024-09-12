@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -124,14 +125,7 @@ public class ProductController {
 	    
 	    return ResponseEntity.ok(response);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
 	// ==================
 	// 상품 추가
 	@PostMapping
@@ -229,6 +223,25 @@ public class ProductController {
 			} catch (Exception e) {
 				// 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
 				throw new RuntimeException("상품 삭제 실패", e);
+			}
+		}
+		return ResponseEntity.ok("success");
+	}
+	
+	// 상품 수량 변경
+	@PutMapping
+	@Transactional
+	public ResponseEntity<String> updateBuQuantity(@RequestParam String seqs, @RequestParam int quantity) throws Exception {
+		String[] productSeqs = seqs.split(","); // seqs를 배열로 변환
+		for (String productSeq : productSeqs) {
+			try {
+				int product_seq = Integer.parseInt(productSeq);
+				if (!productServ.updateByQuantity(product_seq, quantity)) {
+					throw new RuntimeException("상품 수량 업데이트 실패: ");
+				}
+			} catch (Exception e) {
+				// 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+				throw new RuntimeException("상품 수량 업데이트 실패", e);
 			}
 		}
 		return ResponseEntity.ok("success");

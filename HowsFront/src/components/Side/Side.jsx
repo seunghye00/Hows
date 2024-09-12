@@ -22,7 +22,11 @@ export const Side = () => {
         {
             title: '메인 페이지',
             subMenu: [
-                { title: '배너 관리', path: '/admin/banner' }, // path 추가
+                {
+                    title: '배너 관리',
+                    icon: 'bx bx-image',
+                    path: '/admin/banner',
+                }, // path 추가
             ],
         },
         {
@@ -105,7 +109,7 @@ export const Side = () => {
         <div className="side">
             <div className={styles.sideWrap}>
                 {/* 로고 부분 */}
-                <Link to="/admin/">
+                <Link to="/admin/home">
                     <div className={styles.logoBox}>
                         <img src={logo} alt="Logo" />
                         <p className={styles.logotit}>How's</p>
@@ -165,21 +169,27 @@ export const Side = () => {
                                                         {/* 3뎁스가 있을 때만 토글 버튼 추가 */}
                                                         {typeof subMenu !==
                                                             'string' &&
-                                                            subMenu.subMenu && (
-                                                                <span
-                                                                    className={
-                                                                        styles.toggleBtn
-                                                                    }
-                                                                >
-                                                                    {openMenus[
-                                                                        `${menuIndex}-${subIndex}`
-                                                                    ] ? (
-                                                                        <i className="bx bxs-chevron-up"></i>
-                                                                    ) : (
-                                                                        <i className="bx bxs-chevron-down"></i>
-                                                                    )}
-                                                                </span>
-                                                            )}
+                                                        subMenu.subMenu ? (
+                                                            <span
+                                                                className={
+                                                                    styles.toggleBtn
+                                                                }
+                                                            >
+                                                                {openMenus[
+                                                                    `${menuIndex}-${subIndex}`
+                                                                ] ? (
+                                                                    <i className="bx bxs-chevron-up"></i>
+                                                                ) : (
+                                                                    <i className="bx bxs-chevron-down"></i>
+                                                                )}
+                                                            </span>
+                                                        ) : (
+                                                            <span
+                                                                className={
+                                                                    styles.noToggle
+                                                                }
+                                                            />
+                                                        )}
                                                     </div>
 
                                                     {/* 3뎁스 메뉴가 있을 경우에만 표시 */}

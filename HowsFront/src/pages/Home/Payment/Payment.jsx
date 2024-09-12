@@ -133,7 +133,6 @@ export const Payment = () => {
       return false;
     }
 
-
     const name = orderProducts[0].product_title.length > 10 ? orderProducts[0].product_title.slice(0,9) + "..." : orderProducts[0].product_title;
     const count = orderProducts.length > 1 ? ` 외 ${orderProducts.length-1}종` :  "";
     const paymentId = `how-${uuidv4()}`

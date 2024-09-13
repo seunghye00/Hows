@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hows.File.service.FileService;
 import com.hows.blacklistreason.dto.BlacklistReasonDTO;
 import com.hows.common.CustomUserDetails;
+import com.hows.community.service.CommunityService;
 import com.hows.grade.dto.GradeDTO;
 import com.hows.member.dto.MemberDTO;
 import com.hows.member.service.MemberService;
@@ -40,6 +40,8 @@ public class MemberController {
 	private MemberService memServ;
     @Autowired
     private FileService fileServ;
+    @Autowired
+    private CommunityService comServ;    
 
 	@Autowired
 	private PasswordEncoder pwEncoder;
@@ -243,6 +245,20 @@ public class MemberController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	    }
 	}
+	
+	 // 팔로워 목록 가져오기
+    @GetMapping("/getFollower")
+    public ResponseEntity<List<MemberDTO>> getFollower(@RequestParam("member_id") String member_id) {
+        List<MemberDTO> follower = memServ.getFollower(member_id);
+        return ResponseEntity.ok(follower);
+    }
+
+    // 팔로잉 목록 가져오기
+    @GetMapping("/getFollowing")
+    public ResponseEntity<List<MemberDTO>> getFollowing(@RequestParam("member_id") String member_id) {
+        List<MemberDTO> following = memServ.getFollowing(member_id);
+        return ResponseEntity.ok(following);
+    }
   
 	// 마이페이지 게시글(이미지) 출력
 	@GetMapping("/selectPost")
@@ -258,10 +274,19 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 	
+	// 마이페이지 북마크(이미지) 출력
+	@GetMapping("/selectBookmark")
+	public ResponseEntity<List<Map<String, Object>> > selectBookmark(@RequestParam String member_id){
+		List<Map<String, Object>> result = memServ.selectBookmarkByMemberId(member_id);
+		return ResponseEntity.ok(result);
+	}
 	
-	// 마이페이지 스크랩 갯수
-	
-
+	// 마이페이지 북마크 갯수
+	@GetMapping("/countBookmark")
+	public ResponseEntity<Integer> countBookmark(@RequestParam String member_id){
+		int result = memServ.countBookmark(member_id);
+		return ResponseEntity.ok(result);
+	}
 	
 	
 	

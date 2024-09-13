@@ -85,6 +85,13 @@ export const selectPost = (member_id) => {
     return api.get(`/member/selectPost`, { params: { member_id } });
 };
 
+// 게시글 출력
+export const selectBookmark = (member_id) => {
+    return api.get(`/member/selectBookmark`, { params: { member_id } });
+};
+
+
+
 // 팔로우/언팔로우 처리 API 호출 함수
 export const toggleFollow = async data => {
     return api.post(`${baseUrl}/follow`, data) // API 요청으로 팔로우/언팔로우 처리

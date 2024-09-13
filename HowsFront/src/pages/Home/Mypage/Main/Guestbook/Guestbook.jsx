@@ -14,12 +14,12 @@ import {
 } from "../../../../../api/member";
 
 export const Guestbook = () => {
-  const { memberSeq, setMemberSeq, currentUser } = useMemberStore();
+  const { memberSeq, setMemberSeq, currentUser, memberId, setMemberId } = useMemberStore();
   const [contents, setContents] = useState("");
   const [outputs, setOutputs] = useState([]); // 방문 글 상태 추가
   const { member_id } = useParams();
   const inputRef = useRef(null);
-  const [change, setChange] = useState(false);
+
 
   // 페이지 로드 시 member_seq 받아오기
   useEffect(() => {
@@ -28,6 +28,7 @@ export const Guestbook = () => {
         setMemberSeq(resp.data); // zustand에 memberSeq 저장
       });
     }
+    setMemberId(sessionStorage.getItem("member_id"))
   }, [member_id, setMemberSeq]);
 
   // "등록" 버튼
@@ -54,6 +55,7 @@ export const Guestbook = () => {
   useEffect(() => {
     if (memberSeq) {
       getGuestbookList(memberSeq).then((resp) => {
+        console.log("누굴까 : ", resp.data);
         setOutputs(resp.data);
       });
     }
@@ -98,7 +100,10 @@ export const Guestbook = () => {
 
           return (
             <div className={styles.output} key={i}>
-              <img src={output.member_avatar || profile} alt={`${output.nickname}의 프로필`} />
+              <img
+                src={output.member_avatar || profile}
+                alt={`${output.nickname}의 프로필`}
+              />
               <div>
                 <div className={styles.writer_writeDate}>
                   <span>{output.nickname}</span>
@@ -109,7 +114,7 @@ export const Guestbook = () => {
                 </div>
               </div>
               {/* 로그인된 사용자와 댓글 작성자가 같은 경우에만 X 버튼 표시 */}
-              {output.member_seq === memberSeq && (
+              {output.member_id === memberId && (
                 <button onClick={() => handleDelBtn(output.guestbook_seq)}>
                   X
                 </button>

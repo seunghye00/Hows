@@ -99,7 +99,7 @@
 }
 
 .dateInfo,
-.priceInfo,
+.orderInfo,
 .memberInfo {
     display: flex;
     gap: 30px;
@@ -107,12 +107,11 @@
     font-size: 18px;
 }
 
-.orderName {
+.addressInfo {
+    padding: 13px;
     font-size: 18px;
-    padding: 10px 13px;
 }
 
-.priceInfo .price,
 .memberInfo .member {
     width: 70%;
 }

@@ -58,10 +58,6 @@ public class GuestbookController {
     @GetMapping("/list")
     public ResponseEntity<List<GuestbookSubDTO>> selectAll(@RequestParam int member_seq){
     	List<GuestbookSubDTO> list = guestServ.selectAll(member_seq);
-    	
-//    	for( GuestbookSub)
-    	
-    	
     	return ResponseEntity.ok(list);
     }
     

@@ -155,8 +155,17 @@ public class CommunityDAO {
 		return mybatis.selectOne("Community.countPost", member_id);
 	}
 
-	// [마이페이지] 스크랩 갯수
+    // [마이페이지] 북마크(이미지) 출력
+    public List<Map<String, Object>> selectBookmarkByMemberId(String member_id){
+    	return mybatis.selectList("Community.selectBookmarkByMemberId", member_id);
+    }
+ 
+    // [마이페이지] 사용자의 게시글 북마크 갯수
+    public int countBookmark(String member_id) {
+    	return mybatis.selectOne("Community.countBookmark", member_id);
+    }
 
+    
 	// 관리자
 	// 신고된 게시물 조회 DAO
 	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) {

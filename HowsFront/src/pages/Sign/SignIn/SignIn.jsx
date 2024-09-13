@@ -45,7 +45,7 @@ export const SignIn = () => {
         login(token);
 
         Swal.fire({
-          title: "성공!",
+          title: "로그인",
           text: `${decoded.nickname} 님 환영합니다.`,
           icon: "success",
           confirmButtonText: "확인",

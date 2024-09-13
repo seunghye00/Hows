@@ -56,7 +56,7 @@ export const Header = () => {
 
     const handleLogout = () => {
         Swal.fire({
-            title: '확인',
+            title: '로그아웃',
             text: '정말 로그아웃을 하시겠습니까?',
             icon: 'question',
             showCancelButton: true,

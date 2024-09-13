@@ -67,4 +67,13 @@
             cart_seq = #{seq}
     </delete>
 
+    <delete id="saleSuccessCart">
+        DELETE FROM
+            cart
+        WHERE
+            member_seq = #{member_seq}
+        AND
+            product_seq = #{product_seq}
+    </delete>
+
 </mapper>

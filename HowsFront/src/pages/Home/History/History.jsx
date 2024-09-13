@@ -6,46 +6,14 @@ import { Delivery } from './Delivery/Delivery';
 import { Coupon } from './Coupon/Coupon';
 // import { Qna } from './Qna/Qna';
 import { TextBox } from './TextBox/TextBox';
-import { useState } from 'react';
+import {useEffect, useState} from 'react';
 
 export const History = () => {
   const navi = useNavigate();
   const location = useLocation();
 
-  const [buyListData, setBuyListData] = useState([]); // 구매내역 데이터
-  const [reviewData, setReviewData] = useState([]); // 리뷰작성내역 데이터
-  const [deliveryData, setDeliveryData] = useState([]); // 배송 목록 데이터
-  const [couponData, setCouponData] = useState([]); // 쿠폰 데이터
-
   // 임시 포인트
   const data = { point: 700 }
-
-  // useEffect(() => {
-  //     // 구매내역 데이터
-  //     const fetchBuyListData = api.get(`/`).then((resp) => {
-  //         setBuyListData(resp.data);
-  //     })
-  //     // 리뷰작성내역 데이터
-  //     const fetchReviewData = api.get(`/`).then((resp) => {
-  //         setReviewData(resp.data);
-  //     })
-  //     // 배송 목록 데이터
-  //     const fetchDeliveryData = api.get(`/`).then((resp) => {
-  //         setDeliveryData(resp.data);
-  //     })
-  //     // 쿠폰 데이터
-  //     const fetchCouponData = api.get(`/coupon`).then((resp) => {
-  //         setCouponData(resp.data);
-  //     })
-
-  //     // 모든 데이터 가져오기
-  //     fetchBuyListData();
-  //     fetchCouponData();
-  //     fetchDeliveryData();
-  //     fetchReviewData();
-  // }, [])
-
-
 
   return (
     <div className={styles.container}>
@@ -67,7 +35,7 @@ export const History = () => {
                       onClick={() => navi("review")}
                       className={location.pathname.includes("review") ? styles.active : ""}
                     >
-                        리뷰작성내역
+                        구매후기
                     </span>
         </div>
         <div className={styles.relivery}>
@@ -75,7 +43,7 @@ export const History = () => {
                       onClick={() => navi("relivery")}
                       className={location.pathname.includes("relivery") ? styles.active : ""}
                     >
-                        주문배송목록
+                        주문 & 결제
                     </span>
         </div>
         <div className={styles.coupon}>

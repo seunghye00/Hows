@@ -44,7 +44,7 @@
 
 	<select id="orderListByStatus" resultType="com.hows.order.dto.OrderInfoListDTO">
 		select
-		o.order_seq, o.order_date, o.order_name, m.name, g.grade_title, o.order_price, s.order_title, p.payment_price, p.payment_date
+		o.order_seq, o.order_date, o.order_name, m.name, g.grade_title, o.order_price, o.orderer_phone, o.orderer_zip_code, o.orderer_address, o.orderer_detail_address, o.order_code, s.order_title, p.payment_price, p.payment_date
 		from orders o
 		join member m on o.member_seq = m.member_seq
 		join grade g on m.grade_code = g.grade_code
@@ -58,9 +58,6 @@
 				<when test="status == 'delivery'">
 					o.order_code IN ('O4', 'O5', 'O6')
 				</when>
-				<otherwise>
-					s.order_title = #{status}
-				</otherwise>
 			</choose>
 		</where>
 	</select>
@@ -106,9 +103,8 @@
 		UPDATE
 			orders
 		SET
-			orders_code = #{orders_code}
+			order_code = #{order_code}
 		WHERE
-			orders_seq = #{orders_seq}
+			order_seq = #{order_seq}
 	</update>
-
 </mapper>

@@ -4,6 +4,24 @@ public class SignInResponseDTO {
 	private String token;
 	private String member_id;
 	private int member_seq;
+    private String nickname;
+    private String member_avatar;
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public String getMember_avatar() {
+		return member_avatar;
+	}
+
+	public void setMember_avatar(String member_avatar) {
+		this.member_avatar = member_avatar;
+	}
 
 	public String getToken() {
 		return token;
@@ -31,9 +49,15 @@ public class SignInResponseDTO {
 
 	public SignInResponseDTO() {}
 
-	public SignInResponseDTO(String token, String member_id, int member_seq) {
+	public SignInResponseDTO(String token, String member_id, int member_seq, String nickname, String member_avatar) {
+		super();
 		this.token = token;
 		this.member_id = member_id;
 		this.member_seq = member_seq;
+		this.nickname = nickname;
+		this.member_avatar = member_avatar;
 	}
+
+	
+	
 }

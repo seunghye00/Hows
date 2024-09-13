@@ -2,14 +2,15 @@ package com.hows.order.dao;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.hows.order.dto.OrderListDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.hows.order.dto.OrderDTO;
 import com.hows.order.dto.OrderInfoListDTO;
+import com.hows.order.dto.OrderListDTO;
 
 @Repository
 public class OrderDAO {
@@ -48,9 +49,8 @@ public class OrderDAO {
         return mybatis.update("Order.updateOrder", orderDTO);
     }
 
-
+    // 주문 상태 별 주문 목록 조회
 	public List<OrderInfoListDTO> getOrdersByStatus(String status) {
 		return mybatis.selectList("Order.orderListByStatus", status);
 	}
-
 }

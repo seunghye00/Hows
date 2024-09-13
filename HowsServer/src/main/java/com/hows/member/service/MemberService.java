@@ -29,8 +29,6 @@ public class MemberService implements UserDetailsService {
 	private MemberDAO memDao;
 	@Autowired
 	private CommunityDAO comDao;
-	@Autowired
-	private GuestbookDAO guestDao;
 	
 	@Autowired
     private SendEmailUtil emailUtil;
@@ -66,7 +64,7 @@ public class MemberService implements UserDetailsService {
 			throw new UsernameNotFoundException("User not found");
 
 		return new CustomUserDetails(dto.getMember_id(), dto.getPw(),
-				AuthorityUtils.createAuthorityList(dto.getRole_code()), dto.getMember_seq());
+				AuthorityUtils.createAuthorityList(dto.getRole_code()), dto.getMember_seq(), dto.getNickname(), dto.getMember_avatar());
 	}
 
 	// 아이디 찾기
@@ -189,6 +187,16 @@ public class MemberService implements UserDetailsService {
     	memDao.removeFollow(fromMemberSeq, toMemberSeq);
     }
     
+ // 팔로워 목록 가져오기
+    public List<MemberDTO> getFollower(String member_id) {
+        return memDao.getFollower(member_id);
+    }
+
+    // 팔로잉 목록 가져오기
+    public List<MemberDTO> getFollowing(String member_id) {
+        return memDao.getFollowing(member_id);
+    }
+    
     // 마이페이지 게시글(이미지) 출력
     public List<Map<String, Object>> selectPostByMemberId(String member_id){
     	return comDao.selectPostByMemberId(member_id);
@@ -199,14 +207,16 @@ public class MemberService implements UserDetailsService {
     	return comDao.countPost(member_id);
     }
 	
-	
-	// 마이페이지 스크랩 갯수
-	
-	
-	// 마이페이지 방문글 갯수
-    public int countGuestbook(String member_id){
-    	return guestDao.countGuestbook(member_id);
+    // 마이페이지 북마크(이미지) 출력
+    public List<Map<String, Object>> selectBookmarkByMemberId(String member_id){
+    	return comDao.selectBookmarkByMemberId(member_id);
     }
+	
+	// 마이페이지 북마크 갯수
+	public int countBookmark(String member_id) {
+		return comDao.countBookmark(member_id);
+	}
+
     
     
 

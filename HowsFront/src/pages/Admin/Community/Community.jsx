@@ -36,8 +36,11 @@ export const Community = () => {
                 `현재 페이지: ${page}, 시작 행: ${startRow}, 끝 행: ${endRow}`
             )
 
+            // 서버로 startRow와 endRow를 전달하여 게시물 목록을 가져옴
             const resp = await reportedCommunity(startRow, endRow)
             console.log('받은 데이터:', resp.data)
+
+            // 상태값 업데이트
             setBoards(resp.data.boards) // 서버에서 받은 게시물 목록을 상태에 저장
             setTotalBoards(resp.data.totalCount) // 전체 게시물 수 저장
         } catch (error) {
@@ -119,7 +122,7 @@ export const Community = () => {
 
     // 페이징 처리 핸들러
     const handlePageChange = pageNumber => {
-        setPage(pageNumber)
+        setPage(pageNumber) // 페이지 상태 업데이트
     }
 
     return (

@@ -27,17 +27,46 @@ export const Main = () => {
     const [user, setUser] = useState([])
     const { member_id } = useParams() // URL에서 member_id 가져오기
     const { memberSeq, setMemberSeq } = useMemberStore()
-    const [isModalOpen, setIsModalOpen] = useState(false) // 모달 상태
     const [selectedImage, setSelectedImage] = useState(profile) // 선택한 이미지 초기값
     // const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
+
+    const [isModalOpen, setIsModalOpen] = useState(false) // 모달 상태
     const [modalContent, setModalContent] = useState('') // 모달 창에 표시할 내용을 구분하는 상태
+    const [modalType, setModalType] = useState(''); // 'followers' 또는 'following'
 
     const [postData, setPostData] = useState(0); // 게시물 데이터
     const [scrapData, setScrapData] = useState(0); // 스크랩 데이터
     const [guestbookData, setGuestbookData] = useState(0); // 방명록 데이터
+    const { currentUser, setCurrentUser } = useMemberStore();
 
 
+    const openModal = (type) => {
+        setModalType(type);
+        setIsModalOpen(true);
 
+        // 팔로워/팔로잉 데이터 
+        if (type === 'follower') {
+
+            console.log("member_id: ", member_id); // 추가된 로그
+
+            api.get(`/member/getFollower`, { params: { member_id } }).then((resp) => {
+
+                console.log("팔로워 : ", resp.data);
+
+                setModalContent(resp.data); // 팔로워 목록을 상태에 저장
+            });
+        } else if (type === 'following') {
+            api.get(`/member/getFollowing`, { params: { member_id } }).then((resp) => {
+
+                console.log("팔로잉 : ", resp.data);
+                setModalContent(resp.data); // 팔로잉 목록을 상태에 저장
+            });
+        }
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+    };
 
 
     useEffect(() => {
@@ -66,6 +95,13 @@ export const Main = () => {
                 console.log('이미지 업로드 성공:', resp.data)
                 // 업로드 후 상태 업데이트
                 setSelectedImage(resp.data) // 서버에서 반환된 이미지 URL로 업데이트
+
+                // setSelectedImage(resp.data.member_avatar || profile); // 기본 이미지로 초기화
+                sessionStorage.setItem("member_avatar", resp.data);
+                setCurrentUser({ ...currentUser, "member_avatar": resp.data });
+
+
+
             })
             .catch(error => {
                 console.error('이미지 업로드 실패:', error)
@@ -90,12 +126,12 @@ export const Main = () => {
         api.get(`/member/countPost`, { params: { member_id: member_id } }).then((resp) => {
             setPostData(resp.data);
         })
-        // 스크랩 데이터
-        // const fetchScrapData = api.get(`/`).then((resp) => {
-        //     setScrapData(resp.data);
-        // })
+        // 북마크 데이터
+        api.get(`/member/countBookmark`, { params: { member_id: member_id } }).then((resp) => {
+            setScrapData(resp.data);
+        })
         // 방명록 데이터
-        api.get(`/member/countGuestbook`, { params: { member_id: member_id } }).then((resp) => {
+        api.get(`/guestbook/countGuestbook`, { params: { member_id: member_id } }).then((resp) => {
             setGuestbookData(resp.data);
         })
     }, [])
@@ -182,13 +218,13 @@ export const Main = () => {
                                 <span className={styles.followText}>
                                     팔로워
                                 </span>
-                                <span className={styles.followCount}>10</span>
+                                <span className={styles.followCount} onClick={() => openModal('follower')}>10</span>
                             </div>
                             <div className={styles.following}>
                                 <span className={styles.followText}>
                                     팔로잉
                                 </span>
-                                <span className={styles.followCount}>30</span>
+                                <span className={styles.followCount} onClick={() => openModal('following')}>30</span>
                             </div>
                         </div>
                         <div className={styles.bottom}>
@@ -265,6 +301,11 @@ export const Main = () => {
             </div>
 
             {/* 모달 컴포넌트 */}
+            {isModalOpen && (
+                <Modal onClose={closeModal} modalType={modalType} />
+            )}
+
+            {/* 프로필 사진 변경 */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
                 <div className={styles.modalBox}>
                     {modalContent === 'profile' && (

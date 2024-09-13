@@ -33,7 +33,6 @@ public class GuestbookController {
 	// 글 작성 위한 member_seq 뽑기
     @GetMapping("/findMemberSeq")
     public ResponseEntity<Integer> findMemberSeq(@RequestParam String member_id) {
-    	
         int member_seq = memServ.findMemberSeq(member_id);
         return ResponseEntity.ok(member_seq); // member_seq 값을 응답으로 전달
     }
@@ -65,13 +64,21 @@ public class GuestbookController {
     // 글 삭제
     @DeleteMapping("/{guestbook_seq}")
     public ResponseEntity<Integer> delete(@PathVariable int guestbook_seq){
-    	
     	int result = guestServ.delete(guestbook_seq);
-    	
     	return ResponseEntity.ok(result);
     }
 	
 	
+	// 마이페이지 방문글 갯수
+	@GetMapping("/countGuestbook")
+	public ResponseEntity<Integer> countGuestbook(@RequestParam String member_id){
+		int result = guestServ.countGuestbook(member_id);
+		return ResponseEntity.ok(result);
+	}
+
+    
+    
+    
     
 	@ExceptionHandler(Exception.class)
 	   public ResponseEntity<String> exceptionHandler(Exception e) {

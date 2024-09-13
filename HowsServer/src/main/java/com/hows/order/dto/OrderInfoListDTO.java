@@ -12,11 +12,12 @@ public class OrderInfoListDTO {
 	private String name;			// 주문자명
 	private int order_price;		// 주문 금액
 	private int payment_price;		// 결제 금액
+	private String order_code;		// 주문 코드
 	private String order_title;		// 주문 상태
 	public int getOrder_seq() {
 		return order_seq;
 	}
-	public void setOrders_seq(int order_seq) {
+	public void setOrder_seq(int order_seq) {
 		this.order_seq = order_seq;
 	}
 	public Timestamp getOrder_date() {
@@ -61,6 +62,12 @@ public class OrderInfoListDTO {
 	public void setPayment_price(int payment_price) {
 		this.payment_price = payment_price;
 	}
+	public String getOrder_code() {
+		return order_code;
+	}
+	public void setOrder_code(String order_code) {
+		this.order_code = order_code;
+	}
 	public String getOrder_title() {
 		return order_title;
 	}
@@ -68,7 +75,8 @@ public class OrderInfoListDTO {
 		this.order_title = order_title;
 	}
 	public OrderInfoListDTO(int order_seq, Timestamp order_date, Timestamp payment_date, String order_name,
-			String grade_title, String name, int order_price, int payment_price, String order_title) {
+			String grade_title, String name, int order_price, int payment_price, String order_code,
+			String order_title) {
 		super();
 		this.order_seq = order_seq;
 		this.order_date = order_date;
@@ -78,6 +86,7 @@ public class OrderInfoListDTO {
 		this.name = name;
 		this.order_price = order_price;
 		this.payment_price = payment_price;
+		this.order_code = order_code;
 		this.order_title = order_title;
 	}
 	public OrderInfoListDTO() {

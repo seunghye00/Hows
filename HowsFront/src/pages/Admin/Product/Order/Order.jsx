@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
-import { orderList } from '../../../../api/order'
-import { formatDate, addCommas } from '../../../../commons/commons'
+import { orderList, updateOrder } from '../../../../api/order'
+import { formatDate, addCommas, SwalComp } from '../../../../commons/commons'
 import styles from './Order.module.css'
 import { Button } from '../../../../components/Button/Button'
 import { Search } from '../../../../components/Search/Search'
@@ -19,6 +19,7 @@ export const Order = () => {
         order_price: 0,
         payment_price: 0,
         grade_title: '',
+        order_title: '',
         name: '',
     })
     const [selectAll, setSelectAll] = useState(false)
@@ -29,6 +30,7 @@ export const Order = () => {
     useEffect(() => {
         orderList('status')
             .then(resp => {
+                console.log(resp.data)
                 const beforeOrders = resp.data.map(order => ({
                     ...order,
                     checked: false, // 초기 체크 상태
@@ -41,16 +43,13 @@ export const Order = () => {
             })
     }, []) // 빈 배열을 종속성으로 두어 최초 한 번만 실행
 
-    // 2. 주문 상태 변경될 때 orders에서 필터링하여 filteredOrders 설정
+    // 주문 목록 필터링 useEffect
     useEffect(() => {
-        if (status === 'product') {
-            setFilteredOrders(orders) // 상태가 '전체'일 경우 모든 주문 목록을 보여줌
-        } else {
-            setFilteredOrders(
-                orders.filter(order => order.order_code === status) // 선택된 상태에 따라 주문 필터링
-            )
-        }
-    }, [status, orders]) // status나 orders가 변경될 때마다 실행
+        const filtered = orders.filter(
+            order => status === 'product' || order.order_code === status
+        )
+        setFilteredOrders(filtered)
+    }, [status, orders]) // orders 상태가 변경될 때마다 필터링
 
     // 3. 검색어 변경될 때 검색어를 포함하는 주문 목록 필터링
     useEffect(() => {
@@ -60,10 +59,39 @@ export const Order = () => {
         setFilteredOrders(filtered) // 검색어에 따라 필터링된 목록 설정
     }, [searchQuery, orders]) // searchQuery나 orders가 변경될 때마다 실행
 
-    // 주문 상태 변경 핸들러
-    const handleChangeStatus = e => {
+    // 주문 목록의 상태 선택 핸들러
+    const handleSelectStatus = e => {
         const choice = e.target.getAttribute('data-label')
         setStatus(choice) // 선택된 상태로 변경
+    }
+
+    // 주문 상태 변경 핸들러
+    const handleChangeStatus = (e, order_seq) => {
+        const order_code = e.target.value
+        updateOrder(order_seq, order_code)
+            .then(resp => {
+                console.log(resp)
+                console.log(resp)
+                // 상태 업데이트만 수행하고 필터링은 useEffect에서 처리
+                setOrders(prevOrders =>
+                    prevOrders.map(order =>
+                        order.order_seq === order_seq
+                            ? { ...order, order_code: order_code } // 상태 변경
+                            : order
+                    )
+                )
+                SwalComp({
+                    type: 'success',
+                    text: '주문 상태를 성공적으로 변경했습니다.',
+                })
+            })
+            .catch(error => {
+                console.log(error)
+                SwalComp({
+                    type: 'error',
+                    text: '주문 상태 변경에 실패했습니다.',
+                })
+            })
     }
 
     // 배송 시작 버튼 클릭 핸들러
@@ -152,28 +180,28 @@ export const Order = () => {
             <div className={styles.container}>
                 <div className={styles.category}>
                     <span
-                        onClick={handleChangeStatus}
+                        onClick={handleSelectStatus}
                         data-label="product"
                         className={status === 'product' ? styles.active : ''}
                     >
                         전체
                     </span>
                     <span
-                        onClick={handleChangeStatus}
+                        onClick={handleSelectStatus}
                         data-label="O1"
                         className={status === 'O1' ? styles.active : ''}
                     >
                         입금 대기
                     </span>
                     <span
-                        onClick={handleChangeStatus}
+                        onClick={handleSelectStatus}
                         data-label="O2"
                         className={status === 'O2' ? styles.active : ''}
                     >
                         결제 완료
                     </span>
                     <span
-                        onClick={handleChangeStatus}
+                        onClick={handleSelectStatus}
                         data-label="O3"
                         className={status === 'O3' ? styles.active : ''}
                     >
@@ -253,13 +281,27 @@ export const Order = () => {
                                     >
                                         \ {addCommas(order.order_price)}
                                     </div>
-                                    <div
-                                        className={styles.cols}
-                                        onClick={() =>
-                                            handleViewInfo(order.order_seq)
-                                        }
-                                    >
-                                        {order.order_title}
+                                    <div className={styles.cols}>
+                                        <select
+                                            value={order.order_code} // 현재 주문 상태를 기본 값으로 설정
+                                            onChange={
+                                                e =>
+                                                    handleChangeStatus(
+                                                        e,
+                                                        order.order_seq
+                                                    ) // e와 order_seq를 함께 전달
+                                            }
+                                        >
+                                            <option value="O1">
+                                                입금 대기
+                                            </option>
+                                            <option value="O2">
+                                                결제 완료
+                                            </option>
+                                            <option value="O3">
+                                                배송 준비
+                                            </option>
+                                        </select>
                                     </div>
                                 </div>
                             ))
@@ -279,18 +321,18 @@ export const Order = () => {
                         <div>{formatDate(viewOrder.payment_date)}</div>
                     </div>
                 </div>
-                <div className={styles.orderName}>
-                    <div className={styles.subTitle}>주문명</div>
-                    <div>{viewOrder.order_name}</div>
-                </div>
-                <div className={styles.priceInfo}>
+                <div className={styles.orderInfo}>
+                    <div className={styles.name}>
+                        <div className={styles.subTitle}>주문명</div>
+                        <div>{viewOrder.order_name}</div>
+                    </div>
                     <div className={styles.price}>
                         <div className={styles.subTitle}>주문 금액</div>
-                        <div>{addCommas(viewOrder.order_price)}</div>
+                        <div>{addCommas(viewOrder.order_price)}원</div>
                     </div>
                     <div className={styles.price}>
                         <div className={styles.subTitle}>결재 금액</div>
-                        <div>{addCommas(viewOrder.payment_price)}</div>
+                        <div>{addCommas(viewOrder.payment_price)}원</div>
                     </div>
                 </div>
                 <div className={styles.memberInfo}>
@@ -301,6 +343,19 @@ export const Order = () => {
                     <div className={styles.member}>
                         <div className={styles.subTitle}>회원명</div>
                         <div>{viewOrder.name}</div>
+                    </div>
+                    <div className={styles.member}>
+                        <div className={styles.subTitle}>전화 번호</div>
+                        <div>{viewOrder.orderer_phone}</div>
+                    </div>
+                </div>
+                <div className={styles.addressInfo}>
+                    <div className={styles.subTitle}>배송지</div>
+                    <div>
+                        {viewOrder.orderer_zip_code} <br />
+                        {viewOrder.orderer_address}
+                        {'  '}
+                        {viewOrder.orderer_detail_address}
                     </div>
                 </div>
             </Modal>

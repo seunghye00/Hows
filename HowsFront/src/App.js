@@ -6,13 +6,14 @@ import { Header } from './components/Header/Header'
 import { Footer } from './components/Footer/Footer'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { useAuthStore } from './store/store';
+import { useAuthStore, useMemberStore } from './store/store';
+import { jwtDecode } from 'jwt-decode'
 
 
 function App() {
     const [session, setSession] = useState(true);
     const { isAuth, login } = useAuthStore();
-
+    const { setCurrentUser } = useMemberStore();
 
     // 로딩
 
@@ -20,6 +21,16 @@ function App() {
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         if (token != null) {
+            const decoded = jwtDecode(token);
+            sessionStorage.getItem("member_id");
+            const nickname = sessionStorage.getItem("nickname");
+            const profile = sessionStorage.getItem("member_avatar");
+
+            setCurrentUser({
+                "nickname": nickname,
+                "member_avatar": profile
+            });
+
             login(token);
         }
     }, [])

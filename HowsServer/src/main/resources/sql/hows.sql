@@ -33,6 +33,21 @@ increment by 1
 nomaxvalue
 nocache;
 
+-- 방명록
+create table guestbook (
+    guestbook_seq number primary key,
+    guestbook_contents varchar2(900) not null,
+    guestbook_write_date timestamp default sysdate,
+    member_seq number not null, -- 방명록이 작성된 사용자의 시퀀스
+    member_id varchar2(20) not null
+);
+
+create sequence guestbook_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
+
 -- 등급
 create table grade (
 grade_code char(2) primary key,

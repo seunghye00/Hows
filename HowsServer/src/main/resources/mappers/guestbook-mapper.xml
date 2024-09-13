@@ -19,9 +19,9 @@
 
 	<!-- 전체 출력 -->
 	<select id="selectAll" resultType="com.hows.member.dto.GuestbookSubDTO">
-	    select g.*, m.nickname
+	    select g.*, m.nickname, m.member_avatar
 	    from guestbook g
-	    join member m on g.member_seq = m.member_seq
+	    join member m on g.member_id = m.member_id
 	    where g.member_seq = ${member_seq}
 	    order by g.guestbook_seq desc
 	</select>

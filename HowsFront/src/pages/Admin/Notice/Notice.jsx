@@ -1,44 +1,116 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from './Notice.module.css'
 import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
-import test from '../../../assets/images/푸바오.png'
+import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
+import { selectNtc, detailNtc, deleteNtc } from '../../../api/notice'
+import { formatDate } from '../../../commons/commons'
 
 export const Notice = () => {
-    const [searchResults, setSearchResults] = useState([])
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [selectedNotice, setSelectedNotice] = useState(null)
+    const [searchResults, setSearchResults] = useState([]) // 검색 결과 저장
+    const [notices, setNotices] = useState([]) // 공지사항 목록 저장
+    const [totalNtcs, setTotalNtcs] = useState(0) // 전체 공지사항 수
+    const [page, setPage] = useState(1) // 현재 페이지 상태
+    const [itemsPerPage] = useState(10) // 페이지당 항목 수
+    const [isModalOpen, setIsModalOpen] = useState(false) // 모달 열림 상태
+    const [selectedNotice, setSelectedNotice] = useState(null) // 선택된 공지사항
 
     const navigate = useNavigate()
 
-    // 공지사항 데이터 (임시 데이터)
-    const notices = [
-        {
-            id: 1,
-            title: '공지사항 입니다~',
-            writer: '관리자',
-            date: '2024-08-31',
-            viewCount: 5,
-            content:
-                '이게 공지사항 이라고?\n이게....공지사항 인가?\n아니 이게 공지사항 일수가 있어?\n이거 공지사항이 맞지?\n이딴게 공지사항?\n이건 공지사항이 아닌거 같은데?',
-        },
-        {
-            id: 2,
-            title: '다른 공지사항',
-            writer: '홍길동',
-            date: '2024-09-01',
-            viewCount: 5,
-            content: '이것은 다른 공지사항의 내용입니다.',
-        },
-        // 더 많은 공지사항 데이터 추가
-    ]
+    // 페이징에 따른 startRow와 endRow 계산
+    const startRow = (page - 1) * itemsPerPage + 1
+    const endRow = page * itemsPerPage
+
+    // 공지사항 목록 가져오기 (useEffect 사용)
+    useEffect(() => {
+        loadNotices()
+    }, [page])
+
+    const loadNotices = async () => {
+        try {
+            console.log(
+                `현재 페이지: ${page}, 시작 행: ${startRow}, 끝 행: ${endRow}, 페이지당 항목 수: ${itemsPerPage}`
+            )
+
+            // 서버에 startRow와 endRow를 넘겨서 데이터를 받아옴
+            const response = await selectNtc(startRow, endRow)
+
+            // 서버 응답 데이터 확인
+            console.log('서버에서 받은 데이터:', response.data)
+
+            // 서버에서 받은 공지사항 목록과 전체 공지사항 수를 상태에 저장
+            const { noticeList, totalNotices } = response.data
+            console.log(
+                '공지사항 목록:',
+                noticeList,
+                '전체 공지사항 수:',
+                totalNotices
+            )
+
+            // 서버에서 받은 공지사항 목록을 상태에 저장
+            setNotices(noticeList)
+            // 전체 공지사항 수 저장 (페이징을 위한 값)
+            setTotalNtcs(totalNotices)
+        } catch (error) {
+            console.error('공지사항 목록을 불러오는데 실패했습니다.', error)
+        }
+    }
+
+    // 공지사항 삭제 함수
+    const handleDelete = async notice_seq => {
+        Swal.fire({
+            title: '공지사항 삭제',
+            text: '정말로 이 공지사항을 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+        }).then(async result => {
+            if (result.isConfirmed) {
+                try {
+                    const resp = await deleteNtc(notice_seq)
+                    if (resp.status === 200) {
+                        Swal.fire({
+                            title: '삭제 완료',
+                            text: '공지사항이 성공적으로 삭제되었습니다.',
+                            icon: 'success',
+                        })
+                        // 성공적으로 삭제된 경우 목록을 업데이트
+                        setNotices(prevNotices =>
+                            prevNotices.filter(
+                                notice => notice.notice_seq !== notice_seq
+                            )
+                        )
+                    } else {
+                        Swal.fire({
+                            title: '삭제 실패',
+                            text: '공지사항 삭제에 실패했습니다.',
+                            icon: 'error',
+                        })
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        title: '오류 발생',
+                        text: '공지사항 삭제 중 오류가 발생했습니다.',
+                        icon: 'error',
+                    })
+                }
+            }
+        })
+    }
 
     // 공지사항 제목 클릭 시 모달 열기
-    const openModal = notice => {
-        setSelectedNotice(notice)
-        setIsModalOpen(true)
+    const openModal = async notice_seq => {
+        try {
+            const response = await detailNtc(notice_seq)
+            const noticeData = response.data
+            setSelectedNotice(noticeData)
+            setIsModalOpen(true)
+        } catch (error) {
+            console.error('공지사항 조회 실패:', error)
+        }
     }
 
     // 모달 닫기
@@ -49,11 +121,19 @@ export const Notice = () => {
 
     // 검색 기능 구현
     const handleSearch = query => {
-        const results = notices.filter(
-            notice =>
-                notice.title.includes(query) || notice.writer.includes(query)
-        )
-        setSearchResults(results)
+        if (query) {
+            const results = notices.filter(notice =>
+                notice.notice_title.includes(query)
+            )
+            setSearchResults(results)
+        } else {
+            setSearchResults([]) // 검색어가 없을 경우 검색 결과 초기화
+        }
+    }
+
+    // 페이지 변경 처리
+    const handlePageChange = pageNumber => {
+        setPage(pageNumber) // 페이지 상태 업데이트
     }
 
     // 검색 결과가 있으면 그 결과를, 없으면 전체 리스트를 보여줌
@@ -63,14 +143,13 @@ export const Notice = () => {
         <div className={styles.noticeContainer}>
             <div className={styles.headerSection}>
                 <div className={styles.searchSection}>
-                    <Search
-                        placeholder="제목 또는 작성자 검색"
-                        onSearch={handleSearch}
-                    />
+                    <Search placeholder="제목 검색" onSearch={handleSearch} />
                     <Button
                         size="s"
                         title="등록하기"
-                        onClick={() => navigate('/admin/notice/writeNotice')}
+                        onClick={() => {
+                            navigate('/admin/notice/writeNotice')
+                        }}
                     />
                 </div>
             </div>
@@ -79,59 +158,99 @@ export const Notice = () => {
                 <div className={styles.noticeHeader}>
                     <div className={styles.headerItem}>NO</div>
                     <div className={styles.headerItem}>제목</div>
-                    <div className={styles.headerItem}>작성자</div>
                     <div className={styles.headerItem}>작성날짜</div>
                     <div className={styles.headerItem}>조회수</div>
+                    <div className={styles.headerItem}>삭제</div>
                 </div>
 
                 {displayNotices.map((notice, index) => (
-                    <div className={styles.noticeRow} key={notice.id}>
-                        <div className={styles.noticeItem}>{index + 1}</div>
+                    <div className={styles.noticeRow} key={notice.notice_seq}>
                         <div className={styles.noticeItem}>
-                            <span
-                                className={styles.span}
-                                onClick={() => openModal(notice)}
-                            >
-                                {notice.title}
+                            {startRow + index}
+                        </div>
+                        <div
+                            className={styles.noticeItem}
+                            onClick={() => openModal(notice.notice_seq)} // 공지사항 제목 클릭 시 모달 열기
+                        >
+                            <span className={styles.span}>
+                                {notice.notice_title}
                             </span>
                         </div>
-                        <div className={styles.noticeItem}>{notice.writer}</div>
-                        <div className={styles.noticeItem}>{notice.date}</div>
-
                         <div className={styles.noticeItem}>
-                            <span className={styles.viewcount}>
-                                {notice.viewCount}
-                            </span>
+                            {formatDate(notice.notice_date)}
+                        </div>
+                        <div className={styles.noticeItem}>
+                            {notice.view_count}
+                        </div>
+                        <div className={styles.noticeItem}>
+                            <Button
+                                size="s"
+                                title="삭제"
+                                onClick={() => handleDelete(notice.notice_seq)} // 삭제 버튼 클릭 시 삭제 함수 호출
+                            />
                         </div>
                     </div>
                 ))}
             </div>
 
+            {/* 페이징 컴포넌트 */}
+            <div className={styles.pagination}>
+                <Paging
+                    page={page}
+                    count={totalNtcs} // 전체 공지사항 개수
+                    perpage={itemsPerPage} // 페이지당 항목 수
+                    setPage={handlePageChange} // 페이지 변경 함수
+                />
+            </div>
+
+            {/* 모달 창 */}
             {isModalOpen && selectedNotice && (
                 <div className={styles.modal}>
                     <div className={styles.modalContent}>
                         <div className={styles.headerSection}>
                             <div className={styles.titleView}>
-                                <h3>{selectedNotice.title}</h3>
-                                <span>조회수 : {selectedNotice.viewCount}</span>
+                                <h3>{selectedNotice.notice_title}</h3>
                             </div>
                             <div className={styles.writerDate}>
-                                <span>작성자 : {selectedNotice.writer}</span>
-                                <span>작성날짜 : {selectedNotice.date}</span>
+                                <span>
+                                    작성날짜 :{' '}
+                                    {formatDate(selectedNotice.notice_date)}
+                                </span>
                             </div>
                         </div>
                         <hr />
                         <div className={styles.modalBody}>
                             <div className={styles.contentContainer}>
-                                <img
-                                    src={test}
-                                    alt="첨부된 이미지"
-                                    className={styles.image}
+                                {selectedNotice.notice_image && (
+                                    <div className={styles.img}>
+                                        <span className={styles.ntcimg}>
+                                            <img
+                                                className={styles.ntcimg}
+                                                src={
+                                                    selectedNotice.notice_image
+                                                }
+                                                alt="공지사항 이미지"
+                                            />
+                                        </span>
+                                    </div>
+                                )}
+                                <div
+                                    dangerouslySetInnerHTML={{
+                                        __html: selectedNotice.notice_contents,
+                                    }}
                                 />
-                                <div>{selectedNotice.content}</div>
                             </div>
                         </div>
                         <div className={styles.btn}>
+                            <Button
+                                size="s"
+                                title="수정"
+                                onClick={() =>
+                                    navigate(
+                                        `/admin/notice/modifyNotice/${selectedNotice.notice_seq}`
+                                    )
+                                }
+                            />
                             <Button
                                 size="s"
                                 title="닫기"
@@ -141,10 +260,6 @@ export const Notice = () => {
                     </div>
                 </div>
             )}
-
-            <div className={styles.pagination}>
-                <Paging />
-            </div>
         </div>
     )
 }

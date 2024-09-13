@@ -13,13 +13,14 @@ export const EditorComp = ({ onChange, contents }) => {
             editorInstanceRef.current = new Editor({
                 el: editorRef.current,
                 height: '100%',
-                initialEditType: 'wysiwyg',
+                initialEditType: 'markdown',
                 previewStyle: 'vertical',
                 initialValue: contents || '', // 초기 콘텐츠 설정
                 events: {
                     change: () => {
                         const content = editorInstanceRef.current.getMarkdown()
-                        onChange(content) // 에디터 내용이 변경될 때마다 부모 컴포넌트로 전달
+                        // 마크다운 내용을 그대로 부모 컴포넌트로 전달
+                        onChange(content)
                     },
                 },
                 hooks: {
@@ -33,14 +34,21 @@ export const EditorComp = ({ onChange, contents }) => {
 
                             uploadFile(formData)
                                 .then(response => {
-                                    if (!response.ok) {
+                                    if (response.status !== 200) {
                                         throw new Error('파일 업로드 실패')
                                     }
-                                    return response.json()
+                                    return response.data // 서버에서 반환된 URL
                                 })
-                                .then(result => {
-                                    const imageUrl = result.url // 서버에서 반환된 이미지 URL
-                                    callback(imageUrl, '이미지 설명') // 에디터에 이미지 URL 삽입
+                                .then(imageUrl => {
+                                    // 에디터에 마크다운 형식으로 이미지 삽입
+                                    callback(imageUrl, '이미지 설명') // 에디터에 이미지 삽입
+
+                                    // 이미지 삽입 후 줄바꿈 추가
+                                    const editorInstance =
+                                        editorInstanceRef.current
+                                    editorInstance.insertText('\n\n')
+                                    // 이미지 아래에 줄바꿈 추가
+                                    // 한줄 하려했는데 한줄은 안먹어 에디터가...
                                 })
                                 .catch(error => {
                                     console.error(

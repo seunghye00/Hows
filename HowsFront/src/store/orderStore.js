@@ -15,7 +15,6 @@ export const useOrderStore = create((set) => ({
   orderPrice: 0,
   setOrderPrice: price => set({ orderPrice : price }),
 
-
   paymentInfoDefault: {
     orderName: "",
     totalAmount: 0,

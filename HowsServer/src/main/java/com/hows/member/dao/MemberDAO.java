@@ -131,7 +131,15 @@ public class MemberDAO {
         mybatis.delete("Member.removeFollow", Map.of("from_member_seq", fromMemberSeq, "to_member_seq", toMemberSeq));
     } 
 
+    // 팔로워 목록 가져오기
+    public List<MemberDTO> getFollower(String member_id) {
+    	return mybatis.selectList("Member.getFollower", member_id);
+    }
     
+    // 팔로잉 목록 가져오기
+    public List<MemberDTO> getFollowing(String member_id) {
+    	return mybatis.selectList("Member.getFollowing", member_id);
+    }
 	 
 	// =======================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)

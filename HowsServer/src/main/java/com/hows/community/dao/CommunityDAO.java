@@ -130,7 +130,7 @@ public class CommunityDAO {
     public void updateViewCount(int board_seq) {
         mybatis.update("Community.updateViewCount", board_seq);
     }
-    
+
 	// 조회수 가져오기 서비스 메서드
 	public int getViewCount(int board_seq) {
 		return mybatis.selectOne("Community.getViewCount", board_seq);
@@ -155,9 +155,16 @@ public class CommunityDAO {
     	return mybatis.selectOne("Community.countPost", member_id);
     }
 
-	// [마이페이지] 스크랩 갯수
+    // [마이페이지] 북마크(이미지) 출력
+    public List<Map<String, Object>> selectBookmarkByMemberId(String member_id){
+    	return mybatis.selectList("Community.selectBookmarkByMemberId", member_id);
+    }
  
-    
+    // [마이페이지] 사용자의 게시글 북마크 갯수
+    public int countBookmark(String member_id) {
+    	return mybatis.selectOne("Community.countBookmark", member_id);
+    }
+
     
 	// 관리자
 	// 게시물 신고 조회 (관리자)

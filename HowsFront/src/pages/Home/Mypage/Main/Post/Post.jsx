@@ -13,7 +13,6 @@ export const Post = () => {
 
   useEffect(() => {
     selectPost(member_id).then(resp => {
-      console.log("출력 : ", resp.data);
       setPostList(resp.data);
     })
   }, [member_id]);

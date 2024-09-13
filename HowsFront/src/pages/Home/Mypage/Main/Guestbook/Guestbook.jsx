@@ -25,7 +25,6 @@ export const Guestbook = () => {
   useEffect(() => {
     if (member_id) {
       findMemberSeq(member_id).then((resp) => {
-        console.log("member_seq : ", resp.data);
         setMemberSeq(resp.data); // zustand에 memberSeq 저장
       });
     }
@@ -33,7 +32,7 @@ export const Guestbook = () => {
 
   // "등록" 버튼
   const handleWriteBtn = () => {
-    const content = inputRef.current.innerText; // innerText 사용
+    const content = inputRef.current.innerText;
     const requestBody = {
       member_seq: memberSeq,
       guestbook_contents: content,
@@ -42,11 +41,9 @@ export const Guestbook = () => {
     // 데이터를 서버에 저장한 후 전체 목록 다시 불러오기
     insertGuestbook(requestBody).then((resp) => {
       if (resp.data > 0) {
-        api
-          .get(`/guestbook/list`, { params: { member_seq: memberSeq } })
-          .then((resp) => {
-            setOutputs(resp.data);
-          });
+        getGuestbookList(memberSeq).then((resp) => {
+          setOutputs(resp.data);
+        });
         setContents("");
         inputRef.current.innerText = "";
       }
@@ -83,7 +80,7 @@ export const Guestbook = () => {
       {/* =================== */}
       <div className={styles.visitPost}>
         <div className={styles.input}>
-          <img src={profile} alt="" />
+          <img src={currentUser.member_avatar} alt="" />
           <div
             ref={inputRef} // ref 설정
             className={styles.inputText}
@@ -101,7 +98,7 @@ export const Guestbook = () => {
 
           return (
             <div className={styles.output} key={i}>
-              <img src={profile} alt="" />
+              <img src={output.member_avatar || profile} alt={`${output.nickname}의 프로필`} />
               <div>
                 <div className={styles.writer_writeDate}>
                   <span>{output.nickname}</span>

@@ -52,9 +52,9 @@ public class CartController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/{seq}")
-    public ResponseEntity<String> deleteCart(@PathVariable int seq) throws Exception {
-        String result = cartServ.deleteCart(seq);
+    @DeleteMapping("/{seq}/{type}")
+    public ResponseEntity<String> deleteCart(@AuthenticationPrincipal CustomUserDetails user, @PathVariable int seq, @PathVariable String type) throws Exception {
+        String result = cartServ.deleteCart(seq, user.getMemberSeq(), type);
         return ResponseEntity.ok(result);
     }
 

@@ -61,6 +61,11 @@ public class CartDTO {
 
     public CartDTO(){}
 
+    public CartDTO(int product_seq, int member_seq) {
+        this.member_seq = member_seq;
+        this.product_seq = product_seq;
+    }
+
     public CartDTO(int cart_seq, int member_seq, int product_seq, int cart_quantity, int cart_price, Timestamp cart_date) {
         this.cart_seq = cart_seq;
         this.member_seq = member_seq;

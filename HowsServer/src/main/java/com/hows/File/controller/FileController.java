@@ -24,7 +24,7 @@ public class FileController {
 		System.out.println("여긴 서버");
 		
 		// 파일을 서버와 DB에 저장하고 반환받은 파일 경로 저장
-		String result = fileServ.upload(file, 0, "F3");
+		String result = fileServ.upload(file, 0, "F6");
 		return ResponseEntity.ok(result);
 	}
 	

@@ -35,7 +35,7 @@ export const Main = () => {
     const [postData, setPostData] = useState(0); // 게시물 데이터
     const [scrapData, setScrapData] = useState(0); // 스크랩 데이터
     const [guestbookData, setGuestbookData] = useState(0); // 방명록 데이터
-
+    const { currentUser, setCurrentUser } = useMemberStore();
 
 
 
@@ -66,6 +66,13 @@ export const Main = () => {
                 console.log('이미지 업로드 성공:', resp.data)
                 // 업로드 후 상태 업데이트
                 setSelectedImage(resp.data) // 서버에서 반환된 이미지 URL로 업데이트
+
+                // setSelectedImage(resp.data.member_avatar || profile); // 기본 이미지로 초기화
+                sessionStorage.setItem("member_avatar", resp.data);
+                setCurrentUser({ ...currentUser, "member_avatar": resp.data });
+
+
+
             })
             .catch(error => {
                 console.error('이미지 업로드 실패:', error)
@@ -95,7 +102,7 @@ export const Main = () => {
         //     setScrapData(resp.data);
         // })
         // 방명록 데이터
-        api.get(`/member/countGuestbook`, { params: { member_id: member_id } }).then((resp) => {
+        api.get(`/guestbook/countGuestbook`, { params: { member_id: member_id } }).then((resp) => {
             setGuestbookData(resp.data);
         })
     }, [])

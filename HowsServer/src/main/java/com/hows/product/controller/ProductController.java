@@ -68,11 +68,9 @@ public class ProductController {
 	// 리뷰 등록
 	@PostMapping("/reviewAdd")
 	@Transactional
-	public ResponseEntity<String> submitReview(
-			@RequestParam("images") MultipartFile[] images, // 여러 이미지 파일
+	public ResponseEntity<String> submitReview(@RequestParam("images") MultipartFile[] images, // 여러 이미지 파일
 			@RequestParam("reviewData") String reviewData, // 리뷰 데이터 (JSON)
-			@RequestParam("image_orders") int[] imageOrders
-	) throws Exception {
+			@RequestParam("image_orders") int[] imageOrders) throws Exception {
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			// JSON 형식의 리뷰 데이터를 파싱
@@ -85,11 +83,11 @@ public class ProductController {
 			// 리뷰 저장
 			int reviewSeq = reviewServ.saveReview(rating, reviewText, productSeq, memberId);
 
-			// 이미지 파일 처리 
+			// 이미지 파일 처리
 			if (images != null && images.length > 0) {
 				for (int i = 0; i < images.length; i++) {
 					String imageUrl = fileServ.upload(images[i], productSeq, "F4");
-					
+
 					System.out.println(imageUrl + " 결과");
 					// imageUrl : GCS에 등록된 이미지 URL
 					// review_image 테이블에 등록
@@ -98,32 +96,30 @@ public class ProductController {
 						reviewServ.insertReviewImage(imageDTO);
 					}
 				}
-			}else {
-                throw new IOException("이미지 업로드 실패");
-            }
+			} else {
+				throw new IOException("이미지 업로드 실패");
+			}
 		} catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("리뷰등록 또는 이미지 업로드 실패", e);
-        }
+			e.printStackTrace();
+			throw new RuntimeException("리뷰등록 또는 이미지 업로드 실패", e);
+		}
 		return ResponseEntity.ok().build();
 	}
-	
-	//리뷰 출력 (페이징)
+
+	// 리뷰 출력 (페이징)
 	@GetMapping("/getReviewList/{product_seq}")
-	public ResponseEntity<Map<String, Object>> getReviewList(
-	        @PathVariable int product_seq,
-	        @RequestParam(defaultValue = "1") int page,
-	        @RequestParam(defaultValue = "10") int itemsPerPage
-	) throws Exception {
+	public ResponseEntity<Map<String, Object>> getReviewList(@PathVariable int product_seq,
+			@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int itemsPerPage)
+			throws Exception {
 
-	    // 페이징된 리뷰 목록 조회
-	    List<Map<String, Object>> reviewList = reviewServ.getReviewList(product_seq, page, itemsPerPage);
+		// 페이징된 리뷰 목록 조회
+		List<Map<String, Object>> reviewList = reviewServ.getReviewList(product_seq, page, itemsPerPage);
 
-	    // 페이징 정보와 리뷰 목록을 함께 반환
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("reviews", reviewList);	
-	    
-	    return ResponseEntity.ok(response);
+		// 페이징 정보와 리뷰 목록을 함께 반환
+		Map<String, Object> response = new HashMap<>();
+		response.put("reviews", reviewList);
+
+		return ResponseEntity.ok(response);
 	}
 
 	// ==================
@@ -165,15 +161,16 @@ public class ProductController {
 	// 관리자
 	// 리뷰 신고 목록 조회 (관리자)
 	@GetMapping("/reportedReviews")
-	public ResponseEntity<Map<String, Object>> getReportedReviews(@RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int itemsPerPage) throws Exception {
+	public ResponseEntity<Map<String, Object>> getReportedReviews(@RequestParam int startRow, @RequestParam int endRow)
+			throws Exception {
+
 		// 전체 신고 리뷰 카운트
 		int totalCount = reviewServ.getReportedReviewsCount();
 
 		// 페이징된 리뷰 신고 목록 조회
-		List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews(page, itemsPerPage);
+		List<Map<String, Object>> reportedReviews = reviewServ.getReportedReviews(startRow, endRow);
 
-		// 페이징 정보와 리뷰 목록을 함께 반환
+		// 응답 데이터 구성
 		Map<String, Object> response = new HashMap<>();
 		response.put("totalCount", totalCount);
 		response.put("reviews", reportedReviews);
@@ -227,11 +224,12 @@ public class ProductController {
 		}
 		return ResponseEntity.ok("success");
 	}
-	
+
 	// 상품 수량 변경
 	@PutMapping
 	@Transactional
-	public ResponseEntity<String> updateBuQuantity(@RequestParam String seqs, @RequestParam int quantity) throws Exception {
+	public ResponseEntity<String> updateBuQuantity(@RequestParam String seqs, @RequestParam int quantity)
+			throws Exception {
 		String[] productSeqs = seqs.split(","); // seqs를 배열로 변환
 		for (String productSeq : productSeqs) {
 			try {

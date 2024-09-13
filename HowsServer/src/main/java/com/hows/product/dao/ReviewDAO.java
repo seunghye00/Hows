@@ -21,57 +21,48 @@ public class ReviewDAO {
 	public void insertReview(ReviewDTO review) {
 		myBatis.insert("Product.insertReview", review);
 	}
-	
+
 	// 리뷰 이미지 저장
 	public void insertReviewImage(ImageDTO imageDTO) {
 		myBatis.insert("Product.insertReviewImage", imageDTO);
 	}
-	
+
 	// 리뷰 목록 출력 (페이징)
 	public List<Map<String, Object>> getReviewList(int product_seq, int startRow, int endRow) throws Exception {
-	    System.out.println("getReviewList dao");
+		System.out.println("getReviewList dao");
 
-	    // 파라미터를 하나의 맵에 묶어서 전달
-	    Map<String, Object> params = new HashMap<>();
-	    params.put("product_seq", product_seq);
-	    params.put("startRow", startRow);
-	    params.put("endRow", endRow);
+		// 파라미터를 하나의 맵에 묶어서 전달
+		Map<String, Object> params = new HashMap<>();
+		params.put("product_seq", product_seq);
+		params.put("startRow", startRow);
+		params.put("endRow", endRow);
 
-	    // 파라미터를 맵으로 전달
-	    return myBatis.selectList("Product.getReviewList", params);
+		// 파라미터를 맵으로 전달
+		return myBatis.selectList("Product.getReviewList", params);
 	}
 
 	// My 리뷰 목록
 	public List<Map<String, Object>> myReview(String memberId) {
-		return myBatis.selectList("Product.myReview",memberId);
+		return myBatis.selectList("Product.myReview", memberId);
 	}
 
 	// My 리뷰 이미지 목록
 	public List<ImageDTO> myReviewImage(int reviewSeq) {
-		return myBatis.selectList("Product.myReviewImage",reviewSeq);
+		return myBatis.selectList("Product.myReviewImage", reviewSeq);
 	}
-	
-	
-	
-	
-	
-	
-	
-	
+
 	// 관리자
 	// 리뷰 신고목록 조회 (관리자)
-	public List<Map<String, Object>> getReportedReviews(int startRow, int endRow) throws Exception {
-	    Map<String, Object> params = new HashMap<>();
-	    params.put("startRow", startRow);
-	    params.put("endRow", endRow);
-	    
-	    // 페이징된 신고 리뷰 목록을 MyBatis 쿼리를 통해 조회
-	    return myBatis.selectList("Product.getReportedReviews", params);
+	public List<Map<String, Object>> getReportedReviews(int startRow, int endRow) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("startRow", startRow);
+		params.put("endRow", endRow);
+		return myBatis.selectList("Product.getReportedReviews", params);
 	}
-	
+
 	// 전체 신고 리뷰 카운트 조회
-	public int getReportedReviewsCount() throws Exception {
-	    return myBatis.selectOne("Product.getReportedReviewsCount");
+	public int getReportedReviewsCount() {
+		return myBatis.selectOne("Product.getReportedReviewsCount");
 	}
 
 	// 리뷰 신고 내역 조회 (관리자)
@@ -82,14 +73,14 @@ public class ReviewDAO {
 
 	// 리뷰 신고 삭제 (관리자)
 	public int deleteReviewReport(int review_seq) throws Exception {
-	    return myBatis.delete("Product.deleteReviewReport", review_seq);
+		return myBatis.delete("Product.deleteReviewReport", review_seq);
 	}
 
 	// 리뷰 삭제
 	public int deleteReview(int review_seq) throws Exception {
-	    return myBatis.delete("Product.deleteReview", review_seq);
+		return myBatis.delete("Product.deleteReview", review_seq);
 	}
-	
+
 	public int selectLastReviewSeq() throws Exception {
 		return myBatis.selectOne("Product.selectLastReviewSeq");
 	}

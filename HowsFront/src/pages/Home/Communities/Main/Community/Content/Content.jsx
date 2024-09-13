@@ -338,13 +338,7 @@ export const Content = () => {
 
                                 <div className={styles.mainContentTxt}>
                                     <div className={styles.btnBox}>
-                                        <div
-                                            className={styles.btnLeft}
-                                            onClick={e => {
-                                                e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
-                                                toggleLike(content.BOARD_SEQ) // BOARD_SEQ를 전달
-                                            }}
-                                        >
+                                        <div className={styles.btnLeft}>
                                             <div
                                                 className={styles.likeBtn}
                                                 onClick={e => {

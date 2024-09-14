@@ -1,5 +1,6 @@
 package com.hows.member.dao;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,13 +133,25 @@ public class MemberDAO {
     } 
 
     // 팔로워 목록 가져오기
-    public List<MemberDTO> getFollower(int member_seq) {
+    public List<Map<String, Object>> getFollower(int member_seq) {
     	return mybatis.selectList("Member.getFollower", member_seq);
     }
     
     // 팔로잉 목록 가져오기
-    public List<MemberDTO> getFollowing(int member_seq) {
+    public List<Map<String, Object>> getFollowing(int member_seq) {
     	return mybatis.selectList("Member.getFollowing", member_seq);
+    }
+    
+    // 팔로워, 팔로잉 수 가져오기
+    public Map<String, BigDecimal> countFollow(int member_seq){
+    	Map<String, Integer> map = mybatis.selectOne("Member.countFollow", member_seq);
+    	return mybatis.selectOne("Member.countFollow", member_seq);
+    }
+    
+    // 맞팔 되어있는지
+    public Boolean eachFollow(Map<String, Integer> params) {
+    	Integer count = mybatis.selectOne("Member.eachFollow", params);
+		return count != null && count > 0;
     }
 	 
 	// =======================================================[ 관리자 ]

@@ -16,10 +16,11 @@ import { api } from "./../../../../config/config";
 import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
 import { Modal } from "../../../../components/Modal/Modal"
-import { useMemberStore } from "../../../../store/store";
-import { deleteProfileImage, findMemberSeq, selectInfo, uploadProfileImage, userInfo } from "../../../../api/member";
+import { useAuthStore, useMemberStore } from "../../../../store/store";
+import { countBookmark, countGuestbook, countPost, deleteProfileImage, findMemberSeq, getCountFollow, getFollower, getFollowing, selectInfo, toggleFollow, uploadProfileImage, userInfo } from "../../../../api/member";
 import { TextBox } from './TextBox/TextBox';
 import Swal from "sweetalert2";
+import { jwtDecode } from 'jwt-decode';
 
 export const Main = () => {
     const navi = useNavigate()
@@ -34,11 +35,19 @@ export const Main = () => {
     // const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
     const [modalContent, setModalContent] = useState('') // 모달 창에 표시할 내용을 구분하는 상태
 
-    const [postData, setPostData] = useState(0); // 게시물 데이터
-    const [scrapData, setScrapData] = useState(0); // 스크랩 데이터
-    const [guestbookData, setGuestbookData] = useState(0); // 방명록 데이터
-    const { currentUser, setCurrentUser } = useMemberStore();
+    const [postData, setPostData] = useState(0); // 게시물 개수
+    const [scrapData, setScrapData] = useState(0); // 스크랩 개수
+    const [guestbookData, setGuestbookData] = useState(0); // 방명록 개수
 
+    const [countFollow, setCountFollow] = useState({}); // 팔로워, 팔로잉 수
+    const [followerData, setFollowerData] = useState([]); // 팔로워 데이터
+    const [followingData, setFollowingData] = useState([]); // 팔로잉 데이터
+
+    const { currentUser, setCurrentUser } = useMemberStore();
+    const { isAuth } = useAuthStore() // 로그인 여부 확인
+    const session_member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+    const session_member_seq = jwtDecode(sessionStorage.getItem("token")).member_seq // token에서 member_seq 가져오기
+    const [isEachFollow, setIsEachFollow] = useState(false);
 
     useEffect(() => {
         // url에서 가져온 member_id로 해당 페이지 member_id의 데이터 가져오기
@@ -60,8 +69,24 @@ export const Main = () => {
     }, [member_id, setMemberSeq])
 
 
+    useEffect(() => {
+        // 게시물 개수
+        countPost(member_id).then((resp) => {
+            setPostData(resp.data);
+        })
+        // 북마크 개수
+        countBookmark(member_id).then((resp) => {
+            setScrapData(resp.data);
+        })
+        // 방명록 개수
+        countGuestbook(member_id).then((resp) => {
+            setGuestbookData(resp.data);
+        })
+    }, [])
+
+    // ref를 사용하여 파일 input 클릭
     const handleFileInputClick = () => {
-        fileInputRef.current.click(); // ref를 사용하여 파일 input 클릭
+        fileInputRef.current.click();
     };
 
     // 서버로 이미지 업로드 함수
@@ -98,21 +123,88 @@ export const Main = () => {
             })
     }
 
+    // 팔로워, 팔로잉 수
+    useEffect(() => {
+        if (memberSeq > 0) {
+            getCountFollow(memberSeq).then(resp => {
+                setCountFollow(resp.data);
+            })
+        }
+    }, [memberSeq])
+
+
+    // 팔로워, 팔로잉 목록 출력
+    const handleFollow = (memberSeq, type) => {
+        if (type === "follower") {
+            getFollower(memberSeq).then(resp => {
+                console.log("팔로워 목록 : ", resp.data)
+                setFollowerData(resp.data);
+            })
+        } else if (type === "following") {
+            getFollowing(memberSeq).then(resp => {
+                console.log("팔로잉 목록 : ", resp.data)
+                setFollowingData(resp.data);
+            })
+        }
+    }
+
+
+    // 팔로우, 팔로잉 상태 변경 
+    const handleIsFollowing = (targetMemberSeq) => {
+        toggleFollow({
+            from_member_seq: session_member_seq, // 로그인한 사용자의 member_seq
+            to_member_seq: targetMemberSeq, // 팔로우할 대상의 member_seq (팔로잉 취소)
+            checkStatus: false, // 팔로우 상태 변경 
+
+        }).then(resp => {
+            // 팔로우 상태 업데이트
+            setFollowerData(prevList =>
+                prevList.map(item =>
+                    item.MEMBER_SEQ === targetMemberSeq
+                        ? { ...item, IS_FOLLOWING: resp.data.isFollowing ? "Y" : "N" }
+                        : item
+                )
+            )
+            // 팔로잉 상태 업데이트 
+            setFollowingData(prevList =>
+                prevList.map(item =>
+                    item.MEMBER_SEQ === targetMemberSeq
+                        ? { ...item, IS_FOLLOWING: resp.data.isFollowing ? "Y" : "N" }
+                        : item
+                )
+            )
+            // 팔로워, 팔로잉 수 업데이트
+            getCountFollow(memberSeq).then(resp => {
+                setCountFollow(resp.data); // 팔로워, 팔로잉 수 업데이트
+            });
+        })
+    }
+
+    // useEffect(() => {
+    //     handleIsFollowing()
+    // }, [memberSeq, session_member_seq])
 
     useEffect(() => {
-        // 게시물 데이터
-        api.get(`/member/countPost`, { params: { member_id: member_id } }).then((resp) => {
-            setPostData(resp.data);
-        })
-        // 북마크 데이터
-        api.get(`/member/countBookmark`, { params: { member_id: member_id } }).then((resp) => {
-            setScrapData(resp.data);
-        })
-        // 방명록 데이터
-        api.get(`/guestbook/countGuestbook`, { params: { member_id: member_id } }).then((resp) => {
-            setGuestbookData(resp.data);
-        })
-    }, [])
+        if (memberSeq > 0 && session_member_seq > 0) {
+            const params = { from_member_seq: session_member_seq, to_member_seq: memberSeq };
+
+            api.post(`/member/eachFollow`, params).then(resp => {
+                console.log("결과 :::: ", resp.data);
+                setIsEachFollow(resp.data);
+            });
+
+        }
+
+    }, [memberSeq, followerData, followingData])
+
+
+
+    // 팔로우 목록에서 사용자 클릭 시 페이지 이동
+    const handleMovePage = (memberId) => {
+        navi(`/mypage/main/${memberId}/post`);
+        setIsModalOpen(false);
+    }
+
 
 
     return (
@@ -141,7 +233,7 @@ export const Main = () => {
                                 setIsModalOpen(true)
                             }
                         }}
-                        style={{ cursor: sessionStorage.getItem('member_id') === user.member_id ? 'pointer' : 'default' }}
+                        style={{ cursor: session_member_id === user.member_id ? 'pointer' : 'default' }}
                     >
                         <img src={selectedImage} alt="Profile" />
                     </div>
@@ -168,20 +260,30 @@ export const Main = () => {
                             <span className={styles.id}>@{user.member_id}</span>
                             <div className={styles.follower}>
                                 <span className={styles.followText}> 팔로워 </span>
-                                <span className={styles.followCount}>10</span>
+                                <span className={styles.followCount}
+                                    onClick={() => { handleFollow(memberSeq, "follower"); setModalContent('follower'); setIsModalOpen(true) }}>{countFollow.FOLLOWER}</span>
                             </div>
                             <div className={styles.following}>
                                 <span className={styles.followText}> 팔로잉 </span>
-                                <span className={styles.followCount}>30</span>
+                                <span className={styles.followCount}
+                                    onClick={() => { handleFollow(memberSeq, "following"); setModalContent('following'); setIsModalOpen(true) }}>{countFollow.FOLLOWING}</span>
                             </div>
                         </div>
                         <div className={styles.bottom}>
-                            {sessionStorage.getItem('member_id') !=
-                                user.member_id && ( // 본인이 아닐시에는 표시 X
+                            {
+                                session_member_id != user.member_id ?  // 본인일 때 표시 X
                                     <>
-                                        <button className={styles.followBtn}> 팔로우 + </button>
+                                        {
+                                            // 내가 팔로우한 상태라면 "팔로우 -" / 팔로우 하지 않은 상태라면 "팔로우 +"
+                                            isEachFollow ?
+                                                <button className={styles.delFollowBtn} onClick={() => handleIsFollowing(memberSeq)}> 팔로우 - </button>
+                                                :
+                                                <button className={styles.addFollowBtn} onClick={() => handleIsFollowing(memberSeq)}> 팔로우 + </button>
+                                        }
                                     </>
-                                )}
+                                    :
+                                    <></>
+                            }
                         </div>
                     </div>
                 </div>
@@ -219,56 +321,109 @@ export const Main = () => {
 
             {/* 모달 컴포넌트 */}
             <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-                <div className={styles.modalBox}>
-                    {modalContent === 'profile' && (
-                        <>
-                            <h2>프로필 사진 변경</h2>
-                            <div>
-                                <button className={styles.modBtn} onClick={handleFileInputClick}>수정</button>
-                                <button className={styles.delBtn} onClick={() => {
-                                    handleDeleteProfileImage(); // 서버에 이미지 삭제 요청
-                                    setIsModalOpen(false);
-                                }}>삭제</button>
-                            </div>
-                            <input
-                                ref={fileInputRef} // ref 할당
-                                type="file"
-                                style={{ display: 'none' }}
-                                accept="image/*"
-                                onChange={e => {
-                                    const file = e.target.files[0]
-                                    if (file) {
-                                        const reader = new FileReader()
-                                        reader.onloadend = () => {
-                                            handleUploadImage(file); // 이미지 서버로 전송
-                                        };
-                                        reader.readAsDataURL(file);
+                {/* 프로필 사진 변경 */}
+                {modalContent === 'profile' && (
+                    <div className={styles.modalBox}>
+                        <h2>프로필 사진 변경</h2>
+                        <div>
+                            <button className={styles.modBtn} onClick={handleFileInputClick}>수정</button>
+                            <button className={styles.delBtn} onClick={() => {
+                                handleDeleteProfileImage(); // 서버에 이미지 삭제 요청
+                                setIsModalOpen(false);
+                            }}>삭제</button>
+                        </div>
+                        <input
+                            ref={fileInputRef} // ref 할당
+                            type="file"
+                            style={{ display: 'none' }}
+                            accept="image/*"
+                            onChange={e => {
+                                const file = e.target.files[0]
+                                if (file) {
+                                    const reader = new FileReader()
+                                    reader.onloadend = () => {
+                                        handleUploadImage(file); // 이미지 서버로 전송
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                                setIsModalOpen(false) // 모달 닫기
+                            }}
+                        />
+                    </div>
+                )}
+                {/* 배너 사진 변경 */}
+                {modalContent === 'banner' && (
+                    <div className={styles.modalBox}>
+                        <h2>배너 사진 변경</h2>
+                        <p>사진은 1470 * 260 사이즈를 권장합니다</p>
+                        <div>
+                            <button className={styles.modBtn}>수정</button>
+                            <button
+                                className={styles.delBtn}
+                                onClick={() => setIsModalOpen(false)}
+                            >
+                                삭제
+                            </button>
+                        </div>
+                    </div>
+                )}
+                {/* 팔로워 목록 */}
+                {modalContent === 'follower' && (
+                    <div className={styles.followListBox}>
+                        <h2>팔로워 목록</h2>
+                        {followerData.map((follower, i) => {
+                            return (
+                                <div className={styles.followList} key={i}>
+                                    <div className={styles.followImg}>
+                                        <img src={follower.MEMBER_AVATAR || profile} />
+                                    </div>
+                                    <span onClick={() => handleMovePage(follower.MEMBER_ID)}>{follower.NICKNAME}</span>
+                                    {
+                                        follower.MEMBER_ID !== session_member_id ?
+                                            (
+                                                follower.IS_FOLLOWING == "Y" ?
+                                                    <button className={styles.followingBtn} onClick={() => handleIsFollowing(follower.MEMBER_SEQ)}>팔로잉</button>
+                                                    :
+                                                    <button className={styles.followerBtn} onClick={() => handleIsFollowing(follower.MEMBER_SEQ)}>팔로우</button>
+                                            )
+                                            : (
+                                                <></>
+                                            )
                                     }
-                                    setIsModalOpen(false) // 모달 닫기
-                                }}
-                            />
-                        </>
-                    )}
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
+                {/* 팔로잉 목록 */}
+                {modalContent === 'following' && (
+                    <div className={styles.followListBox}>
+                        <h2>팔로잉 목록</h2>
+                        {followingData.map((following, i) => {
+                            return (
+                                <div className={styles.followList} key={i}>
+                                    <div className={styles.followImg}>
+                                        <img src={following.MEMBER_AVATAR || profile} />
+                                    </div>
+                                    <span onClick={() => handleMovePage(following.MEMBER_ID)}>{following.NICKNAME}</span>
+                                    {
+                                        following.MEMBER_ID !== session_member_id ?
+                                            (following.IS_FOLLOWING == "Y" ?
+                                                <button className={styles.followingBtn} onClick={() => handleIsFollowing(following.MEMBER_SEQ)}>팔로잉</button>
+                                                :
+                                                <button className={styles.followerBtn} onClick={() => handleIsFollowing(following.MEMBER_SEQ)}>팔로우</button>)
 
-
-                    {modalContent === 'banner' && (
-                        <>
-                            <h2>배너 사진 변경</h2>
-                            <p>사진은 1470 * 260 사이즈를 권장합니다</p>
-                            <div>
-                                <button className={styles.modBtn}>수정</button>
-                                <button
-                                    className={styles.delBtn}
-                                    onClick={() => setIsModalOpen(false)}
-                                >
-                                    삭제
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
+                                            : (
+                                                <></>
+                                            )
+                                    }
+                                </div>
+                            )
+                        })}
+                    </div>
+                )}
             </Modal>
 
-        </div>
+        </div >
     )
 }

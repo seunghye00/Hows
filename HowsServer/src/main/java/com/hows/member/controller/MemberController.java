@@ -1,5 +1,6 @@
 package com.hows.member.controller;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -248,17 +249,37 @@ public class MemberController {
 	
 	 // 팔로워 목록 가져오기
     @GetMapping("/getFollower")
-    public ResponseEntity<List<MemberDTO>> getFollower(@RequestParam("member_seq") int member_seq) {
-        List<MemberDTO> follower = memServ.getFollower(member_seq);
+    public ResponseEntity<List<Map<String, Object>>> getFollower(@RequestParam("member_seq") int member_seq) {
+    	List<Map<String, Object>> follower = memServ.getFollower(member_seq);
         return ResponseEntity.ok(follower);
     }
 
     // 팔로잉 목록 가져오기
     @GetMapping("/getFollowing")
-    public ResponseEntity<List<MemberDTO>> getFollowing(@RequestParam("member_seq") int member_seq) {
-        List<MemberDTO> following = memServ.getFollowing(member_seq);
+    public ResponseEntity<List<Map<String, Object>>> getFollowing(@RequestParam("member_seq") int member_seq) {
+    	List<Map<String, Object>> following = memServ.getFollowing(member_seq);
         return ResponseEntity.ok(following);
     }
+    
+    // 팔로워, 팔로잉 수 가져오기
+    @GetMapping("/countFollow")
+    public ResponseEntity<Map<String, BigDecimal>> countFollow(@RequestParam("member_seq") int member_seq){
+    	
+    	System.out.println("팔로우, 팔로잉 수 시퀀스 ::: "+ member_seq);
+    	
+    	Map<String, BigDecimal> result = memServ.countFollow(member_seq);
+    	return ResponseEntity.ok(result);
+    }
+    
+    // 맞팔 되어있는지
+    @PostMapping("/eachFollow")
+    public ResponseEntity<Boolean> eachFollow(@RequestBody Map<String, Integer> params){
+    	Boolean result = memServ.eachFollow(params);
+    	return ResponseEntity.ok(result);
+    }
+    
+    
+    
   
 	// 마이페이지 게시글(이미지) 출력
 	@GetMapping("/selectPost")

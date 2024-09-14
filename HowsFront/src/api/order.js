@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {api, host} from '../config/config'
+import { api, host } from '../config/config'
 
 const baseUrl = `${host}/order`
 
@@ -11,6 +11,13 @@ export const orderList = status => {
 }
 
 // 주문, 주문목록 추가
-export const addOrder = (order) => {
-    return api.post(`/order`, order);
+export const addOrder = order => {
+    return api.post(`/order`, order)
+}
+
+// 주문 상태 업데이트
+export const updateOrder = (order_seq, order_code) => {
+    return axios.put(`${baseUrl}/updateOrderCode`, null, {
+        params: { order_seq, order_code },
+    })
 }

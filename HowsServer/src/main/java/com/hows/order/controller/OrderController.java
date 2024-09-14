@@ -51,10 +51,16 @@ public class OrderController {
 		String result = orderServ.updateOrder(orderDTO);
 		return ResponseEntity.ok(result);
 	}
+	
+	@PutMapping("updateOrderCode")
+	public ResponseEntity<String> updateOrderCode(@RequestParam int order_seq, @RequestParam String order_code) throws Exception {
+		String result = orderServ.updateOrder(new OrderDTO(order_seq, order_code));
+		return ResponseEntity.ok(result);
+	}
 
 	@ExceptionHandler(Exception.class)
-	public String exceptionHandler(Exception e) {
+	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();
-		return "redirect:/error";
+		return ResponseEntity.badRequest().body("fail");
 	}
 }

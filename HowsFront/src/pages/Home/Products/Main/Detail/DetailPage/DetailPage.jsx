@@ -148,21 +148,18 @@ export const DetailPage = () => {
 
     // 리뷰 등록
     const handleSubmit = () => {
-        
-        if (isSubmitting) return; // 이미 제출 중이라면 더 이상 진행하지 않음
-
-        // 제출 시작 시 버튼을 비활성화
+        if (isSubmitting) return;
+    
         setIsSubmitting(true);
-
+    
         if (!isFormValid()) {
             alert('별점, 리뷰 내용, 그리고 이미지를 모두 입력해 주세요.');
-            setIsSubmitting(false); // 유효성 검사가 실패하면 버튼을 다시 활성화
+            setIsSubmitting(false);
             return;
         }
-
+    
         const formData = new FormData();
     
-        // 리뷰 데이터를 JSON 형식으로 변환하여 FormData에 추가함
         const reviewData = JSON.stringify({
             rating: data.rating,
             review_contents: data.review_contents,
@@ -171,36 +168,46 @@ export const DetailPage = () => {
         });
         formData.append('reviewData', reviewData);
     
-        // 이미지 여러 파일 추가 
         if (data.images && data.images.length > 0) {
             data.images.forEach((image) => {
                 formData.append('images', image); 
             });
         }
-
+    
         data.images.forEach((_, index) =>
             formData.append('image_orders', index + 1)
         )
     
-        // 서버로 전송
         api.post(`/product/reviewAdd`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         }).then((response) => {
-
-            // console.log('성공', response.data);
             Swal.fire({
-                icon: "warning",
+                icon: "success",
                 title: "리뷰 제출에 성공했습니다.",
                 showConfirmButton: true,
-            })
-            handleCloseModal();
-            return;
-
+            });
+    
+            // 리뷰 등록 성공 시, 새 리뷰를 추가하여 리뷰 목록을 업데이트
+            const newReview = {
+                RATING: data.rating,
+                REVIEW_CONTENTS: data.review_contents,
+                MEMBER_ID: memberId,
+                REVIEW_DATE: new Date(), // 현재 시간을 등록 시간으로 사용
+                images: previewImages.map((src, index) => ({ IMAGE_URL: src })), // 이미지 미리보기 배열을 사용하여 새 리뷰 이미지로 추가
+            };
+            
+            setReviews((prevReviews) => [newReview, ...prevReviews]); // 새 리뷰를 목록에 추가
+            setTotalReviews(prevCount => prevCount + 1); // 전체 리뷰 수 업데이트
+            setIsModalOpen(false); // 모달 닫기
+            setIsSubmitting(false); // 제출 상태 해제
         }).catch((error) => {
             alert('리뷰 제출에 실패했습니다');
-            handleCloseModal();
+            setIsModalOpen(false);
+            setIsSubmitting(false);
         });
     };
+    
+    
 
     // 리뷰 이미지 로딩 함수
     const loadReviewImages = async (reviewSeq) => {

@@ -159,6 +159,7 @@ export const Payment = () => {
     const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
     setPaymentInfo({ orderName, totalAmount });
     const result = requestPaymentEvent(paymentInfo, orderInfo)
+    console.log("result ==== ", result)
     if(result === "ok") {
       SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
         if(resp) {

@@ -2,6 +2,7 @@ package com.hows.history.service;
 
 import com.hows.order.dao.OrderDAO;
 import com.hows.order.dto.OrderDTO;
+import com.hows.order.dto.OrderListDTO;
 import com.hows.payment.dao.PaymentDAO;
 import com.hows.product.dao.ReviewDAO;
 import com.hows.product.dto.ImageDTO;
@@ -41,6 +42,17 @@ public class HistoryService {
 
         return mapList;
     }
+
+    /** 주문 디테일 **/
+    public Map<String, Object> orderDetail(int orderSeq) {
+        OrderDTO detail = orderDAO.orderDetail((orderSeq));
+        List<HashMap<String, Object>> orderList = orderDAO.myOrderList(orderSeq);
+        Map<String, Object> map = new HashMap<>();
+        map.put("orderDetail", detail);
+        map.put("orderList", orderList);
+        return map;
+    }
+
 
     /** Review 목록 **/
     public List<?> myReview (String memberId) {

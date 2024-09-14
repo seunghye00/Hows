@@ -42,6 +42,7 @@
   /* flex: 1; */
   height: 200px;
   width: 200px;
+  min-width: 200px;
   margin-right: 50px;
   cursor: pointer;
   background-color: var(--hows-point-color-lightest);

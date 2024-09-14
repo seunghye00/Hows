@@ -132,13 +132,13 @@ public class MemberDAO {
     } 
 
     // 팔로워 목록 가져오기
-    public List<MemberDTO> getFollower(String member_id) {
-    	return mybatis.selectList("Member.getFollower", member_id);
+    public List<MemberDTO> getFollower(int member_seq) {
+    	return mybatis.selectList("Member.getFollower", member_seq);
     }
     
     // 팔로잉 목록 가져오기
-    public List<MemberDTO> getFollowing(String member_id) {
-    	return mybatis.selectList("Member.getFollowing", member_id);
+    public List<MemberDTO> getFollowing(int member_seq) {
+    	return mybatis.selectList("Member.getFollowing", member_seq);
     }
 	 
 	// =======================================================[ 관리자 ]

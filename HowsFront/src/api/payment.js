@@ -45,6 +45,8 @@ export const requestPaymentEvent = async(payment, orderInfo) => {
       if(res.data > 0) {
         // 주문 데이터 저장 성공 시 결제 데이터 저장
         addPayment(paymentResult).then(resp => {
+          console.log("addPayment ==== ", resp.data);
+
           // 주문 완료한 목록 장바구니에서 삭제
           orderInfo.orderProducts.map(item =>{
             deleteCart(item.product_seq, "saleSuccess");

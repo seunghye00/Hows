@@ -30,6 +30,15 @@
 			member_seq = #{member_seq}
 	</select>
 
+	<select id="orderDetail" resultType="com.hows.order.dto.OrderDTO">
+		SELECT
+			*
+		FROM
+			orders
+		WHERE
+			order_seq = #{order_seq}
+	</select>
+
 	<select id="myOrderList" resultMap="myOrderMap">
 		SELECT
 			ol.*,

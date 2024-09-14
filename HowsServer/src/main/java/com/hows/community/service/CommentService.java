@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hows.community.dao.CommentDAO;
 import com.hows.community.dto.CommentReportDTO;
+import com.hows.community.dto.ReplyReportDTO;
 
 @Service
 public class CommentService {
@@ -85,7 +86,30 @@ public class CommentService {
 	// 신고 댓글 삭제
 	@Transactional
 	public int deleteCmt(int comment_seq) {
-		commentDAO.deleteCommentReport(comment_seq); // 신고 기록 삭제
-		return commentDAO.deleteCmt(comment_seq); // 댓글 삭제
+		commentDAO.deleteCommentReport(comment_seq);
+		return commentDAO.deleteCmt(comment_seq);
+	}
+
+	// 대댓글 신고조회 (관리자)
+	// 신고된 대댓글 목록 조회
+	public List<Map<String, Object>> getReportedReplys(int startRow, int endRow) {
+		return commentDAO.getReportedReplys(startRow, endRow); 
+	}
+
+	// 신고된 대댓글 총 개수 조회
+	public int getReportedReplysCount() {
+		return commentDAO.getReportedReplysCount();
+	}
+
+	// 대댓글 신고 내역 조회
+	public List<ReplyReportDTO> getReplyReport(int reply_seq) {
+		return commentDAO.getReplyReport(reply_seq);
+	}
+
+	// 신고 대댓글 삭제
+	@Transactional
+	public int deleteReply(int reply_seq) {
+		commentDAO.deleteReplyReport(reply_seq);
+		return commentDAO.deleteReply(reply_seq);
 	}
 }

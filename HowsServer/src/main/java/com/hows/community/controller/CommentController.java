@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.hows.community.dto.CommentDTO;
 import com.hows.community.dto.CommentReportDTO;
+import com.hows.community.dto.ReplyReportDTO;
 import com.hows.community.service.CommentService;
 
 @RestController
@@ -136,7 +137,7 @@ public class CommentController {
 
 	// 관리자
 	// 댓글 신고조회 (관리자)
-	// 댓글 신고 목록 조회 (페이징 포함)
+	// 댓글 신고 목록 조회
 	@GetMapping("/reportedComments")
 	public ResponseEntity<Map<String, Object>> getReportedComments(@RequestParam int startRow,
 			@RequestParam int endRow) {
@@ -169,6 +170,46 @@ public class CommentController {
 		int result = commentServ.deleteCmt(comment_seq);
 		if (result > 0) {
 			return ResponseEntity.ok(result); // 성공 시 200 OK
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 실패 시 404 NOT FOUND
+		}
+	}
+
+	// 대댓글 신고조회 (관리자)
+	// 신고된 대댓글 목록 조회
+	@GetMapping("/reportedReplys")
+	public ResponseEntity<Map<String, Object>> getReportedReplys(@RequestParam("startRow") int startRow,
+			@RequestParam("endRow") int endRow) {
+		try {
+			int totalCount = commentServ.getReportedReplysCount();
+			List<Map<String, Object>> replys = commentServ.getReportedReplys(startRow, endRow);
+			return ResponseEntity.ok(Map.of("replys", replys, "totalCount", totalCount));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+
+	// 대댓글 신고 내역 조회
+	@GetMapping("/replyReport/{reply_seq}")
+	public ResponseEntity<List<ReplyReportDTO>> getReplyReport(@PathVariable int reply_seq) {
+		try {
+			List<ReplyReportDTO> reportList = commentServ.getReplyReport(reply_seq);
+			return ResponseEntity.ok(reportList);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+		}
+	}
+
+	// 대댓글 삭제
+	@DeleteMapping("/deleteReply/{reply_seq}")
+	public ResponseEntity<Integer> deleteReply(@PathVariable int reply_seq) {
+
+		int result = commentServ.deleteReply(reply_seq); // 대댓글 삭제
+		if (result > 0) {
+			return ResponseEntity.ok().build();
+
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 실패 시 404 NOT FOUND
 		}

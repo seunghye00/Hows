@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.hows.community.dto.CommentReportDTO;
+import com.hows.community.dto.ReplyReportDTO;
 
 @Repository
 public class CommentDAO {
@@ -119,4 +120,34 @@ public class CommentDAO {
 	public int deleteCmt(int comment_seq) {
 		return mybatis.delete("Comment.deleteCmt", comment_seq);
 	}
+
+	// 대댓글 신고조회 (관리자)
+	// 신고된 대댓글 목록 조회
+	public List<Map<String, Object>> getReportedReplys(int startRow, int endRow) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("startRow", startRow);
+		params.put("endRow", endRow);
+		return mybatis.selectList("Comment.getReportedReplies", params);
+	}
+
+	// 신고된 대댓글 총 개수 조회
+	public int getReportedReplysCount() {
+		return mybatis.selectOne("Comment.getReportedReplysCount");
+	}
+
+	// 대댓글 신고 내역 조회
+	public List<ReplyReportDTO> getReplyReport(int reply_seq) {
+		return mybatis.selectList("Comment.getReplyReport", reply_seq);
+	}
+	
+	// 대댓글 신고 기록 삭제
+	public void deleteReplyReport(int reply_seq) {
+		mybatis.delete("Comment.deleteReplyReport", reply_seq);
+	}
+
+	// 대댓글 삭제
+	public int deleteReply(int reply_seq) {
+		return mybatis.delete("Comment.deleteReply", reply_seq);
+	}
+
 }

@@ -113,13 +113,52 @@ export const getCommentReport = async comment_seq => {
     }
 }
 
-// 신고 게시판 삭제 (관리자)
+// 신고 댓글 삭제 (관리자)
 export const deleteCmt = async comment_seq => {
     try {
         const response = await api.delete(`/comment/deleteCmt/${comment_seq}`)
         return response.data
     } catch (error) {
         console.error('댓글 삭제 중 오류 발생:', error)
+        throw error
+    }
+}
+
+// 대댓글
+// 신고 대댓글 조회 (관리자)
+export const getReportedReplys = async (startRow, endRow) => {
+    try {
+        const response = await api.get('/comment/reportedReplys', {
+            params: {
+                startRow,
+                endRow,
+            },
+        })
+        return response.data
+    } catch (error) {
+        console.error('대댓글 조회 중 오류 발생:', error)
+        throw error
+    }
+}
+
+// 신고 내역 조회 (관리자)
+export const getReplyReport = async reply_seq => {
+    try {
+        const response = await api.get(`/comment/replyReport/${reply_seq}`)
+        return response.data
+    } catch (error) {
+        console.error('대댓글 신고 내역 조회 중 오류 발생:', error)
+        throw error
+    }
+}
+
+// 신고 대댓글 삭제 (관리자)
+export const deleteReply = async reply_seq => {
+    try {
+        const response = await api.delete(`/comment/deleteReply/${reply_seq}`)
+        return response.data
+    } catch (error) {
+        console.error('대댓글 삭제 중 오류 발생:', error)
         throw error
     }
 }

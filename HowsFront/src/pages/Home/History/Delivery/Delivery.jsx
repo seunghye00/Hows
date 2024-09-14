@@ -9,18 +9,33 @@ import {addCommas, formatDate} from "../../../../commons/commons";
 export const Delivery = () => {
 
   const [myPayment, setMyPayment] = useState([]);
-
+  const [selectPaymentId, setSelectPaymentId] = useState("");
   const [orderDetail, setOrderDetail] = useState([]);
+  const [reason, setReason] = useState()
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleDetail = (seq) => {
+  const handleDetail = (seq, id) => {
     myPaymentsDetail(seq).then(res => {
-      console.log("order ==== ", res.data);
       setOrderDetail(res.data);
+      setSelectPaymentId(id);
       setIsModalOpen(true);
     });
+  }
+
+  const handleReason = (e) => {
+    setReason(e.target.value);
+  }
+
+  const handleSaleCancel = (id) => {
+    const params = {
+      id,
+      reason
+    }
+    api.post(`/payment/cancel`, params).then(res => {
+      console.log("res ==== ", res);
+    })
   }
 
   useEffect(() => {
@@ -47,7 +62,7 @@ export const Delivery = () => {
               <div className={styles.shippingRow} key={item.order_seq}>
                 <div className={styles.shippingItem}>How's-order_{item.order_seq}</div>
                 <div className={styles.shippingItem}>
-                  <p onClick={() => handleDetail(item.order_seq)}>{item.order_name}</p>
+                  <p onClick={() => handleDetail(item.order_seq, item.payment_id)}>{item.order_name}</p>
                 </div>
                 <div className={styles.shippingItem}>
                   <span>{item.payment_title}</span>
@@ -91,6 +106,10 @@ export const Delivery = () => {
                 })
               }
             </div>
+
+            <input type="text" onChange={handleReason} placeholder="취소 사유를 적어주세요"/>
+            <button onClick={() => handleSaleCancel(selectPaymentId)} >구매 취소</button>
+            
           </div>
         </Modal>
       }

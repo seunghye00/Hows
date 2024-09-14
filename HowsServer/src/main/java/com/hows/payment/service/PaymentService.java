@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -94,37 +95,42 @@ public class PaymentService {
     }
 
     /** 결제 취소 **/
-    public String paymentCancel(String paymentId){
-        String result = "";
+    public String paymentCancel(Map<String, Object> map){
+        String paymentId = (String) map.get("id");
+        String reason = (String) map.get("reason");
+        String result = "fail";
 
         try {
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "PortOne " + portoneApiSecret);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
+            Map<String, String> body = new HashMap<>();
+            body.put("reason", reason);
+            HttpEntity<Map<String, String>> entity = new HttpEntity<>(body, headers);
 
             String url = portoneApiUrl + paymentId + "/cancel";
             ResponseEntity<Object> paymentResponse = restTemplate.exchange(
-                    url, HttpMethod.DELETE, entity, Object.class);
+                    url, HttpMethod.POST, entity, Object.class);
 
-            // 전체 ResponseEntity 출력
-            System.out.println(paymentResponse);
+            // Body를 Map으로 캐스팅
+            Map<String, Object> responseBody = (Map<String, Object>) paymentResponse.getBody();
 
-            // 상태 코드 출력
-            System.out.println("Status Code: " + paymentResponse.getStatusCode());
+            // cancellation 객체 가져오기
+            Map<String, Object> cancellation = (Map<String, Object>) responseBody.get("cancellation");
 
-            // 헤더 출력
-            System.out.println("Headers: " + paymentResponse.getHeaders());
+            String status = (String) cancellation.get("status");
+            Integer totalAmount = (Integer) cancellation.get("totalAmount");
 
-            // 바디 출력
-            System.out.println("Body: " + paymentResponse.getBody());
+            if(status.equals("SUCCEEDED")){
+                // 결제 내역 취소로 변경
+                // order 취소 or 환불로 변경
+                result = "ok";
+            }
 
             if (!paymentResponse.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException("Failed to retrieve payment details: " + paymentResponse.getBody());
             }
 
-            // paymentResponse 의 결제 취소 데이터가 success 면
-            result = "ok";
 
         } catch (Exception e) {
             e.printStackTrace();

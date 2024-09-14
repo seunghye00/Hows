@@ -18,5 +18,5 @@ export const updateCart = (item) => {
 /** 상품 삭제 **/
 export const deleteCart = (seq, type) => {
   if(!type) type = "cart";
-  return api.delete(`/cart/${type}/${seq}`);
+  return api.delete(`/cart/${seq}/${type}`);
 }

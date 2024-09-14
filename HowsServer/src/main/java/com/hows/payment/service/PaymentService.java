@@ -107,6 +107,18 @@ public class PaymentService {
             ResponseEntity<Object> paymentResponse = restTemplate.exchange(
                     url, HttpMethod.DELETE, entity, Object.class);
 
+            // 전체 ResponseEntity 출력
+            System.out.println(paymentResponse);
+
+            // 상태 코드 출력
+            System.out.println("Status Code: " + paymentResponse.getStatusCode());
+
+            // 헤더 출력
+            System.out.println("Headers: " + paymentResponse.getHeaders());
+
+            // 바디 출력
+            System.out.println("Body: " + paymentResponse.getBody());
+
             if (!paymentResponse.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException("Failed to retrieve payment details: " + paymentResponse.getBody());
             }

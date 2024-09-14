@@ -1,15 +1,30 @@
 import styles from "./Delivery.module.css"
 import React, {useEffect, useState} from 'react'
-import {myPayments} from "../../../../api/history";
+import {myPayments, myPaymentsDetail} from "../../../../api/history";
 import {TextBox} from "../TextBox/TextBox";
+import {Modal} from "../../../../components/Modal/Modal";
+import {api} from "../../../../config/config";
+import {formatDate} from "../../../../commons/commons";
 
 export const Delivery = () => {
 
   const [myPayment, setMyPayment] = useState([]);
 
+  const [orderDetail, setOrderDetail] = useState([]);
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleDetail = (seq) => {
+    myPaymentsDetail(seq).then(res => {
+      console.log("order ==== ", res.data);
+      setOrderDetail(res.data);
+      setIsModalOpen(true);
+    });
+  }
+
   useEffect(() => {
     myPayments().then(res => {
-      console.log("res ==== ", res);
       setMyPayment(res.data);
     });
   }, []);
@@ -32,7 +47,7 @@ export const Delivery = () => {
               <div className={styles.shippingRow} key={item.order_seq}>
                 <div className={styles.shippingItem}>How's-order_{item.order_seq}</div>
                 <div className={styles.shippingItem}>
-                  <span>{item.order_name}</span>
+                  <p onClick={() => handleDetail(item.order_seq)}>{item.order_name}</p>
                 </div>
                 <div className={styles.shippingItem}>
                   <span>{item.payment_title}</span>
@@ -44,6 +59,36 @@ export const Delivery = () => {
             <TextBox text={"주문 내역이"}/>
         }
       </div>
+
+      {
+        isModalOpen &&
+        <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+          <div className={styles.modalBox}>
+            <p>주문자 : {orderDetail.orderDetail.orderer_name}</p><br/>
+            <p>연락처 : {orderDetail.orderDetail.orderer_phone}</p><br/>
+            <p>배송지 : {orderDetail.orderDetail.orderer_address} {orderDetail.orderDetail.orderer_detail_address}</p><br/>
+            <p>주문날짜 : {formatDate(orderDetail.orderDetail.order_date)}</p><br/>
+            <p>총 결제금액 : {orderDetail.orderDetail.order_price}</p><br/>
+            <p>배송 상품</p><br/>
+            <div className={styles.orderList}>
+              {
+                orderDetail.orderList.map(item => {
+                  return (
+                    <div key={item.product_seq}>
+                      <img src={item.product_thumbnail} alt=""/>
+                      <p>상품명: {item.product_title}</p><br/>
+                      <p>수량: {item.order_list_count}</p><br/>
+                      <p>가격: {item.order_list_price}</p><br/>
+                    </div>
+                  );
+                })
+              }
+            </div>
+
+          </div>
+        </Modal>
+      }
+
     </div>
   )
 }

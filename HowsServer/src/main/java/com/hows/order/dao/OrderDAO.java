@@ -28,6 +28,11 @@ public class OrderDAO {
         return mybatis.selectList("Order.myOrder", memberSeq);
     }
 
+    /** 주문 Detail **/
+    public OrderDTO orderDetail(int orderSeq) {
+        return mybatis.selectOne("Order.orderDetail", orderSeq);
+    }
+
     /** 주문 목록 조회 **/
     public List<HashMap<String, Object>> myOrderList(int orderSeq) {
         return mybatis.selectList("Order.myOrderList", orderSeq);

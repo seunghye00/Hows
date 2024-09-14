@@ -158,24 +158,66 @@
     </delete>
     
      <!-- 팔로워 목록 가져오기 -->
-    <select id="getfollower" resultType="com.hows.member.dto.MemberDTO">
-        select m.member_seq, m.member_id, m.nickname, m.member_avatar
-        from follow f
-        join member m on f.from_member_seq = m.member_seq
-        where f.to_member_seq = #{member_id}
+    <select id="getFollower" resultType="map">
+		SELECT
+		    CASE 
+		        WHEN EXISTS (
+		            SELECT 1
+		            FROM follow f2
+		            WHERE f2.from_member_seq = ${member_seq}
+		            AND f2.to_member_seq = f.from_member_seq
+		        ) THEN 'Y'
+		        ELSE 'N'
+		    END AS is_following,
+		    m.member_seq,
+		    m.member_id,
+		    m.nickname,
+		    m.member_avatar
+		FROM 
+		    follow f
+		    JOIN member m ON f.from_member_seq = m.member_seq
+		WHERE 
+		    f.to_member_seq = ${member_seq}
     </select>
 
-    <!-- 팔로잉 목록 가져오기 -->
-    <select id="getfollowing" resultType="com.hows.member.dto.MemberDTO">
-        select m.member_seq, m.member_id, m.nickname, m.member_avatar
-        from follow f
-        join member m on f.to_member_seq = m.member_seq
-        where f.from_member_seq = #{member_id}
+	<!-- 팔로잉 목록 가져오기 -->
+	<select id="getFollowing" resultType="map">
+	    SELECT
+	        CASE 
+	            WHEN EXISTS (
+	                SELECT 1
+	                FROM follow f2
+	                WHERE f2.from_member_seq = ${member_seq}
+	                AND f2.to_member_seq = f.to_member_seq
+	            ) THEN 'Y'
+	            ELSE 'N'
+	        END AS is_following,
+	        m.member_seq,
+	        m.member_id,
+	        m.nickname,
+	        m.member_avatar
+	    FROM 
+	        follow f
+	        JOIN member m ON f.to_member_seq = m.member_seq
+	    WHERE 
+	        f.from_member_seq = ${member_seq}
+	</select>
+
+    
+    <!-- 팔로워, 팔로잉 수 가져오기 -->
+    <select id="countFollow" resultType="map">
+    	select
+			(select count(*) from follow where from_member_seq = ${member_seq}) as following,
+			(select count(*) from follow where to_member_seq = ${member_seq}) as follower
+		from dual
+    </select>
+    
+    <!-- 맞팔 되어있는지 -->
+    <select id="eachFollow" resultType="int">
+    	select count(*) from follow where from_member_seq = ${from_member_seq} and to_member_seq = ${to_member_seq}
     </select>
     
     
-    
-
 	<!-- ===========================================[ 관리자 ] -->
 	<!-- 전체 회원조회 (관리자) -->
 	<select id="selectAll" parameterType="map"

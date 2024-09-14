@@ -42,6 +42,7 @@
   /* flex: 1; */
   height: 200px;
   width: 200px;
+  min-width: 200px;
   margin-right: 50px;
   cursor: pointer;
   background-color: var(--hows-point-color-lightest);
@@ -117,20 +118,32 @@
 .container .mainBox .header .userInfo .bottom {
   flex: 1.5;
 }
-.container .mainBox .header .userInfo .bottom .followBtn {
+.container .mainBox .header .userInfo .bottom > button {
   width: 150px;
   height: 55px;
   font-size: 24px;
   font-weight: 600;
   border-radius: 10px;
   border: none;
-  background-color: var(--hows-point-color);
-  color: var(--hows-white);
   transition-duration: 0.3s;
   margin: 10px 0 0 5px;
 }
-.container .mainBox .header .userInfo .bottom .followBtn:hover {
+.container .mainBox .header .userInfo .bottom .addFollowBtn {
+  background-color: var(--hows-point-color);
+  color: var(--hows-white);
+}
+.container .mainBox .header .userInfo .bottom .addFollowBtn:hover {
   background-color: var(--hows-point-color-dark);
+}
+
+.container .mainBox .header .userInfo .bottom .delFollowBtn {
+  border: 2px solid var(--hows-point-color);
+  background-color: var(--hows-white);
+  color: var(--hows-point-color-darker);
+}
+.container .mainBox .header .userInfo .bottom .delFollowBtn:hover {
+  background-color: var(--hows-point-color);
+  color: var(--hows-white);
 }
 
 /* 하단 게시물 부분 */
@@ -209,4 +222,71 @@
 
 .modalBox .delBtn {
   color: var(--hows-gray-400);
+}
+
+.followListBox {
+  width: 350px;
+  height: 450px;
+  display: flex;
+  flex-direction: column;
+  padding: 25px 20px;
+  /* background-color: aliceblue; */
+}
+.followListBox > h2 {
+  text-align: center;
+  padding-bottom: 40px;
+  font-size: 28px;
+}
+
+.followListBox .followList {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.followListBox .followList .followImg {
+  width: 53px;
+  height: 53px;
+  border: 1px solid var(--hows-point-color-dark);
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 15px;
+}
+.followListBox .followList .followImg > img {
+  width: 100%;
+  height: 100%;
+}
+
+.followListBox .followList > span {
+  flex: 1;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.followListBox .followList > button {
+  width: 70px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition-duration: 0.4s;
+}
+.followListBox .followList .followerBtn {
+  background-color: var(--hows-point-color-dark);
+  color: var(--hows-white);
+}
+.followListBox .followList .followerBtn:hover {
+  background-color: var(--hows-point-color-darker);
+}
+
+.followListBox .followList .followingBtn {
+  border: 1px solid var(--hows-point-color-dark);
+  background-color: var(--hows-white);
+  color: var(--hows-point-color-darker);
+}
+.followListBox .followList .followingBtn:hover {
+  background-color: var(--hows-point-color-dark);
+  color: var(--hows-white);
 }

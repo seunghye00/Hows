@@ -4,7 +4,7 @@ import {myPayments, myPaymentsDetail} from "../../../../api/history";
 import {TextBox} from "../TextBox/TextBox";
 import {Modal} from "../../../../components/Modal/Modal";
 import {api} from "../../../../config/config";
-import {formatDate} from "../../../../commons/commons";
+import {addCommas, formatDate} from "../../../../commons/commons";
 
 export const Delivery = () => {
 
@@ -61,6 +61,7 @@ export const Delivery = () => {
       </div>
 
       {
+        /* 주문 & 결제 내역 디테일 */
         isModalOpen &&
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <div className={styles.modalBox}>
@@ -74,17 +75,22 @@ export const Delivery = () => {
               {
                 orderDetail.orderList.map(item => {
                   return (
-                    <div key={item.product_seq}>
-                      <img src={item.product_thumbnail} alt=""/>
-                      <p>상품명: {item.product_title}</p><br/>
-                      <p>수량: {item.order_list_count}</p><br/>
-                      <p>가격: {item.order_list_price}</p><br/>
+                    <div className={styles.orderProduct} key={item.product_seq}>
+                      <div className={styles.image}>
+                        <img src={item.product_thumbnail} alt="상품이미지"/>
+                      </div>
+                      <div className={styles.info}>
+                        <p>{item.product_title}</p>
+                        <div className={styles.count}>
+                          <span>수량 : {item.order_list_count}</span>
+                          <span>{addCommas(item.order_list_price)}원</span>
+                        </div>
+                      </div>
                     </div>
                   );
                 })
               }
             </div>
-
           </div>
         </Modal>
       }

@@ -28,7 +28,7 @@ export const Order = () => {
 
     // 1. 컴포넌트가 처음 렌더링될 때 API 호출하여 전체 주문 목록 불러옴
     useEffect(() => {
-        orderList('status')
+        orderList(status)
             .then(resp => {
                 console.log(resp.data)
                 const beforeOrders = resp.data.map(order => ({

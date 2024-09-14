@@ -248,15 +248,15 @@ public class MemberController {
 	
 	 // 팔로워 목록 가져오기
     @GetMapping("/getFollower")
-    public ResponseEntity<List<MemberDTO>> getFollower(@RequestParam("member_id") String member_id) {
-        List<MemberDTO> follower = memServ.getFollower(member_id);
+    public ResponseEntity<List<MemberDTO>> getFollower(@RequestParam("member_seq") int member_seq) {
+        List<MemberDTO> follower = memServ.getFollower(member_seq);
         return ResponseEntity.ok(follower);
     }
 
     // 팔로잉 목록 가져오기
     @GetMapping("/getFollowing")
-    public ResponseEntity<List<MemberDTO>> getFollowing(@RequestParam("member_id") String member_id) {
-        List<MemberDTO> following = memServ.getFollowing(member_id);
+    public ResponseEntity<List<MemberDTO>> getFollowing(@RequestParam("member_seq") int member_seq) {
+        List<MemberDTO> following = memServ.getFollowing(member_seq);
         return ResponseEntity.ok(following);
     }
   

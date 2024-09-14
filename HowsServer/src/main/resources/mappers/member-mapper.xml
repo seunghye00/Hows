@@ -158,24 +158,21 @@
     </delete>
     
      <!-- 팔로워 목록 가져오기 -->
-    <select id="getfollower" resultType="com.hows.member.dto.MemberDTO">
+    <select id="getFollower" resultType="com.hows.member.dto.MemberDTO">
         select m.member_seq, m.member_id, m.nickname, m.member_avatar
-        from follow f
-        join member m on f.from_member_seq = m.member_seq
-        where f.to_member_seq = #{member_id}
+		from follow f
+		join member m on f.from_member_seq = ${member_seq}
+		and f.to_member_seq = m.member_seq
     </select>
 
     <!-- 팔로잉 목록 가져오기 -->
-    <select id="getfollowing" resultType="com.hows.member.dto.MemberDTO">
+    <select id="getFollowing" resultType="com.hows.member.dto.MemberDTO">
         select m.member_seq, m.member_id, m.nickname, m.member_avatar
-        from follow f
-        join member m on f.to_member_seq = m.member_seq
-        where f.from_member_seq = #{member_id}
+		from follow f
+		join member m on f.to_member_seq = ${member_seq}
+		and f.from_member_seq = m.member_seq
     </select>
     
-    
-    
-
 	<!-- ===========================================[ 관리자 ] -->
 	<!-- 전체 회원조회 (관리자) -->
 	<select id="selectAll" parameterType="map"

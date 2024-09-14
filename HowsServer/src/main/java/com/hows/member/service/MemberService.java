@@ -1,5 +1,6 @@
 package com.hows.member.service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,6 @@ import com.hows.common.util.PasswordUtil;
 import com.hows.common.util.SendEmailUtil;
 import com.hows.community.dao.CommunityDAO;
 import com.hows.grade.dto.GradeDTO;
-import com.hows.member.dao.GuestbookDAO;
 import com.hows.member.dao.MemberDAO;
 import com.hows.member.dto.MemberDTO;
 import com.hows.role.dto.RoleDTO;
@@ -29,8 +29,6 @@ public class MemberService implements UserDetailsService {
 	private MemberDAO memDao;
 	@Autowired
 	private CommunityDAO comDao;
-	@Autowired
-	private GuestbookDAO guestDao;
 	
 	@Autowired
     private SendEmailUtil emailUtil;
@@ -66,7 +64,7 @@ public class MemberService implements UserDetailsService {
 			throw new UsernameNotFoundException("User not found");
 
 		return new CustomUserDetails(dto.getMember_id(), dto.getPw(),
-				AuthorityUtils.createAuthorityList(dto.getRole_code()), dto.getMember_seq());
+				AuthorityUtils.createAuthorityList(dto.getRole_code()), dto.getMember_seq(), dto.getNickname(), dto.getMember_avatar());
 	}
 
 	// 아이디 찾기
@@ -189,6 +187,26 @@ public class MemberService implements UserDetailsService {
     	memDao.removeFollow(fromMemberSeq, toMemberSeq);
     }
     
+    // 팔로워 목록 가져오기
+    public List<Map<String, Object>> getFollower(int member_seq) {
+        return memDao.getFollower(member_seq);
+    }
+
+    // 팔로잉 목록 가져오기
+    public List<Map<String, Object>> getFollowing(int member_seq) {
+        return memDao.getFollowing(member_seq);
+    }
+    
+    // 팔로워, 팔로잉 수 가져오기
+    public Map<String, BigDecimal> countFollow(int member_seq){
+    	return memDao.countFollow(member_seq);
+    }
+    
+    // 맞팔 되어있는지
+    public Boolean eachFollow(Map<String, Integer> params) {
+    	return memDao.eachFollow(params);
+    }
+    
     // 마이페이지 게시글(이미지) 출력
     public List<Map<String, Object>> selectPostByMemberId(String member_id){
     	return comDao.selectPostByMemberId(member_id);
@@ -199,14 +217,16 @@ public class MemberService implements UserDetailsService {
     	return comDao.countPost(member_id);
     }
 	
-	
-	// 마이페이지 스크랩 갯수
-	
-	
-	// 마이페이지 방문글 갯수
-    public int countGuestbook(String member_id){
-    	return guestDao.countGuestbook(member_id);
+    // 마이페이지 북마크(이미지) 출력
+    public List<Map<String, Object>> selectBookmarkByMemberId(String member_id){
+    	return comDao.selectBookmarkByMemberId(member_id);
     }
+	
+	// 마이페이지 북마크 갯수
+	public int countBookmark(String member_id) {
+		return comDao.countBookmark(member_id);
+	}
+
     
     
 

@@ -1,5 +1,6 @@
 package com.hows.member.controller;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hows.File.service.FileService;
 import com.hows.blacklistreason.dto.BlacklistReasonDTO;
 import com.hows.common.CustomUserDetails;
+import com.hows.community.service.CommunityService;
 import com.hows.grade.dto.GradeDTO;
 import com.hows.member.dto.MemberDTO;
 import com.hows.member.service.MemberService;
@@ -40,6 +41,8 @@ public class MemberController {
 	private MemberService memServ;
     @Autowired
     private FileService fileServ;
+    @Autowired
+    private CommunityService comServ;    
 
 	@Autowired
 	private PasswordEncoder pwEncoder;
@@ -243,6 +246,40 @@ public class MemberController {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 	    }
 	}
+	
+	 // 팔로워 목록 가져오기
+    @GetMapping("/getFollower")
+    public ResponseEntity<List<Map<String, Object>>> getFollower(@RequestParam("member_seq") int member_seq) {
+    	List<Map<String, Object>> follower = memServ.getFollower(member_seq);
+        return ResponseEntity.ok(follower);
+    }
+
+    // 팔로잉 목록 가져오기
+    @GetMapping("/getFollowing")
+    public ResponseEntity<List<Map<String, Object>>> getFollowing(@RequestParam("member_seq") int member_seq) {
+    	List<Map<String, Object>> following = memServ.getFollowing(member_seq);
+        return ResponseEntity.ok(following);
+    }
+    
+    // 팔로워, 팔로잉 수 가져오기
+    @GetMapping("/countFollow")
+    public ResponseEntity<Map<String, BigDecimal>> countFollow(@RequestParam("member_seq") int member_seq){
+    	
+    	System.out.println("팔로우, 팔로잉 수 시퀀스 ::: "+ member_seq);
+    	
+    	Map<String, BigDecimal> result = memServ.countFollow(member_seq);
+    	return ResponseEntity.ok(result);
+    }
+    
+    // 맞팔 되어있는지
+    @PostMapping("/eachFollow")
+    public ResponseEntity<Boolean> eachFollow(@RequestBody Map<String, Integer> params){
+    	Boolean result = memServ.eachFollow(params);
+    	return ResponseEntity.ok(result);
+    }
+    
+    
+    
   
 	// 마이페이지 게시글(이미지) 출력
 	@GetMapping("/selectPost")
@@ -258,20 +295,19 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 	
-	
-	// 마이페이지 스크랩 갯수
-	
-	
-	// 마이페이지 방문글 갯수
-	@GetMapping("/countGuestbook")
-	public ResponseEntity<Integer> countGuestbook(@RequestParam String member_id){
-		
-		System.out.println("게시글 요청 member_id : "+ member_id);
-		
-		int result = memServ.countGuestbook(member_id);
+	// 마이페이지 북마크(이미지) 출력
+	@GetMapping("/selectBookmark")
+	public ResponseEntity<List<Map<String, Object>> > selectBookmark(@RequestParam String member_id){
+		List<Map<String, Object>> result = memServ.selectBookmarkByMemberId(member_id);
 		return ResponseEntity.ok(result);
 	}
-
+	
+	// 마이페이지 북마크 갯수
+	@GetMapping("/countBookmark")
+	public ResponseEntity<Integer> countBookmark(@RequestParam String member_id){
+		int result = memServ.countBookmark(member_id);
+		return ResponseEntity.ok(result);
+	}
 	
 	
 	

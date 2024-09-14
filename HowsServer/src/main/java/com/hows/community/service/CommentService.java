@@ -22,9 +22,38 @@ public class CommentService {
 	}
 
 	// 게시글 댓글 목록 출력
-	public List<Map<String, Object>> getCommentsBoardSeq(int board_seq) {
-		return commentDAO.getCommentsBoardSeq(board_seq); // 댓글 목록을 DB에서 조회
-	}
+//    public List<Map<String, Object>> getCommentsBoardSeq(int board_seq) {
+//        return commentDAO.getCommentsBoardSeq(board_seq); // 댓글 목록을 DB에서 조회
+//    }
+
+    // 게시글 댓글 목록 출력 (페이지네이션 적용)
+    public List<Map<String, Object>> getCommentsBoardSeqWithPagination(int boardSeq, int page, int itemsPerPage) {
+        // startRow와 endRow 계산
+        int startRow = (page - 1) * itemsPerPage + 1;
+        int endRow = page * itemsPerPage;
+
+        // DAO에 startRow와 endRow를 전달하여 댓글 목록 조회
+        return commentDAO.getCommentsBoardSeqWithPagination(boardSeq, startRow, endRow);
+    }
+	
+	// 게시글 댓글 수정 
+    public void updateComment(int commentSeq, String commentContents) {
+        commentDAO.updateComment(commentSeq, commentContents);
+    }
+	
+	// 게시글 댓글 삭제 
+    public void deleteComment(int comment_seq) {
+        commentDAO.deleteComment(comment_seq);
+    }
+    
+	// 게시글 댓글 삭제 시 좋아요 연결 테이블 삭제 
+    public void deleteLike(int comment_seq) {
+        commentDAO.deleteLike(comment_seq);
+    }
+    // 사용자가 이미 좋아요를 눌렀는지 확인
+ 	public boolean checkIfUserLikedBoard(String memberId, int comment_seq) {
+ 		return commentDAO.checkIfUserLikedBoard(memberId, comment_seq);
+ 	}
 
 	// 게시글 댓글 수정
 	public void updateComment(int commentSeq, String commentContents) {
@@ -65,6 +94,21 @@ public class CommentService {
 	public void sendCommentReport(int commentSeq, String reportCode, String memberId) {
 		commentDAO.sendCommentReport(commentSeq, reportCode, memberId); // 현재 조회수 반환
 	}
+	
+    // 전체 댓글 수 가져오기
+    public int getTotalCommentsCount(int boardSeq) {
+        return commentDAO.getTotalCommentsCount(boardSeq);
+    }
+    
+    // 답글 작성 메소드
+    public void writeReply(int commentSeq, String replyContent, String memberId) {
+        commentDAO.writeReply(commentSeq, replyContent, memberId);
+    }
+    
+    // 특정 댓글에 달린 답글 목록 가져오기
+    public List<Map<String, Object>> getRepliesByCommentSeq(int commentSeq) {
+        return commentDAO.getRepliesByCommentSeq(commentSeq);
+    }
 
 	// 관리자
 	// 댓글 신고조회 (관리자)

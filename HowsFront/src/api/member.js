@@ -85,10 +85,47 @@ export const selectPost = (member_id) => {
     return api.get(`/member/selectPost`, { params: { member_id } });
 };
 
+// 스크랩(북마크) 출력
+export const selectBookmark = (member_id) => {
+    return api.get(`/member/selectBookmark`, { params: { member_id } });
+};
+
+// 게시물 개수
+export const countPost = (member_id) => {
+    return api.get(`/member/countPost`, { params: { member_id } });
+};
+
+// 북마크 개수
+export const countBookmark = (member_id) => {
+    return api.get(`/member/countBookmark`, { params: { member_id } });
+};
+
+// 방명록 개수
+export const countGuestbook = (member_id) => {
+    return api.get(`/guestbook/countGuestbook`, { params: { member_id } });
+};
+
 // 팔로우/언팔로우 처리 API 호출 함수
 export const toggleFollow = async data => {
     return api.post(`${baseUrl}/follow`, data) // API 요청으로 팔로우/언팔로우 처리
 }
+
+// 팔로워, 팔로잉 수
+export const getCountFollow = (member_seq) => {
+    return api.get(`/member/countFollow`, { params: { member_seq } });
+};
+
+// 팔로워 목록
+export const getFollower = (member_seq) => {
+    return api.get(`/member/getFollower`, { params: { member_seq } });
+};
+
+// 팔로잉 목록
+export const getFollowing = (member_seq) => {
+    return api.get(`/member/getFollowing`, { params: { member_seq } });
+};
+
+
 
 export const adminstart = () => {
     // 여기서 밑 부터 관리자 기능!

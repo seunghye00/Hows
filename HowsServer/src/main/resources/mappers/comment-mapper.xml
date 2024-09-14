@@ -13,18 +13,16 @@
 	</insert>
 
 	<!-- 게시글 댓글 목록 출력 -->
-	<select id="getCommentsBoardSeq" resultType="map">
-		select
-		c.comment_seq,
-		c.comment_contents,
-		to_char(c.comment_write_date,
-		'YYYY-MM-DD HH24:MI:SS') as comment_write_date,
-		c.board_seq,
-		c.member_id,
-		m.nickname,
-		m.member_avatar,
-		count(distinct
-		cl.comment_like_seq) as like_count
+	<!-- <select id="getCommentsBoardSeq" resultType="map">
+		select 
+		    c.comment_seq, 
+		    c.comment_contents, 
+		    to_char(c.comment_write_date, 'YYYY-MM-DD HH24:MI:SS') as comment_write_date,
+		    c.board_seq, 
+		    c.member_id,
+		    m.nickname,
+		    m.member_avatar,
+		    count(distinct cl.comment_like_seq) as like_count
 		from comments c
 		join member m on
 		c.member_id = m.member_id
@@ -39,8 +37,35 @@
 		m.nickname,
 		m.member_avatar
 		order by c.comment_seq asc
-	</select>
-
+	</select> -->
+	
+	<!-- 게시글 댓글 목록 출력 (페이지네이션 적용) -->
+    <select id="getCommentsBoardSeqWithPagination" resultType="map">
+        select * from (
+	        select 
+	            c.comment_seq, 
+	            c.comment_contents, 
+	            to_char(c.comment_write_date, 'YYYY-MM-DD HH24:MI:SS') as comment_write_date,
+	            c.board_seq, 
+	            c.member_id,
+	            m.nickname,
+	            m.member_avatar,
+	            count(distinct cl.comment_like_seq) as like_count,
+	            row_number() over (order by c.comment_seq asc) as rn
+	        from comments c
+	        join member m on c.member_id = m.member_id
+	        left join comment_like cl on c.comment_seq = cl.comment_seq
+	        where c.board_seq = #{board_seq}
+	        group by c.comment_seq, 
+	                 c.comment_contents, 
+	                 c.comment_write_date, 
+	                 c.board_seq, 
+	                 c.member_id,
+	                 m.nickname,
+	                 m.member_avatar
+	    ) where rn between #{startRow} and #{endRow}
+    </select>
+	
 	<!-- 게시글 댓글 수정 -->
 	<update id="updateComment">
 		update comments set comment_contents =
@@ -97,6 +122,38 @@
 		(comment_report_seq.nextval, #{report_code}, default, #{member_id},
 		#{comment_seq})
 	</insert>
+	
+	<!-- 전체 댓글 수 가져오기 -->
+    <select id="getTotalCommentsCount" resultType="int">
+        select count(*)
+        from comments
+        where board_seq = #{board_seq}
+    </select>
+    
+    <!-- 댓글에 답글 작성  -->
+    <insert id="writeReply">
+    	insert into reply values(reply_seq.nextval, #{reply_contents}, default, #{comment_seq}, #{member_id})
+	</insert>
+	
+    <!-- 댓글에 달린 답글 목록 조회 -->
+    <select id="getRepliesByCommentSeq" resultType="map">
+        select 
+		    r.reply_seq, 
+		    r.reply_contents, 
+		    to_char(r.reply_date, 'yyyy-mm-dd hh24:mi:ss') as reply_date,
+		    r.comment_seq, 
+		    r.member_id,
+		    m.nickname,
+		    m.member_avatar,
+		    count(distinct rl.reply_like_seq) as like_count
+		from reply r
+		join member m on r.member_id = m.member_id
+		left join reply_like rl on r.reply_seq = rl.reply_seq
+		where r.comment_seq = #{comment_seq}
+		group by r.reply_seq, r.reply_contents, r.reply_date, r.comment_seq, r.member_id, m.nickname, m.member_avatar
+		order by r.reply_seq asc
+    </select>
+	
 
 	<!-- 관리자 -->
 	<!-- 댓글 신고조회 (관리자) -->

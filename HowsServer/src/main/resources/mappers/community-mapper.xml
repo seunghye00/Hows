@@ -262,8 +262,37 @@
 		select count(*) from board
 		where member_id = #{member_id}
 	</select>
-
-
+	
+	<!-- [마이페이지] 북마크(이미지) 출력 -->
+	<select id="selectBookmarkByMemberId" resultType="map">
+	    select 
+	        b.board_seq,
+	        b.board_contents,
+	        to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date,
+	        b.view_count,
+	        b.member_id,
+	        m.name as member_name, 
+	        bi.image_url
+	    from 
+	        board_book_mark bbm
+	    inner join 
+	        board b on bbm.board_seq = b.board_seq
+	    inner join 
+	        member m on b.member_id = m.member_id
+	    left join 
+	        board_image bi on b.board_seq = bi.board_seq
+	    where 
+	        bbm.member_id = #{member_id}
+	    order by board_book_mark_seq desc
+	</select>
+	
+	<!-- [마이페이지] 사용자의 게시글 북마크 갯수 -->
+	<select id="countBookmark" resultType="int">
+		select count(*) from board_book_mark where member_id = #{member_id}
+	</select>
+	
+	
+	
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->
 

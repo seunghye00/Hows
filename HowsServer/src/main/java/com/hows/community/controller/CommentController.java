@@ -45,29 +45,39 @@ public class CommentController {
 		return ResponseEntity.ok().build();
 	}
 
-	// 게시글 댓글 목록 불러오기
+	// 게시글 댓글 목록 불러오기 (페이지네이션 적용)
 	@GetMapping("/getComments")
-	public ResponseEntity<List<Map<String, Object>>> getComments(@RequestParam("board_seq") int boardSeq,
-			@RequestParam(value = "member_id", required = false) String memberId) {
+	public ResponseEntity<Map<String, Object>> getComments(
+	        @RequestParam("board_seq") int boardSeq, 
+	        @RequestParam(value = "member_id", required = false) String memberId,
+	        @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "5") int itemsPerPage) {
 
-		List<Map<String, Object>> comments = commentServ.getCommentsBoardSeq(boardSeq); // 댓글 목록 조회 로직
+	    // 페이지네이션을 위한 offset과 limit 계산
+	    int offset = (page - 1) * itemsPerPage;
+
+	    // 댓글 목록 조회 (페이지네이션 적용)
+        List<Map<String, Object>> comments = commentServ.getCommentsBoardSeqWithPagination(boardSeq, page, itemsPerPage);
+
+	    // 각 댓글에 대해 사용자가 좋아요를 눌렀는지 확인하여 isLiked 필드 추가
+	    for (Map<String, Object> comment : comments) {
+	        BigDecimal commentSeqDecimal = (BigDecimal) comment.get("COMMENT_SEQ");
+	        int commentSeq = commentSeqDecimal.intValue(); // BigDecimal을 int로 변환
 
 		// 각 댓글에 대해 사용자가 좋아요를 눌렀는지 확인하여 isLiked 필드 추가
 		for (Map<String, Object> comment : comments) {
 			BigDecimal commentSeqDecimal = (BigDecimal) comment.get("COMMENT_SEQ");
 			int commentSeq = commentSeqDecimal.intValue(); // BigDecimal을 int로 변환
 
-			// 회원일 경우에만 좋아요 여부 확인
-			if (memberId != null) {
-				boolean isLiked = commentServ.checkIfUserLikedBoard(memberId, commentSeq);
-				comment.put("isLiked", isLiked);
-			} else {
-				// 비회원일 경우 기본값으로 좋아요를 누르지 않은 상태
-				comment.put("isLiked", false);
-			}
-		}
+	    // 전체 댓글 개수 조회
+	    int totalCommentsCount = commentServ.getTotalCommentsCount(boardSeq);
 
-		return ResponseEntity.ok(comments); // 댓글 목록을 JSON 형식으로 반환
+	    // 응답 데이터 구조 설정
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("comments", comments); // 현재 페이지의 댓글 목록
+	    response.put("totalCount", totalCommentsCount); // 전체 댓글 수
+
+	    return ResponseEntity.ok(response); // 댓글 목록과 전체 댓글 수를 JSON 형식으로 반환
 	}
 
 	// 게시글 댓글 수정
@@ -90,13 +100,16 @@ public class CommentController {
 
 	// 댓글 좋아요
 	@PostMapping("{comment_seq}/like")
-	public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable int comment_seq,
-			@RequestBody Map<String, Object> requestBody // member_id를 body에서 받음
-	) {
-		Map<String, Object> response = new HashMap<>();
-		try {
-			String userId = (String) requestBody.get("member_id"); // member_id 가져오기
-			System.out.println(userId + " 진입 확인");
+    public ResponseEntity<Map<String, Object>> toggleLike(
+            @PathVariable int comment_seq,
+            @RequestBody Map<String, Object> requestBody // member_id를 body에서 받음
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            String userId = (String) requestBody.get("member_id"); // member_id 가져오기
+            
+            // 1. 사용자가 이미 좋아요를 눌렀는지 확인
+            boolean isLiked = commentServ.checkIfUserLikedBoard(userId, comment_seq);
 
 			// 1. 사용자가 이미 좋아요를 눌렀는지 확인
 			boolean isLiked = commentServ.checkIfUserLikedBoard(userId, comment_seq);
@@ -134,6 +147,39 @@ public class CommentController {
 		commentServ.sendCommentReport(commentSeq, reportCode, memberId);
 		return ResponseEntity.ok().build();
 	}
+	
+	// 답글 작성
+	@PostMapping("/reply")
+    public ResponseEntity<Void> writeReply(
+        @RequestBody Map<String, Object> requestData
+    ) {
+	    System.out.println(requestData + " 전체 요청 데이터");
+        int commentSeq = (int) requestData.get("comment_seq");
+        String replyContent = (String) requestData.get("reply_content");
+        String memberId = (String) requestData.get("member_id");
+
+        // 서비스 호출하여 답글 작성 처리
+        commentServ.writeReply(commentSeq, replyContent, memberId);
+
+	    return ResponseEntity.ok().build();
+       
+    }
+	
+	// 답글 목록 불러오기
+	@GetMapping("/repliesList")
+	public ResponseEntity<Map<String, Object>> getReplies(
+	        @RequestParam("comment_seq") int commentSeq, 
+	        @RequestParam(value = "member_id", required = false) String memberId) {
+	    
+	    // 답글 목록 조회
+	    List<Map<String, Object>> replies = commentServ.getRepliesByCommentSeq(commentSeq);
+	    // 답글 목록 응답 데이터 구조 설정
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("replies", replies); // 해당 댓글의 답글 목록
+	    System.out.println("서버에서 응답할 데이터: " + response); // 서버에서 보내는 데이터 콘솔 출력
+	    return ResponseEntity.ok(response); // 답글 목록을 JSON 형식으로 반환
+	}
+	
 
 	// 관리자
 	// 댓글 신고조회 (관리자)

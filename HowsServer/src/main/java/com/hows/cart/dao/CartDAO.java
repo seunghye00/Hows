@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Repository
 public class CartDAO {
@@ -33,6 +32,11 @@ public class CartDAO {
     /** 상품 삭제 **/
     public int deleteCart(int seq) {
         return mybatis.delete("Cart.deleteCart", seq);
+    }
+
+    /** 상품 구매 성공 시 카트에 있는 상품 삭제 **/
+    public int saleSuccessCart(CartDTO cartDTO) {
+        return mybatis.delete("Cart.saleSuccessCart", cartDTO);
     }
 
 }

@@ -10,6 +10,7 @@ public class GuestbookSubDTO {
 	private int member_seq;
 	private String member_id;
 	private String nickname; // member 테이블의 nickname 추가
+	private String member_avatar;
 	
 	
 	public GuestbookSubDTO() {
@@ -35,8 +36,29 @@ public class GuestbookSubDTO {
 		this.nickname = nickname;
 	}
 
+
+	public GuestbookSubDTO(int guestbook_seq, String guestbook_contents, Timestamp guestbook_write_date, int member_seq,
+			String member_id, String nickname, String member_avatar) {
+		super();
+		this.guestbook_seq = guestbook_seq;
+		this.guestbook_contents = guestbook_contents;
+		this.guestbook_write_date = guestbook_write_date;
+		this.member_seq = member_seq;
+		this.member_id = member_id;
+		this.nickname = nickname;
+		this.member_avatar = member_avatar;
+	}
+
 	
 	
+	public String getMember_avatar() {
+		return member_avatar;
+	}
+
+	public void setMember_avatar(String member_avatar) {
+		this.member_avatar = member_avatar;
+	}
+
 	public String getNickname() {
 		return nickname;
 	}

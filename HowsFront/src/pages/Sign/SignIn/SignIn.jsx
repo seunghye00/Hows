@@ -4,7 +4,7 @@ import { useState } from "react";
 import logo from "../../../assets/images/logo_how.png";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { useAuthStore } from "./../../../store/store";
+import { useAuthStore, useMemberStore } from "./../../../store/store";
 import { host } from "./../../../config/config";
 import { FindId } from "./FindId/FindId";
 import { FindPw } from "./FindPw/FindPw";
@@ -15,6 +15,7 @@ export const SignIn = () => {
   const navi = useNavigate();
   const [user, setUser] = useState({ member_id: "", pw: "" });
   const { login } = useAuthStore();
+  const { setCurrentUser } = useMemberStore();
   const [page, setPage] = useState("login"); // main으로 해야하나
 
   const handleInputLogin = (e) => {
@@ -28,14 +29,24 @@ export const SignIn = () => {
   const handleLoginBtn = () => {
     loginUser(user)
       .then((resp) => {
-        const { token, member_id } = resp.data; // 서버 응답에서 token과 memberId 분해 할당
+        const { token } = resp.data; // 서버 응답에서 token과 memberId 분해 할당
+        const decoded = jwtDecode(token);
+
         sessionStorage.setItem("token", token);
-        sessionStorage.setItem("member_id", member_id); // 사용자 ID도 저장
+        sessionStorage.setItem("member_id", decoded.sub); // 사용자 ID도 저장
+        sessionStorage.setItem("nickname", decoded.nickname); // 사용자 닉네임 저장
+        sessionStorage.setItem("member_avatar", decoded.member_avatar); // 사용자 프로필사진 저장
+
+        setCurrentUser({
+          "nickname": decoded.nickname,
+          "member_avatar": decoded.member_avatar
+        });
+
         login(token);
 
         Swal.fire({
-          title: "성공!",
-          text: `${member_id} 님 환영합니다.`,
+          title: "로그인",
+          text: `${decoded.nickname} 님 환영합니다.`,
           icon: "success",
           confirmButtonText: "확인",
         });

@@ -15,3 +15,7 @@ export const myPayments = () => {
   return api.get(`/history/payment`);
 }
 
+/** 결제 및 주문내역 디테일 **/
+export const myPaymentsDetail = (seq) => {
+  return api.get(`/history/order/${seq}`);
+}

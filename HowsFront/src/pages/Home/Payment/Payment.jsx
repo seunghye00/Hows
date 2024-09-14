@@ -147,6 +147,7 @@ export const Payment = () => {
     }
 
     const orderInfo = {
+      orderName,
       totalAmount,
       orderProducts,
       name: data.name,
@@ -157,22 +158,19 @@ export const Payment = () => {
     }
     const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
     setPaymentInfo({ orderName, totalAmount });
-    requestPaymentEvent(paymentInfo, orderInfo).then(res => {
-      console.log("requestPaymentEvent res ==== ", res);
-      if(res.data === "ok") {
-        SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
-          if(resp) {
-            navi("/mypage/userDashboard/buyList");
-          } else {
-            navi("/");
-          }
-        });
-      } else {
+    const result = requestPaymentEvent(paymentInfo, orderInfo)
+    console.log("result ==== ", result)
+    if(result === "ok") {
+      SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
+        if(resp) {
+          navi("/mypage/userDashboard/buyList");
+        } else {
+          navi("/");
+        }
+      });
+    } else {
 
-      }
-    });
-
-
+    }
   }
 
   /** 회원 정보 셋팅 **/

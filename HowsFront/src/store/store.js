@@ -15,7 +15,7 @@ export const useMemberStore = create(set => ({
     memberId: null,
     currentUser: { // 현재 사용자 정보를 초기화
         nickname: '', // 사용자 닉네임
-        profileImage: '' // 사용자 프로필 이미지
+        member_avatar: '' // 사용자 프로필 이미지
     },
 
     setMemberSeq: seq => set({ memberSeq: seq }),

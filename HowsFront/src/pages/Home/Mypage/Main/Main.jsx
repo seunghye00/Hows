@@ -17,7 +17,7 @@ import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
 import { Modal } from "../../../../components/Modal/Modal"
 import { useAuthStore, useMemberStore } from "../../../../store/store";
-import { countBookmark, countGuestbook, countPost, deleteProfileImage, findMemberSeq, getCountFollow, getFollower, getFollowing, selectInfo, toggleFollow, uploadProfileImage, userInfo } from "../../../../api/member";
+import { countBookmark, countGuestbook, countPost, deleteProfileImage, eachFollow, findMemberSeq, getCountFollow, getFollower, getFollowing, selectInfo, toggleFollow, uploadProfileImage, userInfo } from "../../../../api/member";
 import { TextBox } from './TextBox/TextBox';
 import Swal from "sweetalert2";
 import { jwtDecode } from 'jwt-decode';
@@ -79,7 +79,7 @@ export const Main = () => {
             setScrapData(resp.data);
         })
         // 방명록 개수
-        countGuestbook(member_id).then((resp) => {
+        countGuestbook(memberSeq).then((resp) => {
             setGuestbookData(resp.data);
         })
     }, [])
@@ -180,32 +180,21 @@ export const Main = () => {
         })
     }
 
-    // useEffect(() => {
-    //     handleIsFollowing()
-    // }, [memberSeq, session_member_seq])
-
+    // [마이페이지 메인 팔로우 버튼] 내가 상대방 팔로우 했는지 버튼 표시 
     useEffect(() => {
         if (memberSeq > 0 && session_member_seq > 0) {
-            const params = { from_member_seq: session_member_seq, to_member_seq: memberSeq };
-
-            api.post(`/member/eachFollow`, params).then(resp => {
+            eachFollow(session_member_seq, memberSeq).then(resp => {
                 console.log("결과 :::: ", resp.data);
                 setIsEachFollow(resp.data);
             });
-
         }
-
     }, [memberSeq, followerData, followingData])
-
-
 
     // 팔로우 목록에서 사용자 클릭 시 페이지 이동
     const handleMovePage = (memberId) => {
         navi(`/mypage/main/${memberId}/post`);
         setIsModalOpen(false);
     }
-
-
 
     return (
         <div className={styles.container}>
@@ -277,7 +266,7 @@ export const Main = () => {
                                         {
                                             // 내가 팔로우한 상태라면 "팔로우 -" / 팔로우 하지 않은 상태라면 "팔로우 +"
                                             isEachFollow ?
-                                                <button className={styles.delFollowBtn} onClick={() => handleIsFollowing(memberSeq)}> 팔로우 - </button>
+                                                <button className={styles.delFollowBtn} onClick={() => handleIsFollowing(memberSeq)}> 팔로잉 </button>
                                                 :
                                                 <button className={styles.addFollowBtn} onClick={() => handleIsFollowing(memberSeq)}> 팔로우 + </button>
                                         }
@@ -372,55 +361,59 @@ export const Main = () => {
                 {modalContent === 'follower' && (
                     <div className={styles.followListBox}>
                         <h2>팔로워 목록</h2>
-                        {followerData.map((follower, i) => {
-                            return (
-                                <div className={styles.followList} key={i}>
-                                    <div className={styles.followImg}>
-                                        <img src={follower.MEMBER_AVATAR || profile} />
+                        <div>
+                            {followerData.map((follower, i) => {
+                                return (
+                                    <div className={styles.followList} key={i}>
+                                        <div className={styles.followImg}>
+                                            <img src={follower.MEMBER_AVATAR || profile} />
+                                        </div>
+                                        <span onClick={() => handleMovePage(follower.MEMBER_ID)}>{follower.NICKNAME}</span>
+                                        {
+                                            follower.MEMBER_ID !== session_member_id ?
+                                                (
+                                                    follower.IS_FOLLOWING == "Y" ?
+                                                        <button className={styles.followingBtn} onClick={() => handleIsFollowing(follower.MEMBER_SEQ)}>팔로잉</button>
+                                                        :
+                                                        <button className={styles.followerBtn} onClick={() => handleIsFollowing(follower.MEMBER_SEQ)}>팔로우</button>
+                                                )
+                                                : (
+                                                    <></>
+                                                )
+                                        }
                                     </div>
-                                    <span onClick={() => handleMovePage(follower.MEMBER_ID)}>{follower.NICKNAME}</span>
-                                    {
-                                        follower.MEMBER_ID !== session_member_id ?
-                                            (
-                                                follower.IS_FOLLOWING == "Y" ?
-                                                    <button className={styles.followingBtn} onClick={() => handleIsFollowing(follower.MEMBER_SEQ)}>팔로잉</button>
-                                                    :
-                                                    <button className={styles.followerBtn} onClick={() => handleIsFollowing(follower.MEMBER_SEQ)}>팔로우</button>
-                                            )
-                                            : (
-                                                <></>
-                                            )
-                                    }
-                                </div>
-                            )
-                        })}
+                                )
+                            })}
+                        </div>
                     </div>
                 )}
                 {/* 팔로잉 목록 */}
                 {modalContent === 'following' && (
                     <div className={styles.followListBox}>
                         <h2>팔로잉 목록</h2>
-                        {followingData.map((following, i) => {
-                            return (
-                                <div className={styles.followList} key={i}>
-                                    <div className={styles.followImg}>
-                                        <img src={following.MEMBER_AVATAR || profile} />
-                                    </div>
-                                    <span onClick={() => handleMovePage(following.MEMBER_ID)}>{following.NICKNAME}</span>
-                                    {
-                                        following.MEMBER_ID !== session_member_id ?
-                                            (following.IS_FOLLOWING == "Y" ?
-                                                <button className={styles.followingBtn} onClick={() => handleIsFollowing(following.MEMBER_SEQ)}>팔로잉</button>
-                                                :
-                                                <button className={styles.followerBtn} onClick={() => handleIsFollowing(following.MEMBER_SEQ)}>팔로우</button>)
+                        <div>
+                            {followingData.map((following, i) => {
+                                return (
+                                    <div className={styles.followList} key={i}>
+                                        <div className={styles.followImg}>
+                                            <img src={following.MEMBER_AVATAR || profile} />
+                                        </div>
+                                        <span onClick={() => handleMovePage(following.MEMBER_ID)}>{following.NICKNAME}</span>
+                                        {
+                                            following.MEMBER_ID !== session_member_id ?
+                                                (following.IS_FOLLOWING == "Y" ?
+                                                    <button className={styles.followingBtn} onClick={() => handleIsFollowing(following.MEMBER_SEQ)}>팔로잉</button>
+                                                    :
+                                                    <button className={styles.followerBtn} onClick={() => handleIsFollowing(following.MEMBER_SEQ)}>팔로우</button>)
 
-                                            : (
-                                                <></>
-                                            )
-                                    }
-                                </div>
-                            )
-                        })}
+                                                : (
+                                                    <></>
+                                                )
+                                        }
+                                    </div>
+                                )
+                            })}
+                        </div>
                     </div>
                 )}
             </Modal>

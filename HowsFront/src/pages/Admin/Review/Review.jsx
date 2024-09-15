@@ -225,7 +225,9 @@ export const Review = () => {
                         <h3>신고당한 리뷰</h3>
                         <div className={styles.reviewDetail}>
                             <img
-                                src={selectedReview.imageUrl || test}
+                                src={
+                                    selectedReview.IMAGE_URL || test
+                                } /* 리뷰 이미지 URL 사용 */
                                 alt="리뷰 이미지"
                             />
                             <div>{selectedReview.REVIEW_CONTENTS}</div>

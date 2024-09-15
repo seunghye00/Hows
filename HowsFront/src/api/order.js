@@ -21,3 +21,15 @@ export const updateOrder = (order_seq, order_code) => {
         params: { order_seq, order_code },
     })
 }
+
+// 배송 시작
+export const startDelivery = orderSeqs => {
+    const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
+    return axios.put(`${baseUrl}/startDelivery`, null, { params: { seqs } })
+}
+
+// 구매 확정 시작
+export const doneOrder = orderSeqs => {
+    const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
+    return axios.put(`${baseUrl}/doneOrder`, null, { params: { seqs } })
+}

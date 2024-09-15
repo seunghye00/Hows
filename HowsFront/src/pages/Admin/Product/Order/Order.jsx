@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import Swal from 'sweetalert2'
-import { orderList, updateOrder } from '../../../../api/order'
+import { orderList, updateOrder, startDelivery } from '../../../../api/order'
 import { formatDate, addCommas, SwalComp } from '../../../../commons/commons'
 import styles from './Order.module.css'
 import { Button } from '../../../../components/Button/Button'
@@ -28,9 +27,9 @@ export const Order = () => {
 
     // 1. 컴포넌트가 처음 렌더링될 때 API 호출하여 전체 주문 목록 불러옴
     useEffect(() => {
-        orderList('status')
+        orderList(status)
             .then(resp => {
-                console.log(resp.data)
+                // console.log(resp.data)
                 const beforeOrders = resp.data.map(order => ({
                     ...order,
                     checked: false, // 초기 체크 상태
@@ -43,21 +42,21 @@ export const Order = () => {
             })
     }, []) // 빈 배열을 종속성으로 두어 최초 한 번만 실행
 
-    // 주문 목록 필터링 useEffect
     useEffect(() => {
-        const filtered = orders.filter(
+        // searchQuery가 비어있지 않은 경우 검색어에 맞는 주문을 필터링
+        let filtered = orders
+        if (searchQuery !== '') {
+            filtered = filtered.filter(order =>
+                order.order_name.includes(searchQuery)
+            )
+        }
+        // status에 따른 필터링
+        filtered = filtered.filter(
             order => status === 'product' || order.order_code === status
         )
+        // 최종 필터링된 목록 설정
         setFilteredOrders(filtered)
-    }, [status, orders]) // orders 상태가 변경될 때마다 필터링
-
-    // 3. 검색어 변경될 때 검색어를 포함하는 주문 목록 필터링
-    useEffect(() => {
-        const filtered = orders.filter(order =>
-            order.order_name.includes(searchQuery)
-        )
-        setFilteredOrders(filtered) // 검색어에 따라 필터링된 목록 설정
-    }, [searchQuery, orders]) // searchQuery나 orders가 변경될 때마다 실행
+    }, [orders, searchQuery, status]) // orders, searchQuery, status가 변경될 때마다 실행
 
     // 주문 목록의 상태 선택 핸들러
     const handleSelectStatus = e => {
@@ -70,16 +69,15 @@ export const Order = () => {
         const order_code = e.target.value
         updateOrder(order_seq, order_code)
             .then(resp => {
-                console.log(resp)
-                console.log(resp)
-                // 상태 업데이트만 수행하고 필터링은 useEffect에서 처리
-                setOrders(prevOrders =>
-                    prevOrders.map(order =>
-                        order.order_seq === order_seq
-                            ? { ...order, order_code: order_code } // 상태 변경
-                            : order
-                    )
+                // console.log(resp)
+                // 상태 변경 후 orders 배열을 업데이트
+                const updatedOrders = orders.map(order =>
+                    order.order_seq === order_seq
+                        ? { ...order, order_code } // 상태를 변경
+                        : order
                 )
+                // 주문 목록 업데이트
+                setOrders(updatedOrders)
                 SwalComp({
                     type: 'success',
                     text: '주문 상태를 성공적으로 변경했습니다.',
@@ -96,7 +94,52 @@ export const Order = () => {
 
     // 배송 시작 버튼 클릭 핸들러
     const handleStartDelivery = () => {
-        console.log('배송 시작')
+        SwalComp({ type: 'confirm', text: '배송을 시작하시겠습니까 ?' }).then(
+            result => {
+                if (result.isConfirmed) {
+                    // 선택된 항목
+                    const selectedOrders = filteredOrders.filter(
+                        order => order.checked
+                    )
+                    // 상품 수량 변경 요청
+                    startDelivery(selectedOrders.map(order => order.order_seq))
+                        .then(() => {
+                            SwalComp({
+                                type: 'success',
+                                text: '선택한 주문의 배송이 시작되었습니다.',
+                            })
+                            // 배송 시작 후 주문 목록 업데이트
+                            const updatedOrders = filteredOrders.filter(
+                                order => {
+                                    // 현재 주문(order)의 order_seq가 선택된 주문 목록(selectedOrders)의 order_seq와 일치하는지 확인
+                                    return !selectedOrders.some(
+                                        selected =>
+                                            selected.order_seq ===
+                                            order.order_seq
+                                    )
+                                }
+                            )
+                            // 업데이트된 주문 목록을 상태로 설정
+                            setOrders(updatedOrders)
+                        })
+                        .catch(error => {
+                            SwalComp({
+                                type: 'error',
+                                text: '선택한 주문의 배송 시작에 실패했습니다.',
+                            })
+                            console.error('삭제 실패 :', error)
+                        })
+                    // 전체 선택 체크박스를 해제
+                    setSelectAll(false)
+                    setFilteredOrders(
+                        filteredOrders.map(order => ({
+                            ...order,
+                            checked: false,
+                        }))
+                    )
+                }
+            }
+        )
     }
 
     // 주문 목록 클릭 시 상세 정보 보기
@@ -143,22 +186,16 @@ export const Order = () => {
     const handleDeleteOrder = () => {
         const selectedOrders = orders.filter(order => order.checked)
         if (selectedOrders.length === 0) {
-            Swal.fire({
-                title: '경고 !',
+            SwalComp({
+                type: 'warning',
                 text: '삭제할 주문 선택해주세요.',
-                icon: 'warning',
-                confirmButtonText: '확인',
             })
             return
         }
 
-        Swal.fire({
-            title: '삭제 확인',
+        SwalComp({
+            type: 'question',
             text: '정말로 삭제하시겠습니까?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: '확인',
-            cancelButtonText: '취소',
         }).then(result => {
             if (result.isConfirmed) {
                 // 삭제 로직 추가

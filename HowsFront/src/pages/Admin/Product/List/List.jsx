@@ -201,6 +201,7 @@ export const List = () => {
         setIsModalOpen(false) // 모달 닫기
     }
 
+    // 상품 수량 변경
     const handleUpdate = () => {
         SwalComp({ type: 'confirm', text: '정말로 변경하시겠습니까 ?' }).then(
             result => {
@@ -223,6 +224,7 @@ export const List = () => {
                             // 수량 변경 후 제품 목록 업데이트
                             const updatedProducts = filteredProducts.map(
                                 product => {
+                                    // 현재 제품(product)의 product_seq가 선택된 제품 목록(selectedProducts)의 product_seq와 일치하는지 확인
                                     if (
                                         selectedProducts.some(
                                             selected =>
@@ -230,15 +232,19 @@ export const List = () => {
                                                 product.product_seq
                                         )
                                     ) {
+                                        // 선택된 제품 목록에 현재 제품이 포함된 경우
                                         return {
-                                            ...product,
-                                            quantity: quantity, // 새 수량으로 업데이트
-                                            checked: !product.checked,
+                                            ...product, // 기존 제품의 속성을 복사
+                                            quantity: quantity, // 수량을 새 값으로 업데이트
+                                            checked: !product.checked, // 'checked' 상태를 반전
                                         }
                                     }
-                                    return product
+                                    // 선택된 제품 목록에 현재 제품이 포함되지 않은 경우
+                                    return product // 현재 제품을 변경 없이 그대로 반환
                                 }
                             )
+
+                            // 업데이트된 제품 목록을 상태로 설정
                             setFilteredProducts(updatedProducts)
                         })
                         .catch(error => {
@@ -246,16 +252,16 @@ export const List = () => {
                                 type: 'error',
                                 text: '상품 수량 변경에 실패했습니다.',
                             })
-                            // 전체 선택 체크박스를 해제
-                            setSelectAll(false)
-                            setFilteredProducts(
-                                filteredProducts.map(product => ({
-                                    ...product,
-                                    checked: false,
-                                }))
-                            )
                             console.error('삭제 실패 :', error)
                         })
+                    // 전체 선택 체크박스를 해제
+                    setSelectAll(false)
+                    setFilteredProducts(
+                        filteredProducts.map(product => ({
+                            ...product,
+                            checked: false,
+                        }))
+                    )
                     setIsModalOpen(false) // 모달 닫기
                 }
             }

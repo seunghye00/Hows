@@ -74,7 +74,9 @@ export const Item = () => {
                       <img src={item.product_thumbnail} alt="img" />
                     </div>
                     <div className={styles.title}>
-                      <div>{item.product_title}</div>
+                      <div>
+                        {item.product_title.length > 20 ? `${item.product_title.slice(0, 20)}...` : item.product_title}
+                      </div>
                       <div>{addCommas(item.price || 0)}</div>
                     </div>
                   </div>

@@ -66,7 +66,7 @@ export const Review = () => {
     const handleDeleteReview = async review_seq => {
         Swal.fire({
             title: '리뷰 삭제',
-            text: '정말로 이 리뷰를 삭제하시겠습니까?',
+            text: '정말로 이 리뷰를 삭제 하시겠습니까?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: '삭제',

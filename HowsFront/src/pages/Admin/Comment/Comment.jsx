@@ -1,77 +1,122 @@
-import React, { useState } from 'react'
-import styles from './Comment.module.css'
+import React, { useState, useEffect } from 'react'
+import Swal from 'sweetalert2'
+import {
+    getReportedComments,
+    getCommentReport,
+    deleteCmt,
+} from '../../../api/comment'
 import { Search } from '../../../components/Search/Search'
 import { Paging } from '../../../components/Pagination/Paging'
 import { Button } from '../../../components/Button/Button'
+import styles from './Comment.module.css'
+import { formatDate } from '../../../commons/commons'
 
 export const Comment = () => {
-    const [commentReportModalOpen, setCommentReportModalOpen] = useState(false)
-    const [specificCommentModalOpen, setSpecificCommentModalOpen] =
-        useState(false)
+    const [comments, setComments] = useState([])
+    const [totalComments, setTotalComments] = useState(0)
+    const [page, setPage] = useState(1)
+    const [itemsPerPage] = useState(10)
     const [selectedComment, setSelectedComment] = useState(null)
+    const [commentReports, setCommentReports] = useState([])
+    const [isCommentModalOpen, setIsCommentModalOpen] = useState(false)
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false)
     const [searchResults, setSearchResults] = useState([])
 
-    // 신고당한 댓글 임시 데이터
-    const reportedComments = [
-        {
-            id: 1,
-            boardTitle: '이것은 게시판!',
-            commenter: '민바오',
-            date: '2024-08-31',
-            reportCount: 1,
-            content: '이것은 신고당한 댓글~ 이랍니다~~',
-        },
-        {
-            id: 2,
-            boardTitle: '이것은 게시판!',
-            commenter: '홍길동',
-            date: '2024-08-30',
-            reportCount: 2,
-            content: '또 다른 신고당한 댓글~',
-        },
-    ]
+    // startRow, endRow 계산
+    const startRow = (page - 1) * itemsPerPage + 1
+    const endRow = page * itemsPerPage
 
-    // 첫 번째 모달: 특정 댓글 조회
-    const openSpecificCommentModal = boardTitle => {
-        const comment = reportedComments.find(
-            cmt => cmt.boardTitle === boardTitle
-        )
+    useEffect(() => {
+        fetchReportedComments()
+    }, [page])
+
+    const fetchReportedComments = async () => {
+        try {
+            const { comments, totalCount } = await getReportedComments(
+                startRow,
+                endRow
+            )
+
+            console.log(
+                `현재 페이지: ${page}, 시작 행: ${startRow}, 끝 행: ${endRow}`
+            )
+            console.log('신고된 댓글 목록:', comments)
+            setComments(comments)
+            setTotalComments(totalCount)
+        } catch (error) {
+            console.error('신고 댓글 목록 불러오기 중 오류 발생:', error)
+        }
+    }
+
+    // 신고된 댓글 내용 모달 열기
+    const handleOpenCommentModal = comment => {
+        console.log('선택된 댓글:', comment)
         setSelectedComment(comment)
-        setSpecificCommentModalOpen(true)
+        setIsCommentModalOpen(true)
     }
 
-    // 두 번째 모달: 신고 내역 모달
-    const openReportModal = () => {
-        setCommentReportModalOpen(true)
+    // 신고된 댓글 신고내역 모달 열기
+    const handleOpenReportModal = async comment_seq => {
+        try {
+            const reports = await getCommentReport(comment_seq)
+            console.log('신고 내역:', reports)
+            setCommentReports(reports)
+            setIsReportModalOpen(true)
+        } catch (error) {
+            console.error('신고 내역 불러오기 중 오류 발생:', error)
+        }
     }
 
-    // 모달 닫기
-    const closeModals = () => {
-        setCommentReportModalOpen(false)
-        setSpecificCommentModalOpen(false)
+    // 댓글 삭제 (SweetAlert 적용)
+    const handleDeleteComment = async comment_seq => {
+        const result = await Swal.fire({
+            title: '댓글을 삭제하시겠습니까?',
+            text: '삭제 후 복구할 수 없습니다!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소',
+        })
+
+        if (result.isConfirmed) {
+            try {
+                await deleteCmt(comment_seq)
+                Swal.fire(
+                    '삭제 완료',
+                    '댓글이 성공적으로 삭제되었습니다.',
+                    'success'
+                )
+                fetchReportedComments() // 댓글 삭제 후 목록 갱신
+            } catch (error) {
+                Swal.fire(
+                    '삭제 실패',
+                    '댓글 삭제 중 오류가 발생했습니다.',
+                    'error'
+                )
+                console.error('댓글 삭제 중 오류 발생:', error)
+            }
+        }
     }
 
     // 검색 기능 구현
     const handleSearch = query => {
-        const results = reportedComments.filter(
+        const results = comments.filter(
             comment =>
-                comment.boardTitle.includes(query) ||
-                comment.commenter.includes(query)
+                comment.BOARD_CONTENTS.includes(query) ||
+                comment.NICKNAME.includes(query)
         )
         setSearchResults(results)
     }
 
     // 검색 결과가 있으면 그 결과를, 없으면 전체 리스트를 보여줌
-    const displayComments =
-        searchResults.length > 0 ? searchResults : reportedComments
+    const displayComments = searchResults.length > 0 ? searchResults : comments
 
     return (
         <div className={styles.commentContainer}>
             <div className={styles.headerSection}>
                 <div className={styles.searchSection}>
-                    {/* 기존 검색 UI를 Search 컴포넌트로 대체 */}
                     <Search
-                        placeholder="제목 또는 작성자 검색"
+                        placeholder="내용 또는 작성자 검색"
                         onSearch={handleSearch}
                     />
                 </div>
@@ -80,7 +125,7 @@ export const Comment = () => {
             <div className={styles.commentlist}>
                 <div className={styles.commentHeader}>
                     <div className={styles.headerItem}>NO</div>
-                    <div className={styles.headerItem}>제목</div>
+                    <div className={styles.headerItem}>내용</div>
                     <div className={styles.headerItem}>작성자</div>
                     <div className={styles.headerItem}>작성날짜</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>
@@ -89,81 +134,109 @@ export const Comment = () => {
 
                 {displayComments.map((comment, index) => (
                     <div className={styles.commentRow} key={index}>
-                        <div className={styles.commentItem}>{comment.id}</div>
+                        <div className={styles.commentItem}>
+                            {startRow + index}
+                        </div>
                         <div
                             className={styles.commentItem}
-                            onClick={() =>
-                                openSpecificCommentModal(comment.boardTitle)
-                            }
+                            onClick={() => handleOpenCommentModal(comment)}
                         >
                             <span className={styles.span}>
-                                {comment.boardTitle}
+                                {comment.BOARD_CONTENTS}
                             </span>
                         </div>
                         <div className={styles.commentItem}>
-                            {comment.commenter}
+                            {comment.NICKNAME}
                         </div>
-                        <div className={styles.commentItem}>{comment.date}</div>
+                        <div className={styles.commentItem}>
+                            {comment.WRITE_DATE}
+                        </div>
 
                         <div
                             className={styles.commentItem}
-                            onClick={openReportModal}
+                            onClick={() =>
+                                handleOpenReportModal(comment.COMMENT_SEQ)
+                            }
                         >
                             <span className={styles.reportcount}>
-                                {comment.reportCount}
+                                {comment.REPORT_COUNT}
                             </span>
                         </div>
                         <div className={styles.commentItem}>
-                            <Button size="s" title="삭제" />
+                            <Button
+                                size="s"
+                                title="삭제"
+                                onClick={() =>
+                                    handleDeleteComment(comment.COMMENT_SEQ)
+                                }
+                            />
                         </div>
                     </div>
                 ))}
             </div>
 
-            {specificCommentModalOpen && (
+            <Paging
+                page={page}
+                count={totalComments}
+                perpage={itemsPerPage}
+                setPage={setPage}
+            />
+
+            {isCommentModalOpen && (
                 <div className={styles.reportModal}>
                     <div className={styles.modalContent}>
-                        <h3>신고된 댓글 상세조회</h3>
+                        <h3>신고된 댓글 상세 조회</h3>
                         {selectedComment ? (
                             <div className={styles.replortcmt}>
                                 <textarea
                                     readOnly
-                                    value={selectedComment.content}
+                                    value={selectedComment.COMMENT_CONTENTS}
                                     className={styles.textarea}
                                 />
                             </div>
                         ) : (
                             <p>댓글이 없습니다.</p>
                         )}
-                        <Button size="s" title="닫기" onClick={closeModals} />
+                        <Button
+                            size="s"
+                            title="닫기"
+                            onClick={() => setIsCommentModalOpen(false)}
+                        />
                     </div>
                 </div>
             )}
 
-            {commentReportModalOpen && (
+            {isReportModalOpen && (
                 <div className={styles.reportModal}>
                     <div className={styles.modalContent}>
-                        <h3>댓글 신고내역</h3>
+                        <h3>댓글 신고 내역</h3>
                         <div className={styles.reportTable}>
                             <div className={styles.tableHeader}>
                                 <div>신고자</div>
                                 <div>신고 사유</div>
                                 <div>신고 날짜</div>
                             </div>
-                            <div className={styles.tableRow}>
-                                <div>서갈</div>
-                                <div>과도한 욕설</div>
-                                <div>2024-09-05</div>
-                            </div>
+                            {commentReports.map(report => (
+                                <div
+                                    className={styles.tableRow}
+                                    key={report.comment_report_seq}
+                                >
+                                    <div>{report.member_id}</div>
+                                    <div>{report.report_code}</div>
+                                    <div>
+                                        {formatDate(report.comment_report_date)}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                        <Button size="s" title="닫기" onClick={closeModals} />
+                        <Button
+                            size="s"
+                            title="닫기"
+                            onClick={() => setIsReportModalOpen(false)}
+                        />
                     </div>
                 </div>
             )}
-
-            <div className={styles.pagination}>
-                <Paging />
-            </div>
         </div>
     )
 }

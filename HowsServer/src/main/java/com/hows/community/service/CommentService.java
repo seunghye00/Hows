@@ -5,20 +5,22 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.hows.community.dao.CommentDAO;
-import com.hows.community.dto.TagDTO;
+import com.hows.community.dto.CommentReportDTO;
+import com.hows.community.dto.ReplyReportDTO;
 
 @Service
 public class CommentService {
 	@Autowired
 	private CommentDAO commentDAO;
-	
+
 	// 게시글 댓글 작성
 	public void writeComment(int boardSeq, String memberId, String commentContents) {
-		commentDAO.writeComment(boardSeq, memberId, commentContents );
+		commentDAO.writeComment(boardSeq, memberId, commentContents);
 	}
-	
+
 	// 게시글 댓글 목록 출력
 //    public List<Map<String, Object>> getCommentsBoardSeq(int board_seq) {
 //        return commentDAO.getCommentsBoardSeq(board_seq); // 댓글 목록을 DB에서 조회
@@ -53,21 +55,21 @@ public class CommentService {
  		return commentDAO.checkIfUserLikedBoard(memberId, comment_seq);
  	}
 
- 	// 좋아요 추가
- 	public void addLike(String memberId, int comment_seq) {
- 		commentDAO.addLike(memberId, comment_seq);
- 	}
+	// 좋아요 추가
+	public void addLike(String memberId, int comment_seq) {
+		commentDAO.addLike(memberId, comment_seq);
+	}
 
- 	// 좋아요 취소
- 	public void removeLike(String memberId, int comment_seq) {
- 		commentDAO.removeLike(memberId, comment_seq);
- 	}
- 	
+	// 좋아요 취소
+	public void removeLike(String memberId, int comment_seq) {
+		commentDAO.removeLike(memberId, comment_seq);
+	}
+
 	// 댓글 총 좋아요 수 가져오기
 	public int getLikeCount(int comment_seq) {
 		return commentDAO.getLikeCount(comment_seq);
 	}
-	
+
 	// 댓글 신고
 	public void sendCommentReport(int commentSeq, String reportCode, String memberId) {
 		commentDAO.sendCommentReport(commentSeq, reportCode, memberId); // 현재 조회수 반환
@@ -87,4 +89,51 @@ public class CommentService {
     public List<Map<String, Object>> getRepliesByCommentSeq(int commentSeq) {
         return commentDAO.getRepliesByCommentSeq(commentSeq);
     }
+
+	// 관리자
+	// 댓글 신고조회 (관리자)
+	// 신고 댓글 목록 조회 (페이징 포함)
+	public List<Map<String, Object>> getReportedComments(int startRow, int endRow) {
+		return commentDAO.getReportedComments(startRow, endRow);
+	}
+
+	// 전체 신고 댓글 개수 조회
+	public int getReportedCommentsCount() {
+		return commentDAO.getReportedCommentsCount();
+	}
+
+	// 댓글 신고 내역 조회
+	public List<CommentReportDTO> getCommentReport(int comment_seq) {
+		return commentDAO.getCommentReport(comment_seq);
+	}
+
+	// 신고 댓글 삭제
+	@Transactional
+	public int deleteCmt(int comment_seq) {
+		commentDAO.deleteCommentReport(comment_seq);
+		return commentDAO.deleteCmt(comment_seq);
+	}
+
+	// 대댓글 신고조회 (관리자)
+	// 신고된 대댓글 목록 조회
+	public List<Map<String, Object>> getReportedReplys(int startRow, int endRow) {
+		return commentDAO.getReportedReplys(startRow, endRow); 
+	}
+
+	// 신고된 대댓글 총 개수 조회
+	public int getReportedReplysCount() {
+		return commentDAO.getReportedReplysCount();
+	}
+
+	// 대댓글 신고 내역 조회
+	public List<ReplyReportDTO> getReplyReport(int reply_seq) {
+		return commentDAO.getReplyReport(reply_seq);
+	}
+
+	// 신고 대댓글 삭제
+	@Transactional
+	public int deleteReply(int reply_seq) {
+		commentDAO.deleteReplyReport(reply_seq);
+		return commentDAO.deleteReply(reply_seq);
+	}
 }

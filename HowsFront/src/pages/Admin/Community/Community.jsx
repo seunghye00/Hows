@@ -51,7 +51,14 @@ export const Community = () => {
     // 게시물 신고 내역을 서버에서 가져오는 함수
     const loadBoardReport = async board_seq => {
         try {
+            // board_seq 확인을 위한 콘솔 로그 추가
+            console.log('신고된 게시물 번호 (board_seq):', board_seq)
+
             const resp = await CommunityReport(board_seq)
+
+            // 서버에서 받은 데이터 확인을 위한 콘솔 로그 추가
+            console.log('서버에서 받은 신고 내역 데이터:', resp.data)
+
             setReportData(resp.data) // 서버에서 받은 신고 내역을 상태에 저장
             setBoardReportModalOpen(true) // 모달 열기
         } catch (error) {
@@ -63,7 +70,7 @@ export const Community = () => {
     const handleDeleteBoard = async board_seq => {
         Swal.fire({
             title: '게시물 삭제',
-            text: '정말로 이 게시물을 삭제하시겠습니까?',
+            text: '정말로 이 게시물을 삭제 하시겠습니까?',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: '삭제',
@@ -160,7 +167,7 @@ export const Community = () => {
                             {post.MEMBER_ID}
                         </div>
                         <div className={styles.communityItem}>
-                            {formatDate(post.BOARD_WRITE_DATE)}
+                            {post.BOARD_WRITE_DATE}
                         </div>
                         <div
                             className={styles.communityItem}

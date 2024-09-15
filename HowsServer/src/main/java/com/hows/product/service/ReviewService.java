@@ -41,6 +41,23 @@ public class ReviewService {
 		int endRow = page * itemsPerPage;
 		return reviewDAO.getReviewList(product_seq, startRow, endRow);
 	}
+	
+	// 리뷰 이미지 가져오기
+	public List<String> getReviewImgList(int review_seq) throws Exception {
+		// 페이징을 위한 startRow, endRow 계산
+		return reviewDAO.getReviewImgList(review_seq);
+	} 
+	
+	// 리뷰 삭제
+    public void delReview(int review_seq) throws Exception {
+        reviewDAO.delReviewImages(review_seq); // 리뷰에 연결된 이미지 먼저 삭제
+        reviewDAO.delReview(review_seq);  // 리뷰 삭제
+    }
+
+    
+    
+    
+    
 
 	// 관리자
 	// 리뷰 신고 목록 조회 (관리자)

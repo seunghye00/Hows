@@ -73,7 +73,7 @@ public class CommentService {
 
 	// 댓글 신고
 	public void sendCommentReport(int commentSeq, String reportCode, String memberId) {
-		commentDAO.sendCommentReport(commentSeq, reportCode, memberId); // 현재 조회수 반환
+		commentDAO.sendCommentReport(commentSeq, reportCode, memberId); 
 	}
 	
     // 전체 댓글 수 가져오기
@@ -81,6 +81,7 @@ public class CommentService {
         return commentDAO.getTotalCommentsCount(boardSeq);
     }
     
+    // 답글 영역
     // 답글 작성 메소드
     public void writeReply(int commentSeq, String replyContent, String memberId) {
         commentDAO.writeReply(commentSeq, replyContent, memberId);
@@ -95,6 +96,30 @@ public class CommentService {
     public void updateReply(int replySeq, String replyContents) {
         commentDAO.updateReply(replySeq, replyContents); // DAO 호출하여 답글 수정
     }
+    
+    // 사용자가 답글에 좋아요를 눌렀는지 확인
+    public boolean checkIfUserLikedReply(String memberId, int replySeq) {
+        return commentDAO.checkIfUserLikedReply(memberId, replySeq);
+    }
+
+    //답글에 대한 좋아요 추가
+    public void addReplyLike(String memberId, int replySeq) {
+        commentDAO.addReplyLike(memberId, replySeq);
+    }
+
+    // 답글에 대한 좋아요 취소
+    public void removeReplyLike(String memberId, int replySeq) {
+        commentDAO.removeReplyLike(memberId, replySeq);
+    }
+
+    //답글의 총 좋아요 수 조회
+    public int getReplyLikeCount(int replySeq) {
+        return commentDAO.getReplyLikeCount(replySeq);
+    }
+	// 답글 신고
+	public void sendReplyReport(int replySeq, String reportCode, String memberId) {
+		commentDAO.sendReplyReport(replySeq, reportCode, memberId); 
+	}
 	// 관리자
 	// 댓글 신고조회 (관리자)
 	// 신고 댓글 목록 조회 (페이징 포함)

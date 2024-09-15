@@ -160,7 +160,39 @@
 	    set reply_contents = #{reply_contents}
 	    where reply_seq = #{reply_seq}
 	</update>
-
+	
+	<!-- 답글에 대한 좋아요 여부 확인 -->
+	<select id="checkIfUserLikedReply" resultType="int">
+	    select count(*) from reply_like where member_id = #{member_id} and reply_seq = #{reply_seq}
+	</select>
+	
+	<!-- 답글에 대한 좋아요 추가 -->
+	<insert id="addReplyLike" parameterType="map">
+	    insert into reply_like
+	    values (reply_like_seq.nextval, #{member_id}, #{reply_seq})
+	</insert>
+	
+	<!-- 답글에 대한 좋아요 취소 -->
+	<delete id="removeReplyLike" parameterType="map">
+	    delete from reply_like 
+	    where member_id = #{member_id} 
+	      and reply_seq = #{reply_seq}
+	</delete>
+	
+	<!-- 특정 답글의 총 좋아요 수 조회 -->
+	<select id="getReplyLikeCount" parameterType="int" resultType="int">
+	    select count(*) 
+	    from reply_like 
+	    where reply_seq = #{reply_seq}
+	</select>
+	
+	<!-- 답글 신고 -->
+	<insert id="sendReplyReport">
+		insert into reply_report
+		values
+		(reply_report_seq.nextval, #{report_code}, default, #{member_id},
+		#{reply_seq})
+	</insert>
 	<!-- 관리자 -->
 	<!-- 댓글 신고조회 (관리자) -->
 	<select id="getReportedComments" resultType="map">

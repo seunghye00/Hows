@@ -76,7 +76,6 @@
 }
 
 .replyTextarea {
-    width: calc(100% - 50px);
     padding: 5px 10px;
     border-radius: 8px;
     box-sizing: border-box;

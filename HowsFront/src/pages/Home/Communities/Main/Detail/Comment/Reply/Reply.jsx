@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Editor, EditorState, ContentState } from 'draft-js'
 import 'draft-js/dist/Draft.css'
 import styles from './Reply.module.css'
+import { toggleLikeReply } from '../../../../../../../api/comment' // 좋아요 API 가져오기
+import { PiSiren } from 'react-icons/pi'
 
 // 날짜 포맷팅 함수
 const formatDate = dateString => {
@@ -22,18 +24,22 @@ const formatDate = dateString => {
 export const Reply = ({
     replyData, // 답글 데이터
     handleUpdateReply, // 수정된 답글을 서버로 전송하는 함수 (Comment에서 전달)
-    handleDeleteReply, // 답글 삭제 함수
+    handleDeleteReply, // 삭제 함수도 props로 전달
     handleReplyToggle, // 답글 달기 토글
     activeReplySeq, // 활성화된 답글 seq
     isOwner, // 해당 답글의 주인 여부
     editingReplySeq, // 현재 수정 중인 답글 seq
     setEditingReplySeq, // 수정 모드 설정 함수
+    member_id, // 사용자 ID
+    handleOpenReportModalForReply, // 신고 모달 열기 함수 (부모로부터 전달)
 }) => {
     const [editorState, setEditorState] = useState(() =>
         EditorState.createWithContent(
             ContentState.createFromText(replyData.REPLY_CONTENTS)
         )
     )
+    const [isLiked, setIsLiked] = useState(replyData.isLiked) // 좋아요 상태 초기화
+    const [likeCount, setLikeCount] = useState(replyData.LIKE_COUNT) // 좋아요 수 초기화
 
     // 수정 모드 전환 시 커서 끝으로 이동
     useEffect(() => {
@@ -62,6 +68,29 @@ export const Reply = ({
         }
     }
 
+    const handleDelete = () => {
+        // 상위 컴포넌트에 삭제 요청 전달
+        handleDeleteReply(replyData.REPLY_SEQ)
+    }
+
+    // 좋아요 처리 함수
+    const handleLike = async () => {
+        try {
+            const response = await toggleLikeReply(
+                replyData.REPLY_SEQ,
+                member_id
+            )
+            const { isLiked: updatedIsLiked, like_count: updatedLikeCount } =
+                response.data
+
+            // UI 업데이트
+            setIsLiked(updatedIsLiked)
+            setLikeCount(updatedLikeCount)
+        } catch (error) {
+            console.error('좋아요 처리 중 오류 발생:', error)
+        }
+    }
+
     return (
         <div className={styles.replyItem}>
             <div className={styles.replyHeader}>
@@ -86,11 +115,11 @@ export const Reply = ({
                     <div className={styles.replyDate}>
                         {formatDate(replyData.REPLY_DATE)}
                     </div>
-                    <div className={styles.replyLike}>
-                        <i className="bx bx-heart"></i>
-                        <span className={styles.likeCount}>
-                            {replyData.LIKE_COUNT}
-                        </span>
+                    <div className={styles.replyLike} onClick={handleLike}>
+                        <i
+                            className={isLiked ? 'bx bxs-heart' : 'bx bx-heart'}
+                        ></i>
+                        <span className={styles.likeCount}>{likeCount}</span>
                     </div>
                     <div
                         className={styles.replyLeave}
@@ -127,11 +156,7 @@ export const Reply = ({
                                     </div>
                                     <div
                                         className={styles.btnDelete}
-                                        onClick={() =>
-                                            handleDeleteReply(
-                                                replyData.REPLY_SEQ
-                                            )
-                                        }
+                                        onClick={handleDelete} // 삭제 처리
                                     >
                                         삭제
                                     </div>
@@ -139,6 +164,16 @@ export const Reply = ({
                             )}
                         </>
                     ) : null}
+                    {/* 신고하기 버튼 */}
+                    <div
+                        className={styles.reportComment}
+                        onClick={() =>
+                            handleOpenReportModalForReply(replyData.REPLY_SEQ)
+                        }
+                    >
+                        <PiSiren />
+                        신고하기
+                    </div>
                 </div>
             </div>
         </div>

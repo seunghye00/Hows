@@ -174,9 +174,26 @@ public class CommentController {
 	    
 	    // 답글 목록 조회
 	    List<Map<String, Object>> replies = commentServ.getRepliesByCommentSeq(commentSeq);
-	    // 답글 목록 응답 데이터 구조 설정
+
+	    // 각 답글에 대해 사용자가 좋아요를 눌렀는지 확인하여 isLiked 필드 추가
+	    for (Map<String, Object> reply : replies) {
+	        BigDecimal replySeqDecimal = (BigDecimal) reply.get("REPLY_SEQ");
+	        int replySeq = replySeqDecimal.intValue(); // BigDecimal을 int로 변환
+
+	        // 회원일 경우에만 좋아요 여부 확인
+	        if (memberId != null) {
+	            boolean isLiked = commentServ.checkIfUserLikedReply(memberId, replySeq);
+	            reply.put("isLiked", isLiked);
+	        } else {
+	            // 비회원일 경우 기본값으로 좋아요를 누르지 않은 상태
+	            reply.put("isLiked", false);
+	        }
+	    }
+
+	    // 응답 데이터 구조 설정
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("replies", replies); // 해당 댓글의 답글 목록
+	    
 	    return ResponseEntity.ok(response); // 답글 목록을 JSON 형식으로 반환
 	}
 	
@@ -189,6 +206,52 @@ public class CommentController {
 	    commentServ.updateReply(replySeq, replyContents);
 
 	    return ResponseEntity.ok().build();
+	}
+	
+	// 답글 좋아요
+	@PostMapping("reply/{reply_seq}/like")
+	public ResponseEntity<Map<String, Object>> toggleReplyLike(
+	        @PathVariable int reply_seq, // reply_seq로 변경
+	        @RequestBody Map<String, Object> requestBody // member_id를 body에서 받음
+	) {
+	    Map<String, Object> response = new HashMap<>();
+	    try {
+	        String userId = (String) requestBody.get("member_id"); // member_id 가져오기
+
+	        // 1. 사용자가 해당 답글에 이미 좋아요를 눌렀는지 확인
+	        boolean isLiked = commentServ.checkIfUserLikedReply(userId, reply_seq); // 댓글용 메서드를 답글용으로 변경
+	        if (isLiked) {
+	            // 2. 이미 좋아요를 눌렀다면 좋아요 취소
+	            commentServ.removeReplyLike(userId, reply_seq); // 답글 좋아요 취소 메서드로 변경
+	            response.put("isLiked", false); // 좋아요가 취소되었으므로 false
+	            response.put("message", "좋아요가 취소되었습니다.");
+	        } else {
+	            // 3. 좋아요 추가
+	            commentServ.addReplyLike(userId, reply_seq); // 답글 좋아요 추가 메서드로 변경
+	            response.put("isLiked", true); // 좋아요가 추가되었으므로 true
+	            response.put("message", "좋아요가 추가되었습니다.");
+	        }
+
+	        // 4. 좋아요 수 업데이트 후 반환
+	        int likeCount = commentServ.getReplyLikeCount(reply_seq); // 댓글 좋아요 수 가져오는 메서드를 답글용으로 변경
+	        response.put("like_count", likeCount);
+	        return ResponseEntity.ok(response);
+
+	    } catch (Exception e) {
+	        response.put("error", "좋아요 처리 중 오류 발생: " + e.getMessage());
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+	    }
+	}
+	
+	// 답글 신고	
+	@PostMapping("/report/reply")
+	public ResponseEntity<Void> sendReplyReport(@RequestBody Map<String, Object> reportData) {
+		int replySeq = (Integer) reportData.get("reply_seq");
+		String reportCode = (String) reportData.get("report_code");
+		String memberId = (String) reportData.get("member_id");
+
+		commentServ.sendReplyReport(replySeq, reportCode, memberId);
+		return ResponseEntity.ok().build();
 	}
 	
 	// 관리자

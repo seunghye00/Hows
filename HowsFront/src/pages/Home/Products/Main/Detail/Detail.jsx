@@ -41,6 +41,8 @@ export const Detail = () => {
 
 
     useEffect(()=>{
+        // 페이지가 로드될 때 스크롤을 맨 위로 이동
+        window.scrollTo(0, 0);
 
         // 상품 상세 정보
         getProductDetail(product_seq)

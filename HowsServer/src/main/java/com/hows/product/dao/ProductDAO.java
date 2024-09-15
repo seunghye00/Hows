@@ -16,6 +16,11 @@ public class ProductDAO {
 	@Autowired
 	private SqlSession myBatis;
 	
+	// 베스트 상품 목록 출력
+    public List<ProductDTO> getBestProducts() {
+        return myBatis.selectList("Product.getBestProducts");
+    }
+    
 	// 전체 목록 출력
 	public List<ProductDTO> getProducts () throws Exception{
 		return myBatis.selectList("Product.getProducts");

@@ -5,6 +5,27 @@
 
 <mapper namespace="Product">
 
+	<!-- 베스트 상품 목록 -->
+    <select id="getBestProducts" resultType="com.hows.product.dto.ProductDTO">
+        SELECT p.product_seq, 
+               p.product_thumbnail, 
+               p.product_title, 
+               p.product_contents, 
+               p.price, 
+               p.quantity, 
+               COALESCE(SUM(ol.order_list_count), 0) AS total_sales <!-- 총 판매량, 주문이 없는 경우 0으로 표시 -->
+        FROM product p 
+        LEFT JOIN order_list ol <!-- 주문 리스트와 상품 조인 -->
+        ON p.product_seq = ol.product_seq 
+        GROUP BY p.product_seq, 
+                 p.product_thumbnail, 
+                 p.product_title, 
+                 p.product_contents, 
+                 p.price, 
+                 p.quantity 
+        ORDER BY total_sales DESC
+    </select>
+    
 	<resultMap id="myReviewMap" type="java.util.HashMap">
 		<result property="review_seq" column="review_seq"/>
 		<result property="rating" column="rating"/>
@@ -149,12 +170,13 @@
     SELECT *
     FROM (
         SELECT 
-            r.review_seq,                  <!-- 리뷰 번호 -->
-            p.product_title,               <!-- 상품 제목 -->
-            m.nickname,        			   <!-- 리뷰 작성자 (닉네임) -->
-            r.review_contents,             <!-- 리뷰 내용 추가 -->
+            r.review_seq,                      <!-- 리뷰 번호 -->
+            p.product_title,                   <!-- 상품 제목 -->
+            m.nickname,                        <!-- 리뷰 작성자 (닉네임) -->
+            r.review_contents,                 <!-- 리뷰 내용 -->
             TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 변환 -->
             COUNT(rr.review_report_seq) AS report_count,  <!-- 신고 횟수 -->
+            ri.image_url,                      <!-- 리뷰 이미지 URL -->
             ROW_NUMBER() OVER (ORDER BY r.review_seq DESC) AS row_num  <!-- 각 행에 순번 부여 -->
         FROM 
             review r
@@ -162,12 +184,14 @@
             product p ON r.product_seq = p.product_seq
         JOIN 
             member m ON r.member_id = m.member_id
+        LEFT JOIN 
+            review_image ri ON r.review_seq = ri.review_seq  <!-- 리뷰 이미지 조인 -->
         JOIN 
             review_report rr ON r.review_seq = rr.review_seq  <!-- 신고 기록 조인 -->
         GROUP BY 
-            r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
-    )
-    WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
+            r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date, ri.image_url
+    	)
+    	WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
 	</select>
 	
 	<!-- 페이지네비를 위한 신고 리뷰 카운트 (관리자) -->

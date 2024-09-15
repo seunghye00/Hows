@@ -32,7 +32,10 @@ export const Admin = () => {
                 />
                 <Route path="/admin/product/*" element={<Product />} />
                 <Route path="/admin/notice/*" element={<WriteNotice />} />
-                <Route path="/admin/notice/*" element={<ModifyNotice />} />
+                <Route
+                    path="/admin/notice/modifyNotice/:notice_seq"
+                    element={<ModifyNotice />}
+                />
                 <Route
                     path="/member"
                     element={

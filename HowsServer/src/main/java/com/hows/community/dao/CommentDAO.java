@@ -50,14 +50,7 @@ public class CommentDAO {
         return result != null && result > 0;
     }
 
-	// 게시글 댓글 수정
-	public void updateComment(int commentSeq, String commentContents) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("comment_seq", commentSeq);
-		params.put("comment_contents", commentContents);
-		mybatis.update("Comment.updateComment", params);
-	}
-
+	
     // 게시글에 좋아요 제거
     public void removeLike(String member_id, int comment_seq) {
         Map<String, Object> params = new HashMap<>();
@@ -99,15 +92,7 @@ public class CommentDAO {
     public List<Map<String, Object>> getRepliesByCommentSeq(int commentSeq) {
         return mybatis.selectList("Comment.getRepliesByCommentSeq", commentSeq);
     }
-	// 게시글 댓글 삭제
-	public void deleteComment(int comment_seq) {
-		mybatis.delete("Comment.deleteComment", comment_seq);
-	}
-
-	// 댓글 좋아요 삭제
-	public void deleteLike(int comment_seq) {
-		mybatis.delete("Comment.deleteLike", comment_seq);
-	}
+	
 
 	// 게시글에 좋아요 추가
 	public void addLike(String member_id, int comment_seq) {

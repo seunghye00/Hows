@@ -6,6 +6,11 @@ const categoryUrl = `${host}/category`
 const likeUrl = `${host}/likes`
 
 /************************************ [사용자 기능] ************************************/
+// 베스트 상품 출력 함수 (판매순)
+export const getBestProducts = () => {
+    return axios.get(`${baseUrl}/getBestProducts`)
+}
+
 // 리뷰 목록 요청 함수
 export const getReviewList = (product_seq, page, itemsPerPage) => {
     return axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
@@ -29,6 +34,7 @@ export const getLikeCount = (product_seq) => {
     })
 }
 
+// 리뷰 이미지 
 export const getReviewImgList = (reviewSeq) => {
     return axios.get(`${baseUrl}/getReviewImgList/${reviewSeq}`);
 }

@@ -30,6 +30,15 @@
 			member_seq = #{member_seq}
 	</select>
 
+	<select id="orderDetail" resultType="com.hows.order.dto.OrderDTO">
+		SELECT
+			*
+		FROM
+			orders
+		WHERE
+			order_seq = #{order_seq}
+	</select>
+
 	<select id="myOrderList" resultMap="myOrderMap">
 		SELECT
 			ol.*,
@@ -44,12 +53,11 @@
 
 	<select id="orderListByStatus" resultType="com.hows.order.dto.OrderInfoListDTO">
 		select
-		o.order_seq, o.order_date, o.order_name, m.name, g.grade_title, o.order_price, o.orderer_phone, o.orderer_zip_code, o.orderer_address, o.orderer_detail_address, o.order_code, s.order_title, p.payment_price, p.payment_date
+		o.order_seq, o.order_date, o.order_name, m.name, g.grade_title, o.order_price, o.orderer_phone, o.orderer_zip_code, o.orderer_address, o.orderer_detail_address, o.order_code, p.payment_price, p.payment_date, o.done_delivery_date
 		from orders o
 		join member m on o.member_seq = m.member_seq
 		join grade g on m.grade_code = g.grade_code
 		join payment p on o.order_seq = p.order_seq
-		join order_status s on o.order_code = s.order_code
 		<where>
 			<choose>
 				<when test="status == 'product'">
@@ -104,6 +112,9 @@
 			orders
 		SET
 			order_code = #{order_code}
+			<if test="order_code == 'O5'">
+			, done_delivery_date = sysdate
+			</if>
 		WHERE
 			order_seq = #{order_seq}
 	</update>

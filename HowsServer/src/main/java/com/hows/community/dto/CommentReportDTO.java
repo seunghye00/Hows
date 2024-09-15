@@ -7,14 +7,14 @@ public class CommentReportDTO {
 	private int comment_report_seq;
 	private String report_code;
 	private Timestamp comment_report_date;
-	private int member_id;
+	private String member_id;
 	private int comment_seq;
 
 	public CommentReportDTO() {
 
 	}
 
-	public CommentReportDTO(int comment_report_seq, String report_code, Timestamp comment_report_date, int member_id,
+	public CommentReportDTO(int comment_report_seq, String report_code, Timestamp comment_report_date, String member_id,
 			int comment_seq) {
 		super();
 		this.comment_report_seq = comment_report_seq;
@@ -48,11 +48,11 @@ public class CommentReportDTO {
 		this.comment_report_date = comment_report_date;
 	}
 
-	public int getMember_id() {
+	public String getMember_id() {
 		return member_id;
 	}
 
-	public void setMember_id(int member_id) {
+	public void setMember_id(String member_id) {
 		this.member_id = member_id;
 	}
 

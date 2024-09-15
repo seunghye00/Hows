@@ -1,6 +1,7 @@
 package com.hows.payment.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,9 +38,9 @@ public class PaymentController {
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/{id}/cancel")
-    public ResponseEntity<?> cancel(@PathVariable("id") String paymentId) throws Exception {
-        String result = paymentServ.paymentCancel(paymentId);
+    @PostMapping("/cancel")
+    public ResponseEntity<?> cancel(@RequestBody Map<String, Object> map) throws Exception {
+        String result = paymentServ.paymentCancel(map);
         return ResponseEntity.ok(result);
     }
 

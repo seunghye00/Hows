@@ -1,5 +1,6 @@
 package com.hows.member.service;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,6 @@ import com.hows.common.util.PasswordUtil;
 import com.hows.common.util.SendEmailUtil;
 import com.hows.community.dao.CommunityDAO;
 import com.hows.grade.dto.GradeDTO;
-import com.hows.member.dao.GuestbookDAO;
 import com.hows.member.dao.MemberDAO;
 import com.hows.member.dto.MemberDTO;
 import com.hows.role.dto.RoleDTO;
@@ -187,14 +187,24 @@ public class MemberService implements UserDetailsService {
     	memDao.removeFollow(fromMemberSeq, toMemberSeq);
     }
     
- // 팔로워 목록 가져오기
-    public List<MemberDTO> getFollower(String member_id) {
-        return memDao.getFollower(member_id);
+    // 팔로워 목록 가져오기
+    public List<Map<String, Object>> getFollower(int member_seq) {
+        return memDao.getFollower(member_seq);
     }
 
     // 팔로잉 목록 가져오기
-    public List<MemberDTO> getFollowing(String member_id) {
-        return memDao.getFollowing(member_id);
+    public List<Map<String, Object>> getFollowing(int member_seq) {
+        return memDao.getFollowing(member_seq);
+    }
+    
+    // 팔로워, 팔로잉 수 가져오기
+    public Map<String, BigDecimal> countFollow(int member_seq){
+    	return memDao.countFollow(member_seq);
+    }
+    
+    // 맞팔 되어있는지
+    public Boolean eachFollow(Map<String, Integer> params) {
+    	return memDao.eachFollow(params);
     }
     
     // 마이페이지 게시글(이미지) 출력

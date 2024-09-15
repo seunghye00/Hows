@@ -7,49 +7,62 @@ import { api, host } from '../../../../../../config/config';
 import { useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../../store/store';
 import { formatDate } from '../../../../../../commons/commons'
-import axios from 'axios';
 import Swal from "sweetalert2";
 import { Paging } from '../../../../../../components/Pagination/Paging';
+import { 
+    getReviewList , 
+    getProductDetail,
+    getReviewImgList
+} from '../../../../../../api/product';
+import axios from 'axios';
 
 export const DetailPage = () => {
+    const { product_seq } = useParams(); 
     const { isAuth } = useAuthStore() // 로그인 여부 확인
-    const { product_seq } = useParams();
     const memberId = sessionStorage.getItem("member_id"); // 세션에서 member_id 가져오기
 
 
-    // ===== 상태 =====
+    // ======================================== 상태 ========================================
     const [data, setData] = useState({
         rating: 0,                  // 별점 상태
         review_contents: '',        // 리뷰 내용
         product_seq: product_seq,   // 상품 번호를 URL에서 가져온 현재 product_seq 로 설정
-        image_url: '',              // 이미지 URL
+        image_url: [],              // 이미지 URL
     });
+    const [ activeTab, setActiveTab ] = useState('info'); // 탭 메뉴
+    const [ isModalOpen, setIsModalOpen ] = useState(false); // 모달창
 
+    const [ page, setPage ] = useState(1) // 페이지네이션, 현재 페이지
+    const [ itemsPerPage ] = useState(10)  // 페이지네이션, 페이지당 항목 수
+    const [ totalReviews, setTotalReviews ] = useState(0) // 페이지네이션, 전체 리뷰 개수 
 
-    const [activeTab, setActiveTab] = useState('info'); // 탭 메뉴
-    const [isModalOpen, setIsModalOpen] = useState(false); // 모달창
     const [ reviews,setReviews ] = useState([]); // 리뷰 목록
-    const [averageRating, setAverageRating] = useState(0); // 평균 별점
-    const [ratingsCount, setRatingsCount] = useState({
-        5: 0,
-        4: 0,
-        3: 0,
-        2: 0,
-        1: 0
-    }); // 각 점수에 몇 명이 있는지 저장하는 상태
-    const [page, setPage] = useState(1) // 현재 페이지 상태
-    const [itemsPerPage] = useState(3) // 페이지당 항목 수
-    const [totalReviews, setTotalReviews] = useState(0) // 전체 리뷰 개수 
-    // ===== 상태 =====
+
+    const [ averageRating, setAverageRating ] = useState(0); // 평균 별점
+    const [ ratingsCount, setRatingsCount ] = useState({5: 0,4: 0,3: 0,2: 0,1: 0}); // 각 점수에 몇 명이 있는지 저장
+
+    const [ isSubmitting, setIsSubmitting ] = useState(false); // 제출 중 여부
+    const [ productContents, setProductContents ] = useState(''); // 상품 정보
+    const [ previewImages, setPreviewImages ] = useState([]); // 이미지 미리보기 URL을 저장
+    // ======================================== 상태 ======================================== 
 
 
     // 탭 메뉴  
     const handleTabChange = (tabName) => setActiveTab(tabName);
 
-    // 모달창 열기 및 닫기
-    const handleOpenModal = () => setIsModalOpen(true);
-    const handleCloseModal = () => setIsModalOpen(false);
 
+    // 모달창 열기 및 닫기 (상태 초기화)
+    const handleOpenModal = () => {
+        setData({
+            rating: 0,
+            review_contents: '',
+            product_seq: product_seq,
+            images: []
+        });
+        setPreviewImages([]);  // 이미지 미리보기 초기화
+        setIsModalOpen(true); 
+    };
+    const handleCloseModal = () => setIsModalOpen(false);
 
     // 별점 변경 시 호출되는 함수
     const handleRatingChange = (newRating) => {
@@ -59,7 +72,7 @@ export const DetailPage = () => {
         }));
     };
 
-    // 리뷰 내용 변경 핸들러
+    // 리뷰 내용 변경 함수
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setData((prevData) => ({
@@ -68,28 +81,64 @@ export const DetailPage = () => {
         }));
     };
 
-    // 이미지 선택 핸들러
+    // [리뷰 작성] 이미지 선택
     const handleImageChange = (event) => {
         const files = event.target.files;
         if (files) {
-            // 파일 수를 4개로 제한
-            if (files.length > 4) {
+            // 파일 수가 4개를 초과하면 경고 메시지 표시
+            if (files.length > 4 || (data.images && data.images.length + files.length > 4)) {
                 Swal.fire({
                     icon: "warning",
                     title: "최대 4개의 파일만 선택할 수 있습니다.",
                     showConfirmButton: true,
-                })
-                handleCloseModal(); // 모달 창 닫기
-                return ;
+                });
+                return;
             }
     
-            // 파일 목록을 상태로 저장
+            // 새로 선택한 파일들을 URL로 변환하여 미리보기 배열에 추가
+            const newPreviewImages = Array.from(files).map(file => URL.createObjectURL(file));
+
+            // 기존 이미지들과 새로 선택한 이미지를 병합하여 상태 업데이트
+            setPreviewImages((prevImages) => [...prevImages, ...newPreviewImages]);
+
+            // 기존 이미지들과 새로 선택한 이미지를 병합하여 상태에 저장
             setData(prevData => ({
-                ...prevData,
-                images: Array.from(files) // 파일 리스트를 배열로 변환
+                ...prevData, // 기존 데이터는 유지하고
+                images: [...(prevData.images || []), ...Array.from(files)] // 이미지 배열 업데이트
             }));
         }
     };
+
+    //[리뷰 작성] 이미지 제거 
+    const handleRemoveImage = (index) => {
+
+        // 이미지 URL을 미리보기 배열에서 제거
+        setPreviewImages((prevImages) => prevImages.filter((_, i) => i !== index));
+    
+        // 이미지 파일을 data.images에서 제거
+        setData((prevData) => ({
+            ...prevData, // 기존의 데이터는 유지하고
+            images: prevData.images.filter((_, i) => i !== index) // 선택된 이미지만 삭제
+        }));
+    };
+    // 선택한 이미지들을 미리보기에 표시하는 함수 (배열에 저장된 이미지 URL을 기반으로 렌더링)
+    const renderPreviewImages = () => {
+        return previewImages.map((src, index) => (
+            <div key={index} className={styles.previewImageContainer}>
+                {/* 이미지 미리보기 */}
+                <img src={src} alt={`preview ${index}`} className={styles.previewImage} />
+
+                {/* 이미지 삭제 버튼: 클릭 시 handleRemoveImage 함수 호출 */}
+                <button 
+                    className={styles.deleteButton} 
+                    onClick={() => handleRemoveImage(index)} // 이미지 제거 함수 호출
+                >
+                    X
+                </button>
+            </div>
+        ));
+    };
+    
     
     // 모든 필드를 입력했는지 검사
     const isFormValid = () => {
@@ -99,14 +148,18 @@ export const DetailPage = () => {
 
     // 리뷰 등록
     const handleSubmit = () => {
+        if (isSubmitting) return;
+    
+        setIsSubmitting(true);
+    
         if (!isFormValid()) {
             alert('별점, 리뷰 내용, 그리고 이미지를 모두 입력해 주세요.');
+            setIsSubmitting(false);
             return;
         }
-
+    
         const formData = new FormData();
     
-        // 리뷰 데이터를 JSON 형식으로 변환하여 FormData에 추가함
         const reviewData = JSON.stringify({
             rating: data.rating,
             review_contents: data.review_contents,
@@ -115,85 +168,153 @@ export const DetailPage = () => {
         });
         formData.append('reviewData', reviewData);
     
-        // 이미지 여러 파일 추가 
         if (data.images && data.images.length > 0) {
             data.images.forEach((image) => {
                 formData.append('images', image); 
             });
         }
-
+    
         data.images.forEach((_, index) =>
             formData.append('image_orders', index + 1)
         )
     
-        // 서버로 전송
         api.post(`/product/reviewAdd`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
         }).then((response) => {
-
-            // console.log('성공', response.data);
             Swal.fire({
-                icon: "warning",
+                icon: "success",
                 title: "리뷰 제출에 성공했습니다.",
                 showConfirmButton: true,
-            })
-            handleCloseModal();
-            return;
-
+            });
+    
+            // 리뷰 등록 성공 시, 새 리뷰를 추가하여 리뷰 목록을 업데이트
+            const newReview = {
+                RATING: data.rating,
+                REVIEW_CONTENTS: data.review_contents,
+                MEMBER_ID: memberId,
+                REVIEW_DATE: new Date(), // 현재 시간을 등록 시간으로 사용
+                images: previewImages.map((src, index) => ({ IMAGE_URL: src })), // 이미지 미리보기 배열을 사용하여 새 리뷰 이미지로 추가
+            };
+            
+            setReviews((prevReviews) => [newReview, ...prevReviews]); // 새 리뷰를 목록에 추가
+            setTotalReviews(prevCount => prevCount + 1); // 전체 리뷰 수 업데이트
+            setIsModalOpen(false); // 모달 닫기
+            setIsSubmitting(false); // 제출 상태 해제
         }).catch((error) => {
             alert('리뷰 제출에 실패했습니다');
-            handleCloseModal();
+            setIsModalOpen(false);
+            setIsSubmitting(false);
         });
     };
+    
+    
 
+    // 리뷰 이미지 로딩 함수
+    const loadReviewImages = async (reviewSeq) => {
+        try {
+            const response = await getReviewImgList(reviewSeq);
+            return response.data.reviewImgs || [];
+        } catch (error) {
+            console.error('리뷰 이미지 불러오기 오류', error);
+            return [];
+        }
+    };
 
-    // 페이징에 따른 startRow와 endRow 계산
-    // const startRow = (page - 1) * itemsPerPage + 1
-    // const endRow = page * itemsPerPage
-
+    //리뷰 목록
     useEffect(() => {
-        axios.get(`${host}/product/getReviewList/${product_seq}`, {
-            params: {page, itemsPerPage}})
-        .then(resp => {
-            if (resp.data.reviews.length > 0) {
-                // console.log(resp.data.reviews)
-
-                const totalCount = resp.data.reviews[0].TOTAL_COUNT;
-                // console.log("토탈: ", totalCount);
-
-                setReviews(resp.data.reviews); // 리뷰 데이터 설정
-                setTotalReviews(totalCount); // 전체 리뷰 개수 설정
+        const fetchReviews = async () => {
+            try {
+                const resp = await getReviewList(product_seq, page, itemsPerPage);
+                const reviewsData = resp.data.reviews;
+    
+                if (reviewsData.length > 0) {
+                    // 각 리뷰에 이미지 데이터를 병합
+                    const reviewsWithImages = await Promise.all(
+                        // 각 리뷰에 연결된 이미지 배열 추가 
+                        reviewsData.map(async (review) => {
+                            const images = await loadReviewImages(review.REVIEW_SEQ);
+                            return { ...review, images };
+                        })
+                    );
+    
+                    // 리뷰 상태 및 총 리뷰 수 설정
+                    setReviews(reviewsWithImages);
+                    setTotalReviews(reviewsData[0].TOTAL_COUNT);
+    
+                    // 평균 별점 계산
+                    const totalRating = reviewsData.reduce((acc, review) => acc + review.RATING, 0);
+                    setAverageRating(totalRating / reviewsData.length);
+    
+                    // 별점 카운트 업데이트
+                    const newRatingsCount = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+                    reviewsData.forEach(review => newRatingsCount[review.RATING]++);
+                    setRatingsCount(newRatingsCount);
+                } else {
+                    // 리뷰가 없을 경우 초기화
+                    setReviews([]);
+                    setTotalReviews(0);
+                    setAverageRating(0);
+                    setRatingsCount({ 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 });
+                }
+            } catch (error) {
+                console.error('리뷰 목록 불러오기 오류', error);
             }
+        };
+    
+        fetchReviews();
+    }, [product_seq, page, itemsPerPage]);
+    
 
-            // 서버에서 데이터를 성공적으로 받아온 경우 처리
-            if (resp.data && resp.data.reviewList && resp.data.reviewList.length > 0) {
-                setReviews(resp.data.reviewList);
-
-                // 리뷰의 RATING 값을 이용해 평균 별점 계산
-                const totalRating = resp.data.reviewList.reduce((acc, review) => acc + review.RATING, 0);
-                const average = totalRating / resp.data.reviewList.length;
-                setAverageRating(average); // 평균 별점 상태로 저장
-
-                // 각 별점(1~5)에 몇 명이 해당하는지 카운팅
-                const newRatingsCount = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-                resp.data.reviewList.forEach(review => {
-                    const rating = review.RATING;
-                    if (rating >= 1 && rating <= 5) {
-                        newRatingsCount[rating]++; // 해당 별점에 해당하는 인원수 증가
-                    }
-                });
-                setRatingsCount(newRatingsCount); // 각 점수별 인원수를 상태로 저장
-            }
+    const handlePageChange = (newPage) => {
+        const startRow = (newPage - 1) * itemsPerPage + 1;
+        const endRow = newPage * itemsPerPage;
+        getReviewList(product_seq, startRow, endRow)
+        .then(response => {
+            setReviews(response.data.reviews);
+            setTotalReviews(response.data.total_count);
         })
         .catch(error => {
             console.error('리뷰 목록 오류', error);
         });
-    }, [product_seq,page]); // product_seq가 변경될 때마다 실행
 
-    const handlePageChange = (newPage) => {
-        setPage(newPage)
+    setPage(newPage);  // 페이지 상태 업데이트
     }
 
+
+    // 리뷰 삭제 함수
+    const handleReviewDel = (review_seq) => {
+        axios.delete(`${host}/product/delReview/${review_seq}`)
+            .then(response => {
+                console.log('리뷰 삭제 성공:', response.data);
+                // 삭제된 리뷰를 제외하고 나머지 리뷰로 상태 업데이트
+                setReviews(prevReviews => prevReviews.filter(review => review.REVIEW_SEQ !== review_seq));
+                Swal.fire({
+                    icon: "success",
+                    title: "리뷰가 성공적으로 삭제되었습니다.",
+                    showConfirmButton: true,
+                });
+            })
+            .catch(error => {
+                console.error('리뷰 삭제 실패:', error);
+                Swal.fire({
+                    icon: "error",
+                    title: "리뷰 삭제에 실패했습니다.",
+                    showConfirmButton: true,
+                });
+            });
+    };
+
+    //리뷰 수정
+    const handleModify = () => {
+
+    }
+
+     // 상품 설명 불러오기
+    useEffect(()=>{
+        getProductDetail(product_seq)
+        .then(resp=>{setProductContents(resp.data.product_contents);})
+        .catch((error) => {console.error('상품 설명 불러오기 오류', error);});
+    },[])
 
     return(
         <div className={styles.container}>
@@ -208,7 +329,7 @@ export const DetailPage = () => {
                     {/* 상품 정보 내용 */}
                     <h2>상품 정보</h2>
                     <div>
-                        여기는 상품 정보.
+                        {productContents}
                     </div>
                 </div>
                 )}
@@ -261,8 +382,14 @@ export const DetailPage = () => {
                                             <input type="file" accept="image/*" id='files' className={styles.files} onChange={handleImageChange} multiple/>
                                         </div>
                                         <span className={styles.filesTitle}>첨부파일은 최대 4개까지만 가능합니다</span>
-
-                                        <button onClick={handleSubmit}>리뷰 제출</button> 
+                                        {/* 이미지 미리보기 */}
+                                        <div className={styles.previewContainer}>
+                                            {renderPreviewImages()}
+                                        </div>
+                                        <button onClick={handleSubmit} disabled={isSubmitting}>
+                                            {/* disabled -> 폼 요소를 비활성화 */}
+                                            {isSubmitting ? '제출 중...' : '리뷰 제출'}
+                                        </button> 
                                     </div>
                                 </div>
                             </Modal>
@@ -296,18 +423,40 @@ export const DetailPage = () => {
                                 <div>최신순</div>
                             </div>
                             <div className={styles.reviewBox}>
+                                {console.log(reviews)}
                                 {reviews.length > 0 ? (
-                                    reviews.map((review, index) => (
-                                        <div key={review.REVIEW_SEQ || index}>
+                                    (reviews || []).map((review, index) => (
+                                        <div key={index}>
                                             <div>
-                                                <div> <img src={img} alt='img'/> </div>
                                                 <div>
-                                                    <div>{review.MEMBER_ID} </div>
-                                                    <div><StarRating rating={review.RATING} /></div>
+                                                    <div> <img src={img} alt='img'/> </div>
+                                                    <div>
+                                                        <div>{review.MEMBER_ID} </div>
+                                                        <div><StarRating rating={review.RATING} /></div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    {/* 세션 memberId와 review.MEMBER_ID가 같을 때만 수정/삭제 버튼을 보여줌 */}
+                                                    {memberId === review.MEMBER_ID && (
+                                                        <>
+                                                            <button onClick={handleModify}>수정</button>
+                                                            <button onClick={()=>{
+                                                                handleReviewDel(review.REVIEW_SEQ);
+                                                            }}>삭제</button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             </div>
                                             <div>
-                                                <div> <img src={img} alt='img'/> </div>
+                                                <div>
+                                                {(review.images || []).length > 0 ? (
+                                                    review.images.map((img, imgIndex) => (
+                                                        <div key={imgIndex}> <img src={img.IMAGE_URL} alt='img'/> </div>
+                                                    ))
+                                                ) : (
+                                                    <div>이미지가 없습니다.</div> 
+                                                )}
+                                                </div>
                                                 <div>
                                                     <div>{review.REVIEW_DATE ? formatDate(review.REVIEW_DATE) : '날짜 없음'}</div> 
                                                     <div>{review.REVIEW_CONTENTS}</div>

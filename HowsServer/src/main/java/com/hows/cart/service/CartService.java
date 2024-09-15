@@ -35,6 +35,7 @@ public class CartService {
     /** 상품 삭제 **/
     public String deleteCart(int seq, int memberSeq, String type) {
         int result = 0;
+        System.out.println("type === " + type);
         if(type.equals("cart")){
             // seq : cart_seq
             result = cartDAO.deleteCart(seq);

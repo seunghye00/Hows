@@ -63,12 +63,7 @@ public class CommentController {
 	    for (Map<String, Object> comment : comments) {
 	        BigDecimal commentSeqDecimal = (BigDecimal) comment.get("COMMENT_SEQ");
 	        int commentSeq = commentSeqDecimal.intValue(); // BigDecimal을 int로 변환
-
-		// 각 댓글에 대해 사용자가 좋아요를 눌렀는지 확인하여 isLiked 필드 추가
-		for (Map<String, Object> comment : comments) {
-			BigDecimal commentSeqDecimal = (BigDecimal) comment.get("COMMENT_SEQ");
-			int commentSeq = commentSeqDecimal.intValue(); // BigDecimal을 int로 변환
-
+	    }
 	    // 전체 댓글 개수 조회
 	    int totalCommentsCount = commentServ.getTotalCommentsCount(boardSeq);
 
@@ -110,9 +105,6 @@ public class CommentController {
             
             // 1. 사용자가 이미 좋아요를 눌렀는지 확인
             boolean isLiked = commentServ.checkIfUserLikedBoard(userId, comment_seq);
-
-			// 1. 사용자가 이미 좋아요를 눌렀는지 확인
-			boolean isLiked = commentServ.checkIfUserLikedBoard(userId, comment_seq);
 
 			if (isLiked) {
 				// 2. 이미 좋아요를 눌렀다면 좋아요 취소
@@ -266,5 +258,4 @@ public class CommentController {
 		e.printStackTrace();
 		return ResponseEntity.badRequest().body("fail");
 	}
-
 }

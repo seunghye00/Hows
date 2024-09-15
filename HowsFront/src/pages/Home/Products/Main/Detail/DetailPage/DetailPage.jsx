@@ -231,20 +231,26 @@ export const DetailPage = () => {
                     );
     
                     // 리뷰 작성자 프로필 이미지를 불러오는 부분
-                    // reviewsData 배열에서 각 리뷰 작성자의 MEMBER_ID로 userInfo API를 호출해서 프로필 이미지를 가져옴
                     const avatarPromises = reviewsData.map(async (review) => {
-
-                        // 각 작성자의 프로필 이미지 API 호출
-                        const profileResp = await userInfo(review.MEMBER_ID); 
-
-                        // 작성자의 memberId와 avatar(프로필 이미지) 반환
-                        return { memberId: review.MEMBER_ID, avatar: profileResp.data.member_avatar }; 
-
+                        // member_id가 null 또는 "null"이 아닌 경우에만 호출
+                        if (review.MEMBER_ID && review.MEMBER_ID !== "null") { 
+                            try {
+                                // 프로필 이미지 API 호출
+                                const profileResp = await userInfo(review.MEMBER_ID);
+                                return { memberId: review.MEMBER_ID, avatar: profileResp.data.member_avatar };
+                            } catch (error) {
+                                console.error(`프로필 이미지를 불러오는 중 오류 발생: ${review.MEMBER_ID}`, error);
+                                return { memberId: review.MEMBER_ID, avatar: img }; // 오류 발생 시 기본 이미지
+                            }
+                        } else {
+                            return { memberId: review.MEMBER_ID, avatar: img };  // member_id가 없으면 기본 이미지 반환
+                        }
                     });
 
-                    const avatarData = await Promise.all(avatarPromises); 
+                    const avatarData = await Promise.all(avatarPromises);
+
     
-                    // 각 리뷰 작성자의 memberId를 키로, 프로필 이미지를 값으로 하는 객체를 생성
+                    // 프로필 이미지를 상태로 저장
                     const avatarsMap = avatarData.reduce((acc, { memberId, avatar }) => {
                         // memberId를 키로, avatar(프로필 이미지)를 값으로 저장
                         acc[memberId] = avatar; 

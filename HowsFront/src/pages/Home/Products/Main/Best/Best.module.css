@@ -8,7 +8,6 @@
 }
 
 .bestTitlt{
-    /* background-color: red; */
     height: 100px;
     font-size: 24px;
     font-weight: bold;
@@ -17,11 +16,8 @@
     align-items: center;
 }
 .contents {
-    /* width: 325px;
-    height: 500px; */
     display: flex; flex-wrap: wrap;
     padding: 20px 0px;
-    /* gap: 20px; */
 }
 
 .item {
@@ -29,6 +25,7 @@
     height: 500px;
     margin: 10px;
     position: relative;
+    cursor: pointer;
 }
 
 .item:hover .img > img {
@@ -53,7 +50,6 @@
 
 /* 상품 이미지 */
 .img {
-    /* border:1px solid #000; */
     height: 400px;
     overflow: hidden;
     border-radius: 10px 10px 0px 0px; 
@@ -68,19 +64,14 @@
     border:1px solid var(--hows-gray-200);
     border-radius: 0 0 8px 8px;
     height: 100px;
-    /* background-color: red; */
 }
 
 /* 상품 설명 - 상품명 */
 .title > div{
+    text-align: center;
     height: 50px; 
     display: flex;
     justify-content: center;
     align-items: center;
-    /* border:1px solid #000; */
-}
-
-/* 상품 설명 - 상품 가격 */
-.title > div:last-child{
-    /* border:1px solid #000; */
+    overflow: hidden; 
 }

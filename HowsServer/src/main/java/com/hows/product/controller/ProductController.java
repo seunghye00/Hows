@@ -42,6 +42,14 @@ public class ProductController {
 	@Autowired
 	private FileService fileServ;
 
+    // 베스트 상품 목록 출력
+    @GetMapping("/getBestProducts")
+    public ResponseEntity<List<ProductDTO>> getBestProducts() {
+        List<ProductDTO> bestProducts = productServ.getBestProducts();
+        return ResponseEntity.ok(bestProducts);
+    }
+	
+	
 	// 전체 목록 출력
 	@GetMapping
 	public ResponseEntity<List<ProductDTO>> getProducts() throws Exception {

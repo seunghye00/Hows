@@ -53,6 +53,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: hidden; text-align: center;
 }
 
 /* 상품 설명 - 상품 가격 */

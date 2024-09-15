@@ -129,6 +129,7 @@
     justify-content: center;
     align-items: center;
     /* border:1px solid #000; */
+    overflow: hidden; text-align: center;
 }
 
 /* 상품 설명 - 상품 가격 */

@@ -266,5 +266,4 @@ public class CommentController {
 		e.printStackTrace();
 		return ResponseEntity.badRequest().body("fail");
 	}
-
 }

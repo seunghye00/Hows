@@ -40,24 +40,6 @@ public class CommentDAO {
         return mybatis.selectList("Comment.getCommentsBoardSeqWithPagination", params);
     }
     
-	// 게시글 댓글 수정 
-    public void updateComment(int commentSeq, String commentContents) {
-    	Map<String, Object> params = new HashMap<>();
-        params.put("comment_seq", commentSeq);
-        params.put("comment_contents", commentContents);
-    	mybatis.update("Comment.updateComment", params);
-    }
-    
-    // 게시글 댓글 삭제 
-    public void deleteComment(int comment_seq) {
-    	mybatis.delete("Comment.deleteComment", comment_seq);
-    }
-    
-    // 댓글 좋아요 삭제 
-    public void deleteLike(int comment_seq) {
-    	mybatis.delete("Comment.deleteLike", comment_seq);
-    }
-    
     // 사용자가 특정 게시글에 좋아요를 눌렀는지 확인
     public boolean checkIfUserLikedBoard(String member_id, int comment_seq) {
         Map<String, Object> params = new HashMap<>();
@@ -73,8 +55,7 @@ public class CommentDAO {
     public void removeLike(String member_id, int comment_seq) {
         Map<String, Object> params = new HashMap<>();
         params.put("member_id", member_id);
-        params.put("comment_seq", comment_seq);
-        
+        params.put("comment_seq", comment_seq);  
         mybatis.delete("Comment.removeLike", params);
     }
     

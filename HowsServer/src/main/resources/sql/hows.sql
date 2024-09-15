@@ -460,6 +460,7 @@ create table orders (
     order_code char(2) not null,
     order_name varchar2(200) not null,
     order_date timestamp default sysdate not null,
+    done_delivery_date timestamp,
     order_price number not null,
     orderer_name varchar2(30) not null,
     orderer_phone varchar2(11) not null,

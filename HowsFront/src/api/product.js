@@ -1,8 +1,41 @@
 import axios from 'axios'
-import { host } from '../config/config'
+import { host, api } from '../config/config'
 
 const baseUrl = `${host}/product`
 const categoryUrl = `${host}/category`
+const likeUrl = `${host}/likes`
+
+/************************************ [사용자 기능] ************************************/
+// 리뷰 목록 요청 함수
+export const getReviewList = (product_seq, page, itemsPerPage) => {
+    return axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
+        params: {
+            page : page, // 페이지 번호 전달
+            itemsPerPage : itemsPerPage, // 페이지당 항목 수 전달
+        }
+    })
+}
+// 상품 상세 정보 요청 함수
+export const getProductDetail = (product_seq) => {
+    return axios.get(`${baseUrl}/detail/${product_seq}`)
+}
+
+// 좋아요 개수
+export const getLikeCount = (product_seq) => {
+    return axios.get(`${likeUrl}/count`, {
+        params: {
+            product_seq : product_seq,
+        }
+    })
+}
+
+export const getReviewImgList = (reviewSeq) => {
+    return axios.get(`${baseUrl}/getReviewImgList/${reviewSeq}`);
+}
+
+
+
+/************************************ / [사용자 기능] ************************************/
 
 // 상품 카테고리 목록 요청 함수
 export const categoryList = () => {

@@ -58,9 +58,14 @@
 		select max(review_seq) from review
 	</select>
 	
+	<!-- 리뷰이미지 가져오기 -->
+	<select id="getReviewImgList" resultType="map" parameterType="int">
+	 	select IMAGE_URL from REVIEW_IMAGE where review_seq = #{reviewSeq}
+	</select>
+	
 	<!-- 리뷰 목록 출력 (페이징) -->
 	<select id="getReviewList" resultType="map">
-		SELECT 
+		 SELECT 
 		    r.*,
 		    (SELECT COUNT(*)
 		     FROM REVIEW
@@ -79,6 +84,22 @@
 		) r
 		WHERE r.rn BETWEEN #{startRow} AND #{endRow}
 	</select>
+	
+	<!-- 삭제 -->
+	<delete id="delReviewImages" parameterType="int">
+	    DELETE FROM review_images WHERE review_seq = #{review_seq}
+	</delete>
+	
+	<delete id="delReview" parameterType="int">
+	    DELETE FROM reviews WHERE review_seq = #{review_seq}
+	</delete>
+
+    
+	
+	
+	
+	
+	
 	
 	<!-- My 리뷰 목록 -->
 	<select id="myReview" resultMap="myReviewMap">

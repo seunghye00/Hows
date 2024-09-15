@@ -8,6 +8,7 @@ public class OrderDTO {
 	private String order_code;
 	private String order_name;
 	private Timestamp order_date;
+	private Timestamp done_delivery_date;
 	private int order_price;
 	private String orderer_name;
 	private String orderer_phone;
@@ -53,6 +54,14 @@ public class OrderDTO {
 
 	public void setOrder_date(Timestamp order_date) {
 		this.order_date = order_date;
+	}
+
+	public Timestamp getDone_delivery_date() {
+		return done_delivery_date;
+	}
+
+	public void setDone_delivery_date(Timestamp done_delivery_date) {
+		this.done_delivery_date = done_delivery_date;
 	}
 
 	public int getOrder_price() {
@@ -126,13 +135,15 @@ public class OrderDTO {
 	}
 
 	public OrderDTO(int order_seq, int member_seq, String order_code, String order_name, Timestamp order_date,
-			int order_price, String orderer_name, String orderer_phone, String orderer_zip_code, String orderer_address,
-			String orderer_detail_address) {
+			Timestamp done_delivery_date, int order_price, String orderer_name, String orderer_phone,
+			String orderer_zip_code, String orderer_address, String orderer_detail_address) {
+		super();
 		this.order_seq = order_seq;
 		this.member_seq = member_seq;
 		this.order_code = order_code;
 		this.order_name = order_name;
 		this.order_date = order_date;
+		this.done_delivery_date = done_delivery_date;
 		this.order_price = order_price;
 		this.orderer_name = orderer_name;
 		this.orderer_phone = orderer_phone;

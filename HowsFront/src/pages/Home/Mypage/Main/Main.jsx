@@ -249,7 +249,8 @@ export const Main = () => {
                                             <button className={styles.infoUpdate} onClick={() => navi('/mypage/update')} >
                                                 수정
                                             </button>
-                                            <button className={styles.mypage} onClick={() => navi('/mypage/userDashboard')} >
+                                            {/* <button className={styles.mypage} onClick={() => navi('/mypage/userDashboard')} > */}
+                                            <button className={styles.mypage} onClick={() => navi('/history/buyList')} >
                                                 마이페이지
                                             </button>
                                         </>

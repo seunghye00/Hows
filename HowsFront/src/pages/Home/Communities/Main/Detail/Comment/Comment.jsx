@@ -1,12 +1,69 @@
 import React, { useState, useEffect } from 'react'
+import {
+    Editor,
+    EditorState,
+    ContentState,
+    Modifier,
+    CompositeDecorator,
+    getDefaultKeyBinding,
+    convertToRaw,
+    RichUtils,
+} from 'draft-js'
+import 'draft-js/dist/Draft.css'
 import styles from './Comment.module.css'
 import { PiSiren } from 'react-icons/pi'
-import { useAuthStore } from '../../../../../../store/store'
-import { toggleLikeAPI } from '../../../../../../api/comment' // 좋아요 처리 API 함수
 import { useNavigate } from 'react-router-dom'
-import { sendReply, getReplies } from '../../../../../../api/comment' // API 함수 불러오기
-import { userInfo } from '../../../../../../api/member' // API 함수 불러오기
+import { useAuthStore } from '../../../../../../store/store'
+import {
+    toggleLikeAPI,
+    sendReply,
+    getReplies,
+    updateReplyAPI, // Reply 업데이트 API 추가
+} from '../../../../../../api/comment'
+import { userInfo } from '../../../../../../api/member'
+import { Reply } from './Reply/Reply'
 
+// 링크 스타일을 적용하는 컴포넌트
+const TagLink = props => {
+    const navigate = useNavigate()
+    return (
+        <span
+            className={styles.tagLink}
+            onClick={() =>
+                navigate(
+                    `/profile/${
+                        props.contentState.getEntity(props.entityKey).getData()
+                            .id
+                    }`
+                )
+            } // 엔티티에서 ID 추출 후 프로필로 이동
+            style={{ color: 'blue', cursor: 'pointer' }}
+        >
+            {props.children}
+        </span>
+    )
+}
+
+// Draft.js 데코레이터: `@태그`를 감지해서 스타일을 적용
+const findTagEntities = (contentBlock, callback, contentState) => {
+    const text = contentBlock.getText()
+    const tagRegex = /@\w+/g
+    let matchArr, start
+    while ((matchArr = tagRegex.exec(text)) !== null) {
+        start = matchArr.index
+        callback(start, start + matchArr[0].length)
+    }
+}
+
+// 엔티티가 추가된 데코레이터 정의
+const decorator = new CompositeDecorator([
+    {
+        strategy: findTagEntities,
+        component: TagLink,
+    },
+])
+
+// 날짜 형식을 처리하는 유틸리티 함수
 const formatDate = dateString => {
     const date = new Date(dateString)
     const now = new Date()
@@ -22,57 +79,81 @@ const formatDate = dateString => {
     return `${year}-${month}-${day}`
 }
 
+// Comment 컴포넌트는 각 댓글과 답글 기능을 관리합니다.
 export const Comment = ({
     commentData,
-    isReply = false, // 답글 여부
     handleOpenReportModalForComment,
     handleUpdateComment,
     handleDeleteComment,
 }) => {
-    const navigate = useNavigate() // 페이지 이동을 위한 navigate 함수
-    const { isAuth } = useAuthStore() // 로그인 여부
-    const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
+    const navigate = useNavigate()
+    const { isAuth } = useAuthStore()
+    const member_id = sessionStorage.getItem('member_id')
     const isOwner = isAuth && member_id === commentData?.MEMBER_ID
-    const [isEditing, setIsEditing] = useState(false) // 수정 상태 관리
-    const [isLiked, setIsLiked] = useState(commentData.isLiked || false) // 서버에서 받은 좋아요 여부 상태
-    const [likeCount, setLikeCount] = useState(commentData.LIKE_COUNT || 0) // 서버에서 받은 좋아요 수 상태
-    const [editedComment, setEditedComment] = useState(
-        commentData.COMMENT_CONTENTS
-    ) // 수정된 댓글 내용
-    const [replyOpen, setReplyOpen] = useState(false) // 댓글에서 답글 입력창 토글
-    const [replyContent, setReplyContent] = useState('') // 답글 내용
-    const [replies, setReplies] = useState(commentData.replies || []) // 답글 목록 상태
-    const [replyInputOpen, setReplyInputOpen] = useState({}) // 답글들 각각에 대한 답글 입력창 토글 상태
-    const [userProfile, setUserProfile] = useState('') // 유저 프로필 정보 상태
-    const [showAllReplies, setShowAllReplies] = useState(false) // 더보기/접기 여부
-    const [likeStatus, setLikeStatus] = useState({}) // 각 답글의 좋아요 상태
-    const [replyEditingState, setReplyEditingState] = useState({}) // 답글 수정 상태
+    const [isEditing, setIsEditing] = useState(false)
+    const [isLiked, setIsLiked] = useState(commentData.isLiked || false)
+    const [likeCount, setLikeCount] = useState(commentData.LIKE_COUNT || 0)
 
-    // 유저 정보 불러오기 (세션에서 가져온 member_id로)
+    const [editedComment, setEditedComment] = useState(
+        EditorState.createWithContent(
+            ContentState.createFromText(commentData.COMMENT_CONTENTS),
+            decorator
+        )
+    )
+
+    const [replyContent, setReplyContent] = useState(
+        EditorState.createEmpty(decorator)
+    )
+    const [replies, setReplies] = useState([])
+    const [activeReplySeq, setActiveReplySeq] = useState(null)
+    const [userProfile, setUserProfile] = useState('')
+    const [showAllReplies, setShowAllReplies] = useState(false)
+    const [editingReplySeq, setEditingReplySeq] = useState(null)
+
+    // 유저 프로필 정보 불러오기
     useEffect(() => {
         const fetchUserInfo = async () => {
             if (member_id) {
                 try {
                     const response = await userInfo(member_id)
-                    setUserProfile(response.data.member_avatar) // 유저 아바타 정보 가져오기
+                    setUserProfile(response.data.member_avatar)
                 } catch (error) {
                     console.error('유저 정보 불러오기 중 오류 발생:', error)
                 }
             }
         }
-
         fetchUserInfo()
     }, [member_id])
 
-    // 수정 모드를 토글하는 함수
-    const toggleEditMode = () => {
-        setIsEditing(!isEditing)
-    }
+    // 댓글에 달린 답글 불러오기
+    useEffect(() => {
+        const fetchReplies = async () => {
+            try {
+                const response = await getReplies(
+                    commentData.COMMENT_SEQ,
+                    member_id
+                )
+                setReplies(response.replies)
+            } catch (error) {
+                console.error('답글 불러오기 중 오류 발생:', error)
+            }
+        }
+        fetchReplies()
+    }, [commentData.COMMENT_SEQ, member_id])
 
-    // 댓글 삭제 함수
-    const handleSaveEdit = () => {
-        handleUpdateComment(commentData.COMMENT_SEQ, editedComment) // 수정된 댓글 서버에 업데이트
-        setIsEditing(false) // 수정 모드 종료
+    // 답글 업데이트 함수 (Reply 컴포넌트에 전달)
+    const handleUpdateReply = async (replySeq, updatedContent) => {
+        try {
+            await updateReplyAPI(replySeq, updatedContent)
+            const updatedReplies = replies.map(reply =>
+                reply.REPLY_SEQ === replySeq
+                    ? { ...reply, REPLY_CONTENTS: updatedContent }
+                    : reply
+            )
+            setReplies(updatedReplies)
+        } catch (error) {
+            console.error('답글 수정 중 오류 발생:', error)
+        }
     }
 
     // 좋아요 처리 함수
@@ -85,425 +166,245 @@ export const Comment = ({
             )
             const { isLiked: updatedIsLiked, like_count: updatedLikeCount } =
                 response.data
-
-            setIsLiked(updatedIsLiked) // 서버에서 받은 좋아요 상태로 업데이트
-            setLikeCount(updatedLikeCount) // 서버에서 받은 좋아요 수로 업데이트
+            setIsLiked(updatedIsLiked)
+            setLikeCount(updatedLikeCount)
         } catch (error) {
             console.error('좋아요 처리 중 오류 발생:', error)
         }
     }
 
-    // 댓글 삭제 완료 함수
-    const handleDelete = () => {
-        handleDeleteComment(commentData.COMMENT_SEQ) // 서버에서 댓글 삭제
-    }
-
-    // 답글 목록 가져오기
-    useEffect(() => {
-        const fetchReplies = async () => {
-            try {
-                const response = await getReplies(
-                    commentData.COMMENT_SEQ,
-                    member_id
-                ) // 서버에서 해당 댓글의 답글 목록 불러오기
-                setReplies(response.replies) // 답글 목록 업데이트
-            } catch (error) {
-                console.error('답글 불러오기 중 오류 발생:', error)
-            }
-        }
-
-        fetchReplies() // 컴포넌트 마운트 시 답글 목록 불러오기
-    }, [commentData.COMMENT_SEQ])
-
-    // 답글 모드 토글
     const toggleReply = () => {
-        setReplyOpen(!replyOpen)
+        setActiveReplySeq(prevSeq =>
+            prevSeq === commentData.COMMENT_SEQ ? null : commentData.COMMENT_SEQ
+        )
+        const taggedContent = `@${commentData.NICKNAME} `
+        const newState = Modifier.insertText(
+            replyContent.getCurrentContent(),
+            replyContent.getSelection(),
+            taggedContent
+        )
+        const newEditorState = EditorState.push(
+            replyContent,
+            newState,
+            'insert-characters'
+        )
+        setReplyContent(EditorState.moveFocusToEnd(newEditorState))
     }
 
-    // 답글에서 답글 달기 토글
-    const toggleReplyInputForReply = replySeq => {
-        setReplyInputOpen(prevState => ({
-            ...prevState,
-            [replySeq]: !prevState[replySeq], // 해당 답글의 답글 입력창 토글
-        }))
-    }
-
-    // 엔터로 답글 제출 처리
-    const handleReplyKeyPress = e => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault() // 기본 엔터 키 동작 방지
-            handleReplySubmit() // 답글 전송 함수 호출
-        }
-    }
-
-    // 답글 작성 처리 함수
-    const handleReplySubmit = async (commentSeq = commentData.COMMENT_SEQ) => {
-        if (!replyContent.trim()) return // 내용이 없으면 제출하지 않음
-
+    const handleReplySubmit = async replySeq => {
+        const content = replyContent.getCurrentContent().getPlainText().trim()
+        if (!content) return
         try {
-            await sendReply(commentSeq, replyContent, member_id) // 답글 작성 API 호출
-            setReplyContent('') // 입력창 초기화
-            setReplyOpen(false) // 입력창 닫기
-            setReplyInputOpen({}) // 답글 입력창 닫기
-
-            // 답글 작성 후 답글 목록 다시 불러오기
+            await sendReply(replySeq, content, member_id)
+            setReplyContent(EditorState.createEmpty(decorator))
+            setActiveReplySeq(null)
             const response = await getReplies(
                 commentData.COMMENT_SEQ,
                 member_id
             )
-            setReplies(response.replies) // 새로 받은 답글 목록으로 업데이트
+            setReplies(response.replies)
         } catch (error) {
             console.error('답글 작성 중 오류 발생:', error)
         }
     }
 
-    // 답글 수정 모드 토글 함수
-    const toggleReplyEditMode = replySeq => {
-        setReplyEditingState(prevState => ({
-            ...prevState,
-            [replySeq]: !prevState[replySeq], // 해당 답글의 수정 상태를 토글
-        }))
+    const toggleEditMode = () => {
+        setIsEditing(!isEditing)
     }
 
-    // 답글 수정 저장 함수
-    const handleSaveReplyEdit = async replySeq => {
-        setReplyEditingState(prevState => ({
-            ...prevState,
-            [replySeq]: false, // 수정 후 다시 수정 모드 종료
-        }))
+    const handleSaveEdit = () => {
+        const content = editedComment.getCurrentContent().getPlainText()
+        handleUpdateComment(commentData.COMMENT_SEQ, content)
+        setIsEditing(false)
     }
 
-    // 답글 삭제 함수
-    const handleDeleteReply = async replySeq => {
-        // 답글 삭제 로직 추가
+    const handleDelete = () => {
+        handleDeleteComment(commentData.COMMENT_SEQ)
     }
 
-    // 답글 수 1개일 땐 보이게 처리 1개 이상 시 더보기 생성
-    const toggleShowAllReplies = () => {
-        setShowAllReplies(prevState => !prevState)
+    const keyBindingFn = e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            return 'submit-reply'
+        }
+        return getDefaultKeyBinding(e)
+    }
+
+    const handleKeyCommand = command => {
+        if (command === 'submit-reply') {
+            handleReplySubmit(commentData.COMMENT_SEQ)
+            return 'handled'
+        }
+        return 'not-handled'
     }
 
     return (
         <div className={styles.commentCont}>
-            {/* 댓글 또는 답글의 프로필 이미지와 내용 */}
             <div className={styles.commentInfo}>
                 <div className={styles.imgBox}>
                     <img src={commentData.MEMBER_AVATAR} alt="profile" />
                 </div>
-                <div className={styles.commentName}>{commentData.NICKNAME}</div>
+                <div className={styles.commentName}>
+                    <a
+                        onClick={() =>
+                            navigate(`/profile/${commentData.MEMBER_ID}`)
+                        }
+                    >
+                        {commentData.NICKNAME}
+                    </a>
+                </div>
             </div>
+
             <div className={styles.commentBox}>
                 <div className={styles.commentTxt}>
                     {isEditing ? (
-                        <textarea
-                            value={editedComment}
-                            className={styles.editInput}
-                            onChange={e => {
-                                if (e.target.value.length <= 300)
-                                    setEditedComment(e.target.value)
-                            }}
-                            onInput={e => {
-                                e.target.style.height = 'auto' // 높이를 자동으로 설정하여 이전 설정을 초기화
-                                e.target.style.height = `${Math.min(
-                                    e.target.scrollHeight,
-                                    72
-                                )}px` // 내용에 따라 높이를 조정, 최대 72px로 제한
-                            }}
+                        <Editor
+                            editorState={editedComment}
+                            onChange={setEditedComment}
                         />
                     ) : (
                         commentData.COMMENT_CONTENTS
                     )}
                 </div>
+
                 <div className={styles.btnBox}>
-                    <div className={styles.btnLeft}>
-                        <div className={styles.commentDate}>
-                            {commentData?.COMMENT_WRITE_DATE
-                                ? formatDate(commentData.COMMENT_WRITE_DATE)
-                                : '알 수 없음'}
+                    <div className={styles.replyBtnBox}>
+                        <div className={styles.replyLeft}>
+                            <div className={styles.commentDate}>
+                                {formatDate(commentData.COMMENT_WRITE_DATE)}
+                            </div>
+                            <div
+                                className={styles.btnLike}
+                                onClick={handleLike}
+                            >
+                                <i
+                                    className={
+                                        isLiked ? 'bx bxs-heart' : 'bx bx-heart'
+                                    }
+                                ></i>
+                                <span className={styles.likeCount}>
+                                    {likeCount}
+                                </span>
+                            </div>
+                            <div
+                                className={styles.replyLeave}
+                                onClick={toggleReply}
+                            >
+                                답글 달기
+                            </div>
                         </div>
-                        {/* 좋아요, 신고, 수정, 삭제 등 공통 액션 */}
-                        <div className={styles.btnLike} onClick={handleLike}>
-                            <i
-                                className={
-                                    isLiked ? 'bx bxs-heart' : 'bx bx-heart'
+
+                        <div className={styles.replyRight}>
+                            {isOwner && (
+                                <>
+                                    {isEditing ? (
+                                        <>
+                                            <div
+                                                className={styles.btnSave}
+                                                onClick={handleSaveEdit}
+                                            >
+                                                저장
+                                            </div>
+                                            <div
+                                                className={styles.btnCancel}
+                                                onClick={toggleEditMode}
+                                            >
+                                                취소
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div
+                                                className={styles.btnEdit}
+                                                onClick={toggleEditMode}
+                                            >
+                                                수정
+                                            </div>
+                                            <div
+                                                className={styles.btnDelete}
+                                                onClick={handleDelete}
+                                            >
+                                                삭제
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            )}
+                            <div
+                                className={styles.reportComment}
+                                onClick={() =>
+                                    handleOpenReportModalForComment(
+                                        commentData.COMMENT_SEQ
+                                    )
                                 }
-                            ></i>
-                            <span className={styles.likeCount}>
-                                {likeCount}
-                            </span>
+                            >
+                                <PiSiren />
+                                신고하기
+                            </div>
                         </div>
-                        <div className={styles.btnReply} onClick={toggleReply}>
-                            답글 달기
-                        </div>
-                        {isOwner ? (
-                            <>
-                                {isEditing ? (
-                                    <>
-                                        <div
-                                            className={styles.btnSave}
-                                            onClick={handleSaveEdit}
-                                        >
-                                            <i className="bx bx-save"></i>
-                                        </div>
-                                        <div
-                                            className={styles.btnCancel}
-                                            onClick={toggleEditMode}
-                                        >
-                                            취소
-                                        </div>
-                                    </>
-                                ) : (
-                                    <>
-                                        <div
-                                            className={styles.btnEdit}
-                                            onClick={toggleEditMode}
-                                        >
-                                            <i className="bx bx-edit"></i>
-                                        </div>
-                                        <div
-                                            className={styles.btnDelete}
-                                            onClick={handleDelete}
-                                        >
-                                            <i className="bx bx-trash"></i>
-                                        </div>
-                                    </>
-                                )}
-                            </>
-                        ) : (
-                            <></>
-                        )}
-                    </div>
-                    <div
-                        className={styles.reportComment}
-                        onClick={() =>
-                            handleOpenReportModalForComment(
-                                commentData.COMMENT_SEQ
-                            )
-                        }
-                    >
-                        <PiSiren />
-                        신고하기
                     </div>
                 </div>
 
-                {/* 답글 작성 UI */}
-                {replyOpen && (
+                {replies.length > 1 && (
+                    <a
+                        className={styles.toggleReplyBtn}
+                        onClick={() => setShowAllReplies(!showAllReplies)}
+                    >
+                        {showAllReplies
+                            ? '접기'
+                            : `${replies.length}개 댓글 보기`}
+                    </a>
+                )}
+
+                <div className={styles.replyList}>
+                    {showAllReplies
+                        ? replies.map(reply => (
+                              <Reply
+                                  key={reply.REPLY_SEQ}
+                                  replyData={reply}
+                                  handleReplyToggle={setActiveReplySeq}
+                                  activeReplySeq={activeReplySeq}
+                                  handleReplySubmit={handleReplySubmit}
+                                  replyContent={replyContent}
+                                  setReplyContent={setReplyContent}
+                                  isOwner={isOwner}
+                                  editingReplySeq={editingReplySeq}
+                                  setEditingReplySeq={setEditingReplySeq}
+                                  handleUpdateReply={handleUpdateReply} // 프롭스 전달
+                              />
+                          ))
+                        : replies.slice(-1).map(reply => (
+                              <Reply
+                                  key={reply.REPLY_SEQ}
+                                  replyData={reply}
+                                  handleReplyToggle={setActiveReplySeq}
+                                  activeReplySeq={activeReplySeq}
+                                  handleReplySubmit={handleReplySubmit}
+                                  replyContent={replyContent}
+                                  setReplyContent={setReplyContent}
+                                  isOwner={isOwner}
+                                  editingReplySeq={editingReplySeq}
+                                  setEditingReplySeq={setEditingReplySeq}
+                                  handleUpdateReply={handleUpdateReply} // 프롭스 전달
+                              />
+                          ))}
+                </div>
+
+                {activeReplySeq === commentData.COMMENT_SEQ && (
                     <div className={styles.replyInputContainer}>
                         <div className={styles.imgBox}>
                             <img src={userProfile} alt="profile" />
                         </div>
-                        <textarea
-                            value={replyContent}
-                            onChange={e => setReplyContent(e.target.value)}
-                            placeholder="답글을 입력하세요."
-                            className={styles.replyTextarea}
-                            onKeyPress={handleReplyKeyPress} // 엔터로 제출
-                            onInput={e => {
-                                e.target.style.height = 'auto' // 높이를 자동으로 설정하여 초기화
-                                e.target.style.height = `${Math.min(
-                                    e.target.scrollHeight,
-                                    72
-                                )}px` // 최대 72px로 제한
-                            }}
-                        />
+                        <div className={styles.replyTextarea}>
+                            <Editor
+                                editorState={replyContent}
+                                onChange={setReplyContent}
+                                handleKeyCommand={handleKeyCommand}
+                                keyBindingFn={keyBindingFn}
+                                placeholder="답글을 입력하세요."
+                            />
+                        </div>
                     </div>
                 )}
-
-                {/* 답글 목록 렌더링 */}
-                <div className={styles.replyList}>
-                    {Array.isArray(replies) &&
-                        replies.length > 0 &&
-                        replies.map(reply => (
-                            <div
-                                key={reply.REPLY_SEQ}
-                                className={styles.replyItem}
-                            >
-                                <div className={styles.replyCont}>
-                                    <div className={styles.replyHeader}>
-                                        <div className={styles.imgBox}>
-                                            <img
-                                                src={reply.MEMBER_AVATAR}
-                                                alt={reply.NICKNAME}
-                                            />
-                                        </div>
-                                        <div className={styles.replyNickname}>
-                                            {reply.NICKNAME}
-                                        </div>
-                                    </div>
-                                    <div className={styles.replyBox}>
-                                        <div className={styles.replyTextCont}>
-                                            {replyEditingState[
-                                                reply.REPLY_SEQ
-                                            ] ? (
-                                                <textarea
-                                                    value={editedComment}
-                                                    className={styles.editInput}
-                                                    onChange={e => {
-                                                        if (
-                                                            e.target.value
-                                                                .length <= 300
-                                                        )
-                                                            setEditedComment(
-                                                                e.target.value
-                                                            )
-                                                    }}
-                                                />
-                                            ) : (
-                                                reply.REPLY_CONTENTS
-                                            )}
-                                        </div>
-                                        <div className={styles.replyBtnBox}>
-                                            <div className={styles.replyLeft}>
-                                                <div
-                                                    className={
-                                                        styles.replyWriteDate
-                                                    }
-                                                >
-                                                    {reply?.REPLY_DATE
-                                                        ? formatDate(
-                                                              reply.REPLY_DATE
-                                                          )
-                                                        : '알 수 없음'}
-                                                </div>
-                                                <div
-                                                    className={styles.replyLike}
-                                                >
-                                                    <i
-                                                        className={
-                                                            likeStatus[
-                                                                reply.REPLY_SEQ
-                                                            ]
-                                                                ? 'bx bxs-heart'
-                                                                : 'bx bx-heart'
-                                                        }
-                                                    ></i>
-                                                    <span
-                                                        className={
-                                                            styles.likeCount
-                                                        }
-                                                    >
-                                                        {reply.LIKE_COUNT}
-                                                    </span>
-                                                </div>
-                                                <div
-                                                    onClick={() =>
-                                                        toggleReplyInputForReply(
-                                                            reply.REPLY_SEQ
-                                                        )
-                                                    }
-                                                    className={
-                                                        styles.replyLeave
-                                                    }
-                                                >
-                                                    답글 달기
-                                                </div>
-                                            </div>
-                                            <div className={styles.replyRight}>
-                                                {isAuth &&
-                                                    member_id ===
-                                                        reply?.MEMBER_ID && (
-                                                        <>
-                                                            {replyEditingState[
-                                                                reply.REPLY_SEQ
-                                                            ] ? (
-                                                                <>
-                                                                    <div
-                                                                        className={
-                                                                            styles.btnSave
-                                                                        }
-                                                                        onClick={() =>
-                                                                            handleSaveReplyEdit(
-                                                                                reply.REPLY_SEQ
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <i className="bx bx-save"></i>
-                                                                    </div>
-                                                                    <div
-                                                                        className={
-                                                                            styles.btnCancel
-                                                                        }
-                                                                        onClick={() =>
-                                                                            toggleReplyEditMode(
-                                                                                reply.REPLY_SEQ
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        취소
-                                                                    </div>
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <div
-                                                                        className={
-                                                                            styles.btnEdit
-                                                                        }
-                                                                        onClick={() =>
-                                                                            toggleReplyEditMode(
-                                                                                reply.REPLY_SEQ
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <i className="bx bx-edit"></i>
-                                                                    </div>
-                                                                    <div
-                                                                        className={
-                                                                            styles.btnDelete
-                                                                        }
-                                                                        onClick={() =>
-                                                                            handleDeleteReply(
-                                                                                reply.REPLY_SEQ
-                                                                            )
-                                                                        }
-                                                                    >
-                                                                        <i className="bx bx-trash"></i>
-                                                                    </div>
-                                                                </>
-                                                            )}
-                                                        </>
-                                                    )}
-                                                <div
-                                                    className={
-                                                        styles.replyReport
-                                                    }
-                                                >
-                                                    <PiSiren />
-                                                    신고하기
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/* 답글에 답글 입력창 */}
-                                {replyInputOpen[reply.REPLY_SEQ] && (
-                                    <div className={styles.replyInputContainer}>
-                                        <div className={styles.imgBox}>
-                                            <img
-                                                src={userProfile}
-                                                alt="profile"
-                                            />
-                                        </div>
-                                        <textarea
-                                            value={replyContent}
-                                            onChange={e =>
-                                                setReplyContent(e.target.value)
-                                            }
-                                            placeholder="답글을 입력하세요."
-                                            className={styles.replyTextarea}
-                                            onKeyPress={handleReplyKeyPress} // 엔터로 제출
-                                            onInput={e => {
-                                                e.target.style.height = 'auto' // 높이를 자동으로 설정하여 초기화
-                                                e.target.style.height = `${Math.min(
-                                                    e.target.scrollHeight,
-                                                    72
-                                                )}px` // 최대 72px로 제한
-                                            }}
-                                        />
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                </div>
             </div>
         </div>
     )

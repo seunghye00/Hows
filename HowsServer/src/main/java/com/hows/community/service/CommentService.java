@@ -50,6 +50,7 @@ public class CommentService {
     public void deleteLike(int comment_seq) {
         commentDAO.deleteLike(comment_seq);
     }
+    
     // 사용자가 이미 좋아요를 눌렀는지 확인
  	public boolean checkIfUserLikedBoard(String memberId, int comment_seq) {
  		return commentDAO.checkIfUserLikedBoard(memberId, comment_seq);
@@ -89,7 +90,11 @@ public class CommentService {
     public List<Map<String, Object>> getRepliesByCommentSeq(int commentSeq) {
         return commentDAO.getRepliesByCommentSeq(commentSeq);
     }
-
+    
+    // 답글 수정 서비스 메소드 추가
+    public void updateReply(int replySeq, String replyContents) {
+        commentDAO.updateReply(replySeq, replyContents); // DAO 호출하여 답글 수정
+    }
 	// 관리자
 	// 댓글 신고조회 (관리자)
 	// 신고 댓글 목록 조회 (페이징 포함)

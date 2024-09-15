@@ -40,6 +40,24 @@ public class CommentDAO {
         return mybatis.selectList("Comment.getCommentsBoardSeqWithPagination", params);
     }
     
+	// 게시글 댓글 수정 
+    public void updateComment(int commentSeq, String commentContents) {
+    	Map<String, Object> params = new HashMap<>();
+        params.put("comment_seq", commentSeq);
+        params.put("comment_contents", commentContents);
+    	mybatis.update("Comment.updateComment", params);
+    }
+    
+    // 게시글 댓글 삭제 
+    public void deleteComment(int comment_seq) {
+    	mybatis.delete("Comment.deleteComment", comment_seq);
+    }
+    
+    // 댓글 삭제시 좋아요 되어있는거 삭제 
+    public void deleteLike(int comment_seq) {
+    	mybatis.delete("Comment.deleteLike", comment_seq);
+    }
+    
     // 사용자가 특정 게시글에 좋아요를 눌렀는지 확인
     public boolean checkIfUserLikedBoard(String member_id, int comment_seq) {
         Map<String, Object> params = new HashMap<>();
@@ -51,14 +69,22 @@ public class CommentDAO {
     }
 
 	
-    // 게시글에 좋아요 제거
+    // 댓글 좋아요 제거
     public void removeLike(String member_id, int comment_seq) {
         Map<String, Object> params = new HashMap<>();
         params.put("member_id", member_id);
         params.put("comment_seq", comment_seq);  
         mybatis.delete("Comment.removeLike", params);
     }
-    
+
+	// 댓글 좋아요 추가
+	public void addLike(String member_id, int comment_seq) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("member_id", member_id);
+		params.put("comment_seq", comment_seq);
+		mybatis.insert("Comment.addLike", params);
+	}
+	
     // 특정 댓글 좋아요 개수 가져오기
     public int getLikeCount(int comment_seq) {
         return mybatis.selectOne("Comment.getLikeCount", comment_seq);
@@ -93,15 +119,14 @@ public class CommentDAO {
         return mybatis.selectList("Comment.getRepliesByCommentSeq", commentSeq);
     }
 	
+    // 답글 수정 SQL 호출
+    public void updateReply(int replySeq, String replyContents) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("reply_seq", replySeq);
+        params.put("reply_contents", replyContents);
 
-	// 게시글에 좋아요 추가
-	public void addLike(String member_id, int comment_seq) {
-		Map<String, Object> params = new HashMap<>();
-		params.put("member_id", member_id);
-		params.put("comment_seq", comment_seq);
-
-		mybatis.insert("Comment.addLike", params);
-	}
+        mybatis.update("Comment.updateReply", params); // MyBatis Mapper 호출
+    }
 
 	// 관리자
 	// 댓글 신고조회 (관리자)

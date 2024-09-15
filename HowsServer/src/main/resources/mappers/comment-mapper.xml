@@ -153,7 +153,13 @@
 		group by r.reply_seq, r.reply_contents, r.reply_date, r.comment_seq, r.member_id, m.nickname, m.member_avatar
 		order by r.reply_seq asc
     </select>
-	
+    
+    <!-- 답글 수정 -->
+	<update id="updateReply">
+	    update reply
+	    set reply_contents = #{reply_contents}
+	    where reply_seq = #{reply_seq}
+	</update>
 
 	<!-- 관리자 -->
 	<!-- 댓글 신고조회 (관리자) -->

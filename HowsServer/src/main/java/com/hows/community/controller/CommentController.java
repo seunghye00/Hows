@@ -180,7 +180,17 @@ public class CommentController {
 	    return ResponseEntity.ok(response); // 답글 목록을 JSON 형식으로 반환
 	}
 	
+	// 게시글 답글 수정
+	@PutMapping("/update/reply")
+	public ResponseEntity<Void> updateReply(@RequestBody Map<String, Object> requestData) {
+	    int replySeq = (int) requestData.get("reply_seq");
+	    String replyContents = (String) requestData.get("reply_contents");
+	    // 서비스 호출하여 답글 수정 처리
+	    commentServ.updateReply(replySeq, replyContents);
 
+	    return ResponseEntity.ok().build();
+	}
+	
 	// 관리자
 	// 댓글 신고조회 (관리자)
 	// 댓글 신고 목록 조회

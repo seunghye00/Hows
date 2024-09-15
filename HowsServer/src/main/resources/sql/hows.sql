@@ -419,6 +419,20 @@ increment by 1
 nomaxvalue
 nocache;
 
+-- 리뷰 이미지 관리
+create table review_image (
+    review_image_seq number primary key,          
+    review_seq number not null,                 
+    image_url varchar2(500) not null,    
+    image_order number not null          
+);
+
+create sequence review_image_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
+
 -----------------------------------------------------------------------------------------
 
 -- 시온 (결제)

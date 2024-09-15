@@ -100,7 +100,6 @@ public class NoticeController {
 
 			// 수정 로직 호출
 			Nservice.modifyNtc(notice_seq, dto);
-			System.out.println(modifyNtc(notice_seq, notice_title, notice_contents, file));
 
 			return ResponseEntity.ok("공지사항이 수정되었습니다.");
 		} catch (Exception e) {

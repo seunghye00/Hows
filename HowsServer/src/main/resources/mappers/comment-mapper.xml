@@ -8,9 +8,10 @@
 	<!-- 게시글 댓글 작성 -->
 	<insert id="writeComment">
 		insert into comments
-		values(comment_seq.nextval,#{comment_contents}, default, #{board_seq}, #{member_id})
+		values(comment_seq.nextval,#{comment_contents}, default, #{board_seq},
+		#{member_id})
 	</insert>
-	
+
 	<!-- 게시글 댓글 목록 출력 -->
 	<!-- <select id="getCommentsBoardSeq" resultType="map">
 		select 
@@ -23,16 +24,18 @@
 		    m.member_avatar,
 		    count(distinct cl.comment_like_seq) as like_count
 		from comments c
-		join member m on c.member_id = m.member_id
-		left join comment_like cl on c.comment_seq = cl.comment_seq 
+		join member m on
+		c.member_id = m.member_id
+		left join comment_like cl on c.comment_seq =
+		cl.comment_seq
 		where c.board_seq = #{board_seq}
-		group by c.comment_seq, 
-		         c.comment_contents, 
-		         c.comment_write_date, 
-		         c.board_seq, 
-		         c.member_id,
-		         m.nickname,
-		         m.member_avatar
+		group by c.comment_seq,
+		c.comment_contents,
+		c.comment_write_date,
+		c.board_seq,
+		c.member_id,
+		m.nickname,
+		m.member_avatar
 		order by c.comment_seq asc
 	</select> -->
 	
@@ -65,49 +68,59 @@
 	
 	<!-- 게시글 댓글 수정 -->
 	<update id="updateComment">
-		update comments set comment_contents = #{comment_contents} where comment_seq = #{comment_seq}
+		update comments set comment_contents =
+		#{comment_contents} where comment_seq = #{comment_seq}
 	</update>
-	
+
 	<!-- 게시글 댓글 삭제 -->
 	<delete id="deleteComment">
-		delete from comments where comment_seq = #{comment_seq}
+		delete from comments where comment_seq =
+		#{comment_seq}
 	</delete>
-	
+
 	<!-- 댓글 좋아요 삭제 -->
 	<delete id="deleteLike">
-		delete from comment_like where comment_seq = #{comment_seq}
+		delete from comment_like where comment_seq =
+		#{comment_seq}
 	</delete>
-	
+
 	<!-- 사용자가 해당 댓글에 좋아요를 눌렀는지 확인 -->
 	<select id="checkIfUserLikedBoard" resultType="int">
-	    select count(*) 
-	    from comment_like
-	    where member_id = #{member_id} and comment_seq = #{comment_seq}
+		select count(*)
+		from comment_like
+		where member_id = #{member_id} and comment_seq =
+		#{comment_seq}
 	</select>
-	
+
 	<!-- 댓글에 좋아요 추가 -->
 	<insert id="addLike">
-	    insert into comment_like (comment_like_seq, member_id, comment_seq)
-	    values (comment_like_seq.nextval, #{member_id}, #{comment_seq})
+		insert into comment_like (comment_like_seq,
+		member_id, comment_seq)
+		values (comment_like_seq.nextval, #{member_id},
+		#{comment_seq})
 	</insert>
-	
+
 	<!-- 댓글에서 좋아요 취소 -->
 	<delete id="removeLike">
-	    delete from comment_like
-	    where member_id = #{member_id} and comment_seq = #{comment_seq}
+		delete from comment_like
+		where member_id =
+		#{member_id} and comment_seq = #{comment_seq}
 	</delete>
-	
+
 	<!-- 댓글의 좋아요 수 가져오기 -->
 	<select id="getLikeCount" resultType="int">
-	    select count(*) 
-	    from comment_like
-	    where comment_seq = #{comment_seq}
+		select count(*)
+		from
+		comment_like
+		where comment_seq = #{comment_seq}
 	</select>
-	
-	<!-- 댓글 신고  -->
+
+	<!-- 댓글 신고 -->
 	<insert id="sendCommentReport">
-	    insert into comment_report
-	    values (comment_report_seq.nextval, #{report_code}, default, #{member_id}, #{comment_seq})
+		insert into comment_report
+		values
+		(comment_report_seq.nextval, #{report_code}, default, #{member_id},
+		#{comment_seq})
 	</insert>
 	
 	<!-- 전체 댓글 수 가져오기 -->
@@ -141,4 +154,153 @@
 		order by r.reply_seq asc
     </select>
 	
+
+	<!-- 관리자 -->
+	<!-- 댓글 신고조회 (관리자) -->
+	<select id="getReportedComments" resultType="map">
+		SELECT *
+		FROM (
+		SELECT
+		c.comment_seq,                    <!-- 댓글 번호 -->
+		b.board_contents,                 <!-- 게시판 내용 -->
+		m.nickname,                       <!-- 댓글 작성자 -->
+		c.comment_contents,               <!-- 댓글 내용 추가 -->
+		TO_CHAR(c.comment_write_date, 'YYYY-MM-DD') AS write_date,  <!-- 댓글 작성일 -->
+		COUNT(cr.comment_report_seq) AS report_count,  <!-- 신고 횟수 -->
+		ROW_NUMBER() OVER (ORDER BY c.comment_seq DESC) AS row_num  <!-- 각 행에 순번 
+			부여 -->
+		FROM
+		comments c
+		JOIN
+		board b ON c.board_seq = b.board_seq  <!-- 게시판과 조인 -->
+		JOIN
+		member m ON c.member_id = m.member_id  <!-- 작성자 정보 조인 -->
+		JOIN
+		comment_report cr ON c.comment_seq = cr.comment_seq  <!-- 신고 기록 조인 -->
+		GROUP BY
+		c.comment_seq, b.board_contents, m.nickname,
+		c.comment_contents,
+		c.comment_write_date  <!-- 그룹핑 -->
+		)
+		WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
+	</select>
+
+	<!-- 댓글 신고내역 조회 (관리자) -->
+	<select id="getCommentReport"
+		resultType="com.hows.community.dto.CommentReportDTO">
+		SELECT
+		cr.comment_report_seq,            <!-- 신고 번호 -->
+		r.report_description AS report_code,  <!-- 신고 사유 -->
+		cr.comment_report_date,            <!-- 신고 날짜, 변환 없이 그대로 사용 -->
+		cr.comment_seq,                   <!-- 댓글 번호 -->
+		m.nickname AS member_id           <!-- 신고자 닉네임 (member_id 대신) -->
+		FROM
+		comment_report cr
+		JOIN
+		member m ON cr.member_id = m.member_id  <!-- 신고자 
+			정보 조인 -->
+		JOIN
+		report r ON cr.report_code = r.report_code  <!-- 신고 사유 코드와 조인 -->
+		WHERE
+		cr.comment_seq = #{comment_seq}  <!-- 댓글 번호로 특정 댓글의 신고 내역을 조회 -->
+	</select>
+
+	<!-- 댓글 신고 기록 삭제 -->
+	<delete id="deleteCommentReport">
+		DELETE FROM comment_report WHERE comment_seq =
+		#{comment_seq}
+	</delete>
+
+	<!-- 댓글 삭제 -->
+	<delete id="deleteCmt">
+		DELETE FROM comments WHERE comment_seq =
+		#{comment_seq}
+	</delete>
+
+	<!-- 신고 댓글 개수 조회 -->
+	<select id="getReportedCommentsCount" resultType="int">
+		SELECT
+		COUNT(DISTINCT c.comment_seq)
+		FROM comments c
+		JOIN comment_report cr ON
+		c.comment_seq = cr.comment_seq
+	</select>
+
+	<!-- 대댓글 신고조회 (관리자) -->
+	<select id="getReportedReplies" resultType="map">
+		SELECT *
+		FROM (
+		SELECT
+		r.reply_seq,                        <!-- 대댓글 번호 -->
+		c.comment_contents AS parent_comment_contents,  <!-- 부모 댓글 내용 -->
+		b.board_contents,                   <!-- 게시판 내용 -->
+		m.nickname,       <!-- 대댓글 작성자 닉네임 -->
+		TO_CHAR(r.reply_date, 'YYYY-MM-DD') AS write_date,  <!-- 대댓글 작성일 -->
+		COUNT(rr.reply_report_seq) AS report_count,         <!-- 신고 횟수 -->
+		ROW_NUMBER() OVER (ORDER BY r.reply_seq DESC) AS row_num,  <!-- 순번 -->
+		r.reply_contents AS reported_reply_contents         <!-- 신고당한 대댓글 내용 -->
+		FROM
+		reply r
+		JOIN
+		comments c ON r.comment_seq = c.comment_seq  <!-- 대댓글이 달린 
+			댓글 정보 -->
+		JOIN
+		board b ON c.board_seq = b.board_seq  <!-- 게시판 정보 -->
+		JOIN
+		member m ON r.member_id = m.member_id  <!-- 대댓글 작성자 정보 -->
+		JOIN
+		reply_report rr ON r.reply_seq = rr.reply_seq  <!-- 대댓글 신고 기록 -->
+		GROUP BY
+		r.reply_seq, c.comment_contents, b.board_contents, m.nickname,
+		r.reply_date,
+		r.reply_contents
+		)
+		WHERE row_num BETWEEN #{startRow} AND
+		#{endRow}  <!-- 페이징 처리 -->
+	</select>
+
+	<!-- 신고된 대댓글 총 개수 조회 -->
+	<select id="getReportedReplysCount" resultType="int">
+		SELECT
+		COUNT(DISTINCT r.reply_seq)
+		FROM reply r
+		JOIN reply_report rr ON
+		r.reply_seq = rr.reply_seq
+	</select>
+
+	<!-- 대댓글 신고 내역 조회 -->
+	<select id="getReplyReport"
+		resultType="com.hows.community.dto.ReplyReportDTO">
+		SELECT
+		rr.reply_report_seq,  <!-- 신고 번호 -->
+		r.report_description AS report_code,  <!-- 신고 사유 -->
+		rr.reply_report_date,
+		rr.reply_seq,           <!-- 대댓글 번호 -->
+		m.nickname AS member_id  <!-- 신고자 닉네임 -->
+		FROM
+		reply_report rr
+		JOIN
+		member m ON rr.member_id = m.member_id  <!-- 신고자 정보와 
+			조인 -->
+		JOIN
+		report r ON rr.report_code = r.report_code  <!-- 신고 사유 코드와 조인 -->
+		WHERE
+		rr.reply_seq = #{reply_seq}
+	</select>
+
+	<!-- 대댓글 신고 기록 삭제 -->
+	<delete id="deleteReplyReport">
+		DELETE FROM Reply_report WHERE reply_seq =
+		#{reply_seq}
+	</delete>
+
+	<!-- 대댓글 삭제 -->
+	<delete id="deleteReply">
+		DELETE FROM reply WHERE reply_seq = #{reply_seq}
+	</delete>
 </mapper>
+
+
+
+
+

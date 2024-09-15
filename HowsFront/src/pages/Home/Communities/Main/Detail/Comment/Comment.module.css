@@ -178,6 +178,9 @@
     color: var(--hows-gray-700);
 }
 
-
+.replyRight {
+    display: flex;
+    gap: 10px;
+}
 
 .replyBox {}

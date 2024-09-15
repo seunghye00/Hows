@@ -5,6 +5,27 @@
 
 <mapper namespace="Product">
 
+	<!-- 베스트 상품 목록 -->
+    <select id="getBestProducts" resultType="com.hows.product.dto.ProductDTO">
+        SELECT p.product_seq, 
+               p.product_thumbnail, 
+               p.product_title, 
+               p.product_contents, 
+               p.price, 
+               p.quantity, 
+               COALESCE(SUM(ol.order_list_count), 0) AS total_sales <!-- 총 판매량, 주문이 없는 경우 0으로 표시 -->
+        FROM product p 
+        LEFT JOIN order_list ol <!-- 주문 리스트와 상품 조인 -->
+        ON p.product_seq = ol.product_seq 
+        GROUP BY p.product_seq, 
+                 p.product_thumbnail, 
+                 p.product_title, 
+                 p.product_contents, 
+                 p.price, 
+                 p.quantity 
+        ORDER BY total_sales DESC
+    </select>
+    
 	<resultMap id="myReviewMap" type="java.util.HashMap">
 		<result property="review_seq" column="review_seq"/>
 		<result property="rating" column="rating"/>

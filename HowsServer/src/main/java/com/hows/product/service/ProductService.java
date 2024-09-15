@@ -14,6 +14,11 @@ public class ProductService {
 	@Autowired
 	private ProductDAO productDAO;
 	
+	// 베스트 상품 목록 출력
+    public List<ProductDTO> getBestProducts() {
+        return productDAO.getBestProducts();
+    }
+	
 	// 전체 목록 출력 
 	public List<ProductDTO> getProducts () throws Exception{
 		return productDAO.getProducts();

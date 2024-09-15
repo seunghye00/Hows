@@ -64,10 +64,15 @@ public class CommentController {
 	        BigDecimal commentSeqDecimal = (BigDecimal) comment.get("COMMENT_SEQ");
 	        int commentSeq = commentSeqDecimal.intValue(); // BigDecimal을 int로 변환
 
-		// 각 댓글에 대해 사용자가 좋아요를 눌렀는지 확인하여 isLiked 필드 추가
-		for (Map<String, Object> comment : comments) {
-			BigDecimal commentSeqDecimal = (BigDecimal) comment.get("COMMENT_SEQ");
-			int commentSeq = commentSeqDecimal.intValue(); // BigDecimal을 int로 변환
+	        // 회원일 경우에만 좋아요 여부 확인
+	        if (memberId != null) {
+	            boolean isLiked = commentServ.checkIfUserLikedBoard(memberId, commentSeq);
+	            comment.put("isLiked", isLiked);
+	        } else {
+	            // 비회원일 경우 기본값으로 좋아요를 누르지 않은 상태
+	            comment.put("isLiked", false);
+	        }
+	    }
 
 	    // 전체 댓글 개수 조회
 	    int totalCommentsCount = commentServ.getTotalCommentsCount(boardSeq);
@@ -110,10 +115,6 @@ public class CommentController {
             
             // 1. 사용자가 이미 좋아요를 눌렀는지 확인
             boolean isLiked = commentServ.checkIfUserLikedBoard(userId, comment_seq);
-
-			// 1. 사용자가 이미 좋아요를 눌렀는지 확인
-			boolean isLiked = commentServ.checkIfUserLikedBoard(userId, comment_seq);
-
 			if (isLiked) {
 				// 2. 이미 좋아요를 눌렀다면 좋아요 취소
 				commentServ.removeLike(userId, comment_seq);
@@ -176,7 +177,6 @@ public class CommentController {
 	    // 답글 목록 응답 데이터 구조 설정
 	    Map<String, Object> response = new HashMap<>();
 	    response.put("replies", replies); // 해당 댓글의 답글 목록
-	    System.out.println("서버에서 응답할 데이터: " + response); // 서버에서 보내는 데이터 콘솔 출력
 	    return ResponseEntity.ok(response); // 답글 목록을 JSON 형식으로 반환
 	}
 	

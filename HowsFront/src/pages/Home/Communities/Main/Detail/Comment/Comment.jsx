@@ -398,72 +398,78 @@ export const Comment = ({
                                                     답글 달기
                                                 </div>
                                             </div>
-                                            {isAuth &&
-                                                member_id ===
-                                                    reply?.MEMBER_ID && (
-                                                    <>
-                                                        {replyEditingState[
-                                                            reply.REPLY_SEQ
-                                                        ] ? (
-                                                            <>
-                                                                <div
-                                                                    className={
-                                                                        styles.btnSave
-                                                                    }
-                                                                    onClick={() =>
-                                                                        handleSaveReplyEdit(
-                                                                            reply.REPLY_SEQ
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <i className="bx bx-save"></i>
-                                                                </div>
-                                                                <div
-                                                                    className={
-                                                                        styles.btnCancel
-                                                                    }
-                                                                    onClick={() =>
-                                                                        toggleReplyEditMode(
-                                                                            reply.REPLY_SEQ
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    취소
-                                                                </div>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <div
-                                                                    className={
-                                                                        styles.btnEdit
-                                                                    }
-                                                                    onClick={() =>
-                                                                        toggleReplyEditMode(
-                                                                            reply.REPLY_SEQ
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <i className="bx bx-edit"></i>
-                                                                </div>
-                                                                <div
-                                                                    className={
-                                                                        styles.btnDelete
-                                                                    }
-                                                                    onClick={() =>
-                                                                        handleDeleteReply(
-                                                                            reply.REPLY_SEQ
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <i className="bx bx-trash"></i>
-                                                                </div>
-                                                            </>
-                                                        )}
-                                                    </>
-                                                )}
                                             <div className={styles.replyRight}>
-                                                <PiSiren />
-                                                신고하기
+                                                {isAuth &&
+                                                    member_id ===
+                                                        reply?.MEMBER_ID && (
+                                                        <>
+                                                            {replyEditingState[
+                                                                reply.REPLY_SEQ
+                                                            ] ? (
+                                                                <>
+                                                                    <div
+                                                                        className={
+                                                                            styles.btnSave
+                                                                        }
+                                                                        onClick={() =>
+                                                                            handleSaveReplyEdit(
+                                                                                reply.REPLY_SEQ
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="bx bx-save"></i>
+                                                                    </div>
+                                                                    <div
+                                                                        className={
+                                                                            styles.btnCancel
+                                                                        }
+                                                                        onClick={() =>
+                                                                            toggleReplyEditMode(
+                                                                                reply.REPLY_SEQ
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        취소
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <div
+                                                                        className={
+                                                                            styles.btnEdit
+                                                                        }
+                                                                        onClick={() =>
+                                                                            toggleReplyEditMode(
+                                                                                reply.REPLY_SEQ
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="bx bx-edit"></i>
+                                                                    </div>
+                                                                    <div
+                                                                        className={
+                                                                            styles.btnDelete
+                                                                        }
+                                                                        onClick={() =>
+                                                                            handleDeleteReply(
+                                                                                reply.REPLY_SEQ
+                                                                            )
+                                                                        }
+                                                                    >
+                                                                        <i className="bx bx-trash"></i>
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </>
+                                                    )}
+                                                <div
+                                                    className={
+                                                        styles.replyReport
+                                                    }
+                                                >
+                                                    <PiSiren />
+                                                    신고하기
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

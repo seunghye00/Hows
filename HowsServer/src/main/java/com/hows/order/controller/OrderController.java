@@ -7,6 +7,7 @@ import com.hows.common.CustomUserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.hows.order.dto.OrderDTO;
@@ -52,10 +53,51 @@ public class OrderController {
 		return ResponseEntity.ok(result);
 	}
 	
-	@PutMapping("updateOrderCode")
+	// 주문 상태 변경
+	@PutMapping("/updateOrderCode")
 	public ResponseEntity<String> updateOrderCode(@RequestParam int order_seq, @RequestParam String order_code) throws Exception {
 		String result = orderServ.updateOrder(new OrderDTO(order_seq, order_code));
 		return ResponseEntity.ok(result);
+	}
+	
+	// 배송 시작
+	@Transactional
+	@PutMapping("/startDelivery")
+	public ResponseEntity<String> startDelivery(@RequestParam String seqs) throws Exception {
+		String[] orderSeqs = seqs.split(","); // seqs를 배열로 변환
+		for(String orderSeq : orderSeqs) {
+			try {
+				int order_seq = Integer.parseInt(orderSeq);
+				// 업데이트 실패 시 예외 처리
+				if(orderServ.updateOrder(new OrderDTO(order_seq, "O4")).equals("fail")) {
+					throw new RuntimeException("배송 시작 실패");
+				}
+            } catch (Exception e) {
+                // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+                throw new RuntimeException("배송 시작 실패", e);
+            }
+		}
+		return ResponseEntity.ok("success");
+	}
+	
+	// 구매 확정
+	@Transactional
+	@PutMapping("/doneOrder")
+	public ResponseEntity<String> doneOrder(@RequestParam String seqs) throws Exception {
+		String[] orderSeqs = seqs.split(","); // seqs를 배열로 변환
+		for(String orderSeq : orderSeqs) {
+			try {
+				int order_seq = Integer.parseInt(orderSeq);
+				// 업데이트 실패 시 예외 처리
+				if(orderServ.updateOrder(new OrderDTO(order_seq, "O6")).equals("fail")) {
+					throw new RuntimeException("구매 확정 실패");
+				}
+            } catch (Exception e) {
+                // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+                throw new RuntimeException("구매 확정 실패", e);
+            }
+		}
+		return ResponseEntity.ok("success");
 	}
 
 	@ExceptionHandler(Exception.class)

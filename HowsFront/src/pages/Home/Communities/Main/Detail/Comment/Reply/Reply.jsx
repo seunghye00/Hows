@@ -32,6 +32,7 @@ export const Reply = ({
     setEditingReplySeq, // 수정 모드 설정 함수
     member_id, // 사용자 ID
     handleOpenReportModalForReply, // 신고 모달 열기 함수 (부모로부터 전달)
+    toggleReply,
 }) => {
     const [editorState, setEditorState] = useState(() =>
         EditorState.createWithContent(
@@ -99,7 +100,13 @@ export const Reply = ({
                 </div>
                 <div className={styles.replyNickname}>{replyData.NICKNAME}</div>
             </div>
-            <div className={styles.replyTextarea}>
+            <div
+                className={`${styles.replyTextarea} ${
+                    editingReplySeq === replyData.REPLY_SEQ
+                        ? styles.editing
+                        : ''
+                }`}
+            >
                 {editingReplySeq === replyData.REPLY_SEQ ? (
                     <Editor
                         editorState={editorState}
@@ -121,11 +128,13 @@ export const Reply = ({
                         ></i>
                         <span className={styles.likeCount}>{likeCount}</span>
                     </div>
-                    <div
-                        className={styles.replyLeave}
-                        onClick={() => handleReplyToggle(replyData.REPLY_SEQ)} // 부모 컴포넌트로 답글 달기 처리 위임
-                    >
-                        답글 달기
+                    <div className={styles.replyBtnBox}>
+                        <div
+                            className={styles.replyLeave}
+                            onClick={() => toggleReply(replyData.REPLY_SEQ)}
+                        >
+                            답글 달기
+                        </div>
                     </div>
                 </div>
                 <div className={styles.replyRight}>

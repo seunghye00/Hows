@@ -441,6 +441,7 @@ export const Comment = ({
                                   handleOpenReportModalForReply={
                                       handleOpenReportModalForReply
                                   } // 답글 신고 처리
+                                  toggleReply={toggleReply} // toggleReply 함수 전달
                               />
                           ))
                         : replies.slice(-1).map(reply => (
@@ -461,6 +462,7 @@ export const Comment = ({
                                   handleOpenReportModalForReply={
                                       handleOpenReportModalForReply
                                   } // 답글 신고 처리
+                                  toggleReply={toggleReply} // toggleReply 함수 전달
                               />
                           ))}
                 </div>

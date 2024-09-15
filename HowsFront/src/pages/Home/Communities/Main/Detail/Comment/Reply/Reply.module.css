@@ -77,12 +77,22 @@
 
 .replyTextarea {
     padding: 5px 10px;
-    border-radius: 8px;
+
     box-sizing: border-box;
     font-size: 16px;
     overflow-y: auto;
     letter-spacing: .7px;
     color: var(--hows-gray-700);
-    border: 1px solid var(--hows-gray-600);
     max-height: 72px;
+}
+
+/* 수정 모드일 때 스타일 */
+.editing {
+    border-radius: 8px;
+    border: 1px solid var(--hows-gray-600);
+}
+
+.replyDate {
+    word-wrap: break-word;
+    word-break: keep-all;
 }

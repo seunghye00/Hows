@@ -55,26 +55,6 @@ public class CommentService {
  		return commentDAO.checkIfUserLikedBoard(memberId, comment_seq);
  	}
 
-	// 게시글 댓글 수정
-	public void updateComment(int commentSeq, String commentContents) {
-		commentDAO.updateComment(commentSeq, commentContents);
-	}
-
-	// 게시글 댓글 삭제
-	public void deleteComment(int comment_seq) {
-		commentDAO.deleteComment(comment_seq);
-	}
-
-	// 게시글 댓글 삭제 시 좋아요 연결 테이블 삭제
-	public void deleteLike(int comment_seq) {
-		commentDAO.deleteLike(comment_seq);
-	}
-
-	// 사용자가 이미 좋아요를 눌렀는지 확인
-	public boolean checkIfUserLikedBoard(String memberId, int comment_seq) {
-		return commentDAO.checkIfUserLikedBoard(memberId, comment_seq);
-	}
-
 	// 좋아요 추가
 	public void addLike(String memberId, int comment_seq) {
 		commentDAO.addLike(memberId, comment_seq);

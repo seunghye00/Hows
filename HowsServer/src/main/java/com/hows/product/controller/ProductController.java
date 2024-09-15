@@ -106,11 +106,29 @@ public class ProductController {
 		return ResponseEntity.ok().build();
 	}
 
-	// 리뷰 출력 (페이징)
-	@GetMapping("/getReviewList/{product_seq}")
-	public ResponseEntity<Map<String, Object>> getReviewList(@PathVariable int product_seq,
+	// 리뷰 이미지 가져오기
+	@GetMapping("/getReviewImgList/{review_seq}")
+	public ResponseEntity<Map<String, Object>> getReviewImgList(@PathVariable int review_seq,
 			@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int itemsPerPage)
 			throws Exception {
+
+		// 페이징된 리뷰 목록 조회
+		List<String> reviewImgList = reviewServ.getReviewImgList(review_seq);
+
+		// 페이징 정보와 리뷰 목록을 함께 반환
+		Map<String, Object> response = new HashMap<>();
+		response.put("reviewImgs", reviewImgList);
+
+		return ResponseEntity.ok(response);
+	}
+	
+	// 리뷰 출력 (페이징)
+	@GetMapping("/getReviewList/{product_seq}")
+	public ResponseEntity<Map<String, Object>> getReviewList(
+			@PathVariable int product_seq,
+			@RequestParam(defaultValue = "1") int page, 
+			@RequestParam(defaultValue = "10") int itemsPerPage)
+	throws Exception {
 
 		// 페이징된 리뷰 목록 조회
 		List<Map<String, Object>> reviewList = reviewServ.getReviewList(product_seq, page, itemsPerPage);
@@ -121,6 +139,15 @@ public class ProductController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	// 리뷰 삭제
+	@DeleteMapping("/delReview/{review_seq}")
+	public ResponseEntity<String> delReview(@PathVariable int review_seq) throws Exception {
+	    reviewServ.deleteReview(review_seq);
+	    return ResponseEntity.ok().build();
+	}
+
+
 
 	// ==================
 	// 상품 추가

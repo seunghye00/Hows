@@ -11,8 +11,8 @@ export const orderList = status => {
 }
 
 // 주문, 주문목록 추가
-export const addOrder = order => {
-    return api.post(`/order`, order)
+export const  addOrder = async order => {
+    return await api.post(`/order`, order)
 }
 
 // 주문 상태 업데이트

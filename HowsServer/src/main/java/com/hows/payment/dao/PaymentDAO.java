@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class PaymentDAO {
@@ -26,6 +27,17 @@ public class PaymentDAO {
     /** 결제 내역 추가 **/
     public int addPayment(PaymentDTO paymentDTO) {
         return mybatis.insert("Payment.addPayment", paymentDTO);
+    }
+
+    /** 결제 상태 변경 **/
+    public int updatePayment(Map<String, Object> map) {
+        System.out.println("map ====== "+ map);
+        return mybatis.update("Payment.updatePayment", map);
+    }
+
+    /** 결제 삭제 **/
+    public int cancelPayment(String id) {
+        return mybatis.delete("Payment.cancelPayment", id);
     }
 
 }

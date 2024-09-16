@@ -39,6 +39,10 @@ public class PaymentService {
             int totalAmount = paymentRequest.getTotalAmount();
             int orderSeq = paymentRequest.getOrderSeq();
 
+            System.out.println("paymentId ====== " + paymentId);
+            System.out.println("orderSeq ====== " + orderSeq);
+
+
             // 1. PortOne 결제내역 단건조회 API 호출
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
@@ -95,9 +99,10 @@ public class PaymentService {
     }
 
     /** 결제 취소 **/
-    public String paymentCancel(Map<String, Object> map){
-        String paymentId = (String) map.get("id");
-        String reason = (String) map.get("reason");
+    public String paymentCancel(Map<String, Object> map) {
+        String paymentId = (String) map.get("payment_id");
+        String reason = (String) map.get("payment_text");
+        String type = (String) map.get("type");
         String result = "fail";
 
         try {
@@ -122,15 +127,15 @@ public class PaymentService {
             Integer totalAmount = (Integer) cancellation.get("totalAmount");
 
             if(status.equals("SUCCEEDED")){
-                // 결제 내역 취소로 변경
-                // order 취소 or 환불로 변경
-                result = "ok";
+                if(type.equals("cancel")){
+                    // 결제 내역 취소로 변경
+                    map.put("payment_code", "P5");
+                } else {
+                    // 결제 내역 삭제
+                    int cancel = paymentDAO.cancelPayment(paymentId);
+                    return cancel > 0 ? "ok" : "fail";
+                }
             }
-
-            if (!paymentResponse.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Failed to retrieve payment details: " + paymentResponse.getBody());
-            }
-
 
         } catch (Exception e) {
             e.printStackTrace();

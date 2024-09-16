@@ -50,18 +50,19 @@ export const findMemberSeq = (member_id) => {
 };
 
 // 프로필 이미지 업로드
-export const uploadProfileImage = (file, memberSeq) => {
+export const uploadImage = (file, memberSeq, imageType) => {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('member_seq', memberSeq)
+    formData.append("type", imageType); // 타입 추가
 
-    return api.post('/member/uploadProfileImage', formData)
+    return api.post('/member/uploadImage', formData)
 }
 
 // 프로필 이미지 삭제
-export const deleteProfileImage = memberSeq => {
-    return api.delete('/member/deleteProfileImage', {
-        params: { member_seq: memberSeq },
+export const deleteImage = (memberSeq, imageType) => {
+    return api.delete('/member/deleteImage', {
+        params: { member_seq: memberSeq, type: imageType }
     })
 }
 

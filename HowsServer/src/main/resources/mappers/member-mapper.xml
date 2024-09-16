@@ -101,15 +101,27 @@
     <update id="updateProfileImage">
         update member set member_avatar = #{member_avatar} where member_seq = ${member_seq}
     </update>
+	<!-- 배너 이미지 업데이트 -->
+    <update id="updateBannerImage">
+        update member set member_banner = #{member_banner} where member_seq = ${member_seq}
+    </update>
     
     <!--  현재 프로필 사진 URL 가져오기 -->
 	<select id="getProfileImageUrl" resultType="String">
 	    select member_avatar from member where member_seq = ${member_seq}
 	</select>
+    <!--  현재 배너 사진 URL 가져오기 -->
+	<select id="getBannerImageUrl" resultType="String">
+	    select member_banner from member where member_seq = ${member_seq}
+	</select>
 	
 	<!-- 프로필 삭제 시 member_avatar => null  -->
 	<update id="updateProfileImageToNull">
 	    update member set member_avatar = null where member_seq = ${member_seq}
+	</update>
+	<!-- 프로필 삭제 시 member_avatar => null  -->
+	<update id="updateBannerImageToNull">
+	    update member set member_banner = null where member_seq = ${member_seq}
 	</update>
 	
 

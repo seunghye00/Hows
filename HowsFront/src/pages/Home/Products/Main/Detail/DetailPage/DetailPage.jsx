@@ -1,27 +1,26 @@
 import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styles from './DetailPage.module.css'
+import axios from 'axios';
+import Swal from "sweetalert2";
 import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
 import StarRating from '../../../../../../components/StarRating/StarRating';
 import { Modal } from '../../../../../../components/Modal/Modal';
 import { api, host } from '../../../../../../config/config';
-import { useParams } from 'react-router-dom';
 import { useAuthStore } from '../../../../../../store/store';
 import { formatDate } from '../../../../../../commons/commons'
-import Swal from "sweetalert2";
 import { Paging } from '../../../../../../components/Pagination/Paging';
-import { 
-    getReviewList , 
-    getProductDetail,
-    getReviewImgList
-} from '../../../../../../api/product';
-import axios from 'axios';
+// API 함수 불러오기
+import { userInfo } from '../../../../../../api/member' 
+import { getReviewList , getProductDetail,getReviewImgList } from '../../../../../../api/product';
+
+
 
 export const DetailPage = () => {
     const { product_seq } = useParams(); 
     const { isAuth } = useAuthStore() // 로그인 여부 확인
     const memberId = sessionStorage.getItem("member_id"); // 세션에서 member_id 가져오기
-
-
+    
     // ======================================== 상태 ========================================
     const [data, setData] = useState({
         rating: 0,                  // 별점 상태
@@ -37,29 +36,24 @@ export const DetailPage = () => {
     const [ totalReviews, setTotalReviews ] = useState(0) // 페이지네이션, 전체 리뷰 개수 
 
     const [ reviews,setReviews ] = useState([]); // 리뷰 목록
-
     const [ averageRating, setAverageRating ] = useState(0); // 평균 별점
-    const [ ratingsCount, setRatingsCount ] = useState({5: 0,4: 0,3: 0,2: 0,1: 0}); // 각 점수에 몇 명이 있는지 저장
+    const [ ratingsCount, setRatingsCount ] = useState({5: 0,4: 0,3: 0,2: 0,1: 0});
 
     const [ isSubmitting, setIsSubmitting ] = useState(false); // 제출 중 여부
     const [ productContents, setProductContents ] = useState(''); // 상품 정보
     const [ previewImages, setPreviewImages ] = useState([]); // 이미지 미리보기 URL을 저장
+
+    const [reviewAvatars, setReviewAvatars] = useState({}); // 각 리뷰 작성자의 프로필 이미지를 저장
     // ======================================== 상태 ======================================== 
 
 
     // 탭 메뉴  
     const handleTabChange = (tabName) => setActiveTab(tabName);
 
-
-    // 모달창 열기 및 닫기 (상태 초기화)
+    // 모달창 열기 및 닫기 (상태 초기화 작업)
     const handleOpenModal = () => {
-        setData({
-            rating: 0,
-            review_contents: '',
-            product_seq: product_seq,
-            images: []
-        });
-        setPreviewImages([]);  // 이미지 미리보기 초기화
+        setData({rating: 0, review_contents: '', product_seq:product_seq, images: []});
+        setPreviewImages([]);  
         setIsModalOpen(true); 
     };
     const handleCloseModal = () => setIsModalOpen(false);
@@ -109,7 +103,7 @@ export const DetailPage = () => {
         }
     };
 
-    //[리뷰 작성] 이미지 제거 
+    // [리뷰 작성] 이미지 제거 
     const handleRemoveImage = (index) => {
 
         // 이미지 URL을 미리보기 배열에서 제거
@@ -146,7 +140,7 @@ export const DetailPage = () => {
         return rating && review_contents && images && images.length > 0;
     };
 
-    // 리뷰 등록
+    // 리뷰 등록 함수 
     const handleSubmit = () => {
         if (isSubmitting) return;
     
@@ -220,7 +214,6 @@ export const DetailPage = () => {
         }
     };
 
-    //리뷰 목록
     useEffect(() => {
         const fetchReviews = async () => {
             try {
@@ -237,6 +230,36 @@ export const DetailPage = () => {
                         })
                     );
     
+                    // 리뷰 작성자 프로필 이미지를 불러오는 부분
+                    const avatarPromises = reviewsData.map(async (review) => {
+                        // member_id가 null 또는 "null"이 아닌 경우에만 호출
+                        if (review.MEMBER_ID && review.MEMBER_ID !== "null") { 
+                            try {
+                                // 프로필 이미지 API 호출
+                                const profileResp = await userInfo(review.MEMBER_ID);
+                                return { memberId: review.MEMBER_ID, avatar: profileResp.data.member_avatar };
+                            } catch (error) {
+                                console.error(`프로필 이미지를 불러오는 중 오류 발생: ${review.MEMBER_ID}`, error);
+                                return { memberId: review.MEMBER_ID, avatar: img }; // 오류 발생 시 기본 이미지
+                            }
+                        } else {
+                            return { memberId: review.MEMBER_ID, avatar: img };  // member_id가 없으면 기본 이미지 반환
+                        }
+                    });
+
+                    const avatarData = await Promise.all(avatarPromises);
+
+    
+                    // 프로필 이미지를 상태로 저장
+                    const avatarsMap = avatarData.reduce((acc, { memberId, avatar }) => {
+                        // memberId를 키로, avatar(프로필 이미지)를 값으로 저장
+                        acc[memberId] = avatar; 
+                        return acc;
+                    }, {});
+    
+                    // 프로필 이미지를 상태로 저장
+                    setReviewAvatars(avatarsMap); 
+
                     // 리뷰 상태 및 총 리뷰 수 설정
                     setReviews(reviewsWithImages);
                     setTotalReviews(reviewsData[0].TOTAL_COUNT);
@@ -249,8 +272,7 @@ export const DetailPage = () => {
                     const newRatingsCount = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
                     reviewsData.forEach(review => newRatingsCount[review.RATING]++);
                     setRatingsCount(newRatingsCount);
-                } else {
-                    // 리뷰가 없을 경우 초기화
+                }else {
                     setReviews([]);
                     setTotalReviews(0);
                     setAverageRating(0);
@@ -264,7 +286,7 @@ export const DetailPage = () => {
         fetchReviews();
     }, [product_seq, page, itemsPerPage]);
     
-
+    // 페이지네이션
     const handlePageChange = (newPage) => {
         const startRow = (newPage - 1) * itemsPerPage + 1;
         const endRow = newPage * itemsPerPage;
@@ -304,13 +326,13 @@ export const DetailPage = () => {
             });
     };
 
-    //리뷰 수정
+    //리뷰 수정 함수
     const handleModify = () => {
 
     }
 
-     // 상품 설명 불러오기
     useEffect(()=>{
+        // 상품 설명 불러오기
         getProductDetail(product_seq)
         .then(resp=>{setProductContents(resp.data.product_contents);})
         .catch((error) => {console.error('상품 설명 불러오기 오류', error);});
@@ -325,161 +347,147 @@ export const DetailPage = () => {
             </div>
             <div className={styles.content}>
                 {activeTab === 'info' && (
-                <div className={styles.info}>
-                    {/* 상품 정보 내용 */}
-                    <h2>상품 정보</h2>
-                    <div>
-                        {productContents}
+                    <div className={styles.info}>
+                        <h2>상품 정보</h2>
+                        <div>{productContents}</div>
                     </div>
-                </div>
                 )}
-
                 {activeTab === 'reviews' && (
-                <div className={styles.reviews}>
-                    {/* 상품 리뷰 내용 */}
-                    <div className={styles.reviewsBox}>
-                        <div className={styles.reviewsHeader}>
-                            <div>리뷰 {reviews.length} </div>
-                            
-                            {isAuth ? (
-                                // 로그인 상태일 때
-                                <div onClick={handleOpenModal}>리뷰쓰기</div>
-                            ) : (
-                                // 로그인이 되어 있지 않을 때
-                                <div>로그인 후 리뷰를 작성할 수 있습니다.</div>
-                            )}
+                    <div className={styles.reviews}>
+                        {/* 상품 리뷰 내용 */}
+                        <div className={styles.reviewsBox}>
+                            <div className={styles.reviewsHeader}>
+                                <div>리뷰 {reviews.length} </div>
+                                
+                                {isAuth ? (
+                                    // 로그인 상태일 때
+                                    <div onClick={handleOpenModal}>리뷰쓰기</div>
+                                ) : (
+                                    // 로그인이 되어 있지 않을 때
+                                    <div>로그인 후 리뷰를 작성할 수 있습니다.</div>
+                                )}
 
-                            {/* 모달창 */}
-                            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-                                <div className={styles.modalBox}>
-                                    <h2>리뷰 쓰기</h2>
-                                    <div>
-                                        <span>만족도 </span> &nbsp; &nbsp;
-                                        <StarRating 
-                                            rating={data.rating} // 현재 별점 상태 전달
-                                            onRatingChange={handleRatingChange} // 별점 변경 시 호출
-                                        />
-                                    </div>
-
-                                    <h2>리뷰 작성</h2>
-                                    <div className={styles.reviewModal}>
-                                        <input type='text' 
-                                            name='review_contents' 
-                                            placeholder='리뷰 내용을 입력하세요.' 
-                                            value={data.review_contents} 
-                                            onChange={handleInputChange}
-                                            className={styles.reviewContent}>
-                                        </input>
-
-                                        {/* 이미지 업로드 */}
-                                        <div className={styles.filesBox}>
-                                            <label className={styles.fileBtn} for="files">
-                                                <div>
-                                                    <span> 사진 첨부하기 </span>
-                                                    <i class='bx bxs-file-image'/>
-                                                </div>
-                                            </label>
-                                            <input type="file" accept="image/*" id='files' className={styles.files} onChange={handleImageChange} multiple/>
+                                {/* 모달창 */}
+                                <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                                    <div className={styles.modalBox}>
+                                        <h2>리뷰 쓰기</h2>
+                                        <div>
+                                            <span>만족도 </span> &nbsp; &nbsp;
+                                            <StarRating 
+                                                rating={data.rating} // 현재 별점 상태 전달
+                                                onRatingChange={handleRatingChange} // 별점 변경 시 호출
+                                            />
                                         </div>
-                                        <span className={styles.filesTitle}>첨부파일은 최대 4개까지만 가능합니다</span>
-                                        {/* 이미지 미리보기 */}
-                                        <div className={styles.previewContainer}>
-                                            {renderPreviewImages()}
-                                        </div>
-                                        <button onClick={handleSubmit} disabled={isSubmitting}>
-                                            {/* disabled -> 폼 요소를 비활성화 */}
-                                            {isSubmitting ? '제출 중...' : '리뷰 제출'}
-                                        </button> 
-                                    </div>
-                                </div>
-                            </Modal>
 
-                        </div>
-                        <div className={styles.reviewsStarRating}>
-                            <div><StarRating rating={averageRating} />&nbsp;&nbsp;<span>{averageRating.toFixed(1)}</span></div>
-                            <div>
-                                <ul>
-                                    <li>
-                                        5점&nbsp;&nbsp;{ratingsCount[5]}명
-                                    </li>
-                                    <li>
-                                        4점&nbsp;&nbsp;{ratingsCount[4]}명
-                                    </li>
-                                    <li>
-                                        3점&nbsp;&nbsp;{ratingsCount[3]}명
-                                    </li>
-                                    <li>
-                                        2점&nbsp;&nbsp;{ratingsCount[2]}명
-                                    </li>
-                                    <li>
-                                        1점&nbsp;&nbsp;{ratingsCount[1]}명
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div className={styles.reviewsMain}>
-                            <div className={styles.option}>
-                                <div>베스트순</div>
-                                <div>최신순</div>
-                            </div>
-                            <div className={styles.reviewBox}>
-                                {console.log(reviews)}
-                                {reviews.length > 0 ? (
-                                    (reviews || []).map((review, index) => (
-                                        <div key={index}>
-                                            <div>
-                                                <div>
-                                                    <div> <img src={img} alt='img'/> </div>
+                                        <h2>리뷰 작성</h2>
+                                        <div className={styles.reviewModal}>
+                                            <input type='text' 
+                                                name='review_contents' 
+                                                placeholder='리뷰 내용을 입력하세요.' 
+                                                value={data.review_contents} 
+                                                onChange={handleInputChange}
+                                                className={styles.reviewContent}>
+                                            </input>
+
+                                            {/* 이미지 업로드 */}
+                                            <div className={styles.filesBox}>
+                                                <label className={styles.fileBtn} for="files">
                                                     <div>
-                                                        <div>{review.MEMBER_ID} </div>
-                                                        <div><StarRating rating={review.RATING} /></div>
+                                                        <span> 사진 첨부하기 </span>
+                                                        <i class='bx bxs-file-image'/>
+                                                    </div>
+                                                </label>
+                                                <input type="file" accept="image/*" id='files' className={styles.files} onChange={handleImageChange} multiple/>
+                                            </div>
+                                            <span className={styles.filesTitle}>첨부파일은 최대 4개까지만 가능합니다</span>
+                                            {/* 이미지 미리보기 */}
+                                            <div className={styles.previewContainer}>
+                                                {renderPreviewImages()}
+                                            </div>
+                                            <button onClick={handleSubmit} disabled={isSubmitting}>
+                                                {/* disabled -> 폼 요소를 비활성화 */}
+                                                {isSubmitting ? '제출 중...' : '리뷰 제출'}
+                                            </button> 
+                                        </div>
+                                    </div>
+                                </Modal>
+
+                            </div>
+                            <div className={styles.reviewsStarRating}>
+                                <div><StarRating rating={averageRating} />&nbsp;&nbsp;<span>{averageRating.toFixed(1)}</span></div>
+                                <div>
+                                    <ul>
+                                        <li>5점&nbsp;&nbsp;{ratingsCount[5]}명</li>
+                                        <li>4점&nbsp;&nbsp;{ratingsCount[4]}명</li>
+                                        <li>3점&nbsp;&nbsp;{ratingsCount[3]}명</li>
+                                        <li>2점&nbsp;&nbsp;{ratingsCount[2]}명</li>
+                                        <li>1점&nbsp;&nbsp;{ratingsCount[1]}명</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div className={styles.reviewsMain}>
+                                <div className={styles.option}>
+                                    <div>베스트순</div>
+                                    <div>최신순</div>
+                                </div>
+                                <div className={styles.reviewBox}>
+                                    {console.log(reviews)}
+                                    {reviews.length > 0 ? (
+                                        (reviews || []).map((review, index) => (
+                                            <div key={index}>
+                                                <div>
+                                                    <div>
+                                                        <div>
+                                                            {/* 리뷰 작성자의 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시 */}
+                                                            <img src={reviewAvatars[review.MEMBER_ID] || img} alt="profile"/>
+                                                        </div>
+                                                        <div>
+                                                            <div>{review.MEMBER_ID} </div>
+                                                            <div><StarRating rating={review.RATING} /></div>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        {/* 세션 memberId와 review.MEMBER_ID가 같을 때만 수정/삭제 버튼을 보여줌 */}
+                                                        {memberId === review.MEMBER_ID && (
+                                                            <>
+                                                                <button onClick={handleModify}>수정</button>
+                                                                <button onClick={()=>{handleReviewDel(review.REVIEW_SEQ);}}>삭제</button>
+                                                            </>
+                                                        )}
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    {/* 세션 memberId와 review.MEMBER_ID가 같을 때만 수정/삭제 버튼을 보여줌 */}
-                                                    {memberId === review.MEMBER_ID && (
-                                                        <>
-                                                            <button onClick={handleModify}>수정</button>
-                                                            <button onClick={()=>{
-                                                                handleReviewDel(review.REVIEW_SEQ);
-                                                            }}>삭제</button>
-                                                        </>
+                                                    <div>
+                                                    {(review.images || []).length > 0 ? (
+                                                        review.images.map((img, imgIndex) => (
+                                                            <div key={imgIndex}><img src={img.IMAGE_URL} alt='img'/></div>
+                                                        ))
+                                                    ) : (
+                                                        <div>이미지가 없습니다.</div> 
                                                     )}
+                                                    </div>
+                                                    <div>
+                                                        <div>{review.REVIEW_DATE ? formatDate(review.REVIEW_DATE) : '날짜 없음'}</div> 
+                                                        <div>{review.REVIEW_CONTENTS}</div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div>
-                                                {(review.images || []).length > 0 ? (
-                                                    review.images.map((img, imgIndex) => (
-                                                        <div key={imgIndex}> <img src={img.IMAGE_URL} alt='img'/> </div>
-                                                    ))
-                                                ) : (
-                                                    <div>이미지가 없습니다.</div> 
-                                                )}
-                                                </div>
-                                                <div>
-                                                    <div>{review.REVIEW_DATE ? formatDate(review.REVIEW_DATE) : '날짜 없음'}</div> 
-                                                    <div>{review.REVIEW_CONTENTS}</div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div>리뷰가 없습니다.</div> // 리뷰가 없을 때 처리
-                                )}
-                            </div>
-                            {/* 페이징 컴포넌트 */}
-                            <div>
-                                <Paging
-                                    page={page}
-                                    count={totalReviews} // 전체 리뷰 수
-                                    perpage={itemsPerPage} // 페이지당 항목 수
-                                    setPage={handlePageChange} // 페이지 변경 함수
-                                />
+                                        ))
+                                    ) : (
+                                        <div>리뷰가 없습니다.</div> 
+                                    )}
+                                </div>
+                                <div>
+                                    <Paging
+                                        page={page}
+                                        count={totalReviews} // 전체 리뷰 수
+                                        perpage={itemsPerPage} // 페이지당 항목 수
+                                        setPage={handlePageChange} 
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 )}
 
                 {activeTab === 'details' && (

@@ -155,6 +155,12 @@ export const Member = () => {
                     return
                 }
 
+                // 블랙리스트로 선택되었을 경우, 블랙리스트 사유 모달을 열기
+                if (Role === '블랙리스트') {
+                    openBlacklistModal()
+                    return // 블랙리스트 모달을 연 뒤 더 이상 진행하지 않음
+                }
+
                 const gradeUpdate = gradeCode
                     ? updateGrade({
                           member_id: memberId,
@@ -285,7 +291,7 @@ export const Member = () => {
                     <div className={styles.headerItem}>아이디</div>
                     <div className={styles.headerItem}>전화번호</div>
                     <div className={styles.headerItem}>이메일</div>
-                    <div className={styles.headerItem}>가입 날짜</div>
+                    <div className={styles.headerItem}>가입일시</div>
                 </div>
 
                 {members.length > 0 ? (
@@ -414,7 +420,7 @@ export const Member = () => {
                                 />
                             </div>
                             <div className={styles.infoItem}>
-                                <label>가입날짜</label>
+                                <label>가입일시</label>
                                 <input
                                     type="text"
                                     value={formatDate(
@@ -425,7 +431,7 @@ export const Member = () => {
                                 />
                             </div>
                             <div className={styles.infoItem}>
-                                <label>탈퇴날짜</label>
+                                <label>탈퇴일시</label>
                                 <input
                                     type="text"
                                     value={

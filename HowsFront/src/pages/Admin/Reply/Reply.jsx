@@ -119,7 +119,7 @@ export const Reply = () => {
             <div className={styles.headerSection}>
                 <div className={styles.searchSection}>
                     <Search
-                        placeholder="내용 또는 작성자 검색"
+                        placeholder="게시글 또는 작성자 검색"
                         onSearch={handleSearch}
                     />
                 </div>
@@ -128,9 +128,9 @@ export const Reply = () => {
             <div className={styles.replylist}>
                 <div className={styles.replyHeader}>
                     <div className={styles.headerItem}>NO</div>
-                    <div className={styles.headerItem}>내용</div>
+                    <div className={styles.headerItem}>게시글</div>
                     <div className={styles.headerItem}>작성자</div>
-                    <div className={styles.headerItem}>작성날짜</div>
+                    <div className={styles.headerItem}>작성일시</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>
                     <div className={styles.headerItem}>삭제</div>
                 </div>
@@ -222,7 +222,7 @@ export const Reply = () => {
                             <div className={styles.tableHeader}>
                                 <div>신고자</div>
                                 <div>신고 사유</div>
-                                <div>신고 날짜</div>
+                                <div>신고 일시</div>
                             </div>
                             {replyReports.map(report => (
                                 <div

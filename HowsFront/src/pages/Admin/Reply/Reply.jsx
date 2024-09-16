@@ -135,48 +135,56 @@ export const Reply = () => {
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                {displayReplys.map((reply, index) => (
-                    <div
-                        className={styles.replyRow}
-                        key={reply.reply_seq || index}
-                    >
-                        <div className={styles.replyItem}>
-                            {startRow + index}
-                        </div>
+                {displayReplys.length > 0 ? (
+                    displayReplys.map((reply, index) => (
                         <div
-                            className={styles.replyItem}
-                            onClick={() => handleOpenReplyModal(reply)}
+                            className={styles.replyRow}
+                            key={reply.reply_seq || index}
                         >
-                            <span className={styles.span}>
-                                {reply.BOARD_CONTENTS}
-                            </span>
-                        </div>
-                        <div className={styles.replyItem}>{reply.NICKNAME}</div>
-                        <div className={styles.replyItem}>
-                            {reply.WRITE_DATE}
-                        </div>
+                            <div className={styles.replyItem}>
+                                {startRow + index}
+                            </div>
+                            <div
+                                className={styles.replyItem}
+                                onClick={() => handleOpenReplyModal(reply)}
+                            >
+                                <span className={styles.span}>
+                                    {reply.BOARD_CONTENTS}
+                                </span>
+                            </div>
+                            <div className={styles.replyItem}>
+                                {reply.NICKNAME}
+                            </div>
+                            <div className={styles.replyItem}>
+                                {reply.WRITE_DATE}
+                            </div>
 
-                        <div
-                            className={styles.replyItem}
-                            onClick={() =>
-                                handleOpenReportModal(reply.REPLY_SEQ)
-                            }
-                        >
-                            <span className={styles.reportcount}>
-                                {reply.REPORT_COUNT}
-                            </span>
-                        </div>
-                        <div className={styles.replyItem}>
-                            <Button
-                                size="s"
-                                title="삭제"
+                            <div
+                                className={styles.replyItem}
                                 onClick={() =>
-                                    handleDeleteReply(reply.REPLY_SEQ)
+                                    handleOpenReportModal(reply.REPLY_SEQ)
                                 }
-                            />
+                            >
+                                <span className={styles.reportcount}>
+                                    {reply.REPORT_COUNT}
+                                </span>
+                            </div>
+                            <div className={styles.replyItem}>
+                                <Button
+                                    size="s"
+                                    title="삭제"
+                                    onClick={() =>
+                                        handleDeleteReply(reply.REPLY_SEQ)
+                                    }
+                                />
+                            </div>
                         </div>
+                    ))
+                ) : (
+                    <div className={styles.empty}>
+                        신고 대댓글 목록이 없습니다
                     </div>
-                ))}
+                )}
             </div>
 
             <Paging

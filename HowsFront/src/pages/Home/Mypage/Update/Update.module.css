@@ -12,18 +12,21 @@
 .container .menus > div {
   padding: 15px 20px 10px 20px;
   margin-top: 50px;
-  border-bottom: 2px solid var(--hows-point-color);
+  border-bottom: 1.5px solid var(--hows-point-color);
   cursor: pointer;
   transition-duration: 0.2s;
 }
 .container .menus > div:hover {
   color: var(--hows-point-color);
 }
+.container .menus > div.active {
+  color: var(--hows-point-color-dark);
+}
 .container .menus .updateInfo {
-  margin-right: 70px;
+  margin-right: 50px;
 }
 .container .menus .updatePw {
-  margin-left: 70px;
+  margin-left: 50px;
 }
 
 .container .body {

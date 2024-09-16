@@ -33,7 +33,7 @@
 
 	<!-- 방문글 갯수 -->
 	<select id="countGuestbook" resultType="int">
-    	select count(*) from guestbook where member_id = #{member_id}
+    	select count(*) from guestbook where member_seq = ${member_seq}
 	</select>
 	
 	

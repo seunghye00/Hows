@@ -60,7 +60,7 @@
                 sysdate,
             </if>
             #{payment_id},
-            default
+            null
         )
     </insert>
 
@@ -75,5 +75,12 @@
         AND
             member_seq = #{member_seq}
     </update>
+
+    <delete id="cancelPayment">
+        DELETE FROM
+            payment
+        WHERE
+            payment_id = #{payment_id}
+    </delete>
 
 </mapper>

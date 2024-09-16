@@ -161,22 +161,25 @@ export const Payment = () => {
 
     setPaymentInfo({ orderName, totalAmount });
 
-    requestPaymentEvent(paymentInfo, orderInfo).then(res => {
-      console.log("res ==== ", res);
-      if(res.data === "ok") {
+    // 결제 진행
+    const resultData = await requestPaymentEvent(paymentInfo, orderInfo);
+      if(resultData === "ok") {
         SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
-          if(resp) {
-            navi("/mypage/userDashboard/buyList");
-          } else {
-            navi("/");
-          }
+          if(resp) navi("/history/relivery");
+          else navi("/");
         });
       } else {
         // 실패 시 결제 취소
         paymentCancel(paymentId).then(res => {
-          console.log("res ==== ", res)
+          console.log("res.data ==== ", res.data);
+          alert("결제 실패");
         });
       }
+  }
+
+  const testCancelPayment = () => {
+    paymentCancel().then(res => {
+      console.log("주문 취소 테스트 ==== ", res.data);
     });
   }
 
@@ -269,6 +272,7 @@ export const Payment = () => {
 
   return (
     <div className={styles.container}>
+      <button onClick={testCancelPayment}>결제 취소</button>
       <div className={styles.title}> 주문하기 </div>
       <div className={styles.subTitle}> 선택한 상품 및 배송 정보 </div>
 

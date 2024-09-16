@@ -25,6 +25,7 @@ import {
     updateComment,
     deleteComment,
     sendCommentReport,
+    sendReplyReport,
 } from '../../../../../api/comment' // API 함수 불러오기
 import { userInfo } from '../../../../../api/member' // API 함수 불러오기
 import { useAuthStore } from '../../../../../store/store'
@@ -49,11 +50,11 @@ export const Detail = () => {
     const [comment, setComment] = useState('') // 새로운 댓글 내용
     const member_id = sessionStorage.getItem('member_id') || null // 세션에서 member_id 가져오기
     const [selectedCommentSeq, setSelectedCommentSeq] = useState(null) // 선택된 댓글 시퀀스 추가
+    const [selectedReplySeq, setSelectedReplySeq] = useState(null) // 선택된 답글 시퀀스 추가
     const [page, setPage] = useState(1) // 현재 페이지 상태
     const [itemsPerPage] = useState(5) // 페이지당 항목 수 (5개)
     const [totalCommentsCount, setTotalCommentsCount] = useState(0) // 전체 댓글 수
     const [userProfile, setUserProfile] = useState('') // 유저 프로필 정보 상태
-
     // 게시글 정보 및 이미지, 태그 정보 받아오기
     useEffect(() => {
         const fetchData = async () => {
@@ -179,7 +180,8 @@ export const Detail = () => {
             })
         } else {
             // 로그인된 경우에만 모달 열기
-            setSelectedCommentSeq() // 신고할 댓글 시퀀스 설정
+            setSelectedCommentSeq(null)
+            setSelectedReplySeq(null)
             setIsModalOpen(true)
         }
     }
@@ -196,6 +198,22 @@ export const Detail = () => {
             })
         } else {
             setSelectedCommentSeq(commentSeq) // 댓글 신고 시 해당 댓글 시퀀스 설정
+            setIsModalOpen(true) // 모달 열기
+        }
+    }
+
+    // 답글 신고하기 버튼 클릭 시 호출되는 함수
+    const handleOpenReportModalForReply = replySeq => {
+        if (!member_id || !isAuth) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn')
+            })
+        } else {
+            setSelectedReplySeq(replySeq) // 답글 신고 시 해당 답글 시퀀스 설정
             setIsModalOpen(true) // 모달 열기
         }
     }
@@ -219,6 +237,12 @@ export const Detail = () => {
                     selectedReports,
                     member_id
                 ) // 댓글 신고
+            } else if (selectedReplySeq) {
+                await sendReplyReport(
+                    selectedReplySeq,
+                    selectedReports,
+                    member_id
+                ) // 답글 신고
             } else {
                 await sendReport(board_seq, selectedReports, member_id) // 게시글 신고
             }
@@ -257,10 +281,6 @@ export const Detail = () => {
             })
             return
         }
-        // 콘솔로 값 출력해서 확인
-        console.log('board_seq:', board_seq)
-        console.log('member_id:', member_id)
-        console.log('comment:', comment)
         try {
             await sendComments(board_seq, member_id, comment.trim())
             onCommentSubmit() // 댓글 제출 후 목록 새로고침
@@ -284,7 +304,8 @@ export const Detail = () => {
                 page,
                 itemsPerPage
             )
-            setComments(response)
+            setComments(response.comments)
+            setTotalCommentsCount(response.totalCount)
         } catch (error) {
             console.error('댓글 목록 갱신 실패:', error)
         }
@@ -293,14 +314,27 @@ export const Detail = () => {
     // 댓글 삭제
     const handleDeleteComment = async comment_seq => {
         try {
-            await deleteComment(comment_seq) // 백엔드에서 댓글 삭제 API 호출
-            onCommentSubmit() // 삭제 후 목록 새로고침
-            Swal.fire({
-                icon: 'success',
-                title: '댓글이 삭제되었습니다.',
-                showConfirmButton: false,
-                timer: 1500,
+            const result = await Swal.fire({
+                title: '정말로 삭제하시겠습니까?',
+                text: '삭제 후에는 되돌릴 수 없습니다.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '네, 삭제할래요!',
+                cancelButtonText: '아니요, 취소할래요',
             })
+
+            if (result.isConfirmed) {
+                await deleteComment(comment_seq) // 백엔드에서 댓글 삭제 API 호출
+                onCommentSubmit() // 삭제 후 목록 새로고침
+                Swal.fire({
+                    icon: 'success',
+                    title: '댓글이 삭제되었습니다.',
+                    showConfirmButton: false,
+                    timer: 1500,
+                })
+            }
         } catch (error) {
             console.error('댓글 삭제 중 오류 발생:', error)
             Swal.fire({
@@ -348,17 +382,12 @@ export const Detail = () => {
 
     return (
         <div className={styles.container}>
-            {/* postData가 null이 아닐 때만 렌더링 */}
             {postData && (
                 <>
-                    {/* 프로필 섹션 */}
                     <ProfileSection profileData={postData} />
-                    {/* 이미지 섹션 */}
                     <div className={styles.imageSection}>
                         <ImageSwiper images={imagesData} tags={tagsData} />
                     </div>
-
-                    {/* 게시글 상단 */}
                     <PostActions
                         isLiked={isLiked}
                         likeCount={likeCount}
@@ -380,7 +409,6 @@ export const Detail = () => {
                     </div>
                 </>
             )}
-            {/* 댓글 작성 영역 */}
             <div className={styles.commentInput}>
                 <div className={styles.writerProfile}>
                     <img src={userProfile} alt="profile" />
@@ -393,16 +421,16 @@ export const Detail = () => {
                             setComment(e.target.value)
                     }}
                     onInput={e => {
-                        e.target.style.height = 'auto' // 높이를 자동으로 설정하여 이전 설정을 초기화
+                        e.target.style.height = 'auto'
                         e.target.style.height = `${Math.min(
                             e.target.scrollHeight,
                             72
-                        )}px` // 내용에 따라 높이를 조정, 최대 72px로 제한
+                        )}px`
                     }}
                     onKeyPress={e => {
                         if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault() // 줄바꿈 방지
-                            handleCommentSubmit() // 댓글 전송 함수 호출
+                            e.preventDefault()
+                            handleCommentSubmit()
                         }
                     }}
                     name="comment_contents"
@@ -411,7 +439,7 @@ export const Detail = () => {
             </div>
 
             <div className={styles.commentCont}>
-                {comments && comments.length > 0 ? (
+                {comments.length > 0 ? (
                     comments.map(comment => (
                         <Comment
                             key={comment.COMMENT_SEQ}
@@ -420,8 +448,10 @@ export const Detail = () => {
                             handleOpenReportModalForComment={
                                 handleOpenReportModalForComment
                             }
-                            handleUpdateComment={handleUpdateComment} // 수정 함수 전달
-                            handleDeleteComment={handleDeleteComment} // 삭제 함수 전달
+                            handleUpdateComment={handleUpdateComment}
+                            handleDeleteComment={handleDeleteComment}
+                            setIsModalOpen={setIsModalOpen} // 모달 상태 전달
+                            setSelectedReplySeq={setSelectedReplySeq} // 답글 신고 처리 전달
                         />
                     ))
                 ) : (
@@ -429,15 +459,13 @@ export const Detail = () => {
                 )}
             </div>
 
-            {/* 페이지네이션 컴포넌트 */}
             <Paging
                 page={page}
                 count={totalCommentsCount}
-                setPage={handlePageChange} // 페이지 변경 함수
+                setPage={handlePageChange}
                 perpage={itemsPerPage}
             />
 
-            {/* 신고 영역 */}
             <ReportModal
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}

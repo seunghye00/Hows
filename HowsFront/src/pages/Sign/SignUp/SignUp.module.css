@@ -149,10 +149,10 @@
 }
 
 /* 주소 */
-.container .updateInfo .addressBox input {
+.container .signUpBox .addressBox input {
   margin-bottom: 3px;
 }
-.container .updateInfo .addressBox .addressBtn {
+.container .signUpBox .addressBox .addressBtn {
   height: 35px;
   background-color: var(--hows-point-color-dark);
   color: var(--hows-white);
@@ -165,7 +165,7 @@
   margin-top: 5px;
   height: 50px;
 }
-.container .updateInfo .addressBox .addressBtn:hover {
+.container .signUpBox .addressBox .addressBtn:hover {
   background-color: var(--hows-point-color-darker);
 }
 .modalBox {

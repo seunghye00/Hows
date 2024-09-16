@@ -158,7 +158,7 @@ export const Notice = () => {
                 <div className={styles.noticeHeader}>
                     <div className={styles.headerItem}>NO</div>
                     <div className={styles.headerItem}>제목</div>
-                    <div className={styles.headerItem}>작성날짜</div>
+                    <div className={styles.headerItem}>작성일시</div>
                     <div className={styles.headerItem}>조회수</div>
                     <div className={styles.headerItem}>삭제</div>
                 </div>

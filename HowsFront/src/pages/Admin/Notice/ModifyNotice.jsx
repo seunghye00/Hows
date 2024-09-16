@@ -58,6 +58,25 @@ export const ModifyNotice = () => {
     // 수정 완료 핸들러
     const handleSubmit = async () => {
         try {
+            const { notice_title, notice_contents } = notice
+
+            // 제목 또는 내용이 비어있는 경우 경고 메시지 표시
+            if (!notice_title.trim()) {
+                SwalComp({
+                    type: 'error',
+                    text: '제목을 입력하세요.',
+                })
+                return
+            }
+
+            if (!notice_contents.trim()) {
+                SwalComp({
+                    type: 'error',
+                    text: '내용을 입력하세요.',
+                })
+                return
+            }
+
             const markdownContent = notice.notice_contents
 
             // 이미지 URL만 추출하여 변환

@@ -9,7 +9,7 @@ import {
     useParams,
 } from 'react-router-dom'
 import banner from '../../../../assets/images/마이페이지_가로배너.jpg'
-import profile from '../../../../assets/images/마이페이지_프로필사진.jpg'
+import profile from '../../../../assets/images/기본사진.jpg'
 
 import { useEffect, useState, useRef } from "react";
 import { api } from "./../../../../config/config";

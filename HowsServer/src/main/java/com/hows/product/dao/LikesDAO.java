@@ -35,15 +35,47 @@ public class LikesDAO {
     }
     
     // 좋아요 개수 조회
-    public int getLikeCount(int product_seq) {
+    public int getLikeCount(int product_seq) throws Exception {
         return myBatis.selectOne("Likes.getLikeCount", product_seq);
     }
     
     // 좋아요 확인
-    public boolean checkLikeStatus(int product_seq, String member_id) {
+    public boolean checkLikeStatus(int product_seq, String member_id) throws Exception {
         Map<String, Object> params = new HashMap<>();
         params.put("product_seq", product_seq);
         params.put("member_id", member_id);
         return myBatis.selectOne("Likes.checkLikeStatus", params);
+    }
+    
+    // 리뷰 좋아요 추가
+    public void addReviewLike(int reviewSeq, String memberId) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("review_seq", reviewSeq);
+        params.put("member_id", memberId);
+
+        myBatis.insert("Likes.addReviewLike", params);
+    }
+
+    // 리뷰 좋아요 삭제
+    public void removeReviewLike(int reviewSeq, String memberId) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("review_seq", reviewSeq);
+        params.put("member_id", memberId);
+
+        myBatis.delete("Likes.removeReviewLike", params);
+    }
+
+    // 리뷰 좋아요 개수 조회
+    public int getReviewLikeCount(int reviewSeq) throws Exception {
+        return myBatis.selectOne("Likes.getReviewLikeCount", reviewSeq);
+    }
+
+    // 리뷰 좋아요 상태 확인
+    public boolean checkReviewLikeStatus(int reviewSeq, String memberId) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("review_seq", reviewSeq);
+        params.put("member_id", memberId);
+
+        return myBatis.selectOne("Likes.checkReviewLikeStatus", params);
     }
 }

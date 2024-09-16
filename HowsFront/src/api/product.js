@@ -34,6 +34,45 @@ export const getLikeCount = (product_seq) => {
     })
 }
 
+// 리뷰 좋아요 
+export const reviewLike = (reviewSeq, memberId) => {
+    return axios.post(`${likeUrl}/review/insert`, {
+        review_seq : reviewSeq,
+        member_id : memberId
+    });
+};
+
+// 리뷰 좋아요 취소
+export const reviewUnlike = (reviewSeq, memberId) => {
+    return axios.delete(`${likeUrl}/review/delete`, {
+        data: {
+            review_seq: reviewSeq,
+            member_id: memberId
+        }
+    });
+};
+
+// 리뷰 좋아요 수 가져오기
+export const getReviewLikeCount = (reviewSeq) => {
+    return axios.get(`${likeUrl}/review/count`, {
+        params: {
+            review_seq: reviewSeq
+        }
+    });
+};
+
+// 리뷰 좋아요 상태 확인
+export const checkReviewLikeStatus = (reviewSeq, memberId) => {
+    return axios.get(`${likeUrl}/review/check`, {
+        params: {
+            review_seq: reviewSeq,
+            member_id: memberId
+        }
+    });
+};
+
+
+
 // 리뷰 이미지 
 export const getReviewImgList = (reviewSeq) => {
     return axios.get(`${baseUrl}/getReviewImgList/${reviewSeq}`);

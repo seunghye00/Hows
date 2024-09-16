@@ -158,10 +158,13 @@ export const Cart = () => {
   /** 페이지 로드 **/
   useEffect(() => {
     cartList().then(res => {
-      const arr = res.data.map(item => ({ ...item, checked: true }));
-      setCarts(arr);
-      setCheckCart(arr);
-      totalPrice();
+      if(res.data !== "") {
+        const arr = res.data.map(item => ({ ...item, checked: true }));
+        setCarts(arr);
+        setCheckCart(arr);
+        totalPrice();
+      }
+
     });
   }, []);
 

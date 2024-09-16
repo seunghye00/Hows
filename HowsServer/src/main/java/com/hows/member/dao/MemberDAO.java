@@ -86,16 +86,29 @@ public class MemberDAO {
 	public int updateProfileImage(Map<String, Object> map) {
 	    return mybatis.update("Member.updateProfileImage", map);
 	}
+
+	// 배너 사진 변경
+	public int updateBannerImage(Map<String, Object> map) {
+		return mybatis.update("Member.updateBannerImage", map);
+	}
 	
 	// 현재 프로필 사진 URL 가져오기
 	public String getProfileImageUrl(int member_seq) {
 		return mybatis.selectOne("Member.getProfileImageUrl",member_seq);
 	}
+	// 현재 배너 사진 URL 가져오기
+	public String getBannerImageUrl(int member_seq) {
+		return mybatis.selectOne("Member.getBannerImageUrl",member_seq);
+	}
 	
 	// 프로필 삭제 시 member_avatar => null 
-	 public void updateProfileImageToNull(int member_seq) {
-		 mybatis.update("Member.updateProfileImageToNull", member_seq);
-	    }
+	public void updateProfileImageToNull(int member_seq) {
+		mybatis.update("Member.updateProfileImageToNull", member_seq);
+	}
+	// 배너 삭제 시 member_banner => null 
+	public void updateBannerImageToNull(int member_seq) {
+		mybatis.update("Member.updateBannerImageToNull", member_seq);
+	}
 	
 	// 비밀번호 변경시 기존 비밀번호 확인
 	public String getPasswordById(HashMap<String, String> map) {

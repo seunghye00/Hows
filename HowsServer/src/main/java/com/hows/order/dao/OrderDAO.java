@@ -58,4 +58,9 @@ public class OrderDAO {
 	public List<OrderInfoListDTO> getOrdersByStatus(String status) {
 		return mybatis.selectList("Order.orderListByStatus", status);
 	}
+
+	// 주문 내역 삭제
+	public boolean deleteOrder(int orderSeq) {
+		return mybatis.delete("Order.delete", orderSeq) > 0;
+	}
 }

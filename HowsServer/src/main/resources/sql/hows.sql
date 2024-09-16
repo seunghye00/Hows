@@ -718,6 +718,7 @@ insert into file_code (file_code, file_title) values ('F3', '상품');
 insert into file_code (file_code, file_title) values ('F4', '리뷰');
 insert into file_code (file_code, file_title) values ('F5', '배너');
 insert into file_code (file_code, file_title) values ('F6', '공지사항');
+insert into file_code (file_code, file_title) values ('F7', '마이페이지배너');
 
 commit;
 

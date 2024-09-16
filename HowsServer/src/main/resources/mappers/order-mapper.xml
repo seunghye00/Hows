@@ -55,9 +55,9 @@
 		select
 		o.order_seq, o.order_date, o.order_name, m.name, g.grade_title, o.order_price, o.orderer_phone, o.orderer_zip_code, o.orderer_address, o.orderer_detail_address, o.order_code, p.payment_price, p.payment_date, o.done_delivery_date
 		from orders o
-		join member m on o.member_seq = m.member_seq
-		join grade g on m.grade_code = g.grade_code
-		join payment p on o.order_seq = p.order_seq
+		left join member m on o.member_seq = m.member_seq
+		left join grade g on m.grade_code = g.grade_code
+		left join payment p on o.order_seq = p.order_seq
 		<where>
 			<choose>
 				<when test="status == 'product'">
@@ -107,6 +107,7 @@
 		)
 	</insert>
 
+	<!-- 주문 상태 업데이트 -->
 	<update id="updateOrder">
 		UPDATE
 			orders
@@ -118,4 +119,9 @@
 		WHERE
 			order_seq = #{order_seq}
 	</update>
+	
+	<!-- 주문 내역 삭제 -->
+	<delete id="delete">
+		delete from orders where order_seq = #{orderSeq}
+	</delete>
 </mapper>

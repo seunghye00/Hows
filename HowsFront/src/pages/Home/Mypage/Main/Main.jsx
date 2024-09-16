@@ -17,7 +17,7 @@ import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
 import { Modal } from "../../../../components/Modal/Modal"
 import { useAuthStore, useMemberStore } from "../../../../store/store";
-import { countBookmark, countGuestbook, countPost, deleteProfileImage, eachFollow, findMemberSeq, getCountFollow, getFollower, getFollowing, selectInfo, toggleFollow, uploadProfileImage, userInfo } from "../../../../api/member";
+import { countBookmark, countGuestbook, countPost, deleteImage, deleteProfileImage, eachFollow, findMemberSeq, getCountFollow, getFollower, getFollowing, selectInfo, toggleFollow, uploadImage, uploadProfileImage, userInfo } from "../../../../api/member";
 import { TextBox } from './TextBox/TextBox';
 import Swal from "sweetalert2";
 import { jwtDecode } from 'jwt-decode';
@@ -25,14 +25,16 @@ import { jwtDecode } from 'jwt-decode';
 export const Main = () => {
     const navi = useNavigate()
     const location = useLocation()
-    const fileInputRef = useRef(null); // ref 생성
+    const profileInputRef = useRef(null); // 프로필 이미지 ref 생성
+    const bannerInputRef = useRef(null); // 배너 이미지 ref 생성
 
     const [user, setUser] = useState([])
     const { member_id } = useParams() // URL에서 member_id 가져오기
     const { memberSeq, setMemberSeq } = useMemberStore()
     const [isModalOpen, setIsModalOpen] = useState(false) // 모달 상태
-    const [selectedImage, setSelectedImage] = useState(profile) // 선택한 이미지 초기값
-    // const [selectedFile, setSelectedFile] = useState(null); // 선택한 파일
+    const [selectedProfileImage, setSelectedProfileImage] = useState(profile) // 프로필사진 초기값
+    const [selectedBannerImage, setSelectedBannerImage] = useState(banner) // 배너사진 초기값
+
     const [modalContent, setModalContent] = useState('') // 모달 창에 표시할 내용을 구분하는 상태
 
     const [postData, setPostData] = useState(0); // 게시물 개수
@@ -44,7 +46,6 @@ export const Main = () => {
     const [followingData, setFollowingData] = useState([]); // 팔로잉 데이터
 
     const { currentUser, setCurrentUser } = useMemberStore();
-    const { isAuth } = useAuthStore() // 로그인 여부 확인
     const session_member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
     const session_member_seq = jwtDecode(sessionStorage.getItem("token")).member_seq // token에서 member_seq 가져오기
     const [isEachFollow, setIsEachFollow] = useState(false);
@@ -53,21 +54,19 @@ export const Main = () => {
         // url에서 가져온 member_id로 해당 페이지 member_id의 데이터 가져오기
         if (member_id) {
             userInfo(member_id).then((resp) => {
-                console.log("데이터 : ", resp.data);
                 setUser(resp.data);
                 // 사용자 정보에서 프로필 이미지 설정
-                setSelectedImage(resp.data.member_avatar || profile); // 기본 이미지로 초기화
+                setSelectedProfileImage(resp.data.member_avatar || profile); // 기본 프로필 이미지로 초기화
+                setSelectedBannerImage(resp.data.member_banner || banner); // 기본 배너 이미지로 초기화
 
             }).catch(err => {
                 console.log(err);
             })
             findMemberSeq(member_id).then((resp) => {
-                console.log("member_seq : ", resp.data);
                 setMemberSeq(resp.data); // zustand에 memberSeq 저장
             });
         }
     }, [member_id, setMemberSeq])
-
 
     useEffect(() => {
         // 게시물 개수
@@ -84,20 +83,27 @@ export const Main = () => {
         })
     }, [])
 
-    // ref를 사용하여 파일 input 클릭
-    const handleFileInputClick = () => {
-        fileInputRef.current.click();
+
+    // ref를 사용하여 프로필 사진 input 클릭
+    const handleProfileInputClick = () => {
+        profileInputRef.current.click();
+    };
+    // ref를 사용하여 배너 사진 input 클릭
+    const handleBannerInputClick = () => {
+        bannerInputRef.current.click();
     };
 
     // 서버로 이미지 업로드 함수
-    const handleUploadImage = (file) => {
-        uploadProfileImage(file, memberSeq).then(resp => {
-            console.log('이미지 업로드 성공:', resp.data)
-
-            // 업로드 후 상태 업데이트
-            setSelectedImage(resp.data) // 서버에서 반환된 이미지 URL로 업데이트
-            sessionStorage.setItem("member_avatar", resp.data);
-            setCurrentUser({ ...currentUser, "member_avatar": resp.data });
+    const handleUploadImage = (file, imageType) => {
+        uploadImage(file, memberSeq, imageType).then(resp => {
+            if (imageType === 'profile') {
+                // 업로드 후 상태 업데이트
+                setSelectedProfileImage(resp.data) // 서버에서 반환된 이미지 URL로 업데이트
+                sessionStorage.setItem("member_avatar", resp.data);
+                setCurrentUser({ ...currentUser, "member_avatar": resp.data });
+            } else if (imageType === 'banner') {
+                setSelectedBannerImage(resp.data);
+            }
         })
             .catch(error => {
                 console.error('이미지 업로드 실패:', error)
@@ -105,18 +111,21 @@ export const Main = () => {
     }
 
     // 프로필 사진 삭제
-    const handleDeleteProfileImage = () => {
-        deleteProfileImage(memberSeq).then(resp => {
-            if (resp.data > 0) {
+    const handleDeleteImage = (imageType) => {
+        deleteImage(memberSeq, imageType).then(resp => {
+            if (resp.data === "이미지가 성공적으로 삭제되었습니다.") {
                 Swal.fire({
-                    title: "프로필 삭제",
-                    text: `프로필 사진이 삭제되었습니다.`,
+                    title: `${imageType === 'profile' ? '프로필' : '배너'} 삭제`,
+                    text: `${imageType === 'profile' ? '프로필' : '배너'} 사진이 삭제되었습니다.`,
                     icon: "success",
                     confirmButtonText: "확인",
                 });
             }
-            console.log('이미지 삭제 성공:', resp.data)
-            setSelectedImage(profile) // 기본 이미지로 변경
+            if (imageType === 'profile') {
+                setSelectedProfileImage(profile); // 프로필 기본 이미지로 변경
+            } else if (imageType === 'banner') {
+                setSelectedBannerImage(banner); // 배너 기본 이미지로 변경
+            }
         })
             .catch(error => {
                 console.error('이미지 삭제 실패:', error)
@@ -132,22 +141,18 @@ export const Main = () => {
         }
     }, [memberSeq])
 
-
     // 팔로워, 팔로잉 목록 출력
     const handleFollow = (memberSeq, type) => {
         if (type === "follower") {
             getFollower(memberSeq).then(resp => {
-                console.log("팔로워 목록 : ", resp.data)
                 setFollowerData(resp.data);
             })
         } else if (type === "following") {
             getFollowing(memberSeq).then(resp => {
-                console.log("팔로잉 목록 : ", resp.data)
                 setFollowingData(resp.data);
             })
         }
     }
-
 
     // 팔로우, 팔로잉 상태 변경 
     const handleIsFollowing = (targetMemberSeq) => {
@@ -184,7 +189,6 @@ export const Main = () => {
     useEffect(() => {
         if (memberSeq > 0 && session_member_seq > 0) {
             eachFollow(session_member_seq, memberSeq).then(resp => {
-                console.log("결과 :::: ", resp.data);
                 setIsEachFollow(resp.data);
             });
         }
@@ -209,7 +213,7 @@ export const Main = () => {
                 }}
                 style={{ cursor: sessionStorage.getItem('member_id') === user.member_id ? 'pointer' : 'default' }}
             >
-                <img src={banner}></img>
+                <img src={selectedBannerImage} alt="banner" ></img>
             </div>
             <div className={styles.mainBox}>
                 <div className={styles.header}>
@@ -224,7 +228,7 @@ export const Main = () => {
                         }}
                         style={{ cursor: session_member_id === user.member_id ? 'pointer' : 'default' }}
                     >
-                        <img src={selectedImage} alt="Profile" />
+                        <img src={selectedProfileImage} alt="Profile" />
                     </div>
                     <div className={styles.userInfo}>
                         <div className={styles.top}>
@@ -316,14 +320,14 @@ export const Main = () => {
                     <div className={styles.modalBox}>
                         <h2>프로필 사진 변경</h2>
                         <div>
-                            <button className={styles.modBtn} onClick={handleFileInputClick}>수정</button>
+                            <button className={styles.modBtn} onClick={handleProfileInputClick}>수정</button>
                             <button className={styles.delBtn} onClick={() => {
-                                handleDeleteProfileImage(); // 서버에 이미지 삭제 요청
+                                handleDeleteImage('profile'); // 서버에 프로필 이미지 삭제 요청
                                 setIsModalOpen(false);
                             }}>삭제</button>
                         </div>
                         <input
-                            ref={fileInputRef} // ref 할당
+                            ref={profileInputRef} // ref 할당
                             type="file"
                             style={{ display: 'none' }}
                             accept="image/*"
@@ -332,7 +336,7 @@ export const Main = () => {
                                 if (file) {
                                     const reader = new FileReader()
                                     reader.onloadend = () => {
-                                        handleUploadImage(file); // 이미지 서버로 전송
+                                        handleUploadImage(file, 'profile'); // 프로필 사진 서버로 전송
                                     };
                                     reader.readAsDataURL(file);
                                 }
@@ -345,16 +349,33 @@ export const Main = () => {
                 {modalContent === 'banner' && (
                     <div className={styles.modalBox}>
                         <h2>배너 사진 변경</h2>
-                        <p>사진은 1470 * 260 사이즈를 권장합니다</p>
+                        <p>사진은 1470 * 300 사이즈를 권장합니다</p>
                         <div>
-                            <button className={styles.modBtn}>수정</button>
-                            <button
-                                className={styles.delBtn}
-                                onClick={() => setIsModalOpen(false)}
-                            >
+                            <button className={styles.modBtn} onClick={handleBannerInputClick}>수정</button>
+                            <button className={styles.delBtn} onClick={() => {
+                                handleDeleteImage('banner'); // 서버에 배너 이미지 삭제 요청
+                                setIsModalOpen(false)
+                            }}>
                                 삭제
                             </button>
                         </div>
+                        <input
+                            ref={bannerInputRef} // ref 할당
+                            type="file"
+                            style={{ display: 'none' }}
+                            accept="image/*"
+                            onChange={e => {
+                                const file = e.target.files[0]
+                                if (file) {
+                                    const reader = new FileReader()
+                                    reader.onloadend = () => {
+                                        handleUploadImage(file, 'banner'); // 배너 사진 서버로 전송
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                                setIsModalOpen(false) // 모달 닫기
+                            }}
+                        />
                     </div>
                 )}
                 {/* 팔로워 목록 */}
@@ -417,7 +438,6 @@ export const Main = () => {
                     </div>
                 )}
             </Modal>
-
         </div >
     )
 }

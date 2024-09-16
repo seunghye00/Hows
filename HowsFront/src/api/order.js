@@ -39,3 +39,9 @@ export const deleteOrder = orderSeqs => {
     const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
     return axios.delete(`${baseUrl}`, { params: { seqs } })
 }
+
+// 환불 처리 완료
+export const doneReturn = orderSeqs => {
+    const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
+    return axios.put(`${baseUrl}/doneReturn`, null, { params: { seqs } })
+}

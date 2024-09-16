@@ -128,7 +128,8 @@
     letter-spacing: .7px;
     color: var(--hows-gray-700);
     border: 1px solid var(--hows-gray-600);
-    max-height: 72px;
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .toggleReplyBtn {

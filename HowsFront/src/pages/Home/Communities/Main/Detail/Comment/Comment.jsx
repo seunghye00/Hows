@@ -4,6 +4,7 @@ import {
     EditorState,
     ContentState,
     Modifier,
+    RichUtils,
     CompositeDecorator,
     getDefaultKeyBinding,
 } from 'draft-js'
@@ -95,6 +96,7 @@ export const Comment = ({
     const [isEditing, setIsEditing] = useState(false) // 댓글 수정 모드 여부
     const [isLiked, setIsLiked] = useState(commentData.isLiked || false) // 좋아요 여부
     const [likeCount, setLikeCount] = useState(commentData.LIKE_COUNT || 0) // 좋아요 개수
+    const [isAlertShown, setIsAlertShown] = useState(false)
 
     // 댓글 수정 시의 Draft.js 에디터 상태 (댓글 내용을 에디터로 관리)
     const [editedComment, setEditedComment] = useState(
@@ -163,7 +165,16 @@ export const Comment = ({
 
     // 좋아요 처리 함수
     const handleLike = async () => {
-        if (!isAuth) navigate('/signIn') // 로그인되지 않은 경우 로그인 페이지로 이동
+        if (!isAuth || !member_id) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
+            return
+        }
         try {
             const response = await toggleLikeAPI(
                 commentData.COMMENT_SEQ,
@@ -180,35 +191,93 @@ export const Comment = ({
 
     // 답글 입력창을 열거나 닫는 함수
     const toggleReply = () => {
+        if (!isAuth || !member_id) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
+            return
+        }
         setActiveReplySeq(prevSeq =>
             prevSeq === commentData.COMMENT_SEQ ? null : commentData.COMMENT_SEQ
         )
-        const taggedContent = `@${commentData.NICKNAME} ` // 답글 작성 시 태그된 내용
-        const newState = Modifier.insertText(
-            replyContent.getCurrentContent(),
-            replyContent.getSelection(),
-            taggedContent
-        ) // Draft.js에서 답글 입력창에 태그된 텍스트 삽입
-        const newEditorState = EditorState.push(
-            replyContent,
-            newState,
-            'insert-characters'
-        )
-        setReplyContent(EditorState.moveFocusToEnd(newEditorState)) // 답글 입력창에 포커스 이동
+        // 현재 에디터에 있는 텍스트 확인
+        const currentContent = replyContent.getCurrentContent().getPlainText()
+
+        // 이미 @태그가 있는지 확인
+        if (!currentContent.includes(`@${commentData.NICKNAME}`)) {
+            const taggedContent = `@${commentData.NICKNAME} ` // 답글 작성 시 태그된 내용
+            const newState = Modifier.insertText(
+                replyContent.getCurrentContent(),
+                replyContent.getSelection(),
+                taggedContent
+            ) // Draft.js에서 답글 입력창에 태그된 텍스트 삽입
+            const newEditorState = EditorState.push(
+                replyContent,
+                newState,
+                'insert-characters'
+            )
+            setReplyContent(EditorState.moveFocusToEnd(newEditorState)) // 답글 입력창에 포커스 이동
+        }
     }
 
     // 답글 작성 함수
     const handleReplySubmit = async replySeq => {
-        const content = replyContent.getCurrentContent().getPlainText().trim() // 입력된 답글 내용 가져오기
-        if (!content) return
+        // 최신 에디터 상태를 가져오기 위해 EditorState 업데이트 후 실행
+        const contentState = replyContent.getCurrentContent() // 현재 상태 가져오기
+        const content = contentState.getPlainText().trim() // 입력된 답글 내용 가져오기
+
+        console.log('Reply Submit - Content:', content) // 콘솔로 현재 답글 내용 출력
+
+        // 300글자 이상이면 처리하지 않음
+        if (content.length > 300) {
+            Swal.fire({
+                icon: 'error',
+                title: '답글은 300글자를 넘을 수 없습니다.',
+                showConfirmButton: true,
+            })
+            return
+        }
+
+        // 이미지 삽입 여부 체크
+        const blockMap = contentState.getBlockMap()
+        const hasImage = blockMap.some(block => {
+            const entityKey = block.getEntityAt(0)
+            return (
+                entityKey &&
+                contentState.getEntity(entityKey).getType() === 'IMAGE'
+            )
+        })
+
+        if (hasImage) {
+            Swal.fire({
+                icon: 'error',
+                title: '이미지 첨부는 허용되지 않습니다.',
+                showConfirmButton: true,
+            })
+            return
+        }
+
+        if (!content) return // 내용이 없으면 처리하지 않음
+
         try {
-            await sendReply(replySeq, content, member_id) // 답글 전송 API 호출
-            setReplyContent(EditorState.createEmpty(decorator)) // 답글 입력창 초기화
-            setActiveReplySeq(null) // 답글 입력창 닫기
+            // 서버로 전송
+            await sendReply(replySeq, content, member_id)
+
+            // 답글 입력창 초기화
+            setReplyContent(EditorState.createEmpty(decorator))
+
+            // 답글 입력창 닫기
+            setActiveReplySeq(null)
+
+            // 답글 목록 다시 불러오기
             const response = await getReplies(
                 commentData.COMMENT_SEQ,
                 member_id
-            ) // 답글 목록 다시 불러오기
+            )
             setReplies(response.replies) // 답글 목록 업데이트
         } catch (error) {
             console.error('답글 작성 중 오류 발생:', error)
@@ -230,23 +299,6 @@ export const Comment = ({
     // 댓글 삭제 처리
     const handleDelete = () => {
         handleDeleteComment(commentData.COMMENT_SEQ) // 댓글 삭제
-    }
-
-    // Draft.js 키 바인딩 함수 (엔터 키로 답글 전송 처리)
-    const keyBindingFn = e => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            return 'submit-reply' // 엔터 키로 답글 전송
-        }
-        return getDefaultKeyBinding(e) // 기본 키 바인딩 처리
-    }
-
-    // Draft.js 커맨드 처리 (답글 전송 처리)
-    const handleKeyCommand = command => {
-        if (command === 'submit-reply') {
-            handleReplySubmit(commentData.COMMENT_SEQ) // 답글 전송
-            return 'handled'
-        }
-        return 'not-handled'
     }
 
     // 답글 삭제 처리 함수
@@ -293,8 +345,98 @@ export const Comment = ({
 
     // 답글 신고 모달 열기
     const handleOpenReportModalForReply = replySeq => {
+        if (!isAuth || !member_id) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
+            return
+        }
         setIsModalOpen(true) // 신고 모달을 열기 위한 상태 업데이트
         setSelectedReplySeq(replySeq) // 선택된 답글의 seq 저장
+    }
+
+    // Draft.js 커맨드 처리 (답글 전송 처리)
+    const handleKeyCommand = (command, editorState) => {
+        if (command === 'submit-reply') {
+            const contentState = editorState.getCurrentContent() // 현재 상태 가져오기
+            const content = contentState.getPlainText().trim() // 입력된 텍스트를 가져오기
+
+            if (!content) {
+                return 'handled' // 내용이 없을 경우 처리하지 않음
+            }
+            handleReplySubmit(commentData.COMMENT_SEQ) // 답글 전송
+            return 'handled'
+        }
+        return 'not-handled'
+    }
+
+    // Shift + Enter로 줄바꿈 처리 (Delayed Newline Issue Fix)
+    const handleReturn = (e, editorState) => {
+        if (e.shiftKey) {
+            const contentState = editorState.getCurrentContent()
+            const selectionState = editorState.getSelection()
+
+            // 줄바꿈(\n) 추가
+            const newContentState = Modifier.insertText(
+                contentState,
+                selectionState,
+                '\n'
+            )
+
+            // 새 에디터 상태를 만듦
+            const newEditorState = EditorState.push(
+                editorState,
+                newContentState,
+                'insert-characters'
+            )
+
+            // 포커스 강제 이동
+            setReplyContent(EditorState.moveFocusToEnd(newEditorState))
+            document.getElementById('reply-editor').focus() // 포커스 설정
+
+            return 'handled'
+        }
+
+        handleReplySubmit(commentData.COMMENT_SEQ) // Enter만 누른 경우 답글 전송 처리
+        return 'handled'
+    }
+
+    // 키 바인딩 함수
+    const keyBindingFn = e => {
+        if (e.key === 'Enter') {
+            if (e.shiftKey) {
+                return 'insert-soft-newline' // 줄바꿈
+            }
+            return 'submit-reply' // 답글 전송
+        }
+        return getDefaultKeyBinding(e)
+    }
+
+    // 답글 작성 시의 Draft.js 에디터 상태 관리
+    const handleReplyChange = editorState => {
+        const contentState = editorState.getCurrentContent()
+        const contentLength = contentState.getPlainText().length
+        console.log('Reply Change - Content Length:', contentLength) // 상태 변경 시 글자 수 출력
+        console.log('Reply Change - Content:', contentState.getPlainText()) // 상태 변경 시 내용을 출력
+        // 300글자 이상 입력 시 경고창을 한 번만 띄우고 입력 차단
+        if (contentLength > 300) {
+            if (!isAlertShown) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '답글은 300글자를 넘을 수 없습니다.',
+                    showConfirmButton: true,
+                })
+                setIsAlertShown(true) // 경고창을 한 번만 표시
+            }
+            return
+        }
+
+        setIsAlertShown(false) // 300글자 이내면 경고 상태 해제
+        setReplyContent(editorState) // 상태 업데이트
     }
 
     return (
@@ -476,9 +618,10 @@ export const Comment = ({
                         <div className={styles.replyTextarea}>
                             <Editor
                                 editorState={replyContent} // Draft.js 에디터로 답글 입력창 관리
-                                onChange={setReplyContent}
+                                onChange={handleReplyChange} // 300글자 체크 및 에디터 상태 변경
+                                keyBindingFn={keyBindingFn}
+                                handleReturn={handleReturn} // handleReturn으로 줄바꿈 처리
                                 handleKeyCommand={handleKeyCommand} // 엔터 키로 답글 전송 처리
-                                keyBindingFn={keyBindingFn} // 키 바인딩 처리
                                 placeholder="답글을 입력하세요."
                             />
                         </div>

@@ -81,7 +81,7 @@ export const Main = () => {
         countGuestbook(memberSeq).then((resp) => {
             setGuestbookData(resp.data);
         })
-    }, [])
+    }, [member_id, memberSeq])
 
 
     // ref를 사용하여 프로필 사진 input 클릭

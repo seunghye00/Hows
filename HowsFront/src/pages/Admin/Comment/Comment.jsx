@@ -132,47 +132,53 @@ export const Comment = () => {
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                {displayComments.map((comment, index) => (
-                    <div className={styles.commentRow} key={index}>
-                        <div className={styles.commentItem}>
-                            {startRow + index}
-                        </div>
-                        <div
-                            className={styles.commentItem}
-                            onClick={() => handleOpenCommentModal(comment)}
-                        >
-                            <span className={styles.span}>
-                                {comment.BOARD_CONTENTS}
-                            </span>
-                        </div>
-                        <div className={styles.commentItem}>
-                            {comment.NICKNAME}
-                        </div>
-                        <div className={styles.commentItem}>
-                            {comment.WRITE_DATE}
-                        </div>
+                {displayComments.length > 0 ? (
+                    displayComments.map((comment, index) => (
+                        <div className={styles.commentRow} key={index}>
+                            <div className={styles.commentItem}>
+                                {startRow + index}
+                            </div>
+                            <div
+                                className={styles.commentItem}
+                                onClick={() => handleOpenCommentModal(comment)}
+                            >
+                                <span className={styles.span}>
+                                    {comment.BOARD_CONTENTS}
+                                </span>
+                            </div>
+                            <div className={styles.commentItem}>
+                                {comment.NICKNAME}
+                            </div>
+                            <div className={styles.commentItem}>
+                                {comment.WRITE_DATE}
+                            </div>
 
-                        <div
-                            className={styles.commentItem}
-                            onClick={() =>
-                                handleOpenReportModal(comment.COMMENT_SEQ)
-                            }
-                        >
-                            <span className={styles.reportcount}>
-                                {comment.REPORT_COUNT}
-                            </span>
-                        </div>
-                        <div className={styles.commentItem}>
-                            <Button
-                                size="s"
-                                title="삭제"
+                            <div
+                                className={styles.commentItem}
                                 onClick={() =>
-                                    handleDeleteComment(comment.COMMENT_SEQ)
+                                    handleOpenReportModal(comment.COMMENT_SEQ)
                                 }
-                            />
+                            >
+                                <span className={styles.reportcount}>
+                                    {comment.REPORT_COUNT}
+                                </span>
+                            </div>
+                            <div className={styles.commentItem}>
+                                <Button
+                                    size="s"
+                                    title="삭제"
+                                    onClick={() =>
+                                        handleDeleteComment(comment.COMMENT_SEQ)
+                                    }
+                                />
+                            </div>
                         </div>
+                    ))
+                ) : (
+                    <div className={styles.empty}>
+                        신고 댓글 목록이 없습니다
                     </div>
-                ))}
+                )}
             </div>
 
             <Paging

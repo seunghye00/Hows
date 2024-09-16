@@ -197,7 +197,7 @@ export const Blacklist = () => {
                         </div>
                     ))
                 ) : (
-                    <div className={styles.noResult}>검색 결과가 없습니다.</div>
+                    <div className={styles.empty}>검색 결과가 없습니다.</div>
                 )}
             </div>
 

@@ -71,8 +71,8 @@ public class GuestbookController {
 	
 	// 마이페이지 방문글 갯수
 	@GetMapping("/countGuestbook")
-	public ResponseEntity<Integer> countGuestbook(@RequestParam String member_id){
-		int result = guestServ.countGuestbook(member_id);
+	public ResponseEntity<Integer> countGuestbook(@RequestParam int member_seq){
+		int result = guestServ.countGuestbook(member_seq);
 		return ResponseEntity.ok(result);
 	}
 

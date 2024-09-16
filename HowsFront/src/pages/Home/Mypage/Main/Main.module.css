@@ -229,7 +229,7 @@
   height: 450px;
   display: flex;
   flex-direction: column;
-  padding: 25px 20px;
+  padding: 25px 10px 25px 20px;
   /* background-color: aliceblue; */
 }
 .followListBox > h2 {
@@ -238,10 +238,14 @@
   font-size: 28px;
 }
 
+.followListBox > div {
+  overflow-y: auto;
+}
+
 .followListBox .followList {
   display: flex;
   align-items: center;
-  margin-bottom: 15px;
+  margin: 20px 0;
 }
 
 .followListBox .followList .followImg {
@@ -264,6 +268,7 @@
   cursor: pointer;
 }
 .followListBox .followList > button {
+  margin-right: 10px;
   width: 70px;
   height: 40px;
   font-size: 16px;

@@ -101,8 +101,8 @@ export const countBookmark = (member_id) => {
 };
 
 // 방명록 개수
-export const countGuestbook = (member_id) => {
-    return api.get(`/guestbook/countGuestbook`, { params: { member_id } });
+export const countGuestbook = (member_seq) => {
+    return api.get(`/guestbook/countGuestbook`, { params: { member_seq } });
 };
 
 // 팔로우/언팔로우 처리 API 호출 함수
@@ -125,6 +125,11 @@ export const getFollowing = (member_seq) => {
     return api.get(`/member/getFollowing`, { params: { member_seq } });
 };
 
+// [마이페이지 메인 팔로우 버튼] 내가 상대방 팔로우 했는지 버튼 표시 
+export const eachFollow = (fromMemberSeq, toMemberSeq) => {
+    const params = { from_member_seq: fromMemberSeq, to_member_seq: toMemberSeq };
+    return api.post('/member/eachFollow', params);
+};
 
 
 export const adminstart = () => {

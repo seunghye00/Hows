@@ -278,8 +278,6 @@ public class MemberController {
     	return ResponseEntity.ok(result);
     }
     
-    
-    
   
 	// 마이페이지 게시글(이미지) 출력
 	@GetMapping("/selectPost")

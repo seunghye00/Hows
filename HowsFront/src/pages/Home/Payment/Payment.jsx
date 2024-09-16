@@ -2,7 +2,7 @@ import styles from './Payment.module.css'
 import React, {useEffect, useState} from "react";
 import {useOrderStore} from "../../../store/orderStore";
 import {addCommas, shippingPrice, SwalComp, validateName, validatePhone} from "../../../commons/commons";
-import {requestPaymentEvent} from "../../../api/payment";
+import {paymentCancel, requestPaymentEvent} from "../../../api/payment";
 import { v4 as uuidv4 } from 'uuid';
 import {userInfo} from "../../../api/member";
 import {Modal} from "../../../components/Modal/Modal";
@@ -157,20 +157,30 @@ export const Payment = () => {
       detailAddress: data.detail_address
     }
     const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
-    setPaymentInfo({ orderName, totalAmount });
-    const result = requestPaymentEvent(paymentInfo, orderInfo)
-    console.log("result ==== ", result)
-    if(result === "ok") {
-      SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
-        if(resp) {
-          navi("/mypage/userDashboard/buyList");
-        } else {
-          navi("/");
-        }
-      });
-    } else {
+    console.log("paymentInfo ==== ", paymentInfo);
 
-    }
+    setPaymentInfo({ orderName, totalAmount });
+
+    // 결제 진행
+    const resultData = await requestPaymentEvent(paymentInfo, orderInfo);
+      if(resultData === "ok") {
+        SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
+          if(resp) navi("/history/relivery");
+          else navi("/");
+        });
+      } else {
+        // 실패 시 결제 취소
+        paymentCancel(paymentId).then(res => {
+          console.log("res.data ==== ", res.data);
+          alert("결제 실패");
+        });
+      }
+  }
+
+  const testCancelPayment = () => {
+    paymentCancel().then(res => {
+      console.log("주문 취소 테스트 ==== ", res.data);
+    });
   }
 
   /** 회원 정보 셋팅 **/
@@ -262,6 +272,7 @@ export const Payment = () => {
 
   return (
     <div className={styles.container}>
+      <button onClick={testCancelPayment}>결제 취소</button>
       <div className={styles.title}> 주문하기 </div>
       <div className={styles.subTitle}> 선택한 상품 및 배송 정보 </div>
 

@@ -16,7 +16,7 @@ export const updateCart = (item) => {
 }
 
 /** 상품 삭제 **/
-export const deleteCart = (seq, type) => {
+export const deleteCart = async (seq, type) => {
   if(!type) type = "cart";
-  return api.delete(`/cart/${seq}/${type}`);
+  return await api.delete(`/cart/${seq}/${type}`);
 }

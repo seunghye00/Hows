@@ -20,8 +20,19 @@ public class SendEmailUtil {
         message.setTo(toEmail);
         message.setFrom(sender);
 
-        message.setSubject("임시 비밀번호 발급");
-        message.setText("당신의 임시 비밀번호는 " + tempPw + " 입니다.");
+        message.setSubject("[Hows] 임시 비밀번호 발급 안내");
+        message.setText(new StringBuilder()
+                .append("안녕하세요,\n\n")
+                .append("회원님의 요청에 따라 임시 비밀번호가 발급되었습니다.\n")
+                .append("아래의 임시 비밀번호를 사용하여 로그인하신 후, 안전을 위해 반드시 비밀번호를 변경해주시기 바랍니다.\n\n")
+                .append("임시 비밀번호:  ")
+                .append(tempPw)
+                .append("\n\n")
+                .append("※ 본 이메일은 자동 발송된 메일로 회신이 불가합니다. 문의 사항이 있으시면 고객센터로 연락해주시기 바랍니다.\n\n")
+                .append("감사합니다.\n")
+                .append("Hows 고객 지원팀")
+                .toString());
+        
         mailSender.send(message);
     }
 }

@@ -5,21 +5,25 @@ import {TextBox} from "../TextBox/TextBox";
 import {Modal} from "../../../../components/Modal/Modal";
 import {api} from "../../../../config/config";
 import {addCommas, formatDate} from "../../../../commons/commons";
+import {useNavigate} from "react-router-dom";
+import {paymentCancel} from "../../../../api/payment";
 
 export const Delivery = () => {
 
+  const navi = useNavigate();
+
   const [myPayment, setMyPayment] = useState([]);
-  const [selectPaymentId, setSelectPaymentId] = useState("");
+  const [selectPayment, setSelectPayment] = useState(0);
   const [orderDetail, setOrderDetail] = useState([]);
   const [reason, setReason] = useState()
 
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleDetail = (seq, id) => {
+  const handleDetail = (seq, paymentSeq) => {
     myPaymentsDetail(seq).then(res => {
       setOrderDetail(res.data);
-      setSelectPaymentId(id);
+      setSelectPayment(paymentSeq);
       setIsModalOpen(true);
     });
   }
@@ -28,12 +32,12 @@ export const Delivery = () => {
     setReason(e.target.value);
   }
 
-  const handleSaleCancel = (id) => {
+  const handleSaleCancel = (seq) => {
     const params = {
-      id,
-      reason
+      payment_seq: seq,
+      payment_text: reason
     }
-    api.post(`/payment/cancel`, params).then(res => {
+    api.post(`/history/payment/cancel`, params).then(res => {
       console.log("res ==== ", res);
     })
   }
@@ -62,7 +66,7 @@ export const Delivery = () => {
               <div className={styles.shippingRow} key={item.order_seq}>
                 <div className={styles.shippingItem}>How's-order_{item.order_seq}</div>
                 <div className={styles.shippingItem}>
-                  <p onClick={() => handleDetail(item.order_seq, item.payment_id)}>{item.order_name}</p>
+                  <p onClick={() => handleDetail(item.order_seq, item.payment_seq)}>{item.order_name}</p>
                 </div>
                 <div className={styles.shippingItem}>
                   <span>{item.payment_title}</span>
@@ -76,16 +80,17 @@ export const Delivery = () => {
       </div>
 
       {
-        /* 주문 & 결제 내역 디테일 */
+        /** 주문 & 결제 내역 디테일 **/
         isModalOpen &&
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
           <div className={styles.modalBox}>
-            <p>주문자 : {orderDetail.orderDetail.orderer_name}</p><br/>
-            <p>연락처 : {orderDetail.orderDetail.orderer_phone}</p><br/>
-            <p>배송지 : {orderDetail.orderDetail.orderer_address} {orderDetail.orderDetail.orderer_detail_address}</p><br/>
-            <p>주문날짜 : {formatDate(orderDetail.orderDetail.order_date)}</p><br/>
-            <p>총 결제금액 : {orderDetail.orderDetail.order_price}</p><br/>
-            <p>배송 상품</p><br/>
+            <div className={styles.orderDetail}>
+              <p>주문자 : {orderDetail.orderDetail.orderer_name}</p>
+              <p>연락처 : {orderDetail.orderDetail.orderer_phone}</p>
+              <p>배송지 : {orderDetail.orderDetail.orderer_address} {orderDetail.orderDetail.orderer_detail_address}</p>
+              <p>주문날짜 : {formatDate(orderDetail.orderDetail.order_date)}</p>
+              <p>총 결제금액 : {addCommas(orderDetail.orderDetail.order_price)}원</p>
+            </div>
             <div className={styles.orderList}>
               {
                 orderDetail.orderList.map(item => {
@@ -95,7 +100,7 @@ export const Delivery = () => {
                         <img src={item.product_thumbnail} alt="상품이미지"/>
                       </div>
                       <div className={styles.info}>
-                        <p>{item.product_title}</p>
+                        <p onClick={() => navi(`/products/${item.product_seq}`)}>{item.product_title}</p>
                         <div className={styles.count}>
                           <span>수량 : {item.order_list_count}</span>
                           <span>{addCommas(item.order_list_price)}원</span>
@@ -106,10 +111,8 @@ export const Delivery = () => {
                 })
               }
             </div>
-
             <input type="text" onChange={handleReason} placeholder="취소 사유를 적어주세요"/>
-            <button onClick={() => handleSaleCancel(selectPaymentId)} >구매 취소</button>
-            
+            <button onClick={() => handleSaleCancel(selectPayment)}>구매 취소 요청</button>
           </div>
         </Modal>
       }

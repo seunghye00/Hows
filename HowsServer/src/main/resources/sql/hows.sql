@@ -460,13 +460,13 @@ create table orders (
     order_code char(2) not null,
     order_name varchar2(200) not null,
     order_date timestamp default sysdate not null,
-    done_delivery_date timestamp,
     order_price number not null,
     orderer_name varchar2(30) not null,
     orderer_phone varchar2(11) not null,
     orderer_zip_code varchar2(10) not null,
     orderer_address varchar2(255) not null,
-    orderer_detail_address varchar2(255) not null
+    orderer_detail_address varchar2(255) not null,
+    done_delivery_date timestamp default null
 );
 
 create sequence order_seq
@@ -487,6 +487,7 @@ insert into order_status (order_code, order_title) values ('O3', '배송 준비'
 insert into order_status (order_code, order_title) values ('O4', '배송 중');
 insert into order_status (order_code, order_title) values ('O5', '배송 완료');
 insert into order_status (order_code, order_title) values ('O6', '구매확정');
+insert into order_status (order_code, order_title) values ('O7', '구매취소');
 
 -- 주문 리스트
 create table order_list (
@@ -553,7 +554,8 @@ create table payment (
     payment_code char(2) not null,
     payment_price number not null,    
     payment_date timestamp default sysdate,
-    payment_id varchar2(100) not null
+    payment_id varchar2(100) not null,
+    payment_text varchar2(500) default null
 );
 
 create sequence payment_seq
@@ -571,6 +573,8 @@ create table payment_status (
 insert into payment_status (payment_code, payment_title) values ('P1', '결제대기');
 insert into payment_status (payment_code, payment_title) values ('P2', '결제완료');
 insert into payment_status (payment_code, payment_title) values ('P3', '결제실패');
+insert into payment_status (payment_code, payment_title) values ('P4', '취소요청');
+insert into payment_status (payment_code, payment_title) values ('P5', '결제취소');
 
 -- 배송
 create table shipping (

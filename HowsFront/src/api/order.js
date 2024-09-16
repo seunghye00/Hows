@@ -33,3 +33,9 @@ export const doneOrder = orderSeqs => {
     const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
     return axios.put(`${baseUrl}/doneOrder`, null, { params: { seqs } })
 }
+
+// 주문 내역 삭제
+export const deleteOrder = orderSeqs => {
+    const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
+    return axios.delete(`${baseUrl}`, { params: { seqs } })
+}

@@ -50,18 +50,19 @@ export const findMemberSeq = (member_id) => {
 };
 
 // 프로필 이미지 업로드
-export const uploadProfileImage = (file, memberSeq) => {
+export const uploadImage = (file, memberSeq, imageType) => {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('member_seq', memberSeq)
+    formData.append("type", imageType); // 타입 추가
 
-    return api.post('/member/uploadProfileImage', formData)
+    return api.post('/member/uploadImage', formData)
 }
 
 // 프로필 이미지 삭제
-export const deleteProfileImage = memberSeq => {
-    return api.delete('/member/deleteProfileImage', {
-        params: { member_seq: memberSeq },
+export const deleteImage = (memberSeq, imageType) => {
+    return api.delete('/member/deleteImage', {
+        params: { member_seq: memberSeq, type: imageType }
     })
 }
 
@@ -101,8 +102,8 @@ export const countBookmark = (member_id) => {
 };
 
 // 방명록 개수
-export const countGuestbook = (member_id) => {
-    return api.get(`/guestbook/countGuestbook`, { params: { member_id } });
+export const countGuestbook = (member_seq) => {
+    return api.get(`/guestbook/countGuestbook`, { params: { member_seq } });
 };
 
 // 팔로우/언팔로우 처리 API 호출 함수
@@ -125,6 +126,11 @@ export const getFollowing = (member_seq) => {
     return api.get(`/member/getFollowing`, { params: { member_seq } });
 };
 
+// [마이페이지 메인 팔로우 버튼] 내가 상대방 팔로우 했는지 버튼 표시 
+export const eachFollow = (fromMemberSeq, toMemberSeq) => {
+    const params = { from_member_seq: fromMemberSeq, to_member_seq: toMemberSeq };
+    return api.post('/member/eachFollow', params);
+};
 
 
 export const adminstart = () => {

@@ -69,4 +69,9 @@ public class OrderService {
 	public List<OrderInfoListDTO> getOrdersByStatus(String status) {
 		return orderDAO.getOrdersByStatus(status);
 	}
+
+	// 주문 내역 삭제
+	public boolean deleteOrder(int orderSeq) {
+		return orderDAO.deleteOrder(orderSeq);
+	}
 }

@@ -100,6 +100,25 @@ public class OrderController {
 		return ResponseEntity.ok("success");
 	}
 
+	// 주문 내역 삭제
+	@Transactional
+	@DeleteMapping
+	public ResponseEntity<String> deleteOrder(@RequestParam String seqs) throws Exception {
+		String[] orderSeqs = seqs.split(","); // seqs를 배열로 변환
+		for(String orderSeq : orderSeqs) {
+			try {
+				int order_seq = Integer.parseInt(orderSeq);
+				if(!orderServ.deleteOrder(order_seq)) {
+					throw new RuntimeException("주문 삭제 실패");
+				}
+            } catch (Exception e) {
+                // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+                throw new RuntimeException("주문 삭제 실패", e);
+            }
+		}
+		return ResponseEntity.ok("success");
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

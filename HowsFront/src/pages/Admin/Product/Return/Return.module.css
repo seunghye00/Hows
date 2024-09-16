@@ -73,6 +73,8 @@
 
 .listBox {
     height: 93%;
+    max-height: 620px;
+    overflow-y: auto;
 }
 
 .empty {

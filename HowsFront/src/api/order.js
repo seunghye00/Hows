@@ -11,8 +11,8 @@ export const orderList = status => {
 }
 
 // 주문, 주문목록 추가
-export const addOrder = order => {
-    return api.post(`/order`, order)
+export const  addOrder = async order => {
+    return await api.post(`/order`, order)
 }
 
 // 주문 상태 업데이트
@@ -32,4 +32,16 @@ export const startDelivery = orderSeqs => {
 export const doneOrder = orderSeqs => {
     const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
     return axios.put(`${baseUrl}/doneOrder`, null, { params: { seqs } })
+}
+
+// 주문 내역 삭제
+export const deleteOrder = orderSeqs => {
+    const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
+    return axios.delete(`${baseUrl}`, { params: { seqs } })
+}
+
+// 환불 처리 완료
+export const doneReturn = orderSeqs => {
+    const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
+    return axios.put(`${baseUrl}/doneReturn`, null, { params: { seqs } })
 }

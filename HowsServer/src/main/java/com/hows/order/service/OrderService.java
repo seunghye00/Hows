@@ -28,6 +28,7 @@ public class OrderService {
     /** 주문 등록 **/
     @Transactional
     public int addOrder(Map<String, Object> map, int memberSeq) {
+        int orderSeq = 0;
         try {
             int totalAmount = (int) map.get("totalAmount");
             String orderName = (String) map.get("orderName");
@@ -37,15 +38,16 @@ public class OrderService {
             String address = (String) map.get("address");
             String detailAddress = (String) map.get("detailAddress");
 
-            int orderSeq = orderDAO.addOrder(new OrderDTO(memberSeq, orderName, totalAmount, name, phone, zipCode, address, detailAddress));
+            orderSeq = orderDAO.addOrder(new OrderDTO(memberSeq, orderName, totalAmount, name, phone, zipCode, address, detailAddress));
 
             /** 주문 목록 등록 **/
             List<Map<String, ?>> param = (List<Map<String, ?>>) map.get("orderProducts");
+            System.out.println("param ===== " + param);
             if(param.size() > 0) {
                 for(Map<String, ?> dto : param) {
-                    int productSeq = (int) dto.get("product_seq");
-                    int orderListCount = (int) dto.get("product_quantity");
-                    int orderListPrice = (int) dto.get("product_total_price");
+                    int productSeq = Integer.parseInt(dto.get("product_seq").toString());
+                    int orderListCount = Integer.parseInt(dto.get("product_quantity").toString());
+                    int orderListPrice = Integer.parseInt(dto.get("product_total_price").toString());
 
                     orderDAO.addOrderList(new OrderListDTO(0, orderSeq, productSeq, orderListCount, orderListPrice));
                 }
@@ -55,6 +57,7 @@ public class OrderService {
 
         } catch (Exception e) {
             e.printStackTrace();
+            orderDAO.deleteOrder(orderSeq);
             return -1;
         }
     }
@@ -68,5 +71,10 @@ public class OrderService {
     // 필터링된 주문 목록
 	public List<OrderInfoListDTO> getOrdersByStatus(String status) {
 		return orderDAO.getOrdersByStatus(status);
+	}
+
+	// 주문 내역 삭제
+	public boolean deleteOrder(int orderSeq) {
+		return orderDAO.deleteOrder(orderSeq);
 	}
 }

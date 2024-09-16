@@ -3,7 +3,7 @@ import styles from './Header.module.css'
 import logo from '../../assets/images/logo_how.png'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore, useMemberStore } from './../../store/store'
-import profile from '../../assets/images/마이페이지_프로필사진.jpg'
+import profile from '../../assets/images/기본사진.jpg'
 import { throttle } from 'lodash'
 import { api } from './../../config/config' // API 요청을 위한 경로
 import Swal from "sweetalert2";
@@ -191,6 +191,9 @@ export const Header = () => {
                                                 src={currentUser.member_avatar || profile} // 프로필 사진이 없으면 기본 이미지 사용
                                                 alt="User"
                                                 onClick={handleProfileClick}
+                                                onError={(e) => { // 이미지 로드 실패 시 기본 이미지로 대체
+                                                    e.target.src = profile; // 기본 이미지 경로로 변경
+                                                }}
                                             />
                                         </div>
                                         {profileMenu && (
@@ -200,7 +203,6 @@ export const Header = () => {
                                                         styles.profileMenuItem
                                                     }
                                                     onClick={() => {
-                                                        // navigate('/mypage')
                                                         handleMyPageClick()
                                                         handleItemClick()
                                                     }}

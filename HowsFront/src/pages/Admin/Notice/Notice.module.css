@@ -188,3 +188,12 @@
     display: block;
     margin-bottom: 20px;
 }
+
+.empty{
+    display: flex;
+    font-size: 20px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    top: 40%;
+}

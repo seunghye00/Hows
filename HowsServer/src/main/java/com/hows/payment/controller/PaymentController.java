@@ -40,6 +40,7 @@ public class PaymentController {
 
     @PostMapping("/cancel")
     public ResponseEntity<?> cancel(@RequestBody Map<String, Object> map) throws Exception {
+        System.out.println("결체 취소 파라미터 ======= " + map);
         String result = paymentServ.paymentCancel(map);
         return ResponseEntity.ok(result);
     }

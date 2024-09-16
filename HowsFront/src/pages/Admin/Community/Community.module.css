@@ -79,6 +79,15 @@
 
 .span{
     cursor: pointer;
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow: hidden;
+    word-break: break-word;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 2;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 }
 
 /* 신고 모달창 */
@@ -178,7 +187,14 @@
     cursor: pointer;
 }
 
-
+.empty{
+    display: flex;
+    font-size: 20px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    top: 40%;
+}
 
 
 

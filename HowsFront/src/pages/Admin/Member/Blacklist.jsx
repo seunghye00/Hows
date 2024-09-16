@@ -161,7 +161,7 @@ export const Blacklist = () => {
                     <div className={styles.headerItem}>이름</div>
                     <div className={styles.headerItem}>아이디</div>
                     <div className={styles.headerItem}>블랙리스트 사유</div>
-                    <div className={styles.headerItem}>등록 날짜</div>
+                    <div className={styles.headerItem}>등록일시</div>
                     <div className={styles.headerItem}>해제</div>
                 </div>
 
@@ -197,7 +197,7 @@ export const Blacklist = () => {
                         </div>
                     ))
                 ) : (
-                    <div className={styles.noResult}>검색 결과가 없습니다.</div>
+                    <div className={styles.empty}>검색 결과가 없습니다.</div>
                 )}
             </div>
 
@@ -298,7 +298,7 @@ export const Blacklist = () => {
                                 />
                             </div>
                             <div className={styles.infoItem}>
-                                <label>가입날짜</label>
+                                <label>가입일시</label>
                                 <input
                                     type="text"
                                     value={formatDate(
@@ -309,7 +309,7 @@ export const Blacklist = () => {
                                 />
                             </div>
                             <div className={styles.infoItem}>
-                                <label>탈퇴날짜</label>
+                                <label>탈퇴일시</label>
                                 <input
                                     type="text"
                                     value={

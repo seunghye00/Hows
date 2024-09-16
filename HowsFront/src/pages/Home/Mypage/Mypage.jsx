@@ -2,6 +2,7 @@ import styles from "./Mypage.module.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Main } from "./Main/Main";
 import { Update } from "./Update/Update";
+import { ScrollTop } from "../../../components/ScrollTop/ScrollTop";
 
 export const Mypage = () => {
   return (
@@ -13,6 +14,7 @@ export const Mypage = () => {
         <Route path="main/:member_id/*" element={<Main />} />
         <Route path="update/*" element={<Update />} />
       </Routes>
+      <ScrollTop></ScrollTop>
     </div>
   );
 };

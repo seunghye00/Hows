@@ -35,8 +35,8 @@ public class GuestbookService {
 	}
 	
 	// 마이페이지 방문글 갯수
-    public int countGuestbook(String member_id){
-    	return guestDao.countGuestbook(member_id);
+    public int countGuestbook(int member_seq){
+    	return guestDao.countGuestbook(member_seq);
     }
 	
 	

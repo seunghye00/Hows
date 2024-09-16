@@ -116,7 +116,7 @@ export const Comment = () => {
             <div className={styles.headerSection}>
                 <div className={styles.searchSection}>
                     <Search
-                        placeholder="내용 또는 작성자 검색"
+                        placeholder="게시글 또는 작성자 검색"
                         onSearch={handleSearch}
                     />
                 </div>
@@ -125,54 +125,60 @@ export const Comment = () => {
             <div className={styles.commentlist}>
                 <div className={styles.commentHeader}>
                     <div className={styles.headerItem}>NO</div>
-                    <div className={styles.headerItem}>내용</div>
+                    <div className={styles.headerItem}>게시글</div>
                     <div className={styles.headerItem}>작성자</div>
-                    <div className={styles.headerItem}>작성날짜</div>
+                    <div className={styles.headerItem}>작성일시</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                {displayComments.map((comment, index) => (
-                    <div className={styles.commentRow} key={index}>
-                        <div className={styles.commentItem}>
-                            {startRow + index}
-                        </div>
-                        <div
-                            className={styles.commentItem}
-                            onClick={() => handleOpenCommentModal(comment)}
-                        >
-                            <span className={styles.span}>
-                                {comment.BOARD_CONTENTS}
-                            </span>
-                        </div>
-                        <div className={styles.commentItem}>
-                            {comment.NICKNAME}
-                        </div>
-                        <div className={styles.commentItem}>
-                            {comment.WRITE_DATE}
-                        </div>
+                {displayComments.length > 0 ? (
+                    displayComments.map((comment, index) => (
+                        <div className={styles.commentRow} key={index}>
+                            <div className={styles.commentItem}>
+                                {startRow + index}
+                            </div>
+                            <div
+                                className={styles.commentItem}
+                                onClick={() => handleOpenCommentModal(comment)}
+                            >
+                                <span className={styles.span}>
+                                    {comment.BOARD_CONTENTS}
+                                </span>
+                            </div>
+                            <div className={styles.commentItem}>
+                                {comment.NICKNAME}
+                            </div>
+                            <div className={styles.commentItem}>
+                                {comment.WRITE_DATE}
+                            </div>
 
-                        <div
-                            className={styles.commentItem}
-                            onClick={() =>
-                                handleOpenReportModal(comment.COMMENT_SEQ)
-                            }
-                        >
-                            <span className={styles.reportcount}>
-                                {comment.REPORT_COUNT}
-                            </span>
-                        </div>
-                        <div className={styles.commentItem}>
-                            <Button
-                                size="s"
-                                title="삭제"
+                            <div
+                                className={styles.commentItem}
                                 onClick={() =>
-                                    handleDeleteComment(comment.COMMENT_SEQ)
+                                    handleOpenReportModal(comment.COMMENT_SEQ)
                                 }
-                            />
+                            >
+                                <span className={styles.reportcount}>
+                                    {comment.REPORT_COUNT}
+                                </span>
+                            </div>
+                            <div className={styles.commentItem}>
+                                <Button
+                                    size="s"
+                                    title="삭제"
+                                    onClick={() =>
+                                        handleDeleteComment(comment.COMMENT_SEQ)
+                                    }
+                                />
+                            </div>
                         </div>
+                    ))
+                ) : (
+                    <div className={styles.empty}>
+                        신고 댓글 목록이 없습니다
                     </div>
-                ))}
+                )}
             </div>
 
             <Paging
@@ -214,7 +220,7 @@ export const Comment = () => {
                             <div className={styles.tableHeader}>
                                 <div>신고자</div>
                                 <div>신고 사유</div>
-                                <div>신고 날짜</div>
+                                <div>신고 일시</div>
                             </div>
                             {commentReports.map(report => (
                                 <div

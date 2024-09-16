@@ -158,39 +158,48 @@ export const Notice = () => {
                 <div className={styles.noticeHeader}>
                     <div className={styles.headerItem}>NO</div>
                     <div className={styles.headerItem}>제목</div>
-                    <div className={styles.headerItem}>작성날짜</div>
+                    <div className={styles.headerItem}>작성일시</div>
                     <div className={styles.headerItem}>조회수</div>
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                {displayNotices.map((notice, index) => (
-                    <div className={styles.noticeRow} key={notice.notice_seq}>
-                        <div className={styles.noticeItem}>
-                            {startRow + index}
-                        </div>
+                {displayNotices.length > 0 ? (
+                    displayNotices.map((notice, index) => (
                         <div
-                            className={styles.noticeItem}
-                            onClick={() => openModal(notice.notice_seq)} // 공지사항 제목 클릭 시 모달 열기
+                            className={styles.noticeRow}
+                            key={notice.notice_seq}
                         >
-                            <span className={styles.span}>
-                                {notice.notice_title}
-                            </span>
+                            <div className={styles.noticeItem}>
+                                {startRow + index}
+                            </div>
+                            <div
+                                className={styles.noticeItem}
+                                onClick={() => openModal(notice.notice_seq)} // 공지사항 제목 클릭 시 모달 열기
+                            >
+                                <span className={styles.span}>
+                                    {notice.notice_title}
+                                </span>
+                            </div>
+                            <div className={styles.noticeItem}>
+                                {formatDate(notice.notice_date)}
+                            </div>
+                            <div className={styles.noticeItem}>
+                                {notice.view_count}
+                            </div>
+                            <div className={styles.noticeItem}>
+                                <Button
+                                    size="s"
+                                    title="삭제"
+                                    onClick={() =>
+                                        handleDelete(notice.notice_seq)
+                                    } // 삭제 버튼 클릭 시 삭제 함수 호출
+                                />
+                            </div>
                         </div>
-                        <div className={styles.noticeItem}>
-                            {formatDate(notice.notice_date)}
-                        </div>
-                        <div className={styles.noticeItem}>
-                            {notice.view_count}
-                        </div>
-                        <div className={styles.noticeItem}>
-                            <Button
-                                size="s"
-                                title="삭제"
-                                onClick={() => handleDelete(notice.notice_seq)} // 삭제 버튼 클릭 시 삭제 함수 호출
-                            />
-                        </div>
-                    </div>
-                ))}
+                    ))
+                ) : (
+                    <div className={styles.empty}>공지사항이 없습니다</div>
+                )}
             </div>
 
             {/* 페이징 컴포넌트 */}

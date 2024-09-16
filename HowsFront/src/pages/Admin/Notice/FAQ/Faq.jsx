@@ -19,7 +19,6 @@ const Faq = () => {
     const fetchFaqList = () => {
         selectAllFaq()
             .then(response => {
-                console.log(response.data)
                 setFaqList(response.data) // 상태 업데이트 후 리렌더링
             })
             .catch(error => console.error('FAQ 목록 조회 실패:', error))
@@ -57,6 +56,17 @@ const Faq = () => {
     const handleRegister = () => {
         const newFaq = faqList[editIndex]
 
+        // 제목이나 내용이 비어있는지 확인
+        if (!newFaq.faq_title.trim() || !newFaq.faq_contents.trim()) {
+            Swal.fire({
+                title: '등록 실패',
+                text: '제목과 내용을 모두 입력해주세요.',
+                icon: 'warning',
+                confirmButtonText: '확인',
+            })
+            return
+        }
+
         insertFaq(newFaq)
             .then(response => {
                 setFaqList(
@@ -76,7 +86,6 @@ const Faq = () => {
                 fetchFaqList() // 등록 후 목록을 다시 불러옴
             })
             .catch(error => {
-                console.error('FAQ 등록 실패:', error)
                 Swal.fire({
                     title: '등록 실패',
                     text: 'FAQ 등록 중 오류가 발생했습니다.',
@@ -111,6 +120,20 @@ const Faq = () => {
             if (result.isConfirmed) {
                 const updatedFaq = faqList[editIndex]
 
+                // 제목과 내용 검증
+                if (
+                    !updatedFaq.faq_title.trim() ||
+                    !updatedFaq.faq_contents.trim()
+                ) {
+                    Swal.fire({
+                        title: '수정 실패',
+                        text: '제목과 내용을 모두 입력해주세요.',
+                        icon: 'warning',
+                        confirmButtonText: '확인',
+                    })
+                    return
+                }
+
                 modifyFaq(updatedFaq.faq_seq, updatedFaq)
                     .then(() => {
                         setEditIndex(null)
@@ -123,7 +146,6 @@ const Faq = () => {
                         fetchFaqList() // 수정 후 목록을 다시 불러옴
                     })
                     .catch(error => {
-                        console.error('FAQ 수정 실패:', error)
                         Swal.fire({
                             title: '수정 실패',
                             text: 'FAQ 수정 중 오류가 발생했습니다.',
@@ -168,7 +190,6 @@ const Faq = () => {
                         fetchFaqList() // 삭제 후 목록을 다시 불러옴
                     })
                     .catch(error => {
-                        console.error('FAQ 삭제 실패:', error)
                         Swal.fire({
                             title: '삭제 실패',
                             text: 'FAQ 삭제 중 오류가 발생했습니다.',

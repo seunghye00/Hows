@@ -59,8 +59,21 @@
             <if test="payment_code != 'P1'">
                 sysdate,
             </if>
-            #{payment_id}
+            #{payment_id},
+            default
         )
     </insert>
+
+    <update id="updatePayment">
+        UPDATE
+            payment
+        SET
+            payment_code = #{payment_code},
+            payment_text = #{payment_text}
+        WHERE
+            payment_seq = #{payment_seq}
+        AND
+            member_seq = #{member_seq}
+    </update>
 
 </mapper>

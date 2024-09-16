@@ -9,6 +9,11 @@ export const addPayment = (payment) => {
   return api.post(`/payment/complete`, payment)
 }
 
+/** 결제 취소 **/
+export const cancelPayment = (data) => {
+  return api.post(`/payment/cancel`, data);
+}
+
 /** 결제 시스템 ( PortOne ) **/
 export const requestPaymentEvent = async(payment, orderInfo) => {
   const {REACT_APP_STORE_ID, REACT_APP_CHANNEL_KEY} = process.env;
@@ -16,16 +21,24 @@ export const requestPaymentEvent = async(payment, orderInfo) => {
 
   try {
     // 결제 파라미터
-    const response = await PortOne.requestPayment({
-      storeId: REACT_APP_STORE_ID,          // Store ID 설정
-      channelKey: REACT_APP_CHANNEL_KEY,    // 채널 키 설정
-      paymentId,                            // 결제 건을 구분하는 문자열 ( 결제 요청 및 조회에 필요 )
-      orderName,                            // 주문 내용을 나타내는 문자열
-      totalAmount,                          // 결제 금액
-      currency: "KRW",                      // 결제 화폐
-      payMethod,                            // 결제 수단
-      customer                              // 구매자 정보
-    });
+    // const response = await PortOne.requestPayment({
+    //   storeId: REACT_APP_STORE_ID,          // Store ID 설정
+    //   channelKey: REACT_APP_CHANNEL_KEY,    // 채널 키 설정
+    //   paymentId,                            // 결제 건을 구분하는 문자열 ( 결제 요청 및 조회에 필요 )
+    //   orderName,                            // 주문 내용을 나타내는 문자열
+    //   totalAmount,                          // 결제 금액
+    //   currency: "KRW",                      // 결제 화폐
+    //   payMethod,                            // 결제 수단
+    //   customer                              // 구매자 정보
+    // });
+
+    const response = {
+      paymentId: "how-111963c7-983b-4f25-b0b8-48521ea4bf42",
+      transactionType: "PAYMENT",
+      txId: "0191f9c6-6112-494e-8765-23cd4e392d06"
+    }
+
+    console.log("response ======= ", response);
 
     // 결제 실패
     if(response.code != null) {
@@ -45,7 +58,6 @@ export const requestPaymentEvent = async(payment, orderInfo) => {
       if(res.data > 0) {
         // 주문 데이터 저장 성공 시 결제 데이터 저장
         addPayment(paymentResult).then(resp => {
-          console.log("addPayment ==== ", resp.data);
 
           // 주문 완료한 목록 장바구니에서 삭제
           orderInfo.orderProducts.map(item =>{
@@ -69,5 +81,15 @@ export const requestPaymentEvent = async(payment, orderInfo) => {
 
   // 결제 실패
   return "fail";
+}
+
+/** 결제 취소 **/
+export const paymentCancel = (paymentId) => {
+  const data = {
+    // id : paymentId,
+    id: "how-111963c7-983b-4f25-b0b8-48521ea4bf42",
+    reason : "payment cancel test"
+  }
+  return cancelPayment(data);
 }
 

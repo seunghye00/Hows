@@ -1,17 +1,16 @@
 import styles from './Cart.module.css'
-import img1 from '../../../assets/images/interior_1.jpg'
-import img2 from '../../../assets/images/interior_2.jpg'
-import img3 from '../../../assets/images/interior_3.jpg'
-import img4 from '../../../assets/images/interior_4.jpg'
 import {useNavigate} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {addCommas, shippingPrice} from "../../../commons/commons";
+import {addCommas, shippingPrice, SwalComp} from "../../../commons/commons";
 import {useOrderStore} from "../../../store/orderStore";
 import {cartList, deleteCart, updateCart} from "../../../api/cart";
+import {useAuthStore} from "../../../store/store";
 
 export const Cart = () => {
 
   const navi = useNavigate();
+
+  const { isAuth } = useAuthStore();
 
   const { setOrderProducts, setOrderPrice } = useOrderStore();
 
@@ -157,6 +156,14 @@ export const Cart = () => {
   
   /** 페이지 로드 **/
   useEffect(() => {
+    if (!isAuth) {
+      SwalComp({
+        type: "warning",
+        text: "로그인이 필요한 서비스입니다."
+      });
+      navi("/signIn");
+    }
+
     cartList().then(res => {
       if(res.data !== "") {
         const arr = res.data.map(item => ({ ...item, checked: true }));
@@ -164,10 +171,10 @@ export const Cart = () => {
         setCheckCart(arr);
         totalPrice();
       }
-
     });
-  }, []);
+  }, [isAuth]);
 
+  if(!isAuth) return null;
   return (
     <div className={styles.container}>
       <div className={styles.title}>

@@ -69,6 +69,20 @@
 			</choose>
 		</where>
 	</select>
+	
+	<!-- 반품 목록 조회 -->
+	<select id="getReturnList" resultType="com.hows.order.dto.ReturnDTO">
+		select
+		o.order_seq, r.return_seq, o.order_date, p.payment_date, o.done_delivery_date, 
+		r.return_date, r.done_return_date, o.order_name, m.name, g.grade_title, 
+		o.order_price, p.payment_price, o.orderer_phone, p.payment_id, p.payment_text 
+		from orders o
+		left join member m on o.member_seq = m.member_seq
+		left join grade g on m.grade_code = g.grade_code
+		left join payment p on o.order_seq = p.order_seq
+		left join return r on o.order_seq = r.order_seq
+		where o.order_code = 'O7'
+	</select>
 
 	<insert id="addOrder" parameterType="com.hows.order.dto.OrderDTO">
 		<selectKey keyProperty="order_seq" resultType="int" order="BEFORE">

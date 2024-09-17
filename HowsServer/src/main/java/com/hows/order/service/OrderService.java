@@ -1,11 +1,11 @@
 package com.hows.order.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.hows.order.dto.OrderListDTO;
+import com.hows.order.dto.ReturnDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +72,11 @@ public class OrderService {
 	public List<OrderInfoListDTO> getOrdersByStatus(String status) {
 		return orderDAO.getOrdersByStatus(status);
 	}
+	
+    // 반품 목록
+    public List<ReturnDTO> getReturnList() throws Exception {
+        return orderDAO.getReturnList();
+    }
 
 	// 주문 내역 삭제
 	public boolean deleteOrder(int orderSeq) {

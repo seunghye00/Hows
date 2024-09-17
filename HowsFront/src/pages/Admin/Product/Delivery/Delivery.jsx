@@ -18,7 +18,6 @@ export const Delivery = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [viewOrder, setViewOrder] = useState({
         order_date: '',
-        payment_price: '',
         order_name: '',
         order_price: 0,
         payment_price: 0,

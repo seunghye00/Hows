@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hows.order.dto.OrderDTO;
 import com.hows.order.dto.OrderInfoListDTO;
+import com.hows.order.dto.ReturnDTO;
 import com.hows.order.service.OrderService;
 
 @RestController
@@ -37,6 +38,13 @@ public class OrderController {
 	@GetMapping("/listByStatus")
 	public ResponseEntity<List<OrderInfoListDTO>> getOrdersByStatus(@RequestParam String status) throws Exception {
 		List<OrderInfoListDTO> list = orderServ.getOrdersByStatus(status);
+		return ResponseEntity.ok(list);
+	}
+	
+	// 반품 목록 조회
+	@GetMapping("/getReturnList")
+	public ResponseEntity<List<ReturnDTO>> getReturnList() throws Exception {
+		List<ReturnDTO> list = orderServ.getReturnList();
 		return ResponseEntity.ok(list);
 	}
 

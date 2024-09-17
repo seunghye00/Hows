@@ -51,6 +51,15 @@ public class ReviewDAO {
 	public void delReview(int review_seq) throws Exception {
 	    myBatis.delete("Product.delReview", review_seq); 
 	}
+	
+	// 리뷰 신고 
+    public void sendReviewReport(int review_seq, String report_code, String member_id) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("review_seq", review_seq);
+        params.put("report_code", report_code);
+        params.put("member_id", member_id);
+        myBatis.insert("Product.sendReviewReport", params);
+    }
 
 
     //  =============== 사용자 기능 ===============

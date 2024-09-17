@@ -23,7 +23,10 @@ const formatDate = dateString => {
     return `${year}-${month}-${day}`
 }
 
-export const ProfileSection = ({ profileData }) => {
+export const ProfileSection = ({
+    profileData,
+    handleDeletePost, // 삭제 처리 함수 추가
+}) => {
     const { isAuth } = useAuthStore() // 로그인 여부
     const navigate = useNavigate()
     const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
@@ -79,11 +82,6 @@ export const ProfileSection = ({ profileData }) => {
         navigate('/communities/post')
     }
 
-    const handleDelete = () => {
-        if (!isAuth) navigate('/signIn')
-        console.log('삭제 처리')
-    }
-
     const handleFollow = async () => {
         if (!isAuth) {
             navigate('/signIn')
@@ -127,7 +125,11 @@ export const ProfileSection = ({ profileData }) => {
                 {isOwner ? (
                     <>
                         <Button title="수정" size="s" onClick={handleModify} />
-                        <Button title="삭제" size="s" onClick={handleDelete} />
+                        <Button
+                            title="삭제"
+                            size="s"
+                            onClick={handleDeletePost}
+                        />
                     </>
                 ) : (
                     <Button

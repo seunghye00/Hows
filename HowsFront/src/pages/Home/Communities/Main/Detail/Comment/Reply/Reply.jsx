@@ -4,6 +4,9 @@ import 'draft-js/dist/Draft.css'
 import styles from './Reply.module.css'
 import { toggleLikeReply } from '../../../../../../../api/comment' // 좋아요 API 가져오기
 import { PiSiren } from 'react-icons/pi'
+import Swal from 'sweetalert2'
+import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../../../../../../../store/store'
 
 // 날짜 포맷팅 함수
 const formatDate = dateString => {
@@ -34,6 +37,8 @@ export const Reply = ({
     handleOpenReportModalForReply, // 신고 모달 열기 함수 (부모로부터 전달)
     toggleReply,
 }) => {
+    const { isAuth } = useAuthStore() // 로그인 여부를 확인하는 전역 상태
+    const navigate = useNavigate() // 페이지 이동을 위한 네비게이션 훅
     const [editorState, setEditorState] = useState(() =>
         EditorState.createWithContent(
             ContentState.createFromText(replyData.REPLY_CONTENTS)
@@ -76,6 +81,17 @@ export const Reply = ({
 
     // 좋아요 처리 함수
     const handleLike = async () => {
+        if (!isAuth || !member_id) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
+            return
+        }
+
         try {
             const response = await toggleLikeReply(
                 replyData.REPLY_SEQ,
@@ -90,6 +106,21 @@ export const Reply = ({
         } catch (error) {
             console.error('좋아요 처리 중 오류 발생:', error)
         }
+    }
+
+    // 답글 달기 버튼 클릭 처리
+    const handleReplyClick = () => {
+        if (!isAuth || !member_id) {
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navigate('/signIn') // 로그인 페이지로 이동
+            })
+            return
+        }
+        toggleReply(replyData.REPLY_SEQ)
     }
 
     return (
@@ -131,7 +162,7 @@ export const Reply = ({
                     <div className={styles.replyBtnBox}>
                         <div
                             className={styles.replyLeave}
-                            onClick={() => toggleReply(replyData.REPLY_SEQ)}
+                            onClick={handleReplyClick}
                         >
                             답글 달기
                         </div>

@@ -77,13 +77,13 @@
 
 .replyTextarea {
     padding: 5px 10px;
-
+    word-wrap: break-word;
+    white-space: pre-wrap;
     box-sizing: border-box;
     font-size: 16px;
     overflow-y: auto;
     letter-spacing: .7px;
     color: var(--hows-gray-700);
-    max-height: 72px;
 }
 
 /* 수정 모드일 때 스타일 */

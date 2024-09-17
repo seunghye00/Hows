@@ -332,6 +332,7 @@ export const Modify = () => {
     }, [board_seq])
 
     // 게시글 수정 완료 처리 핸들러
+    // 게시글 수정 완료 처리 핸들러
     const handleSubmitPost = async () => {
         const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
 
@@ -361,7 +362,7 @@ export const Modify = () => {
             formData.append('board_contents', postContent)
             formData.append('member_id', member_id)
 
-            // 기존 이미지 URL 목록 추가 (만약 기존 이미지가 있다면)
+            // 기존 이미지 URL 목록 추가
             const existingImageUrls = images
                 .filter(image => !image.file) // 새로운 파일이 없는 기존 이미지 필터링
                 .map(image => image.src) // URL로 변환
@@ -373,6 +374,9 @@ export const Modify = () => {
             const newImageFiles = images.filter(image => image.file) // 새로 업로드된 이미지 파일
             const newImageOrders = []
             const existingImageOrders = []
+
+            // 태그 데이터 배열 초기화
+            const allTags = []
 
             // 이미지 및 태그 정보 추가
             images.forEach((image, index) => {
@@ -389,7 +393,9 @@ export const Modify = () => {
                     left_position: tag.position.left,
                     top_position: tag.position.top,
                 }))
-                formData.append(`tags_${index}`, JSON.stringify(tags)) // 태그 추가
+
+                // 해당 이미지와 함께 태그 정보를 추가
+                formData.append(`tags_json_${index}`, JSON.stringify(tags)) // 태그 추가
             })
 
             // 이미지 순서 정보 추가 (배열을 직접 추가)
@@ -410,7 +416,7 @@ export const Modify = () => {
                     title: '게시글 수정 완료',
                     text: '게시글이 성공적으로 수정되었습니다.',
                 })
-                navigate('/communities')
+                navigate(`/communities/${board_seq}`)
             } else {
                 throw new Error('이미지 및 태그 저장 실패')
             }

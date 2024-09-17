@@ -80,8 +80,22 @@ public class CommunityDAO {
     
     // 게시글 수정 이미지 주소
 	public List<String> selectImagesUrls(int board_seq) {
-		return mybatis.selectList("Community.selectImagesUrls");
+		return mybatis.selectList("Community.selectImagesUrls", board_seq);
 	}
+    // DB에서 imageUrl로 board_image_seq를 조회하는 로직
+    public int selectBoardImageSeqByUrl(String imageUrl) {
+        return mybatis.selectOne("Community.selectBoardImageSeqByUrl", imageUrl);
+    }
+    
+    // 수정 시 태그정보 가져오는 로직 
+    public List<TagDTO> selectTagsByImageSeq(int boardImageSeq) {
+        return mybatis.selectList("Community.selectTagsByImageSeq", boardImageSeq);
+    }
+    
+    // 수정 시 태그정보 삭제
+    public void deleteTag(int tagSeq) {
+        mybatis.delete("Community.deleteTag", tagSeq);
+    }
     
 	// 사용자가 특정 게시글에 좋아요를 눌렀는지 확인
 	public boolean checkIfUserLikedBoard(String member_id, int board_seq) {

@@ -50,7 +50,30 @@
 		#{board_image_seq}, #{product_seq},
 		#{left_position}, #{top_position})
 	</insert>
+	
+    <!-- 이미지 URL로 board_image_seq 조회 -->
+    <select id="selectBoardImageSeqByUrl" resultType="int">
+        select board_image_seq
+        from board_image
+        where image_url = #{imageUrl}
+    </select>
+    
+    <!-- 특정 이미지에 연결된 태그를 조회하는 쿼리 -->
+    <select id="selectTagsByImageSeq" resultType="com.hows.community.dto.TagDTO">
+        select 
+			*
+        from 
+            board_tag
+        where 
+            board_image_seq = #{boardImageSeq}
+    </select>
 
+    <!-- 태그를 삭제하는 쿼리 -->
+    <delete id="deleteTag">
+        delete from board_tag
+        where board_tag_seq = #{tagSeq}
+    </delete>
+    
 	<!-- 게시글 리스트 출력 -->
 	<select id="selectAll" resultType="map">
 		select b.board_seq,
@@ -172,7 +195,7 @@
 		from
 		board_image
 		where
-    	board_seq = #{board_seq, jdbcType=INTEGER}
+    	board_seq = #{board_seq}
 	</select>
 	
     <!-- 이미지 순서 업데이트 -->
@@ -184,7 +207,7 @@
     
     <!-- 이미지 수정 시 삭제 -->
     <delete id="deleteImage">
-	    delete from image_table where image_url = #{imageUrl}
+	    delete from board_image where image_url = #{imageUrl}
 	</delete>
 	
 	<!-- 사용자가 해당 게시글에 좋아요를 눌렀는지 확인 -->

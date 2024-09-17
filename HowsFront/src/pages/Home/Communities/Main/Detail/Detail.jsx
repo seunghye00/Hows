@@ -454,6 +454,9 @@ export const Detail = () => {
                         copyLinkToClipboard={copyLinkToClipboard}
                         handleOpenReportModal={handleOpenReportModal}
                     />
+                    <div className={styles.mainContent}>
+                        {postData.BOARD_CONTENTS}
+                    </div>
                     <div className={styles.commentInfo}>
                         <div className={styles.commetIcon}>
                             <BiMessageRounded />

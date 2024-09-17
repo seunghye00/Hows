@@ -73,7 +73,22 @@ public class CommunityService {
     	System.out.println("들어오는지 확인");
         communityDAO.deleteImage(imageUrl);
     }
-
+    
+    // DB에서 imageUrl로 board_image_seq를 조회하는 로직
+    public int selectBoardImageSeqByUrl(String imageUrl) {
+        return communityDAO.selectBoardImageSeqByUrl(imageUrl); 
+    }
+    
+    // 수정 시 태그정보 가져오는 로직     
+    public List<TagDTO> selectTagsByImageSeq(int boardImageSeq) {
+        return communityDAO.selectTagsByImageSeq(boardImageSeq);
+    }
+    
+    // 수정 시 태그정보 삭제
+    public void deleteTag(int tagSeq) {
+        communityDAO.deleteTag(tagSeq);
+    }
+    
 	// 사용자가 이미 좋아요를 눌렀는지 확인
 	public boolean checkIfUserLikedBoard(String memberId, int boardSeq) {
 		return communityDAO.checkIfUserLikedBoard(memberId, boardSeq);

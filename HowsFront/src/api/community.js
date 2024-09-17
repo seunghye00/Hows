@@ -22,6 +22,37 @@ export const getCommunityPosts = async (page, limit = 20) => {
         throw error // 오류 발생 시 예외 처리
     }
 }
+// 게시글 및 이미지/태그 작성
+export const submitPost = async formData => {
+    try {
+        const response = await api.post(
+            '/community/write-with-images',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        )
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
+// 게시글 수정 API
+export const updatePostData = async (board_seq, formData) => {
+    try {
+        const response = await api.put(
+            `/community/update-with-images/${board_seq}`,
+            formData
+        )
+        return response
+    } catch (error) {
+        console.error('게시글 수정 중 오류 발생:', error)
+        throw error
+    }
+}
 
 // 게시글 좋아요 토글
 export const toggleLike = (board_seq, member_id) => {
@@ -98,23 +129,6 @@ export const getReport = async () => {
     }
 }
 
-// 게시글 및 이미지/태그 저장
-export const submitPost = async formData => {
-    try {
-        const response = await api.post(
-            '/community/write-with-images',
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        )
-        return response
-    } catch (error) {
-        throw error
-    }
-}
 // 조회수 증가
 export const viewCounting = async board_seq => {
     const response = await api.post(`/community/${board_seq}/increment-view`)

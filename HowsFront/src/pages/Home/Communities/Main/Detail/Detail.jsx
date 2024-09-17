@@ -169,6 +169,11 @@ export const Detail = () => {
         }
     }
 
+    // 게시글 수정
+    const handleModify = () => {
+        navigate(`/communities/modify/${board_seq}`) // board_seq를 path에 포함하여 Modify로 이동
+    }
+
     // 북마크 기능
     const toggleBookmarkHandler = async () => {
         if (!member_id || !isAuth) {
@@ -433,6 +438,7 @@ export const Detail = () => {
                     <ProfileSection
                         profileData={postData}
                         handleDeletePost={handleDeletePost} // 삭제 함수 전달
+                        handleModify={handleModify} // 수정 함수 전달
                     />
                     <div className={styles.imageSection}>
                         <ImageSwiper images={imagesData} tags={tagsData} />

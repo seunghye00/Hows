@@ -3,6 +3,7 @@ package com.hows.community.controller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -116,6 +118,105 @@ public class CommunityController {
 		}
 	}
 
+	// 게시글 업데이트 
+	@PutMapping("/update-with-images/{board_seq}")
+	@Transactional // 트랜잭션 적용
+	public ResponseEntity<Void> updateWriteWithImages(
+	        @PathVariable int board_seq, 
+	        @RequestParam("housing_type_code") String housingTypeCode,
+	        @RequestParam("space_type_code") String spaceTypeCode, 
+	        @RequestParam("area_size_code") String areaSizeCode,
+	        @RequestParam("board_contents") String boardContents, 
+	        @RequestParam("member_id") String memberId,
+	        @RequestParam("existing_image_urls") List<String> existingImageUrls, // 클라이언트에서 받은 기존 이미지 URLs
+	        @RequestPart(value = "new_files", required = false) MultipartFile[] newFiles, // 새로 추가된 이미지 파일
+	        @RequestParam(value = "new_image_orders", required = false) int[] newImageOrders, // 새 이미지 순서 배열
+	        @RequestParam(value = "existing_image_orders", required = false) int[] existingImageOrders // 기존 이미지 순서 배열
+	) {
+	    try {
+	        // 1. 기존 이미지 URL 정보 조회
+	        List<String> currentImageURLs = communityServ.selectImagesUrls(board_seq);  // 수정된 메서드 사용
+	        System.out.println("Current Images from DB: " + currentImageURLs);
+
+	        // 2. 기존 이미지와 클라이언트에서 전달한 기존 이미지 목록 비교하여 삭제된 이미지 찾기
+	        List<String> deletedImages = new ArrayList<>();
+	        for (String currentImage : currentImageURLs) {
+	            if (!existingImageUrls.contains(currentImage)) {
+	                deletedImages.add(currentImage); // 삭제된 이미지
+	            }
+	        }
+
+	        System.out.println("Images to delete: " + deletedImages);
+
+	        // 3. 삭제된 이미지가 있으면 GCS와 DB에서 삭제 처리
+	        for (String deletedImage : deletedImages) {
+	            if (deletedImage != null) {
+	                String fileName = extractFileNameFromURL(deletedImage);
+	                if (fileName != null) {
+	                    System.out.println("Deleting file from GCS: " + fileName);
+	                    String deleteResult = fileServ.deleteFile(fileName, "F2");
+	                    if ("success".equals(deleteResult) || "file_not_found".equals(deleteResult)) {
+	                        // 파일이 존재하지 않더라도 삭제 성공 처리 (이미 GCS에 파일이 없을 수 있음)
+	                        System.out.println("GCS 파일 삭제 성공 또는 파일 없음: " + fileName);
+	                        communityServ.deleteImage(deletedImage); // DB에서 이미지 삭제
+	                    } else {
+	                        System.out.println("GCS 파일 삭제 실패: " + fileName);
+	                    }
+	                }
+	            }
+	        }
+
+	        // 4. 기존 이미지 순서 업데이트 (삭제된 이미지를 제외한 나머지 이미지 처리)
+	        for (int i = 0; i < existingImageUrls.size(); i++) {
+	            String existingImageUrl = existingImageUrls.get(i);
+	            int imageOrder = existingImageOrders[i];
+	            // 남아있는 기존 이미지를 순서에 맞게 DB 업데이트
+	            communityServ.updateImageOrder(existingImageUrl, imageOrder);
+	        }
+
+	        // 5. 새로 추가된 이미지 처리
+	        if (newFiles != null && newFiles.length > 0) {
+	            for (int i = 0; i < newFiles.length; i++) {
+	                MultipartFile file = newFiles[i];
+	                int imageOrder = newImageOrders[i];
+
+	                // 이미지 업로드
+	                String code = "F2";
+	                String uploadResult = fileServ.upload(file, board_seq, code);
+	                System.out.println(uploadResult + " 업로드 결과 확인");
+
+	                if (!uploadResult.equals("fail")) {
+	                    // 새 이미지 DB 저장
+	                    ImageDTO imageDTO = new ImageDTO();
+	                    imageDTO.setBoard_seq(board_seq);
+	                    imageDTO.setImage_url(uploadResult);
+	                    imageDTO.setImage_order(imageOrder);
+	                    communityServ.insertImage(imageDTO);
+	                } else {
+	                    throw new IOException("이미지 업로드 실패");
+	                }
+	            }
+	        }
+
+	        // 6. 게시글 내용 업데이트
+	        CommunityDTO dto = new CommunityDTO();
+	        dto.setHousing_type_code(housingTypeCode);
+	        dto.setSpace_type_code(spaceTypeCode);
+	        dto.setArea_size_code(areaSizeCode);
+	        dto.setBoard_contents(boardContents);
+	        dto.setMember_id(memberId);
+	        dto.setBoard_seq(board_seq); // 게시글 ID 설정
+
+	        communityServ.updateWrite(dto); // 게시글 업데이트
+
+	        return ResponseEntity.ok().build();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("게시글 업데이트 또는 이미지 처리 실패", e);
+	    }
+	}
+
+	
 	// 태그 데이터를 JSON에서 List<TagDTO>로 파싱하는 메서드
 	private List<TagDTO> parseTagsFromJson(String tagsJson, int boardImageSeq) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -298,7 +399,7 @@ public class CommunityController {
 
 		return ResponseEntity.ok(boardDetail);
 	}
-
+	// 이미지 태그정보 
 	@GetMapping("/images/{board_seq}")
 	public ResponseEntity<Map<String, Object>> selectImagesAndTags(@PathVariable int board_seq) {
 		List<Map<String, Object>> images = communityServ.selectImages(board_seq);
@@ -312,6 +413,13 @@ public class CommunityController {
 		return ResponseEntity.ok(result);
 	}
 
+	// 태그정보
+	@GetMapping("/tags/{board_seq}")
+	public ResponseEntity<List<Map<String, Object>>> selectTags(@PathVariable int board_seq) {
+		List<Map<String, Object>> list = communityServ.selectTagsAndProductInfo(board_seq);
+		return ResponseEntity.ok(list);
+	}
+	
 	// 조회수 증가 메서드
 	@PostMapping("/{board_seq}/increment-view")
 	public ResponseEntity<Integer> incrementViewCount(@PathVariable int board_seq) {
@@ -376,15 +484,48 @@ public class CommunityController {
 	// 신고 게시물 삭제 (관리자)
 	@DeleteMapping("/deleteCommunity/{board_seq}")
 	public ResponseEntity<Integer> deleteCommunity(@PathVariable int board_seq) throws Exception {
-		int result = communityServ.deleteCommunity(board_seq);
+		 try {
+		        // 1. 게시글과 연관된 이미지 파일들 가져오기
+		        List<String> fileURLs = communityServ.getFileURLsForBoard(board_seq);
+		        
+		        // 2. GCS에서 파일 삭제
+		        for (String fileURL  : fileURLs) {
+		            String fileName = extractFileNameFromURL(fileURL);
+		            System.out.println(fileName);
+		            String deleteResult = fileServ.deleteFile(fileName, "F2"); // 적절한 code 전달
+		            
+		            if ("success".equals(deleteResult)) {
+		                System.out.println("GCS 파일 삭제 성공: " + fileName);
+		            } else {
+		                System.out.println("GCS 파일 삭제 실패: " + fileName);
+		            }
+		        }
 
-		if (result > 0) {
-			return ResponseEntity.ok(result); // 성공 시 200 OK와 삭제된 행 수 반환
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 삭제 실패 시 404 NOT FOUND
-		}
+		        // 3. 게시글 삭제
+		        int result = communityServ.deleteCommunity(board_seq);
+
+		        if (result > 0) {
+		            return ResponseEntity.ok(result); // 성공 시 200 OK와 삭제된 행 수 반환
+		        } else {
+		            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 삭제 실패 시 404 NOT FOUND
+		        }
+
+		    } catch (Exception e) {
+		        e.printStackTrace();
+		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(0); // 에러 발생 시 500 에러 반환
+		    }
 	}
-
+	
+	// 이미지 제거를 위한 sysname뽑아오는 로직 
+	public String extractFileNameFromURL(String fileURL) {
+	    if (fileURL == null || fileURL.isEmpty()) {
+	        System.out.println("파일 URL이 null이거나 비어있습니다.");
+	        return null;
+	    }
+	    // 마지막 슬래시 뒤에 있는 파일명만 추출
+	    return fileURL.substring(fileURL.lastIndexOf("/") + 1);
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

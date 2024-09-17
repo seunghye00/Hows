@@ -59,7 +59,30 @@ public class CommunityDAO {
 	public List<Map<String, Object>> selectTagsAndProductInfo(int board_seq) {
 		return mybatis.selectList("Community.selectTagsAndProductInfo", board_seq);
 	}
+	
+    // 게시글 업데이트
+    public void updateWrite(CommunityDTO dto) throws Exception {
+        mybatis.update("Community.updateWrite", dto); // 게시글 업데이트 SQL 실행
+    }
 
+    // 이미지 수정 시 삭제 
+    public void deleteImage(String imageUrl) {
+        mybatis.delete("Community.deleteImage", imageUrl);
+    }
+    
+    // 이미지 순서 업데이트
+    public void updateImageOrder(String imageUrl, int imageOrder) throws Exception {
+        Map<String, Object> params = new HashMap<>();
+        params.put("image_url", imageUrl);
+        params.put("image_order", imageOrder);
+        mybatis.update("Community.updateImageOrder", params); // 이미지 순서 업데이트 SQL 실행
+    }
+    
+    // 게시글 수정 이미지 주소
+	public List<String> selectImagesUrls(int board_seq) {
+		return mybatis.selectList("Community.selectImagesUrls");
+	}
+    
 	// 사용자가 특정 게시글에 좋아요를 눌렀는지 확인
 	public boolean checkIfUserLikedBoard(String member_id, int board_seq) {
 		Map<String, Object> params = new HashMap<>();
@@ -164,8 +187,11 @@ public class CommunityDAO {
     public int countBookmark(String member_id) {
     	return mybatis.selectOne("Community.countBookmark", member_id);
     }
-
     
+	// 게시글 이미지 조회 
+    public List<String> getFileURLsByBoardSeq(int board_seq) {
+        return mybatis.selectList("Community.getFileURLsByBoardSeq",board_seq);
+    }
 	// 관리자
 	// 신고된 게시물 조회 DAO
 	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) {

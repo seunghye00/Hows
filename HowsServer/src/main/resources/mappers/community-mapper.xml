@@ -84,12 +84,16 @@
 
 	<!-- 게시글 디테일 조회 -->
 	<select id="selectAllSeq" resultType="map">
-		select b.board_seq,
+		select 
+		b.board_seq,
 		b.board_contents,
 		b.view_count,
 		to_char(b.board_write_date, 'YYYY-MM-DD
 		HH24:MI:SS') as board_write_date,
 		b.member_id,
+        b.housing_type_code,
+        b.space_type_code,
+        b.area_size_code,
 		m.nickname,
 		m.member_id,
 		m.member_avatar,
@@ -112,7 +116,7 @@
 		b.board_seq = bm.board_seq
 		where b.board_seq = #{board_seq}
 		group by
-		b.board_seq, b.board_contents, b.view_count, b.board_write_date,
+		b.board_seq, b.board_contents, b.view_count, b.board_write_date, b.housing_type_code, b.space_type_code, b.area_size_code,
 		b.member_id, m.nickname, m.member_avatar, m.member_id, m.member_seq
 	</select>
 
@@ -149,7 +153,40 @@
 		board_image_seq from board_image where board_seq =
 		#{board_seq})
 	</select>
-
+	
+   <!-- 게시글 업데이트 -->
+    <update id="updateWrite">
+        update board
+        set housing_type_code = #{housing_type_code},
+            space_type_code = #{space_type_code},
+            area_size_code = #{area_size_code},
+            board_contents = #{board_contents},
+            board_write_date = sysdate
+        where board_seq = #{board_seq}
+    </update>
+    
+    <!-- 게시글 수정 이미지 주소  -->
+	<select id="selectImagesUrls" resultType="String">
+		select
+		image_url
+		from
+		board_image
+		where
+    	board_seq = #{board_seq, jdbcType=INTEGER}
+	</select>
+	
+    <!-- 이미지 순서 업데이트 -->
+    <update id="updateImageOrder">
+        update board_image
+        set image_order = #{image_order}
+        where image_url = #{image_url}
+    </update>
+    
+    <!-- 이미지 수정 시 삭제 -->
+    <delete id="deleteImage">
+	    delete from image_table where image_url = #{imageUrl}
+	</delete>
+	
 	<!-- 사용자가 해당 게시글에 좋아요를 눌렀는지 확인 -->
 	<select id="checkIfUserLikedBoard" resultType="int">
 		select count(*)
@@ -291,7 +328,10 @@
 		select count(*) from board_book_mark where member_id = #{member_id}
 	</select>
 	
-	
+	<!-- 게시글 이미지 조회 -->
+	<select id="getFileURLsByBoardSeq" resultType="java.lang.String">
+		select image_url from board_image where board_seq = #{board_seq}
+	</select> 
 	
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->

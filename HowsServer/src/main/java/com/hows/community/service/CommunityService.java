@@ -52,6 +52,27 @@ public class CommunityService {
 	public List<Map<String, Object>> selectTagsAndProductInfo(int board_seq) {
 		return communityDAO.selectTagsAndProductInfo(board_seq);
 	}
+	
+    // 게시글 업데이트 (내용 수정 등)
+    public void updateWrite(CommunityDTO dto) throws Exception {
+        communityDAO.updateWrite(dto); // DAO를 통해 게시글 업데이트 실행
+    }
+
+    // 이미지 순서 업데이트
+    public void updateImageOrder(String imageUrl, int imageOrder) throws Exception {
+        communityDAO.updateImageOrder(imageUrl, imageOrder); // DAO를 통해 이미지 순서 업데이트
+    }
+    
+    // 게시글 수정 이미지 주소
+	public List<String> selectImagesUrls(int board_seq) {
+		return communityDAO.selectImagesUrls(board_seq);
+	}
+    
+    // 이미지 수정 시 삭제 
+    public void deleteImage(String imageUrl) {
+    	System.out.println("들어오는지 확인");
+        communityDAO.deleteImage(imageUrl);
+    }
 
 	// 사용자가 이미 좋아요를 눌렀는지 확인
 	public boolean checkIfUserLikedBoard(String memberId, int boardSeq) {
@@ -114,6 +135,10 @@ public class CommunityService {
 		communityDAO.sendReport(boardSeq, reportCode, memberId); // 현재 조회수 반환
 	}
 
+	// 게시글 이미지 조회 
+	public List<String> getFileURLsForBoard(int board_seq) throws Exception {
+	    return communityDAO.getFileURLsByBoardSeq(board_seq); // board_seq로 URL 목록 가져오는 DAO 호출
+	}
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) throws Exception {

@@ -53,6 +53,11 @@ public class ReviewService {
         reviewDAO.delReviewImages(review_seq); // 리뷰에 연결된 이미지 먼저 삭제
         reviewDAO.delReview(review_seq);  // 리뷰 삭제
     }
+    
+    // 리뷰 신고 처리
+    public void sendReviewReport(int review_seq, String report_code, String member_id) throws Exception{
+        reviewDAO.sendReviewReport(review_seq, report_code, member_id); 
+    }
 
     
     

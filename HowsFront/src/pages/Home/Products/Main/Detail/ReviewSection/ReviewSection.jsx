@@ -10,12 +10,39 @@ import { formatDate } from '../../../../../../commons/commons'
 import { Paging } from '../../../../../../components/Pagination/Paging';
 import { userInfo } from '../../../../../../api/member' 
 import { getReviewList , getReviewImgList , reviewLike, reviewUnlike , getReviewLikeCount , checkReviewLikeStatus } from '../../../../../../api/product';
+import ReportModal from '../ReportModal/ReportModal';
+import { useNavigate } from 'react-router-dom';
 
 export const ReviewSection = ({ product_seq, isAuth }) => {
     const memberId = sessionStorage.getItem("member_id");
+    const navi = useNavigate(); //페이지 전환을 위한 훅
     
-    // 모달창
-    const [ isModalOpen, setIsModalOpen ] = useState(false);
+    // =============== 모달창 ===============
+    const [ isReviewModalOpen, setIsReviewModalOpen ] = useState(false); // 리뷰
+    const [ isReportModalOpen, setIsReportModalOpen ] = useState(false); // 신고 
+    const [ selectedReviewSeq, setSelectedReviewSeq ] = useState(null); // 신고 모달에서 사용할 리뷰 seq
+
+    // 리뷰 작성 모달 열기
+    const handleOpenReviewModal = () => {
+        setIsReportModalOpen(false); // 신고 모달을 닫기
+        setData({rating: 0, review_contents: '', product_seq:product_seq, images: []});
+        setPreviewImages([]);  
+        setIsReviewModalOpen(true); 
+    };
+
+    // 신고 모달 열기
+    const handleOpenReportModal = (reviewSeq) => {
+        setIsReviewModalOpen(false); // 리뷰 모달을 닫기
+        setSelectedReviewSeq(reviewSeq); // 신고하려는 리뷰 seq 저장
+        setIsReportModalOpen(true); 
+    };
+
+    // 모달 닫기
+    const handleCloseReviewModal = () => setIsReviewModalOpen(false);
+    const handleCloseReportModal = () => setIsReportModalOpen(false);
+    // =============== 모달창 ===============
+
+
 
     // 별점 상태, 리뷰 내용, 상품 번호를 URL에서 가져온 현재 product_seq 로 설정, 이미지 URL
     const [data, setData] = useState({rating: 0, review_contents: '', product_seq: product_seq, image_url: [],});
@@ -43,15 +70,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     // 좋아요 상태 관리
     const [liked, setLiked] = useState({});
     const [likeCount, setLikeCount] = useState({});
-
-
-    // 모달창 열기 및 닫기 (상태 초기화 작업)
-    const handleOpenModal = () => {
-        setData({rating: 0, review_contents: '', product_seq:product_seq, images: []});
-        setPreviewImages([]);  
-        setIsModalOpen(true); 
-    };
-    const handleCloseModal = () => setIsModalOpen(false);
 
     // 별점 변경 시 호출되는 함수
     const handleRatingChange = (newRating) => {
@@ -187,17 +205,15 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
             
             setReviews((prevReviews) => [newReview, ...prevReviews]); // 새 리뷰를 목록에 추가
             setTotalReviews(prevCount => prevCount + 1); // 전체 리뷰 수 업데이트
-            setIsModalOpen(false); // 모달 닫기
+            setIsReviewModalOpen(false); // 모달 닫기
             setIsSubmitting(false); // 제출 상태 해제
         }).catch((error) => {
             alert('리뷰 제출에 실패했습니다');
-            setIsModalOpen(false);
+            setIsReviewModalOpen(false);
             setIsSubmitting(false);
         });
     };
     
-    
-
     // 리뷰 이미지 로딩 함수
     const loadReviewImages = async (reviewSeq) => {
         try {
@@ -270,22 +286,29 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     const likePromises = reviewsData.map(async (review) => {
                         try {
                             const likeResp = await getReviewLikeCount(review.REVIEW_SEQ);
-                            // console.log(likeResp.data);  
+                            const likeStatusResp = await checkReviewLikeStatus(review.REVIEW_SEQ, memberId); //좋아요 확인
 
-                            // likeResp.data 자체가 숫자일 경우 바로 반환
-                            return { reviewSeq: review.REVIEW_SEQ, likeCount: likeResp.data || 0 };
+                            return {
+                                reviewSeq: review.REVIEW_SEQ,
+                                likeCount: likeResp.data || 0,
+                                liked: likeStatusResp.data || false, // 좋아요 상태
+                            };
                         } catch (error) {
-                            return { reviewSeq: review.REVIEW_SEQ, likeCount: 0 }; // 오류 발생 시 기본값
+                            return { reviewSeq: review.REVIEW_SEQ, likeCount: 0, liked: false }; // 오류 발생 시 기본값
                         }
                     });
                     const likeData = await Promise.all(likePromises);
+                    console.log("각 리뷰의 좋아요 데이터 확인중"+likeData);
 
                     const newLikeCount = {};
-                    likeData.forEach(({ reviewSeq, likeCount }) => {
-                        newLikeCount[reviewSeq] = likeCount; // 각 리뷰의 좋아요 수를 저장
+                    const newLikedStatus = {};
+                    likeData.forEach(({ reviewSeq, likeCount, liked }) => {
+                        newLikeCount[reviewSeq] = likeCount; // 각 리뷰의 좋아요 수 저장
+                        newLikedStatus[reviewSeq] = liked;  // 각 리뷰의 좋아요 상태 저장
                     });
 
                     setLikeCount(newLikeCount); // 좋아요 수 상태 업데이트
+                    setLiked(newLikedStatus);    // 좋아요 상태 업데이트
                 }else {
                     setReviews([]);
                     setTotalReviews(0);
@@ -299,7 +322,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     
         fetchReviews();
     }, [product_seq, page, itemsPerPage]);
-
+    console.log(liked);
+    
     // 페이지네이션
     const handlePageChange = (newPage) => {
         const startRow = (newPage - 1) * itemsPerPage + 1;
@@ -315,7 +339,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     setPage(newPage);  // 페이지 상태 업데이트
     }
-
 
     // 리뷰 삭제
     const handleReviewDel = (review_seq) => {
@@ -345,19 +368,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     }
 
-    const handleReport = (reviewSeq) => {
-        // 신고 요청을 서버로 보냄
-        axios.post(`${host}/review/report/${reviewSeq}`, { memberId })
-            .then(response => {
-                Swal.fire("신고가 접수되었습니다.");
-                // 추가적인 로직: UI 업데이트 등
-            })
-            .catch(error => {
-                Swal.fire("신고에 실패했습니다.");
-            });
-    };
-
-
     // 리뷰 좋아요 '도움이 돼요'
     const handleLikeClick = (reviewSeq) => {
         if (!isAuth) {
@@ -365,12 +375,39 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                 icon: "warning",
                 title: "로그인을 먼저 해주세요.",
                 showConfirmButton: true,
+            }).then(() => {
+                // 로그인이 안된 경우 로그인 페이지로 이동
+                navi('/signIn');
             });
             return;
         }
 
-        // 현재 리뷰에 좋아요가 없는 경우
-        if (!liked[reviewSeq]) {
+        // 현재 리뷰에 좋아요가 이미 눌린 경우, 취소 여부를 묻는 확인창을 띄움
+        if (liked[reviewSeq]) {
+            Swal.fire({
+                title: "좋아요를 취소하시겠습니까?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "네, 취소합니다",
+                cancelButtonText: "아니오",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 좋아요 취소 로직
+                    setLiked((prev) => ({ ...prev, [reviewSeq]: false }));
+                    setLikeCount((prev) => ({ ...prev, [reviewSeq]: (prev[reviewSeq] || 1) - 1 }));
+
+                    // 좋아요 취소 요청 보내기
+                    reviewUnlike(reviewSeq, memberId)
+                        .then((resp) => {console.log('리뷰 좋아요 취소 성공:', resp);})
+                        .catch((error) => {
+                            console.error('리뷰 좋아요 취소 실패:', error);
+                            // 실패 시 좋아요 상태 복구
+                            setLiked((prev) => ({ ...prev, [reviewSeq]: true }));
+                            setLikeCount((prev) => ({ ...prev, [reviewSeq]: (prev[reviewSeq] || 0) + 1 }));
+                        });
+                }
+            });
+        } else {
             // 좋아요 추가
             setLiked((prev) => ({ ...prev, [reviewSeq]: true }));
             setLikeCount((prev) => ({ ...prev, [reviewSeq]: (prev[reviewSeq] || 0) + 1 }));
@@ -384,24 +421,9 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     setLiked((prev) => ({ ...prev, [reviewSeq]: false }));
                     setLikeCount((prev) => ({ ...prev, [reviewSeq]: (prev[reviewSeq] || 1) - 1 }));
                 });
-        } else {
-            // 좋아요 취소
-            setLiked((prev) => ({ ...prev, [reviewSeq]: false }));
-            setLikeCount((prev) => ({ ...prev, [reviewSeq]: (prev[reviewSeq] || 1) - 1 }));
-
-            // 좋아요 취소 요청 보내기
-            reviewUnlike(reviewSeq, memberId)
-                .then((resp) => {
-                    console.log('리뷰 좋아요 취소 성공:', resp);
-                })
-                .catch((error) => {
-                    console.error('리뷰 좋아요 취소 실패:', error);
-                    // 실패 시 좋아요 상태 복구
-                    setLiked((prev) => ({ ...prev, [reviewSeq]: true }));
-                    setLikeCount((prev) => ({ ...prev, [reviewSeq]: (prev[reviewSeq] || 0) + 1 }));
-                });
         }
     };
+
 
     return (
         <div className={styles.container}>
@@ -413,56 +435,58 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     
                     {isAuth ? (
                         // 로그인 상태일 때
-                        <div onClick={handleOpenModal} style={{ cursor: 'pointer'}}>리뷰쓰기</div>
+                        <div onClick={handleOpenReviewModal} style={{ cursor: 'pointer'}}>리뷰쓰기</div>
                     ) : (
                         // 로그인이 되어 있지 않을 때
                         <div>로그인 후 리뷰를 작성할 수 있습니다.</div>
                     )}
 
-                    {/* 모달창 */}
-                    <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
-                        <div className={styles.modalBox}>
-                            <h2>리뷰 쓰기</h2>
-                            <div>
-                        <span>만족도 </span> &nbsp; &nbsp;
-                                <StarRating 
-                                    rating={data.rating} // 현재 별점 상태 전달
-                                    onRatingChange={handleRatingChange} // 별점 변경 시 호출
-                                />
-                            </div>
-
-                            <h2>리뷰 작성</h2>
-                            <div className={styles.reviewModal}>
-                                <input type='text' 
-                                    name='review_contents' 
-                                    placeholder='리뷰 내용을 입력하세요.' 
-                                    value={data.review_contents} 
-                                    onChange={handleInputChange}
-                                    className={styles.reviewContent}>
-                                </input>
-
-                                {/* 이미지 업로드 */}
-                                <div className={styles.filesBox}>
-                                    <label className={styles.fileBtn} for="files">
-                                        <div>
-                                            <span> 사진 첨부하기 </span>
-                                            <i class='bx bxs-file-image'/>
-                                        </div>
-                                    </label>
-                                    <input type="file" accept="image/*" id='files' className={styles.files} onChange={handleImageChange} multiple/>
+                    {/* 리뷰 모달 */}
+                    {isReviewModalOpen && (
+                        <Modal isOpen={isReviewModalOpen} onClose={handleCloseReviewModal}>
+                            <div className={styles.modalBox}>
+                                <h2>리뷰 쓰기</h2>
+                                <div>
+                                    <span>만족도 </span> &nbsp; &nbsp;
+                                    <StarRating 
+                                        rating={data.rating} // 현재 별점 상태 전달
+                                        onRatingChange={handleRatingChange} // 별점 변경 시 호출
+                                    />
                                 </div>
-                                <span className={styles.filesTitle}>첨부파일은 최대 4개까지만 가능합니다</span>
-                                {/* 이미지 미리보기 */}
-                                <div className={styles.previewContainer}>
-                                    {renderPreviewImages()}
+
+                                <h2>리뷰 작성</h2>
+                                <div className={styles.reviewModal}>
+                                    <input type='text' 
+                                        name='review_contents' 
+                                        placeholder='리뷰 내용을 입력하세요.' 
+                                        value={data.review_contents} 
+                                        onChange={handleInputChange}
+                                        className={styles.reviewContent}>
+                                    </input>
+
+                                    {/* 이미지 업로드 */}
+                                    <div className={styles.filesBox}>
+                                        <label className={styles.fileBtn} for="files">
+                                            <div>
+                                                <span> 사진 첨부하기 </span>
+                                                <i class='bx bxs-file-image'/>
+                                            </div>
+                                        </label>
+                                        <input type="file" accept="image/*" id='files' className={styles.files} onChange={handleImageChange} multiple/>
+                                    </div>
+                                    <span className={styles.filesTitle}>첨부파일은 최대 4개까지만 가능합니다</span>
+                                    {/* 이미지 미리보기 */}
+                                    <div className={styles.previewContainer}>
+                                        {renderPreviewImages()}
+                                    </div>
+                                    <button onClick={handleSubmit} disabled={isSubmitting}>
+                                        {/* disabled -> 폼 요소를 비활성화 */}
+                                        {isSubmitting ? '제출 중...' : '리뷰 제출'}
+                                    </button> 
                                 </div>
-                                <button onClick={handleSubmit} disabled={isSubmitting}>
-                                    {/* disabled -> 폼 요소를 비활성화 */}
-                                    {isSubmitting ? '제출 중...' : '리뷰 제출'}
-                                </button> 
                             </div>
-                        </div>
-                    </Modal>
+                        </Modal>
+                    )}
                 </div>
                 <div className={styles.reviewsStarRating}>
                     <div><StarRating rating={averageRating} />&nbsp;&nbsp;<span>{averageRating.toFixed(1)}</span></div>
@@ -482,7 +506,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                         <div>최신순</div>
                     </div>
                     <div className={styles.reviewBox}>
-                        {console.log(reviews)}
                         {reviews.length > 0 ? (
                             (reviews || []).map((review, index) => (
                                 <div key={index}>
@@ -507,10 +530,23 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                             ) : (
                                                 <>
                                                     {/* 본인이 작성한 리뷰가 아닐 때만 좋아요/신고 버튼을 보여줌 */}
-                                                    <button onClick={() => handleLikeClick(review.REVIEW_SEQ)}>
+                                                    <button 
+                                                        onClick={() => handleLikeClick(review.REVIEW_SEQ)} 
+                                                        style={{ cursor: 'pointer' }} 
+                                                    >
                                                         {likeCount[review.REVIEW_SEQ] > 0 && (<span>{likeCount[review.REVIEW_SEQ]}</span>)}&nbsp; 도움이 돼요
                                                     </button>
-                                                    <button onClick={() => { handleReport(review.REVIEW_SEQ); }}>신고하기</button>
+
+                                                    <button onClick={() => handleOpenReportModal(review.REVIEW_SEQ)}>신고하기</button>
+                                                    {/* 신고 모달 (신고 모달이 열려 있고, 선택된 리뷰와 현재 리뷰가 동일할 때만 신고 모달을 표시) */}
+                                                    {isReportModalOpen && selectedReviewSeq === review.REVIEW_SEQ && (
+                                                        <ReportModal
+                                                            reviewSeq={selectedReviewSeq}
+                                                            memberId={review.MEMBER_ID} 
+                                                            isOpen={isReportModalOpen}
+                                                            onClose={handleCloseReportModal}
+                                                        />
+                                                    )}
                                                 </>
                                             )}
                                         </div>

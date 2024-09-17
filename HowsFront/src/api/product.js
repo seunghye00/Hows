@@ -36,7 +36,7 @@ export const getLikeCount = (product_seq) => {
 
 // 리뷰 좋아요 
 export const reviewLike = (reviewSeq, memberId) => {
-    return axios.post(`${likeUrl}/review/insert`, {
+    return api.post(`likes/review/insert`, {
         review_seq : reviewSeq,
         member_id : memberId
     });
@@ -44,7 +44,7 @@ export const reviewLike = (reviewSeq, memberId) => {
 
 // 리뷰 좋아요 취소
 export const reviewUnlike = (reviewSeq, memberId) => {
-    return axios.delete(`${likeUrl}/review/delete`, {
+    return api.delete(`likes/review/delete`, {
         data: {
             review_seq: reviewSeq,
             member_id: memberId
@@ -71,12 +71,29 @@ export const checkReviewLikeStatus = (reviewSeq, memberId) => {
     });
 };
 
-
-
 // 리뷰 이미지 
 export const getReviewImgList = (reviewSeq) => {
     return axios.get(`${baseUrl}/getReviewImgList/${reviewSeq}`);
 }
+
+// 리뷰 신고 옵션 불러오기
+export const getReport = async () => {
+    try {
+        const response = await api.get('/option/report')
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+// 리뷰 신고 요청
+export const sendReviewReport = (reviewSeq,selectedReason,memberId) => {
+    return api.post(`product/review/report`, {
+        review_seq: reviewSeq,
+        report_code: selectedReason,
+        member_id: memberId,
+    });
+};
 
 
 

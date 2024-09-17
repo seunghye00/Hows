@@ -109,6 +109,7 @@ public class LikesController {
         @RequestParam("member_id") String member_id) 
     throws Exception {
         boolean isLiked = likesServ.isReviewLiked(review_seq, member_id);
+        System.out.println(isLiked);
         return ResponseEntity.ok(isLiked);
     }
 

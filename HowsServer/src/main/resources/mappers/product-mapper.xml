@@ -84,7 +84,7 @@
 	 	select IMAGE_URL from REVIEW_IMAGE where review_seq = #{reviewSeq}
 	</select>
 	
-	<!-- 리뷰 목록 출력 (페이징) -->
+	<!-- 리뷰 목록 출력 (페이지네이션) -->
 	<select id="getReviewList" resultType="map">
 		 SELECT 
 		    r.*,
@@ -106,7 +106,7 @@
 		WHERE r.rn BETWEEN #{startRow} AND #{endRow}
 	</select>
 	
-	<!-- 삭제 -->
+	<!-- 이미지 삭제 -->
 	<delete id="delReviewImages" parameterType="int">
 	    DELETE FROM review_images WHERE review_seq = #{review_seq}
 	</delete>
@@ -114,6 +114,14 @@
 	<delete id="delReview" parameterType="int">
 	    DELETE FROM reviews WHERE review_seq = #{review_seq}
 	</delete>
+	
+	<!-- 리뷰 신고 -->
+	<insert id="sendReviewReport">
+	    INSERT 
+	    	INTO review_report
+	    VALUES 
+	    	(review_report_seq.NEXTVAL, #{report_code}, SYSDATE, #{review_seq}, #{member_id})
+	</insert>
 
     
 	

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -154,6 +155,22 @@ public class ProductController {
 	    reviewServ.deleteReview(review_seq);
 	    return ResponseEntity.ok().build();
 	}
+	
+	// 리뷰 신고
+    @PostMapping("/review/report")
+    public ResponseEntity<Void> sendReviewReport(@RequestBody Map<String, Object> reportData) throws Exception{
+        int review_seq = (Integer) reportData.get("review_seq");
+        String report_code = (String) reportData.get("report_code");
+        String member_id = (String) reportData.get("member_id");
+
+        // System.out.println("review_seq=" + review_seq + ", report_code=" + report_code + ", member_id=" + member_id);
+        if (report_code == null || report_code.length() > 2) {
+            return ResponseEntity.badRequest().build(); // 잘못된 요청 반환
+        }
+        
+        reviewServ.sendReviewReport(review_seq,report_code, member_id);
+        return ResponseEntity.ok().build();
+    }
 
 
 

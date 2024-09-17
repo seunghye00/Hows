@@ -10,8 +10,13 @@ export const orderList = status => {
     })
 }
 
+// 반품 목록 요청 함수
+export const returnList = () => {
+    return axios.get(`${baseUrl}/getReturnList`)
+}
+
 // 주문, 주문목록 추가
-export const  addOrder = async order => {
+export const addOrder = async order => {
     return await api.post(`/order`, order)
 }
 

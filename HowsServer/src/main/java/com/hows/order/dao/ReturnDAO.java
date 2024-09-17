@@ -1,7 +1,5 @@
 package com.hows.order.dao;
 
-import java.util.List;
-
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,6 +11,11 @@ public class ReturnDAO {
 	
     @Autowired
     private SqlSession mybatis;
+
+    // 반품 상태 업데이트
+	public int updateReturn(ReturnDTO dto) {
+		return mybatis.update("Return.updateStatus", dto);
+	}
 
 
 }

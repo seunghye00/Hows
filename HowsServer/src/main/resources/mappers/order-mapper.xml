@@ -74,7 +74,7 @@
 	<select id="getReturnList" resultType="com.hows.order.dto.ReturnDTO">
 		select
 		o.order_seq, r.return_seq, o.order_date, p.payment_date, o.done_delivery_date, 
-		r.return_date, r.done_return_date, o.order_name, m.name, g.grade_title, 
+		r.return_date, r.done_return_date, o.order_name, m.name, g.grade_title, r.return_code,
 		o.order_price, p.payment_price, o.orderer_phone, p.payment_id, p.payment_text 
 		from orders o
 		left join member m on o.member_seq = m.member_seq

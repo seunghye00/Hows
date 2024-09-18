@@ -2,6 +2,10 @@
     display: flex;
 }
 
+.contentWrap>div {
+    width: 100% !important;
+}
+
 .contentCont {
     display: flex;
     gap: 25px;

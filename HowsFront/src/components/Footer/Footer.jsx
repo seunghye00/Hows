@@ -12,7 +12,7 @@ export const Footer = () => {
                             <div className={styles.customerTit}>
                                 <a
                                     onClick={() => {
-                                        navigate('/mypage')
+                                        navigate('/csservice/faq')
                                     }}
                                 >
                                     고객센터

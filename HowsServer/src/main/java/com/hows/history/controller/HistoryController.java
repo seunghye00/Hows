@@ -42,7 +42,7 @@ public class HistoryController {
         return ResponseEntity.ok(list);
     }
 
-    @PostMapping("/payment/cancel")
+    @PutMapping("/payment")
     public ResponseEntity<String> paymentList(@AuthenticationPrincipal CustomUserDetails user, @RequestBody Map<String, Object> map) {
         map.put("member_seq", user.getMemberSeq());
         String result = historyServ.myPaymentCancel(map);

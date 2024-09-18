@@ -133,6 +133,7 @@ export const Payment = () => {
       return false;
     }
 
+    // payment parameter setting
     const name = orderProducts[0].product_title.length > 10 ? orderProducts[0].product_title.slice(0,9) + "..." : orderProducts[0].product_title;
     const count = orderProducts.length > 1 ? ` 외 ${orderProducts.length-1}종` :  "";
     const paymentId = `how-${uuidv4()}`
@@ -146,6 +147,7 @@ export const Payment = () => {
       email: data.email
     }
 
+    // order info setting
     const orderInfo = {
       orderName,
       totalAmount,
@@ -156,31 +158,34 @@ export const Payment = () => {
       address: data.address,
       detailAddress: data.detail_address
     }
-    const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
-    console.log("paymentInfo ==== ", paymentInfo);
+
+    // payment info setting
+    const paymentInfo = {
+      paymentId,
+      orderName,
+      totalAmount, 
+      payMethod,
+      customer
+    };
 
     setPaymentInfo({ orderName, totalAmount });
 
     // 결제 진행
     const resultData = await requestPaymentEvent(paymentInfo, orderInfo);
-      if(resultData === "ok") {
-        SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
-          if(resp) navi("/history/relivery");
-          else navi("/");
-        });
-      } else {
-        // 실패 시 결제 취소
-        paymentCancel(paymentId).then(res => {
-          console.log("res.data ==== ", res.data);
-          alert("결제 실패");
-        });
-      }
-  }
-
-  const testCancelPayment = () => {
-    paymentCancel().then(res => {
-      console.log("주문 취소 테스트 ==== ", res.data);
-    });
+    
+    // 결제 상태
+    if(resultData === "ok") {
+      SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
+        if(resp) navi("/history/delivery");
+        else navi("/");
+      });
+    } else {
+      // 실패 시 결제 취소
+      paymentCancel(paymentId).then(res => {
+        console.log("res.data ==== ", res.data);
+        alert("결제 실패");
+      });
+    }
   }
 
   /** 회원 정보 셋팅 **/
@@ -272,7 +277,6 @@ export const Payment = () => {
 
   return (
     <div className={styles.container}>
-      <button onClick={testCancelPayment}>결제 취소</button>
       <div className={styles.title}> 주문하기 </div>
       <div className={styles.subTitle}> 선택한 상품 및 배송 정보 </div>
 

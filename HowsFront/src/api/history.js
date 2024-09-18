@@ -19,3 +19,8 @@ export const myPayments = () => {
 export const myPaymentsDetail = (seq) => {
   return api.get(`/history/order/${seq}`);
 }
+
+/** 결제 취소 & 환불 요청 **/
+export const requestPayment = (params) => {
+  return api.put(`/history/payment`, params);
+}

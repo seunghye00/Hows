@@ -126,3 +126,37 @@
   justify-content: space-between;
   font-size: 14px;
 }
+
+.cancelBtn {
+  margin-top: 20px;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--hows-point-color);
+  color: var(--hows-white);
+  font-weight: 700;
+}
+
+.cancelReason {
+  width: 300px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.cancelReason > textarea {
+  width: 290px;
+  height: 150px;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+.cancelReason > button {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  background-color: var(--hows-point-color);
+  color: var(--hows-white);
+  font-weight: 700;
+}

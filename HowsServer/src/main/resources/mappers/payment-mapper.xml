@@ -41,6 +41,8 @@
             JOIN orders o ON p.order_seq = o.order_seq
         WHERE
             p.member_seq = #{member_seq}
+        ORDER BY
+            p.payment_seq DESC
     </select>
 
 

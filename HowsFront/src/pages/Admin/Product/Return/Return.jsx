@@ -2,7 +2,7 @@ import styles from './Return.module.css'
 import { Button } from '../../../../components/Button/Button'
 import { Search } from '../../../../components/Search/Search'
 import {
-    orderList,
+    returnList,
     updateOrder,
     doneReturn,
     deleteOrder,
@@ -18,7 +18,6 @@ export const Return = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [viewOrder, setViewOrder] = useState({
         order_date: '',
-        payment_price: '',
         order_name: '',
         order_price: 0,
         payment_price: 0,
@@ -31,7 +30,7 @@ export const Return = () => {
     const [status, setStatus] = useState('return')
 
     useEffect(() => {
-        orderList(status)
+        returnList(status)
             .then(resp => {
                 console.log(resp.data)
                 const beforOrders = resp.data.map(order => ({
@@ -56,7 +55,7 @@ export const Return = () => {
         }
         // 상태별로 주문 목록 필터링
         filtered = filtered.filter(
-            order => status === 'delivery' || order.order_code === status
+            order => status === 'return' || order.order_code === status
         )
         // 최종 필터링된 목록 설정
         setFilteredOrders(filtered)
@@ -290,26 +289,40 @@ export const Return = () => {
                         data-lable="R1"
                         className={status === 'R1' ? styles.active : ''}
                     >
-                        반품 요청
+                        결재 취소 요청
                     </span>
                     <span
                         onClick={handleSelectStatus}
                         data-lable="R2"
                         className={status === 'R2' ? styles.active : ''}
                     >
-                        상품 검수
+                        반품 요청
                     </span>
                     <span
                         onClick={handleSelectStatus}
                         data-lable="R3"
                         className={status === 'R3' ? styles.active : ''}
                     >
+                        상품 검수
+                    </span>
+                    <span
+                        onClick={handleSelectStatus}
+                        data-lable="R4"
+                        className={status === 'R4' ? styles.active : ''}
+                    >
+                        반품 불가
+                    </span>
+                    <span
+                        onClick={handleSelectStatus}
+                        data-lable="R5"
+                        className={status === 'R5' ? styles.active : ''}
+                    >
                         반품 확정
                     </span>
                     <span
-                        onClick={handleChangeStatus}
-                        data-lable="R4"
-                        className={status === 'R4' ? styles.active : ''}
+                        onClick={handleSelectStatus}
+                        data-lable="R6"
+                        className={status === 'R6' ? styles.active : ''}
                     >
                         환불 완료
                     </span>
@@ -361,7 +374,7 @@ export const Return = () => {
                                             handleViewInfo(order.order_seq)
                                         }
                                     >
-                                        {formatDate(order.order_date)}
+                                        {formatDate(order.return_date)}
                                     </div>
                                     <div
                                         className={styles.cols}

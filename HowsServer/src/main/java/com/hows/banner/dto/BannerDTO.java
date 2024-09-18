@@ -1,7 +1,6 @@
 package com.hows.banner.dto;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 
 public class BannerDTO {
 	private int banner_seq;

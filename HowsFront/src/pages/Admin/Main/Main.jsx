@@ -2,43 +2,21 @@ import styles from './Main.module.css'
 
 export const Main = () => {
     return (
-        <div className={styles.dashboardContainer}>
-            {/* Header */}
-            <header className={styles.header}>
-                <h1>How's DashBoard</h1>
-            </header>
-
-            {/* Top boxes */}
-            <div className={styles.topBoxes}>
-                <div className={styles.box}></div>
-                <div className={styles.box}></div>
-            </div>
-
-            {/* Subtitle section */}
-            <div className={styles.subtitleSection}>
-                <h2 className={styles.subtitle}>A Subtitle</h2>
-                <table className={styles.table}>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Pie chart and bar/line charts */}
-            <div className={styles.chartSection}>
-                <div className={styles.pieChart}></div>
-                <div className={styles.barAndLineCharts}>
-                    <div className={styles.barChart}></div>
-                    <div className={styles.lineChart}></div>
+        <div className={styles.container}>
+            <div className={styles.row}>
+                <div className={styles.leftBox}>
+                    <h1>How's DashBoard</h1>
+                    <div className={styles.subBox}>
+                        <div className={styles.contBox}>왼</div>
+                        <div className={styles.contBox}>오</div>
+                    </div>
+                    <div className={styles.listBox}>리스트</div>
                 </div>
+                <div className={styles.rightBox}>오른쪽</div>
+            </div>
+            <div className={styles.row}>
+                <div className={styles.graphBox}>그래프1</div>
+                <div className={styles.graphBox}>그래프2</div>
             </div>
         </div>
     )

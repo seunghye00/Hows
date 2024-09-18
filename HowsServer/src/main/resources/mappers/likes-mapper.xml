@@ -36,4 +36,36 @@
         AND 
         	member_id = #{member_id}
     </select>
+    
+    <!-- 리뷰 좋아요 추가 -->
+    <insert id="addReviewLike">
+        insert into review_like values (review_like_seq.nextval, #{review_seq}, #{member_id})
+    </insert>
+
+    <!-- 리뷰 좋아요 삭제 -->
+    <delete id="removeReviewLike">
+        DELETE FROM 
+        	review_like 
+        WHERE 
+        	review_seq = #{review_seq} 
+        AND 
+        	member_id = #{member_id}
+    </delete>
+
+    <!-- 리뷰 좋아요 개수 조회 -->
+    <select id="getReviewLikeCount" resultType="int">
+        SELECT COUNT(*) FROM review_like
+        WHERE review_seq = #{review_seq}
+    </select>
+
+    <!-- 리뷰 좋아요 확인 -->
+    <select id="checkReviewLikeStatus" resultType="boolean">
+        SELECT 
+		    COUNT(*) AS like_count
+		FROM 
+		    review_like
+		WHERE 
+		    review_seq = #{review_seq}
+		    AND member_id = #{member_id}
+    </select>
 </mapper>

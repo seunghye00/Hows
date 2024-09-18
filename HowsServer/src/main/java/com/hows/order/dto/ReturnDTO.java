@@ -15,6 +15,7 @@ public class ReturnDTO {
 	private String name; // 주문자명
 	private int order_price; // 주문 금액
 	private int payment_price; // 결제 금액
+	private String return_code; // 반품 코드
 	private String orderer_phone; // 주문자 폰번호
 	private String payment_id; // 결재 id
 	private String payment_text; // 결재 취소 이유
@@ -90,6 +91,12 @@ public class ReturnDTO {
 	public void setPayment_price(int payment_price) {
 		this.payment_price = payment_price;
 	}
+	public String getReturn_code() {
+		return return_code;
+	}
+	public void setReturn_code(String return_code) {
+		this.return_code = return_code;
+	}
 	public String getOrderer_phone() {
 		return orderer_phone;
 	}
@@ -108,10 +115,15 @@ public class ReturnDTO {
 	public void setPayment_text(String payment_text) {
 		this.payment_text = payment_text;
 	}
+	public ReturnDTO(int return_seq, String return_code) {
+		super();
+		this.return_seq = return_seq;
+		this.return_code = return_code;
+	}
 	public ReturnDTO(int order_seq, int return_seq, Timestamp order_date, Timestamp payment_date,
 			Timestamp done_delivery_date, Timestamp return_date, Timestamp done_return_date, String order_name,
-			String grade_title, String name, int order_price, int payment_price, String orderer_phone,
-			String payment_id, String payment_text) {
+			String grade_title, String name, int order_price, int payment_price, String return_code,
+			String orderer_phone, String payment_id, String payment_text) {
 		super();
 		this.order_seq = order_seq;
 		this.return_seq = return_seq;
@@ -125,6 +137,7 @@ public class ReturnDTO {
 		this.name = name;
 		this.order_price = order_price;
 		this.payment_price = payment_price;
+		this.return_code = return_code;
 		this.orderer_phone = orderer_phone;
 		this.payment_id = payment_id;
 		this.payment_text = payment_text;

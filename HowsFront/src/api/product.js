@@ -12,14 +12,22 @@ export const getBestProducts = () => {
 }
 
 // 리뷰 목록 요청 함수
-export const getReviewList = (product_seq, page, itemsPerPage) => {
-    return axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
-        params: {
-            page : page, // 페이지 번호 전달
-            itemsPerPage : itemsPerPage, // 페이지당 항목 수 전달
-        }
-    })
-}
+export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
+    return sortType === 'latest'
+        ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            }
+        })
+        : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            }
+        });
+};
+
 // 상품 상세 정보 요청 함수
 export const getProductDetail = (product_seq) => {
     return axios.get(`${baseUrl}/detail/${product_seq}`)

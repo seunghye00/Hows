@@ -120,6 +120,7 @@ public class CommunityController {
 	}
 
 	// 게시글 업데이트 
+	// 게시글 업데이트
 	@PutMapping("/update-with-images/{board_seq}")
 	@Transactional
 	public ResponseEntity<Void> updateWriteWithImages(
@@ -184,38 +185,36 @@ public class CommunityController {
 	                String tagsJson = tagsMap.get("tags_json_" + i);
 	                System.out.println("Received tags JSON for existing image " + i + ": " + tagsJson);
 
-	                if (tagsJson != null && !tagsJson.isEmpty()) {
+	                if (tagsJson != null) {
 	                    List<TagDTO> newTagsList = parseTagsFromJson(tagsJson, boardImageSeq);  // 새로운 태그 파싱
 	                    System.out.println("Parsed tags for existing image " + i + ": " + newTagsList);
 
-	                    if (newTagsList != null && !newTagsList.isEmpty()) {
-	                        // 1) 기존 태그 조회
-	                        List<TagDTO> existingTags = communityServ.selectTagsByImageSeq(boardImageSeq);
+	                    // 1) 기존 태그 조회
+	                    List<TagDTO> existingTags = communityServ.selectTagsByImageSeq(boardImageSeq);
 
-	                        // 2) 삭제할 태그 찾기
-	                        for (TagDTO existingTag : existingTags) {
-	                            boolean isDeleted = newTagsList.stream()
-	                                    .noneMatch(newTag -> newTag.getProduct_seq() == existingTag.getProduct_seq()
-	                                            && newTag.getLeft_position() == existingTag.getLeft_position()
-	                                            && newTag.getTop_position() == existingTag.getTop_position());
-	                            if (isDeleted) {
-	                                communityServ.deleteTag(existingTag.getBoard_tag_seq());  // 태그 삭제
-	                                System.out.println("Deleted tag: " + existingTag);
-	                            }
+	                    // 2) 삭제할 태그 찾기
+	                    for (TagDTO existingTag : existingTags) {
+	                        boolean isDeleted = newTagsList.stream()
+	                                .noneMatch(newTag -> newTag.getProduct_seq() == existingTag.getProduct_seq()
+	                                        && newTag.getLeft_position() == existingTag.getLeft_position()
+	                                        && newTag.getTop_position() == existingTag.getTop_position());
+	                        if (isDeleted) {
+	                            communityServ.deleteTag(existingTag.getBoard_tag_seq());  // 태그 삭제
+	                            System.out.println("Deleted tag: " + existingTag);
 	                        }
+	                    }
 
-	                        // 3) 새로운 태그 추가
-	                        for (TagDTO newTag : newTagsList) {
-	                            boolean isDuplicate = existingTags.stream()
-	                                    .anyMatch(existingTag -> existingTag.getProduct_seq() == newTag.getProduct_seq()
-	                                            && existingTag.getLeft_position() == newTag.getLeft_position()
-	                                            && existingTag.getTop_position() == newTag.getTop_position());
+	                    // 3) 새로운 태그 추가
+	                    for (TagDTO newTag : newTagsList) {
+	                        boolean isDuplicate = existingTags.stream()
+	                                .anyMatch(existingTag -> existingTag.getProduct_seq() == newTag.getProduct_seq()
+	                                        && existingTag.getLeft_position() == newTag.getLeft_position()
+	                                        && existingTag.getTop_position() == newTag.getTop_position());
 
-	                            if (!isDuplicate) {
-	                                newTag.setBoard_image_seq(boardImageSeq);  // 기존 이미지의 시퀀스 설정
-	                                communityServ.insertTag(newTag);  // 중복이 아니면 태그 저장
-	                                System.out.println("Added new tag: " + newTag);
-	                            }
+	                        if (!isDuplicate) {
+	                            newTag.setBoard_image_seq(boardImageSeq);  // 기존 이미지의 시퀀스 설정
+	                            communityServ.insertTag(newTag);  // 중복이 아니면 태그 저장
+	                            System.out.println("Added new tag: " + newTag);
 	                        }
 	                    }
 	                }
@@ -273,6 +272,7 @@ public class CommunityController {
 	        throw new RuntimeException("게시글 업데이트 또는 이미지 처리 실패", e);
 	    }
 	}
+
 
 	
 	// 태그 데이터를 JSON에서 List<TagDTO>로 파싱하는 메서드

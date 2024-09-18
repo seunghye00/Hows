@@ -30,6 +30,7 @@ export const Post = () => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0) // 태그 모달을 연 이미지의 인덱스
     const [tagPosition, setTagPosition] = useState({}) // 태그 위치 저장
     const [searchTerm, setSearchTerm] = useState('') // 검색어
+    const [dominantColor, setDominantColor] = useState('C0') // 추출된 색상을 저장할 상태
     const [searchResults, setSearchResults] = useState([
         {
             product_seq: 1,
@@ -61,6 +62,104 @@ export const Post = () => {
 
     const navigate = useNavigate() // 리다이렉트를 위한 useNavigate Hook 추가
 
+    // 이미지에서 색상을 추출하는 함수
+    const extractColorFromImage = (imageSrc, callback) => {
+        const img = document.createElement('img')
+        img.crossOrigin = 'Anonymous'
+        img.src = imageSrc
+
+        img.onload = () => {
+            const canvas = document.createElement('canvas')
+            canvas.width = img.width
+            canvas.height = img.height
+            const ctx = canvas.getContext('2d')
+            ctx.drawImage(img, 0, 0, img.width, img.height)
+
+            const imageData = ctx.getImageData(
+                0,
+                0,
+                canvas.width,
+                canvas.height
+            ).data
+            const colorCount = {}
+
+            // 중앙 좌표 계산
+            const centerX = Math.floor(img.width / 2)
+            const centerY = Math.floor(img.height / 2)
+
+            // 주변 픽셀 색상 추출
+            const offsets = [
+                { x: 0, y: 0 }, // 중앙
+                { x: -1, y: 0 }, // 왼쪽
+                { x: 1, y: 0 }, // 오른쪽
+                { x: 0, y: -1 }, // 위
+                { x: 0, y: 1 }, // 아래
+                { x: -1, y: -1 }, // 왼쪽 위
+                { x: -1, y: 1 }, // 왼쪽 아래
+                { x: 1, y: -1 }, // 오른쪽 위
+                { x: 1, y: 1 }, // 오른쪽 아래
+            ]
+
+            offsets.forEach(({ x, y }) => {
+                const pixelX = centerX + x
+                const pixelY = centerY + y
+
+                // 이미지 범위 내에서만 색상 추출
+                if (
+                    pixelX >= 0 &&
+                    pixelX < img.width &&
+                    pixelY >= 0 &&
+                    pixelY < img.height
+                ) {
+                    const index = (pixelY * img.width + pixelX) * 4
+                    const r = imageData[index]
+                    const g = imageData[index + 1]
+                    const b = imageData[index + 2]
+
+                    // 특정 임계값 이하의 색상 제외
+                    if (r < 20 && g < 20 && b < 20) return // 너무 어두운 색상 제외
+
+                    // 비슷한 색상 그룹화
+                    const key = `${Math.floor(r / 32) * 32},${
+                        Math.floor(g / 32) * 32
+                    },${Math.floor(b / 32) * 32}`
+                    colorCount[key] = (colorCount[key] || 0) + 1
+                }
+            })
+
+            let dominantColor = ''
+            let maxCount = 0
+
+            for (const color in colorCount) {
+                if (colorCount[color] > maxCount) {
+                    maxCount = colorCount[color]
+                    dominantColor = color
+                }
+            }
+
+            const rgb = dominantColor.split(',').map(Number)
+            console.log(`Extracted Dominant RGB: ${rgb[0]},${rgb[1]},${rgb[2]}`)
+
+            callback(rgb)
+        }
+
+        img.onerror = err => {
+            console.error('이미지를 불러오는 중 오류가 발생했습니다:', err)
+            callback([0, 0, 0]) // 오류 발생 시 기본 검정색 처리
+        }
+    }
+
+    // 썸네일 이미지가 바뀔 때마다 색상을 추출하는 로직
+    useEffect(() => {
+        if (thumbnail) {
+            extractColorFromImage(thumbnail, rgb => {
+                const colorCode = mapColorToCode(rgb)
+                console.log(`Mapped Color Code: ${colorCode}`) // 매핑된 색상 코드 콘솔에 출력
+                setDominantColor(colorCode)
+            })
+        }
+    }, [thumbnail])
+
     // 좌표를 퍼센트로 변환하는 함수
     const convertToPercent = (x, y, imgWidth, imgHeight) => {
         const leftPercent = (x / imgWidth) * 100
@@ -68,60 +167,54 @@ export const Post = () => {
         return { left: leftPercent, top: topPercent }
     }
 
+    // RGB 값을 color_code로 매핑하는 함수
+    const mapColorToCode = rgb => {
+        if (!rgb) return 'C0' // 색상을 추출하지 못했을 때 'C0'으로 처리
+
+        const [r, g, b] = rgb
+
+        if (r > 180 && g > 180 && b > 180) return 'C1' // 화이트
+        if (r < 70 && g < 70 && b < 70) return 'C2' // 블랙
+        if (r > 120 && r < 200 && g > 120 && g < 200 && b > 120 && b < 200)
+            return 'C3' // 그레이
+        if (r > 160 && g > 160 && b < 120) return 'C4' // 옐로우
+        if (r < 130 && g < 130 && b > 140) return 'C5' // 블루 (범위 확대)
+        if (r > 180 && g < 160 && b < 160) return 'C6' // 핑크
+        if (r > 180 && g < 120 && b < 120) return 'C7' // 레드
+        if (r > 150 && g < 120 && b < 80) return 'C8' // 브라운
+        if (g > 130 && r < 140 && b < 120) return 'C9' // 그린
+
+        return 'C0' // 해당되는 색상 코드가 없을 경우 기본적으로 'C0' 처리
+    }
+
     const { getRootProps, getInputProps } = useDropzone({
         onDrop: acceptedFiles => {
             const validFiles = acceptedFiles.filter(file => {
                 const fileExtension = file.name.split('.').pop().toLowerCase()
-                const isValidExtension = validExtensions.includes(fileExtension)
-                const isValidMimeType = [
-                    'image/jpeg',
-                    'image/png',
-                    'image/gif',
-                ].includes(file.type)
+                const isValidExtension = ['jpg', 'jpeg', 'png', 'gif'].includes(
+                    fileExtension
+                )
                 const isValidSize = file.size <= MAX_IMAGE_SIZE_BYTES
 
-                if (!isValidExtension || !isValidMimeType) {
+                if (!isValidExtension || !isValidSize) {
                     Swal.fire({
                         icon: 'error',
                         title: '파일 오류',
-                        text: `${file.name}은 유효하지 않은 파일 형식입니다.`,
+                        text: '유효하지 않은 파일이거나 파일 용량이 큽니다.',
                     })
                     return false
                 }
-
-                if (!isValidSize) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: '파일 용량 초과',
-                        text: `${file.name}은 2MB보다 큽니다.`,
-                    })
-                    return false
-                }
-
                 return true
             })
 
             validFiles.forEach(file => {
                 const reader = new FileReader()
                 reader.onloadend = () => {
-                    setImages(prevImages => {
-                        const updatedImages = [
-                            ...prevImages,
-                            {
-                                src: reader.result,
-                                file: file,
-                                tags: [],
-                                positions: [],
-                            },
-                        ]
-
-                        if (updatedImages.length === 1) {
-                            setThumbnail(reader.result) // 첫 번째 이미지가 썸네일이 되도록 설정
-                            setSelectedImageIndex(0)
-                        }
-
-                        return updatedImages // 배열을 리턴하여 상태 업데이트
-                    })
+                    setImages(prevImages => [
+                        ...prevImages,
+                        { src: reader.result, file: file, tags: [] },
+                    ])
+                    if (!thumbnail) setThumbnail(reader.result) // 첫 번째 이미지를 썸네일로 설정
                 }
                 reader.readAsDataURL(file)
             })
@@ -337,7 +430,8 @@ export const Post = () => {
             formData.append('area_size_code', selectedAreaSize)
             formData.append('board_contents', postContent)
             formData.append('member_id', member_id)
-
+            console.log(dominantColor, '색상 코드 확인')
+            formData.append('color_code', dominantColor) // color_code 추가
             // 이미지 및 태그 정보 추가
             if (images.length === 1) {
                 // 이미지가 하나일 때

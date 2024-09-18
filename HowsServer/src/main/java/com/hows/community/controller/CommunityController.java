@@ -57,6 +57,7 @@ public class CommunityController {
 	public ResponseEntity<Void> insertWriteWithImages(@RequestParam("housing_type_code") String housingTypeCode,
 			@RequestParam("space_type_code") String spaceTypeCode, @RequestParam("area_size_code") String areaSizeCode,
 			@RequestParam("board_contents") String boardContents, @RequestParam("member_id") String memberId,
+			@RequestParam(value = "color_code", required = false) String colorCode, // 단일 color_code로 수정
 			@RequestPart("files") MultipartFile[] files, // FormData에서 여러 이미지 파일을 받음
 			@RequestParam("image_orders") int[] imageOrders, // 이미지 순서를 배열로 받음
 			@RequestParam(value = "tags", required = false) String[] tagsJson, // 태그 데이터를 JSON 문자열 배열로 받음 (이미지 여러 개일 때)
@@ -70,7 +71,8 @@ public class CommunityController {
 			dto.setArea_size_code(areaSizeCode);
 			dto.setBoard_contents(boardContents);
 			dto.setMember_id(memberId);
-
+			dto.setColor_code(colorCode);
+			System.out.println("컬러 코드 확인 " + colorCode);
 			int boardSeq = communityServ.insertWrite(dto); // 게시글 저장
 			System.out.println(boardSeq + " 게시글 시퀀스");
 
@@ -128,6 +130,7 @@ public class CommunityController {
 	        @RequestParam("space_type_code") String spaceTypeCode,
 	        @RequestParam("area_size_code") String areaSizeCode,
 	        @RequestParam("board_contents") String boardContents,
+			@RequestParam(value = "color_code", required = false) String colorCode, // 단일 color_code로 수정
 	        @RequestParam("member_id") String memberId,
 	        @RequestParam("existing_image_urls") List<String> existingImageUrls,
 	        @RequestPart(value = "new_files", required = false) MultipartFile[] newFiles,
@@ -254,13 +257,14 @@ public class CommunityController {
 	                }
 	            }
 	        }
-
+	        System.out.println(colorCode + " 컬러코드 갑 확인");
 	        // 7. 게시글 내용 업데이트
 	        CommunityDTO dto = new CommunityDTO();
 	        dto.setHousing_type_code(housingTypeCode);
 	        dto.setSpace_type_code(spaceTypeCode);
 	        dto.setArea_size_code(areaSizeCode);
 	        dto.setBoard_contents(boardContents);
+	        dto.setColor_code(colorCode);
 	        dto.setMember_id(memberId);
 	        dto.setBoard_seq(board_seq);
 	        communityServ.updateWrite(dto);  // 게시글 업데이트

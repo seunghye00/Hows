@@ -9,6 +9,7 @@ import {
     getAreaSizes,
     getColors,
 } from '../../../../../../api/community'
+import { useAuthStore } from '../../../../../../store/store'
 
 export const Sort = () => {
     const [housingTypes, setHousingTypes] = useState([])
@@ -16,7 +17,7 @@ export const Sort = () => {
     const [areaSizes, setAreaSizes] = useState([])
     const [colors, setColors] = useState([])
     const [keyword, setKeyword] = useState('') // 검색어 상태 추가
-
+    const { isAuth } = useAuthStore() // 로그인 여부 확인
     const navigate = useNavigate()
     const [searchParams, setSearchParams] = useSearchParams()
 
@@ -73,6 +74,17 @@ export const Sort = () => {
         console.log('Updated URL with keyword:', searchValue) // 검색어 로그 출력
     }
 
+    // 글쓰기 버튼 클릭 시 페이지 이동 함수
+    const handleWritePage = () => {
+        if (!isAuth) {
+            // 로그인되지 않았으면 로그인 페이지로 리다이렉트
+            navigate('/signIn', { state: { from: '/communities/post' } })
+            // 'from'으로 돌아가야할 링크를 저장, 로그인 후 다시 리다이렉트될 수 있도록 설정
+        } else {
+            // 로그인되어 있으면 글쓰기 페이지로 이동
+            navigate('/communities/post')
+        }
+    }
     return (
         <div className={styles.sortWrap}>
             <div className={styles.sortcont}>
@@ -242,14 +254,18 @@ export const Sort = () => {
                         </div>
                     )}
                 </div>
-
-                <Search
-                    placeholder="검색어를 입력하세요"
-                    value={keyword} // 검색어 상태 반영
-                    onSearch={searchValue => handleSearchSubmit(searchValue)} // 검색 버튼 클릭 시 URL 업데이트
-                    size="s"
-                />
+                <div className={styles.searchBox}>
+                    <Search
+                        placeholder="검색어를 입력하세요"
+                        value={keyword} // 검색어 상태 반영
+                        onSearch={searchValue =>
+                            handleSearchSubmit(searchValue)
+                        } // 검색 버튼 클릭 시 URL 업데이트
+                        size="s"
+                    />
+                </div>
             </div>
+            <Button size="s" title={'글쓰기'} onClick={handleWritePage} />
         </div>
     )
 }

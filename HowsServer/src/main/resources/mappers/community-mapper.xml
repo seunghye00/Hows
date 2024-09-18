@@ -17,7 +17,7 @@
 		values (#{board_seq}, #{board_contents},
 		default, default,
 		#{housing_type_code}, #{space_type_code},
-		#{area_size_code}, default,
+		#{area_size_code}, #{color_code},
 		#{member_id})
 	</insert>
 
@@ -275,6 +275,7 @@
             space_type_code = #{space_type_code},
             area_size_code = #{area_size_code},
             board_contents = #{board_contents},
+            color_code = #{color_code},
             board_write_date = sysdate
         where board_seq = #{board_seq}
     </update>

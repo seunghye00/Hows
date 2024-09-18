@@ -11,7 +11,7 @@ export const Delivery = () => {
   const navi = useNavigate();
 
   const [myPayment, setMyPayment] = useState([]);
-  const [selectPayment, setSelectPayment] = useState(0);
+  const [selectPayment, setSelectPayment] = useState({paymentSeq: 0, paymentCode:""});
   const [orderDetail, setOrderDetail] = useState([]);
   const [reason, setReason] = useState("")
   const [reasonOpen, setReasonOpen] = useState(false);
@@ -20,15 +20,15 @@ export const Delivery = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
 
-  const handleDetail = (seq, paymentSeq) => {
+  const handleDetail = (seq, paymentSeq, paymentCode) => {
     myPaymentsDetail(seq).then(res => {
       setOrderDetail(res.data);
-      setSelectPayment(paymentSeq);
+      setSelectPayment(prev => ({ paymentSeq, paymentCode}));
       setIsModalOpen(true);
     });
   }
 
-  const handleSaleCancelTest = () => {
+  const handleReasonWrite = () => {
     setReasonOpen(true);
   }
 
@@ -58,6 +58,7 @@ export const Delivery = () => {
 
   useEffect(() => {
     myPayments().then(res => {
+      console.log("res.data === ", res.data);
       setMyPayment(res.data);
     });
   }, [isModalOpen]);
@@ -80,7 +81,7 @@ export const Delivery = () => {
               <div className={styles.shippingRow} key={item.order_seq}>
                 <div className={styles.shippingItem}>How's-order_{item.order_seq}</div>
                 <div className={styles.shippingItem}>
-                  <p onClick={() => handleDetail(item.order_seq, item.payment_seq)}>{item.order_name}</p>
+                  <p onClick={() => handleDetail(item.order_seq, item.payment_seq, item.payment_code)}>{item.order_name}</p>
                 </div>
                 <div className={styles.shippingItem}>
                   <span>{item.payment_title}</span>
@@ -126,10 +127,16 @@ export const Delivery = () => {
                 })
               }
             </div>
-            <button className={styles.cancelBtn} onClick={() => handleSaleCancelTest(selectPayment)}>구매 취소 & 환불 요청</button>
             {
-              reasonOpen &&
-              <Modal isOpen={isModalOpen} onClose={() => setReasonOpen(false)}>
+              selectPayment.paymentCode === "P1" || selectPayment.paymentCode === "P2" ?
+                  <button className={styles.cancelBtn} onClick={() => handleReasonWrite(selectPayment)}>구매 취소 & 환불
+                    요청</button>
+                  :
+                  <></>
+            }
+            {
+                reasonOpen &&
+                <Modal isOpen={isModalOpen} onClose={() => setReasonOpen(false)}>
                 <div className={styles.cancelReason}>
                   <textarea onChange={handleReason} value={reason || ""} placeholder="취소 사유를 적어주세요"/>
                   <button onClick={() => handleSaleCancel(selectPayment)}>구매 취소 요청</button>

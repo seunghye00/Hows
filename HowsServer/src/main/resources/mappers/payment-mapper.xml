@@ -9,6 +9,7 @@
         <result property="payment_seq" column="payment_seq"/>
         <result property="member_seq" column="member_seq"/>
         <result property="order_seq" column="order_seq"/>
+        <result property="payment_code" column="payment_code"/>
         <result property="payment_price" column="payment_price"/>
         <result property="payment_date" column="payment_date" javaType="java.sql.Timestamp"/>
         <result property="payment_id" column="payment_id"/>
@@ -30,6 +31,7 @@
             p.payment_seq,
             p.member_seq,
             p.order_seq,
+            p.payment_code,
             p.payment_price,
             p.payment_date,
             p.payment_id,

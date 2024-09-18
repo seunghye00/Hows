@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './ReviewSection.module.css'
 import axios from 'axios';
 import Swal from "sweetalert2";
@@ -11,10 +11,10 @@ import { Paging } from '../../../../../../components/Pagination/Paging';
 import { userInfo } from '../../../../../../api/member' 
 import { getReviewList , getReviewImgList , reviewLike, reviewUnlike , getReviewLikeCount , checkReviewLikeStatus } from '../../../../../../api/product';
 import ReportModal from '../ReportModal/ReportModal';
-import { useNavigate } from 'react-router-dom';
+import { json, useNavigate } from 'react-router-dom';
 
 export const ReviewSection = ({ product_seq, isAuth }) => {
-    const memberId = sessionStorage.getItem("member_id");
+    const memberId = sessionStorage.getItem("member_id") || null;
     const navi = useNavigate(); //페이지 전환을 위한 훅
     
     // =============== 모달창 ===============
@@ -24,17 +24,54 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     // 리뷰 작성 모달 열기
     const handleOpenReviewModal = () => {
+        setReviewMod({
+            'state': false,
+            'review_seq': 0
+        });
+
         setIsReportModalOpen(false); // 신고 모달을 닫기
         setData({rating: 0, review_contents: '', product_seq:product_seq, images: []});
-        setPreviewImages([]);  
+        setPreviewImages([]);
+        setExistImages([]);
+        setNewImages([]);
+        setIsReviewModalOpen(true); 
+    };
+
+    // 리뷰 수정 모달 열기
+    const handleOpenReviewModifyModal = (review) => {
+        setReviewMod({
+            'state': true,
+            'review_seq': review.REVIEW_SEQ
+        });
+
+        setIsReportModalOpen(false); // 신고 모달을 닫기
+        setPreviewImages([]);
+        setExistImages([]);
+        setNewImages([]);
+        review.images.map((img) => {
+            setExistImages((prevImages) => [...prevImages, img.IMAGE_URL])
+        });
+        setData({rating: review.RATING, review_contents: review.REVIEW_CONTENTS, product_seq:product_seq, images: review.images});
         setIsReviewModalOpen(true); 
     };
 
     // 신고 모달 열기
     const handleOpenReportModal = (reviewSeq) => {
+        if (!isAuth) {
+            // 로그인하지 않은 경우 경고 메시지 표시 후 로그인 페이지로 이동
+            Swal.fire({
+                icon: 'warning',
+                title: '로그인을 먼저 해주세요.',
+                showConfirmButton: true,
+            }).then(() => {
+                navi('/signIn'); // 로그인 페이지로 이동
+            });
+            return; // 로그인 안 되어 있으면 여기서 종료
+        }
+
         setIsReviewModalOpen(false); // 리뷰 모달을 닫기
         setSelectedReviewSeq(reviewSeq); // 신고하려는 리뷰 seq 저장
-        setIsReportModalOpen(true); 
+        setIsReportModalOpen(true); // 신고 모달 열기
     };
 
     // 모달 닫기
@@ -48,7 +85,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     const [data, setData] = useState({rating: 0, review_contents: '', product_seq: product_seq, image_url: [],});
     
     // 리뷰 목록
-    const [ reviews,setReviews ] = useState([]); // 리뷰 목록
+    const [ reviews, setReviews ] = useState([]); // 리뷰 목록
 
     // 페이지네이션
     const [ page, setPage ] = useState(1) // 현재 페이지
@@ -61,11 +98,14 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     // 제출 중 여부
     const [ isSubmitting, setIsSubmitting ] = useState(false);
+
     // 이미지 미리보기 URL을 저장 
+    const [ existImages, setExistImages ] = useState([]); // 기존의 리뷰에서 사용 중인 이미지
+    const [ newImages, setNewImages ] = useState([]); // 사용자가 새로 추가하는 이미지
     const [ previewImages, setPreviewImages ] = useState([]);
     
     // 각 리뷰 작성자의 프로필 이미지를 저장
-    const [reviewAvatars, setReviewAvatars] = useState({}); 
+    const [reviewAvatars, setReviewAvatars] = useState({});
 
     // 좋아요 상태 관리
     const [liked, setLiked] = useState({});
@@ -106,52 +146,167 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
             const newPreviewImages = Array.from(files).map(file => URL.createObjectURL(file));
 
             // 기존 이미지들과 새로 선택한 이미지를 병합하여 상태 업데이트
-            setPreviewImages((prevImages) => [...prevImages, ...newPreviewImages]);
+            setNewImages((prevImages) => [...prevImages, ...newPreviewImages]);
 
             // 기존 이미지들과 새로 선택한 이미지를 병합하여 상태에 저장
-            setData(prevData => ({
+            setData((prevData) => ({
                 ...prevData, // 기존 데이터는 유지하고
-                images: [...(prevData.images || []), ...Array.from(files)] // 이미지 배열 업데이트
+                images: [...Array.from(files)] // 이미지 배열 업데이트
             }));
         }
     };
 
     // [리뷰 작성] 이미지 제거 
-    const handleRemoveImage = (index) => {
-
+    const handleRemoveExistImage = (index) => {
         // 이미지 URL을 미리보기 배열에서 제거
-        setPreviewImages((prevImages) => prevImages.filter((_, i) => i !== index));
+        setExistImages((prevImages) => prevImages.filter((_, i) => i !== index));
     
+        // 이미지 파일을 data.images에서 제거
+        // setData((prevData) => ({
+        //     ...prevData, // 기존의 데이터는 유지하고
+        //     images: prevData.images.filter((_, i) => i !== index) // 선택된 이미지만 삭제
+        // }));
+    };
+
+    const handleRemoveNewImage = (index) => {
+        // 이미지 URL을 미리보기 배열에서 제거
+        setNewImages((prevImages) => prevImages.filter((_, i) => i !== index));
+
         // 이미지 파일을 data.images에서 제거
         setData((prevData) => ({
             ...prevData, // 기존의 데이터는 유지하고
             images: prevData.images.filter((_, i) => i !== index) // 선택된 이미지만 삭제
         }));
     };
+
     // 선택한 이미지들을 미리보기에 표시하는 함수 (배열에 저장된 이미지 URL을 기반으로 렌더링)
     const renderPreviewImages = () => {
-        return previewImages.map((src, index) => (
-            <div key={index} className={styles.previewImageContainer}>
-                {/* 이미지 미리보기 */}
-                <img src={src} alt={`preview ${index}`} className={styles.previewImage} />
+        return (
+            <>
+            {
+                existImages.map((src, index) => (
+                    <div key={index} className={styles.previewImageContainer}>
+                        {/* 이미지 미리보기 */}
+                        <img src={src} alt={`preview ${index}`} className={styles.previewImage} />
 
-                {/* 이미지 삭제 버튼: 클릭 시 handleRemoveImage 함수 호출 */}
-                <button 
-                    className={styles.deleteButton} 
-                    onClick={() => handleRemoveImage(index)} // 이미지 제거 함수 호출
-                >
-                    X
-                </button>
-            </div>
-        ));
+                        {/* 이미지 삭제 버튼: 클릭 시 handleRemoveImage 함수 호출 */}
+                        <button 
+                            className={styles.deleteButton} 
+                            onClick={() => handleRemoveExistImage(index)} // 이미지 제거 함수 호출
+                        >
+                            X
+                        </button>
+                    </div>
+                ))
+            }
+
+            {
+                newImages.map((src, index) => (
+                    <div key={index} className={styles.previewImageContainer}>
+                        {/* 이미지 미리보기 */}
+                        <img src={src} alt={`preview ${index}`} className={styles.previewImage} />
+
+                        {/* 이미지 삭제 버튼: 클릭 시 handleRemoveImage 함수 호출 */}
+                        <button  
+                            className={styles.deleteButton} 
+                            onClick={() => handleRemoveNewImage(index)} // 이미지 제거 함수 호출
+                        >
+                            X
+                        </button>
+                    </div>
+                ))
+            }
+            </>
+        )
     };
-    
     
     // 모든 필드를 입력했는지 검사
     const isFormValid = () => {
         const { rating, review_contents, images } = data;
-        return rating && review_contents && images && images.length > 0;
+        return rating && review_contents && images && (images.length > 0 || existImages.length > 0);
     };
+
+    // 리뷰 수정 함수
+    const handleReviewModifySubmit = () => {
+        if (isSubmitting) return;
+    
+        setIsSubmitting(true);
+    
+        if (!isFormValid()) {
+            alert('별점, 리뷰 내용, 그리고 이미지를 모두 입력해 주세요.');
+            setIsSubmitting(false);
+            return;
+        }
+    
+        const formData = new FormData();
+    
+        const reviewData = JSON.stringify({
+            review_seq: reviewMod.review_seq,
+            rating: data.rating,
+            review_contents: data.review_contents,
+            product_seq: data.product_seq,
+            member_id: memberId 
+        });
+
+        formData.append('reviewData', reviewData);
+        
+        if (data.images && data.images.length > 0) {
+            data.images.forEach((image) => {
+                formData.append('newImages', image); 
+            });
+        }
+
+        if (existImages && existImages.length > 0) {
+            existImages.forEach((image) => {
+                formData.append('existImages', image);
+            });
+        }
+
+        data.images.forEach((_, index) =>
+            formData.append('imageOrders', index + 1)
+        )
+
+        console.log("newImages : " + newImages);        
+
+        api.post(`/product/reviewMod`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        }).then((response) => {
+            Swal.fire({
+                icon: "success",
+                title: "리뷰 수정에 성공했습니다.",
+                showConfirmButton: true,
+            });
+            
+            // 리뷰 등록 성공 시, 새 리뷰를 추가하여 리뷰 목록을 업데이트
+            const modReview = {
+                RATING: data.rating,
+                REVIEW_CONTENTS: data.review_contents,
+                MEMBER_ID: memberId,
+                REVIEW_DATE: new Date(), // 현재 시간을 등록 시간으로 사용
+                images: [...existImages, ...newImages.map((src, index) => ({ IMAGE_URL: src }))], // 이미지 미리보기 배열을 사용하여 새 리뷰 이미지로 추가
+            };
+            
+            // 수정된 리뷰 반영
+            let modifiedReviews = reviews.map((review) => {
+                if (review.REVIEW_SEQ === reviewMod.review_seq){
+                    review.RATING = data.rating;
+                    review.REVIEW_CONTENTS = data.review_contents;
+                    review.REVIEW_DATE = new Date();
+                    review.images = newImages.map((src, index) => ({ IMAGE_URL : src }));
+                }
+                
+                return review;
+            });
+
+            setReviews(modifiedReviews);
+            setIsReviewModalOpen(false); // 모달 닫기
+        }).catch((error) => {
+            alert('리뷰 수정에 실패했습니다');
+            setIsReviewModalOpen(false);
+        });
+
+        setIsSubmitting(false);
+    }
 
     // 리뷰 등록 함수 
     const handleSubmit = () => {
@@ -173,6 +328,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
             product_seq: data.product_seq,
             member_id: memberId 
         });
+
         formData.append('reviewData', reviewData);
     
         if (data.images && data.images.length > 0) {
@@ -200,7 +356,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                 REVIEW_CONTENTS: data.review_contents,
                 MEMBER_ID: memberId,
                 REVIEW_DATE: new Date(), // 현재 시간을 등록 시간으로 사용
-                images: previewImages.map((src, index) => ({ IMAGE_URL: src })), // 이미지 미리보기 배열을 사용하여 새 리뷰 이미지로 추가
+                images: newImages.map((src, index) => ({ IMAGE_URL: src })), // 이미지 미리보기 배열을 사용하여 새 리뷰 이미지로 추가
             };
             
             setReviews((prevReviews) => [newReview, ...prevReviews]); // 새 리뷰를 목록에 추가
@@ -225,10 +381,12 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
         }
     };
 
+    const [sortType, setSortType] = useState('latest');
+
     useEffect(() => {
         const fetchReviews = async () => {
             try {
-                const resp = await getReviewList(product_seq, page, itemsPerPage, memberId);
+                const resp = await getReviewList(product_seq, page, itemsPerPage, sortType);
                 const reviewsData = resp.data.reviews;
     
                 if (reviewsData.length > 0) {
@@ -244,7 +402,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     // 리뷰 작성자 프로필 이미지를 불러오는 부분
                     const avatarPromises = reviewsData.map(async (review) => {
                         // member_id가 null 또는 "null"이 아닌 경우에만 호출
-                        if (review.MEMBER_ID && review.MEMBER_ID !== "null") { 
+                        if (memberId && review.MEMBER_ID && review.MEMBER_ID !== "null") { 
                             try {
                                 // 프로필 이미지 API 호출
                                 const profileResp = await userInfo(review.MEMBER_ID);
@@ -298,7 +456,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                         }
                     });
                     const likeData = await Promise.all(likePromises);
-                    console.log("각 리뷰의 좋아요 데이터 확인중"+likeData);
+                    // console.log("각 리뷰의 좋아요 데이터 확인중"+likeData);
 
                     const newLikeCount = {};
                     const newLikedStatus = {};
@@ -321,8 +479,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
         };
     
         fetchReviews();
-    }, [product_seq, page, itemsPerPage]);
-    console.log(liked);
+    }, [product_seq, page, itemsPerPage, isReviewModalOpen, sortType]);
+    // console.log(liked);
     
     // 페이지네이션
     const handlePageChange = (newPage) => {
@@ -363,10 +521,16 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
             });
     };
 
-    // 리뷰 수정
-    const handleModify = () => {
+    const [reviewMod, setReviewMod] = useState({}); // 리뷰별로 수정 모드 관리
 
-    }
+    // 리뷰 수정 모드 활성화
+    const handleModify = (review) => {
+        setReviewMod({
+            'state' : true,
+            'review_seq' : review.REVIEW_SEQ
+        });
+        handleOpenReviewModifyModal(review);
+    };
 
     // 리뷰 좋아요 '도움이 돼요'
     const handleLikeClick = (reviewSeq) => {
@@ -424,6 +588,10 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
         }
     };
 
+    // 리뷰 정렬 타입 변경
+    const handleChangeSortType = (sortType) => {
+        setSortType(sortType);
+    }
 
     return (
         <div className={styles.container}>
@@ -445,7 +613,13 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     {isReviewModalOpen && (
                         <Modal isOpen={isReviewModalOpen} onClose={handleCloseReviewModal}>
                             <div className={styles.modalBox}>
-                                <h2>리뷰 쓰기</h2>
+                                {/* {console.log("reviewMod : " + reviewMod)} */}
+                                {
+                                reviewMod.state === false ? 
+                                ( <h2>리뷰 쓰기</h2> )
+                                : 
+                                ( <h2>리뷰 수정</h2> )
+                                }
                                 <div>
                                     <span>만족도 </span> &nbsp; &nbsp;
                                     <StarRating 
@@ -479,10 +653,20 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                     <div className={styles.previewContainer}>
                                         {renderPreviewImages()}
                                     </div>
-                                    <button onClick={handleSubmit} disabled={isSubmitting}>
-                                        {/* disabled -> 폼 요소를 비활성화 */}
-                                        {isSubmitting ? '제출 중...' : '리뷰 제출'}
-                                    </button> 
+                                    {
+                                        reviewMod.state === false ? 
+                                        <>
+                                            <button onClick={handleSubmit} disabled={isSubmitting}>
+                                                {isSubmitting ? '제출 중...' : '리뷰 제출'}
+                                            </button>
+                                        </>
+                                    : 
+                                        <>
+                                            <button onClick={handleReviewModifySubmit} disabled={isSubmitting}>
+                                                {isSubmitting ? '제출 중...' : '리뷰 수정'}
+                                            </button>
+                                        </>
+                                    }
                                 </div>
                             </div>
                         </Modal>
@@ -502,8 +686,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                 </div>
                 <div className={styles.reviewsMain}>
                     <div className={styles.option}>
-                        <div>베스트순</div>
-                        <div>최신순</div>
+                        <div onClick={() => handleChangeSortType('best')}>베스트순</div>
+                        <div onClick={() => handleChangeSortType('latest')}>최신순</div>
                     </div>
                     <div className={styles.reviewBox}>
                         {reviews.length > 0 ? (
@@ -517,16 +701,18 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                             </div>
                                             <div>
                                                 <div>{review.MEMBER_ID} </div>
-                                                <div><StarRating rating={review.RATING} /></div>
+                                                <div>
+                                                    <StarRating rating={review.RATING}/>
+                                                </div>
                                             </div>
                                         </div>
                                         <div>
                                             {/* 세션 memberId와 review.MEMBER_ID가 같을 때만 수정/삭제 버튼을 보여줌 */}
                                             {memberId === review.MEMBER_ID ? (
-                                                <>
-                                                    <button onClick={handleModify}>수정</button>
-                                                    <button onClick={() => { handleReviewDel(review.REVIEW_SEQ); }}>삭제</button>
-                                                </>
+                                            <>
+                                                <button onClick={() => handleModify(review)}>수정</button>
+                                                <button onClick={() => handleReviewDel(review.REVIEW_SEQ)}>삭제</button>
+                                            </>
                                             ) : (
                                                 <>
                                                     {/* 본인이 작성한 리뷰가 아닐 때만 좋아요/신고 버튼을 보여줌 */}

@@ -6,8 +6,10 @@ export const Main = () => {
     return (
         <div className={styles.communityWrap}>
             <Routes>
-                <Route path="/" element={<Community />}></Route>
+                <Route path="/sorted" element={<Community />}></Route>
+                <Route path="/search" element={<Community />}></Route>
                 <Route path="/:board_seq" element={<Detail />}></Route>
+                <Route path="/" element={<Community />}></Route>
             </Routes>
         </div>
     )

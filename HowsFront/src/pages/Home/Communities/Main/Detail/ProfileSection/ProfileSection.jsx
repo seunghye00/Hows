@@ -26,6 +26,7 @@ const formatDate = dateString => {
 export const ProfileSection = ({
     profileData,
     handleDeletePost, // 삭제 처리 함수 추가
+    handleModify,
 }) => {
     const { isAuth } = useAuthStore() // 로그인 여부
     const navigate = useNavigate()
@@ -76,11 +77,6 @@ export const ProfileSection = ({
     useEffect(() => {
         fetchFollowStatus()
     }, [memberSeq, profileData?.MEMBER_SEQ])
-
-    const handleModify = () => {
-        if (!isAuth) navigate('/signIn')
-        navigate('/communities/post')
-    }
 
     const handleFollow = async () => {
         if (!isAuth) {

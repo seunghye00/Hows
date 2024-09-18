@@ -30,7 +30,7 @@ public class CommentController {
 	@Autowired
 	private CommentService commentServ;
 
-	// 게시글 댓글 작성
+	// 게시글 댓글 작성 로그인 필요
 	@PostMapping("/write")
 	public ResponseEntity<Void> writeComment(@RequestBody CommentDTO dto) {
 
@@ -45,7 +45,7 @@ public class CommentController {
 		return ResponseEntity.ok().build();
 	}
 
-	// 게시글 댓글 목록 불러오기 (페이지네이션 적용)
+	// 게시글 댓글 목록 불러오기 (페이지네이션 적용) 로그인 필요없음
 	@GetMapping("/getComments")
 	public ResponseEntity<Map<String, Object>> getComments(
 	        @RequestParam("board_seq") int boardSeq, 
@@ -85,7 +85,7 @@ public class CommentController {
 	    return ResponseEntity.ok(response); // 댓글 목록과 전체 댓글 수를 JSON 형식으로 반환
 	}
 
-	// 게시글 댓글 수정
+	// 게시글 댓글 수정 로그인 필요
 	@PutMapping("/update")
 	public ResponseEntity<Void> updateComment(@RequestBody CommentDTO dto) {
 
@@ -95,7 +95,7 @@ public class CommentController {
 		return ResponseEntity.ok().build();
 	}
 
-	// 게시글 댓글 삭제
+	// 게시글 댓글 삭제 로그인 필요
 	@DeleteMapping("/delete/{comment_seq}")
 	public ResponseEntity<Void> deleteComment(@PathVariable int comment_seq) {
 		commentServ.deleteLike(comment_seq); // 댓글 삭제 시 연결 된 좋아요 삭제
@@ -103,7 +103,7 @@ public class CommentController {
 		return ResponseEntity.ok().build();
 	}
 
-	// 댓글 좋아요
+	// 댓글 좋아요 로그인 필요
 	@PostMapping("{comment_seq}/like")
     public ResponseEntity<Map<String, Object>> toggleLike(
             @PathVariable int comment_seq,
@@ -138,7 +138,7 @@ public class CommentController {
 		}
 	}
 
-	// 댓글 신고처리
+	// 댓글 신고처리 로그인 필요
 	@PostMapping("/report")
 	public ResponseEntity<Void> sendCommentReport(@RequestBody Map<String, Object> reportData) {
 		int commentSeq = (Integer) reportData.get("comment_seq");
@@ -149,7 +149,7 @@ public class CommentController {
 		return ResponseEntity.ok().build();
 	}
 	
-	// 답글 작성
+	// 답글 작성 로그인 필요
 	@PostMapping("/reply")
     public ResponseEntity<Void> writeReply(
         @RequestBody Map<String, Object> requestData
@@ -166,7 +166,7 @@ public class CommentController {
        
     }
 	
-	// 답글 목록 불러오기
+	// 답글 목록 불러오기 로그인 필요없음
 	@GetMapping("/repliesList")
 	public ResponseEntity<Map<String, Object>> getReplies(
 	        @RequestParam("comment_seq") int commentSeq, 
@@ -197,7 +197,7 @@ public class CommentController {
 	    return ResponseEntity.ok(response); // 답글 목록을 JSON 형식으로 반환
 	}
 	
-	// 게시글 답글 수정
+	// 게시글 답글 수정 로그인 필요
 	@PutMapping("/update/reply")
 	public ResponseEntity<Void> updateReply(@RequestBody Map<String, Object> requestData) {
 	    int replySeq = (int) requestData.get("reply_seq");
@@ -208,7 +208,7 @@ public class CommentController {
 	    return ResponseEntity.ok().build();
 	}
 	
-	// 답글 좋아요
+	// 답글 좋아요 로그인 필요
 	@PostMapping("reply/{reply_seq}/like")
 	public ResponseEntity<Map<String, Object>> toggleReplyLike(
 	        @PathVariable int reply_seq, // reply_seq로 변경
@@ -243,7 +243,7 @@ public class CommentController {
 	    }
 	}
 	
-	// 답글 신고	
+	// 답글 신고 로그인 필요
 	@PostMapping("/report/reply")
 	public ResponseEntity<Void> sendReplyReport(@RequestBody Map<String, Object> reportData) {
 		int replySeq = (Integer) reportData.get("reply_seq");

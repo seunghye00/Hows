@@ -1,25 +1,72 @@
 import { api } from '../config/config'
 // 게시글 목록 가져오기
-export const getCommunityPosts = async (page, limit = 20) => {
-    const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
-
+export const getCommunityPosts = async ({
+    page,
+    limit = 20,
+    sort = '',
+    housingType = '',
+    spaceType = '',
+    areaSize = '',
+    color = '',
+    keyword = '',
+    member_id,
+}) => {
     try {
+        // 요청에 사용할 파라미터 설정
         const params = {
-            page: page,
-            limit: limit,
+            page,
+            limit,
+            sort,
+            housingType,
+            spaceType,
+            areaSize,
+            color,
+            keyword,
         }
 
-        // 회원인 경우 member_id를 params에 추가
+        // 회원인 경우 member_id 추가
         if (member_id) {
             params.member_id = member_id
         }
 
+        // API 호출
         const response = await api.get('/community', { params })
 
-        // response.data가 없는 경우 빈 배열 반환
         return response.data || []
     } catch (error) {
-        throw error // 오류 발생 시 예외 처리
+        throw error
+    }
+}
+
+// 게시글 및 이미지/태그 작성
+export const submitPost = async formData => {
+    try {
+        const response = await api.post(
+            '/community/write-with-images',
+            formData,
+            {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }
+        )
+        return response
+    } catch (error) {
+        throw error
+    }
+}
+
+// 게시글 수정 API
+export const updatePostData = async (board_seq, formData) => {
+    try {
+        const response = await api.put(
+            `/community/update-with-images/${board_seq}`,
+            formData
+        )
+        return response
+    } catch (error) {
+        console.error('게시글 수정 중 오류 발생:', error)
+        throw error
     }
 }
 
@@ -98,23 +145,6 @@ export const getReport = async () => {
     }
 }
 
-// 게시글 및 이미지/태그 저장
-export const submitPost = async formData => {
-    try {
-        const response = await api.post(
-            '/community/write-with-images',
-            formData,
-            {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            }
-        )
-        return response
-    } catch (error) {
-        throw error
-    }
-}
 // 조회수 증가
 export const viewCounting = async board_seq => {
     const response = await api.post(`/community/${board_seq}/increment-view`)

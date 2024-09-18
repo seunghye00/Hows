@@ -9,23 +9,27 @@ export const Category = () => {
 
     // 카테고리 데이터 (이미지와 텍스트)
     const categories = [
-        { id: 1, imageUrl: img, name: '자취생 필수탬', tag: '#자취' },
+        { id: 0, imageUrl: img, name: '전체 커뮤니티', path: '/communities' }, // 기본 커뮤니티로 돌아가는 버튼
+        { id: 1, imageUrl: img, name: '자취생 필수탬', keyword: '자취' },
         { id: 2, imageUrl: img1, name: '급상승 인기글', sort: 'likes' }, // 좋아요 순 정렬
-        { id: 3, imageUrl: img2, name: '원룸 스타일', tag: '#원룸' },
-        { id: 4, imageUrl: img1, name: '방꾸 스타일', tag: '#방꾸' },
-        { id: 5, imageUrl: img, name: '캠핑 용품 자랑', tag: '#캠핑' },
-        { id: 6, imageUrl: img2, name: 'ROTD 오늘의 룸 스타일', tag: '#ROTD' },
+        { id: 3, imageUrl: img2, name: '원룸 스타일', keyword: '원룸' },
+        { id: 4, imageUrl: img, name: '캠핑 용품 자랑', keyword: '캠핑' },
+        {
+            id: 5,
+            imageUrl: img2,
+            name: 'ROTD 오늘의 룸 스타일',
+            keyword: 'ROTD',
+        },
     ]
 
     // 카테고리 클릭 핸들러
     const handleCategoryClick = category => {
-        // 카테고리에 따라 태그 또는 정렬을 적용
-        if (category.sort) {
-            // 좋아요 순 정렬을 위한 처리
-            navigate(`/community/sorted?sort=${category.sort}`)
-        } else if (category.tag) {
-            // 태그에 따른 게시글 필터링
-            navigate(`/community/tagged?tag=${category.tag}`)
+        if (category.path) {
+            navigate(category.path) // 기본 커뮤니티로 이동
+        } else if (category.sort) {
+            navigate(`/communities/sorted?sort=${category.sort}`)
+        } else if (category.keyword) {
+            navigate(`/communities/search?keyword=${category.keyword}`) // keyword 파라미터로 넘김
         }
     }
 

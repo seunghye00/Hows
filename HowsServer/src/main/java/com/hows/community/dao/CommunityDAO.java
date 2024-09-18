@@ -39,7 +39,12 @@ public class CommunityDAO {
 	public List<Map<String, Object>> selectAll() {
 		return mybatis.selectList("Community.selectAll");
 	}
-
+	
+    // selectCommunityPosts를 호출하여 게시글 리스트를 가져오는 메서드
+    public List<Map<String, Object>> selectCommunityPosts(Map<String, Object> params) {
+        return mybatis.selectList("Community.selectCommunityPosts", params); 
+    }
+    
 	// 게시글 리스트 이미지 출력
 	public List<Map<String, Object>> selectAllImg() {
 		return mybatis.selectList("Community.selectAllImg");

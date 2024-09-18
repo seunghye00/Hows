@@ -51,7 +51,7 @@ public class CommunityController {
 	@Autowired
 	private MemberService memServ;
 
-	// 게시글 및 이미지/태그 저장 (트랜잭션 적용)
+	// 게시글 및 이미지/태그 저장 (트랜잭션 적용) 로그인 필요
 	@PostMapping("/write-with-images")
 	@Transactional // 트랜잭션 적용
 	public ResponseEntity<Void> insertWriteWithImages(@RequestParam("housing_type_code") String housingTypeCode,
@@ -119,8 +119,7 @@ public class CommunityController {
 		}
 	}
 
-	// 게시글 업데이트 
-	// 게시글 업데이트
+	// 게시글 업데이트 로그인 필요
 	@PutMapping("/update-with-images/{board_seq}")
 	@Transactional
 	public ResponseEntity<Void> updateWriteWithImages(
@@ -306,63 +305,72 @@ public class CommunityController {
 		return tags;
 	}
 
-	// 커뮤니티 게시글 불러오는 메서드
+	// 커뮤니티 게시글 불러오는 메서드 로그인 없어도 됌
 	@GetMapping
 	public ResponseEntity<List<Map<String, Object>>> selectAll(
-			@RequestParam(value = "member_id", required = false) String memberId) {
+	        @RequestParam(value = "member_id", required = false) String memberId,
+	        @RequestParam(value = "keyword", required = false) String keyword,
+	        @RequestParam(value = "sort", required = false) String sort,
+	        @RequestParam(value = "housingType", required = false) String housingType,
+	        @RequestParam(value = "spaceType", required = false) String spaceType,
+	        @RequestParam(value = "areaSize", required = false) String areaSize,
+	        @RequestParam(value = "color", required = false) String color,
+	        @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+	        @RequestParam(value = "limit", required = false, defaultValue = "20") int limit
+	) {
 
-		// 게시글 리스트 가져오기
-		List<Map<String, Object>> list = communityServ.selectAll();
-		List<Map<String, Object>> listImg = communityServ.selectAllImg();
+	    // 게시글 리스트 가져오기
+	    List<Map<String, Object>> list = communityServ.selectCommunityPosts(page, limit, keyword, sort, housingType, spaceType, areaSize, color);
 
-		// 이미지 맵핑
-		Map<Integer, List<String>> imageMap = new HashMap<>();
-		for (Map<String, Object> imgData : listImg) {
-			BigDecimal boardSeqDecimal = (BigDecimal) imgData.get("BOARD_SEQ");
-			Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-			String imageUrl = (String) imgData.get("IMAGE_URL");
+	    // 이미지 가져오기 및 맵핑
+	    List<Map<String, Object>> listImg = communityServ.selectAllImg();
+	    Map<Integer, List<String>> imageMap = new HashMap<>();
+	    for (Map<String, Object> imgData : listImg) {
+	        BigDecimal boardSeqDecimal = (BigDecimal) imgData.get("BOARD_SEQ");
+	        Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+	        String imageUrl = (String) imgData.get("IMAGE_URL");
 
-			if (imageUrl != null) {
-				imageMap.putIfAbsent(boardSeq, new ArrayList<>());
-				imageMap.get(boardSeq).add(imageUrl);
-			}
-		}
+	        if (imageUrl != null) {
+	            imageMap.putIfAbsent(boardSeq, new ArrayList<>());
+	            imageMap.get(boardSeq).add(imageUrl);
+	        }
+	    }
 
-		// 각 게시글에 이미지 및 좋아요/북마크 상태 추가
-		for (Map<String, Object> boardData : list) {
-			BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
-			Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-			List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
-			boardData.put("images", images);
+	    // 게시글에 이미지 및 좋아요/북마크 상태 추가
+	    for (Map<String, Object> boardData : list) {
+	        BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
+	        Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+	        List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
+	        boardData.put("images", images);
 
-			if (memberId != null) {
-				// 로그인한 사용자의 SEQ 가져오기
-				MemberDTO fromMemberInfo = memServ.selectInfo(memberId);
-				int fromMemberSeq = fromMemberInfo.getMember_seq(); // 로그인한 사용자의 member_seq
+	        if (memberId != null) {
+	            // 로그인한 사용자의 SEQ 가져오기
+	            MemberDTO fromMemberInfo = memServ.selectInfo(memberId);
+	            int fromMemberSeq = fromMemberInfo.getMember_seq(); // 로그인한 사용자의 member_seq
 
-				// 게시글 작성자의 MEMBER_SEQ 가져오기
-				BigDecimal toMemberSeqDecimal = (BigDecimal) boardData.get("MEMBER_SEQ");
-				Integer toMemberSeq = toMemberSeqDecimal != null ? toMemberSeqDecimal.intValue() : null;
+	            // 게시글 작성자의 MEMBER_SEQ 가져오기
+	            BigDecimal toMemberSeqDecimal = (BigDecimal) boardData.get("MEMBER_SEQ");
+	            Integer toMemberSeq = toMemberSeqDecimal != null ? toMemberSeqDecimal.intValue() : null;
 
-				// 회원일 경우 좋아요 및 북마크 상태 추가
-				boolean isFollowing = memServ.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
-				boolean isLiked = communityServ.checkIfUserLikedBoard(memberId, boardSeq);
-				boolean isBookmarked = communityServ.checkIfUserBookmarkedBoard(memberId, boardSeq);
-				boardData.put("isLiked", isLiked);
-				boardData.put("isFollowing", isFollowing);
-				boardData.put("isBookmarked", isBookmarked);
-			} else {
-				// 비회원일 경우 기본 값 설정
-				boardData.put("isLiked", false);
-				boardData.put("isFollowing", false);
-				boardData.put("isBookmarked", false);
-			}
-		}
+	            // 회원일 경우 좋아요 및 북마크 상태 추가
+	            boolean isFollowing = memServ.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
+	            boolean isLiked = communityServ.checkIfUserLikedBoard(memberId, boardSeq);
+	            boolean isBookmarked = communityServ.checkIfUserBookmarkedBoard(memberId, boardSeq);
+	            boardData.put("isLiked", isLiked);
+	            boardData.put("isFollowing", isFollowing);
+	            boardData.put("isBookmarked", isBookmarked);
+	        } else {
+	            // 비회원일 경우 기본 값 설정
+	            boardData.put("isLiked", false);
+	            boardData.put("isFollowing", false);
+	            boardData.put("isBookmarked", false);
+	        }
+	    }
 
-		return ResponseEntity.ok(list);
+	    return ResponseEntity.ok(list);
 	}
 
-	// 커뮤니티 좋아요
+	// 커뮤니티 좋아요 로그인 필요
 	@PostMapping("{board_seq}/like")
 	public ResponseEntity<Map<String, Object>> toggleLike(@PathVariable int board_seq,
 			@RequestBody Map<String, Object> requestBody // member_id를 body에서 받음
@@ -398,7 +406,7 @@ public class CommunityController {
 		}
 	}
 
-	// 커뮤니티 북마크
+	// 커뮤니티 북마크 로그인 필요
 	@PostMapping("{board_seq}/bookmark")
 	public ResponseEntity<Map<String, Object>> toggleBookmark(@PathVariable int board_seq,
 			@RequestBody Map<String, Object> requestBody // member_id를 body에서 받음
@@ -434,7 +442,7 @@ public class CommunityController {
 		}
 	}
 
-	// 커뮤니티 디테일
+	// 커뮤니티 디테일 로그인 필요없음 
 	@GetMapping("/{board_seq}")
 	public ResponseEntity<Map<String, Object>> selectAllSeq(@PathVariable int board_seq,
 			@RequestParam(value = "member_id", required = false) String memberId) {
@@ -457,6 +465,7 @@ public class CommunityController {
 
 		return ResponseEntity.ok(boardDetail);
 	}
+	
 	// 이미지 태그정보 
 	@GetMapping("/images/{board_seq}")
 	public ResponseEntity<Map<String, Object>> selectImagesAndTags(@PathVariable int board_seq) {

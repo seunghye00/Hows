@@ -1,5 +1,6 @@
 package com.hows.community.service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,23 @@ public class CommunityService {
 	public List<Map<String, Object>> selectAll() {
 		return communityDAO.selectAll();
 	}
-
+	
+    // 필터링 조건을 처리하여 DAO에 넘기는 메서드
+    public List<Map<String, Object>> selectCommunityPosts(int page, int limit, String keyword, String sort, String housingType, String spaceType, String areaSize, String color) {
+    	System.out.println(sort);
+        // 필터링 조건을 저장할 Map 생성
+        Map<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("sort", sort);
+        params.put("housingType", housingType);
+        params.put("spaceType", spaceType);
+        params.put("areaSize", areaSize);
+        params.put("color", color);
+       
+        // DAO에서 필터링된 게시글 리스트 가져오기
+        return communityDAO.selectCommunityPosts(params);
+    }
+    
 	// 게시글 리스트 이미지 출력
 	public List<Map<String, Object>> selectAllImg() {
 		return communityDAO.selectAllImg();

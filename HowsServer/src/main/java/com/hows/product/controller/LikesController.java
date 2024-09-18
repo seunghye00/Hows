@@ -23,8 +23,10 @@ public class LikesController {
 	
 	// 상품 좋아요 추가
     @PostMapping("/insert")
-    public ResponseEntity<String> addLike(@RequestBody Map<String, Object> requestData) 
+    public ResponseEntity<String> addLike(
+    		@RequestBody Map<String, Object> requestData) 
     throws Exception{
+    	
     	 int product_seq = Integer.parseInt(requestData.get("product_seq").toString());
          String member_id = (String) requestData.get("member_id");
 
@@ -34,8 +36,10 @@ public class LikesController {
     
     // 상품 좋아요 취소
     @DeleteMapping("/delete")
-    public ResponseEntity<String> removeLike(@RequestBody Map<String, Object> requestData) 
+    public ResponseEntity<String> removeLike(
+    		@RequestBody Map<String, Object> requestData) 
     throws Exception{
+    	
         int product_seq = Integer.parseInt(requestData.get("product_seq").toString());
         String member_id = (String) requestData.get("member_id");
 
@@ -48,6 +52,7 @@ public class LikesController {
     public ResponseEntity<Integer> getLikeCount(
     		@RequestParam("product_seq") int product_seq) 
     throws Exception{
+    	
         int likeCount = likesServ.getLikeCount(product_seq);
         return ResponseEntity.ok(likeCount);
     }
@@ -64,7 +69,6 @@ public class LikesController {
             System.out.println("로그인하지 않은 사용자입니다.");
             return ResponseEntity.ok(false); // 좋아요 상태가 false로 전달
         }
-
     	
         boolean isLiked = likesServ.isLiked(product_seq, member_id);
         return ResponseEntity.ok(isLiked);
@@ -73,7 +77,8 @@ public class LikesController {
     
     // 리뷰 좋아요 추가
     @PostMapping("/review/insert")
-    public ResponseEntity<String> addReviewLike(@RequestBody Map<String, Object> requestData) 
+    public ResponseEntity<String> addReviewLike(
+    		@RequestBody Map<String, Object> requestData) 
     throws Exception {
         int review_seq = Integer.parseInt(requestData.get("review_seq").toString());
         String member_id = (String) requestData.get("member_id");
@@ -84,8 +89,10 @@ public class LikesController {
 
     // 리뷰 좋아요 취소
     @DeleteMapping("/review/delete")
-    public ResponseEntity<String> removeReviewLike(@RequestBody Map<String, Object> requestData) 
+    public ResponseEntity<String> removeReviewLike(
+    		@RequestBody Map<String, Object> requestData) 
     throws Exception {
+    	
         int review_seq = Integer.parseInt(requestData.get("review_seq").toString());
         String member_id = (String) requestData.get("member_id");
 
@@ -98,6 +105,7 @@ public class LikesController {
     public ResponseEntity<Integer> getReviewLikeCount(
         @RequestParam("review_seq") int review_seq) 
     throws Exception {
+    	
         int likeCount = likesServ.getReviewLikeCount(review_seq);
         return ResponseEntity.ok(likeCount);
     }
@@ -106,10 +114,17 @@ public class LikesController {
     @GetMapping("/review/check")
     public ResponseEntity<Boolean> checkReviewLikeStatus(
         @RequestParam("review_seq") int review_seq,
-        @RequestParam("member_id") String member_id) 
+        @RequestParam(value = "member_id", required = false) String member_id)
     throws Exception {
-        boolean isLiked = likesServ.isReviewLiked(review_seq, member_id);
-        System.out.println(isLiked);
+//    	System.out.println("likes/review/check");
+//    	System.out.println("review_seq : " + review_seq);
+//    	System.out.println("member_id : " + member_id);
+    	
+        boolean isLiked = false;
+        if (member_id != null) isLiked = likesServ.isReviewLiked(review_seq, member_id);
+        
+//      System.out.println("isLiked : " + isLiked);
+        
         return ResponseEntity.ok(isLiked);
     }
 

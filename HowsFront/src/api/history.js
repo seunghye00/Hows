@@ -24,3 +24,8 @@ export const myPaymentsDetail = (seq) => {
 export const requestPayment = (params) => {
   return api.put(`/history/payment`, params);
 }
+
+/** 보유한 쿠폰 조회 **/
+export const myCoupon = () => {
+  return api.get(`/coupon/owner`);
+}

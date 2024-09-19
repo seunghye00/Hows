@@ -10,8 +10,7 @@ export const updateReturn = (return_seq, return_code) => {
     })
 }
 
-// 환불 완료
-export const doneReturn = returnSeqs => {
-    const seqs = returnSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
-    return axios.put(`${baseUrl}/doneReturn`, null, { params: { seqs } })
+// 환불 완료 요청
+export const doneReturn = datas => {
+    return axios.put(`${baseUrl}/doneReturn`, datas) // 데이터는 본문으로 전송
 }

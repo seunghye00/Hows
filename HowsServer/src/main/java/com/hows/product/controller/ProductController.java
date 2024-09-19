@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hows.File.service.FileService;
 import com.hows.product.dto.ImageDTO;
 import com.hows.product.dto.ProductDTO;
+import com.hows.product.dto.ReviewDTO;
 import com.hows.product.dto.ReviewReportDTO;
 import com.hows.product.service.ProductService;
 import com.hows.product.service.ReviewService;
@@ -267,6 +268,22 @@ public class ProductController {
         return ResponseEntity.ok().build();
     }
     
+    // 리뷰 전체 별점
+    @GetMapping("/review/getRatings/{product_seq}")
+    public ResponseEntity<List<ReviewDTO>> getRatings (@PathVariable int product_seq) 
+    throws Exception{
+    	List<ReviewDTO> result = reviewServ.getRatings(product_seq);
+    	return ResponseEntity.ok(result);
+    }
+
+    
+//    @GetMapping("/getBestProducts")
+//    public ResponseEntity<List<ProductDTO>> getBestProducts() 
+//    throws Exception{
+//        List<ProductDTO> bestProducts = productServ.getBestProducts();
+//        return ResponseEntity.ok(bestProducts);
+//    }
+
 	// ==================
 	// 상품 추가
 	@PostMapping

@@ -28,6 +28,11 @@ export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
           })
 }
 
+// 별점
+export const getRatings = (product_seq) => {
+    return axios.get(`${baseUrl}/review/getRatings/${product_seq}`)
+}
+
 // 상품 상세 정보 요청 함수
 export const getProductDetail = product_seq => {
     return axios.get(`${baseUrl}/detail/${product_seq}`)

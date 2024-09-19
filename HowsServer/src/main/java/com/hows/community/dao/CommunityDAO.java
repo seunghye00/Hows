@@ -198,21 +198,26 @@ public class CommunityDAO {
 		return mybatis.selectOne("Community.countPost", member_id);
 	}
 
-	// [마이페이지] 북마크(이미지) 출력
-	public List<Map<String, Object>> selectBookmarkByMemberId(String member_id) {
-		return mybatis.selectList("Community.selectBookmarkByMemberId", member_id);
-	}
-
-	// [마이페이지] 사용자의 게시글 북마크 갯수
-	public int countBookmark(String member_id) {
-		return mybatis.selectOne("Community.countBookmark", member_id);
-	}
-
-	// 게시글 이미지 조회
-	public List<String> getFileURLsByBoardSeq(int board_seq) {
-		return mybatis.selectList("Community.getFileURLsByBoardSeq", board_seq);
-	}
-
+    // [마이페이지] 북마크(이미지) 출력
+    public List<Map<String, Object>> selectBookmarkByMemberId(String member_id){
+    	return mybatis.selectList("Community.selectBookmarkByMemberId", member_id);
+    }
+ 
+    // [마이페이지] 사용자의 게시글 북마크 갯수
+    public int countBookmark(String member_id) {
+    	return mybatis.selectOne("Community.countBookmark", member_id);
+    }
+    
+	// 게시글 이미지 조회 
+    public List<String> getFileURLsByBoardSeq(int board_seq) {
+        return mybatis.selectList("Community.getFileURLsByBoardSeq",board_seq);
+    }
+    
+    // 사용자 구매내역 
+ 	public List<Map<String, Object>> purchaseHistory(int member_seq) {
+ 	    return mybatis.selectList("Community.purchaseHistory", member_seq); 
+ 	}
+ 	
 	// 관리자
 	// 신고된 게시물 조회 DAO
 	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) {

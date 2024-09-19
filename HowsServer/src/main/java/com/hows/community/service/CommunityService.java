@@ -172,6 +172,11 @@ public class CommunityService {
 	public List<String> getFileURLsForBoard(int board_seq) throws Exception {
 	    return communityDAO.getFileURLsByBoardSeq(board_seq); // board_seq로 URL 목록 가져오는 DAO 호출
 	}
+	
+	// 사용자 구매내역 
+	public List<Map<String, Object>> purchaseHistory(int member_seq) throws Exception {
+	    return communityDAO.purchaseHistory(member_seq); 
+	}
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) throws Exception {

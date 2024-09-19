@@ -18,6 +18,7 @@ import {
     getHousingTypes,
     getSpaceTypes,
     getAreaSizes,
+    purchaseHistory,
 } from '../../../../api/community' // 수정된 import 부분
 
 const ItemType = 'IMAGE'
@@ -29,23 +30,8 @@ export const Post = () => {
     const [isEditingTags, setIsEditingTags] = useState(false) // 태그 편집 상태
     const [selectedImageIndex, setSelectedImageIndex] = useState(0) // 태그 모달을 연 이미지의 인덱스
     const [tagPosition, setTagPosition] = useState({}) // 태그 위치 저장
-    const [searchTerm, setSearchTerm] = useState('') // 검색어
     const [dominantColor, setDominantColor] = useState('C0') // 추출된 색상을 저장할 상태
-    const [searchResults, setSearchResults] = useState([
-        {
-            product_seq: 1,
-            product_thumbnail: img,
-            name: 'Hows 스테인리스 철제 프레임 데스크',
-        },
-        {
-            product_seq: 2,
-            product_thumbnail: img1,
-            name: 'Hows 철제 프레임 의자',
-        },
-        { product_seq: 3, product_thumbnail: img2, name: 'Hows 나무 책상' },
-        { product_seq: 4, product_thumbnail: img3, name: 'Hows 철제 책상' },
-        { product_seq: 5, product_thumbnail: img4, name: 'Hows 조명' },
-    ]) // 임시 상품 태그 데이터
+    const [searchResults, setSearchResults] = useState([]) // 구매 상품 태그 데이터
 
     const [postContent, setPostContent] = useState('') // 글 내용
     const MAX_IMAGE_SIZE_BYTES = 1024 * 1024 * 2
@@ -250,10 +236,6 @@ export const Post = () => {
             setThumbnail(updatedImages[0]?.src || null)
             setSelectedImageIndex(0)
         }
-    }
-
-    const handleSearch = () => {
-        setSearchResults(searchResults)
     }
 
     const handleAddTag = product => {
@@ -497,6 +479,30 @@ export const Post = () => {
         }
     }
 
+    // 구매내역 불러오기
+    useEffect(() => {
+        if (isModalOpen) {
+            const fetchPurchaseHistory = async () => {
+                try {
+                    const data = await purchaseHistory()
+
+                    // 서버에서 대문자로 반환되는 필드를 소문자로 변환해서 저장
+                    const formattedData = data.map(item => ({
+                        product_seq: item.PRODUCT_SEQ,
+                        product_thumbnail: item.PRODUCT_THUMBNAIL,
+                        name: item.PRODUCT_TITLE,
+                    }))
+
+                    setSearchResults(formattedData)
+                } catch (error) {
+                    console.error('Error fetching purchase history:', error)
+                }
+            }
+
+            fetchPurchaseHistory()
+        }
+    }, [isModalOpen]) // isModalOpen이 변경될 때마다 실행
+
     return (
         <DndProvider backend={HTML5Backend}>
             <div className={styles.community}>
@@ -696,33 +702,41 @@ export const Post = () => {
                         onClose={() => setIsModalOpen(false)}
                     >
                         <div className={styles.tagModal}>
-                            <div className={styles.tagSearch}>
-                                <Search size="l" />
+                            <div className={styles.tagTitle}>
+                                <h2>구매 내역</h2>
                             </div>
                             <div className={styles.productList}>
-                                {searchResults.map(product => (
-                                    <div
-                                        key={product.product_seq}
-                                        className={styles.searchResultItem}
-                                    >
-                                        <div className={styles.productImg}>
-                                            <img
-                                                src={product.product_thumbnail}
-                                                alt={product.name}
-                                            />
+                                {searchResults.length > 0 ? (
+                                    searchResults.map(product => (
+                                        <div
+                                            key={product.product_seq}
+                                            className={styles.searchResultItem}
+                                        >
+                                            <div className={styles.productImg}>
+                                                <img
+                                                    src={
+                                                        product.product_thumbnail
+                                                    }
+                                                    alt={product.name}
+                                                />
+                                            </div>
+                                            <div className={styles.productInfo}>
+                                                <span>{product.name}</span>
+                                                <Button
+                                                    size="s"
+                                                    title="선택"
+                                                    onClick={() =>
+                                                        handleAddTag(product)
+                                                    }
+                                                />
+                                            </div>
                                         </div>
-                                        <div className={styles.productInfo}>
-                                            <span>{product.name}</span>
-                                            <Button
-                                                size="s"
-                                                title="선택"
-                                                onClick={() =>
-                                                    handleAddTag(product)
-                                                }
-                                            />
-                                        </div>
+                                    ))
+                                ) : (
+                                    <div className={styles.noProductsMessage}>
+                                        <p>구매한 상품이 없습니다.</p>
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
                     </Modal>

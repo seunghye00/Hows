@@ -76,6 +76,11 @@ public class ReviewService {
     	reviewDAO.updateReview(review_seq, rating, review_contents);
     }
     
+    // 리뷰 전체 별점
+    public List<ReviewDTO> getRatings(int product_seq) {
+    	return reviewDAO.getRatings(product_seq);
+    }
+    
     
     
     

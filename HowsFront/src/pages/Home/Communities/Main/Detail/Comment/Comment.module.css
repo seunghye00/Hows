@@ -116,6 +116,7 @@
     margin-top: 10px;
     display: flex;
     gap: 10px;
+    align-items: center;
 }
 
 .replyTextarea {
@@ -130,6 +131,7 @@
     border: 1px solid var(--hows-gray-600);
     word-wrap: break-word;
     white-space: pre-wrap;
+    resize: none;
 }
 
 .toggleReplyBtn {

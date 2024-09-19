@@ -193,8 +193,10 @@
     max-height: 400px;
 }
 
-.tagSearch {
+.tagTitle {
     display: flex;
+    justify-content: center;
+    color: var(--hows-gray-700);
 }
 
 .productList {

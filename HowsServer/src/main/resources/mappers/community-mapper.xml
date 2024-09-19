@@ -406,7 +406,7 @@
 		board_image bi on b.board_seq = bi.board_seq
 		where
 		b.member_id
-		= #{member_id}
+		= #{member_id} order by b.board_seq desc
 	</select>
 
 	<!-- [마이페이지] 게시글 갯수 -->
@@ -448,30 +448,48 @@
 		select image_url from board_image where board_seq = #{board_seq}
 	</select> 
 	
+	<!-- 사용자 구매내역  -->
+	<select id="purchaseHistory" resultType="map">
+		select 
+		    p.product_seq,
+		    p.product_thumbnail,
+		    p.product_title
+		from 
+		    orders o 
+		join 
+		    order_list ol on o.order_seq  = ol.order_seq 
+		join
+		    product p on ol.product_seq = p.product_seq 
+		where 
+		    o.member_seq = #{member_seq} and o.order_code = 'O6'
+	</select>
+	
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->
-
-	<select id="reportedCommunity" parameterType="map"
-		resultType="map">
-		SELECT *
-		FROM (
-		SELECT
-		b.board_seq, -- 게시판 게시물 번호
-		b.board_contents, -- 게시판 내용
-		TO_CHAR(b.board_write_date, 'YYYY-MM-DD') AS board_write_date, -- 작성 날짜
-		m.nickname AS member_id, -- 작성자 (닉네임)
-		COUNT(br.board_report_seq) AS report_count, -- 신고 횟수
-		ROW_NUMBER() OVER (ORDER BY b.board_seq DESC) AS row_num -- 각 행에 순번 부여
-		FROM
-		board b
-		JOIN
-		member m ON b.member_id = m.member_id
-		JOIN
-		board_report br ON b.board_seq = br.board_seq -- 신고 기록 조인
-		GROUP BY
-		b.board_seq, b.board_contents, b.board_write_date, m.nickname
-		)
-		WHERE row_num BETWEEN #{startRow} AND #{endRow}
+	<select id="reportedCommunity" parameterType="map" resultType="map">
+    SELECT *
+    FROM (
+        SELECT
+            b.board_seq, -- 게시판 게시물 번호
+            b.board_contents, -- 게시판 내용
+            TO_CHAR(b.board_write_date, 'YYYY-MM-DD') AS board_write_date, -- 작성 날짜
+            m.nickname AS member_id, -- 작성자 (닉네임)
+            m.member_avatar, -- 작성자 아바타 이미지
+            COUNT(br.board_report_seq) AS report_count, -- 신고 횟수
+            COALESCE(bi.image_url, ' ') AS image_url, 
+            ROW_NUMBER() OVER (ORDER BY b.board_seq DESC) AS row_num -- 각 행에 순번 부여
+        FROM
+            board b
+        JOIN
+            member m ON b.member_id = m.member_id -- 멤버 조인
+        JOIN
+            board_report br ON b.board_seq = br.board_seq -- 신고 기록 조인
+        LEFT JOIN
+            board_image bi ON b.board_seq = bi.board_seq -- 게시물 이미지 조인 (여러 개일 수 있으므로 LEFT JOIN 사용)
+        GROUP BY
+            b.board_seq, b.board_contents, b.board_write_date, m.nickname, m.member_avatar, bi.image_url
+    	)
+    	WHERE row_num BETWEEN #{startRow} AND #{endRow}
 	</select>
 
 	<!-- 게시물 신고내역 조회 (관리자) -->

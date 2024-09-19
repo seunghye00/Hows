@@ -26,7 +26,6 @@ public class HistoryController {
     @GetMapping("/order/{seq}")
     public ResponseEntity<Map<String, Object>> orderList(@PathVariable("seq") int seq) {
         Map<String, Object> map = historyServ.orderDetail(seq);
-        System.out.println("map ==== " + map);
         return ResponseEntity.ok(map);
     }
 
@@ -47,5 +46,11 @@ public class HistoryController {
         map.put("member_seq", user.getMemberSeq());
         String result = historyServ.myPaymentCancel(map);
         return ResponseEntity.ok(result);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> exceptionHandler(Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.badRequest().body(null);
     }
 }

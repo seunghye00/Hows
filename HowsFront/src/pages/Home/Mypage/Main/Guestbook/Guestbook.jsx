@@ -12,14 +12,15 @@ import {
   getGuestbookList,
   insertGuestbook,
 } from "../../../../../api/member";
+import Swal from "sweetalert2";
 
 export const Guestbook = () => {
-  const { memberSeq, setMemberSeq, currentUser, memberId, setMemberId } = useMemberStore();
+  const { memberSeq, setMemberSeq, currentUser, memberId, setMemberId } =
+    useMemberStore();
   const [contents, setContents] = useState("");
   const [outputs, setOutputs] = useState([]); // 방문 글 상태 추가
   const { member_id } = useParams();
   const inputRef = useRef(null);
-
 
   // 페이지 로드 시 member_seq 받아오기
   useEffect(() => {
@@ -28,12 +29,25 @@ export const Guestbook = () => {
         setMemberSeq(resp.data); // zustand에 memberSeq 저장
       });
     }
-    setMemberId(sessionStorage.getItem("member_id"))
+    setMemberId(sessionStorage.getItem("member_id"));
   }, [member_id, setMemberSeq]);
 
   // "등록" 버튼
   const handleWriteBtn = () => {
     const content = inputRef.current.innerText;
+    const MAX_CONTENT_LENGTH = 300;
+
+    // 글자 수 확인 후 제출
+    if (content.length > MAX_CONTENT_LENGTH) {
+      Swal.fire({
+        icon: "warning",
+        title: '글자 수 제한',
+        text: `방명록 내용은 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`,
+        showConfirmButton: true,
+      });
+      return;
+    }
+
     const requestBody = {
       member_seq: memberSeq,
       guestbook_contents: content,
@@ -55,7 +69,6 @@ export const Guestbook = () => {
   useEffect(() => {
     if (memberSeq) {
       getGuestbookList(memberSeq).then((resp) => {
-        console.log("누굴까 : ", resp.data);
         setOutputs(resp.data);
       });
     }

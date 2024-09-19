@@ -45,6 +45,7 @@ export const Main = () => {
     const [followerData, setFollowerData] = useState([]); // 팔로워 데이터
     const [followingData, setFollowingData] = useState([]); // 팔로잉 데이터
 
+    const { isAuth } = useAuthStore() // 로그인 여부 확인
     const { currentUser, setCurrentUser } = useMemberStore();
     const session_member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
     const session_member_seq = jwtDecode(sessionStorage.getItem("token")).member_seq // token에서 member_seq 가져오기
@@ -156,6 +157,17 @@ export const Main = () => {
 
     // 팔로우, 팔로잉 상태 변경 
     const handleIsFollowing = (targetMemberSeq) => {
+        // if (!isAuth || !session_member_seq) {
+        //     Swal.fire({
+        //         icon: 'warning',
+        //         title: '로그인 후 이용할 수 있습니다.',
+        //         showConfirmButton: true,
+        //     }).then(() => {
+        //         navi('/signIn') // 로그인 페이지로 이동
+        //     })
+        //     return
+        // }
+
         toggleFollow({
             from_member_seq: session_member_seq, // 로그인한 사용자의 member_seq
             to_member_seq: targetMemberSeq, // 팔로우할 대상의 member_seq (팔로잉 취소)
@@ -243,7 +255,7 @@ export const Main = () => {
                                                 수정
                                             </button>
                                             {/* <button className={styles.mypage} onClick={() => navi('/mypage/userDashboard')} > */}
-                                            <button className={styles.mypage} onClick={() => navi('/history/buyList')} >
+                                            <button className={styles.mypage} onClick={() => navi('/history/delivery')} >
                                                 마이페이지
                                             </button>
                                         </>

@@ -95,6 +95,7 @@
   display: flex;
   align-items: center;
   padding-right: 290px;
+  min-width: 500px;
 }
 .container .mainBox .header .userInfo .middle .id {
   font-size: 20px;

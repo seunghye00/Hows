@@ -2,13 +2,19 @@
   border-bottom: 1px solid var(--hows-gray-300);
 }
 
+.headerSpacer {
+  height: 86px;
+  /* 헤더 높이에 맞게 설정하세요 */
+  width: 100%;
+}
+
 .headerCont {
   width: 100%;
   display: flex;
   gap: 20px;
   color: var(--hows-gray-900);
   position: relative;
-  z-index: 1000;
+  z-index: 998;
 
   /* 애니메이션을 위한 트랜지션 */
   transition: top 0.1s;

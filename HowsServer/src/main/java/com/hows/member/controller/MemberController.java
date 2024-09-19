@@ -136,22 +136,24 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 	
-	// 프로필 사진 변경
-	@PostMapping("/uploadProfileImage")
+	// 프로필 사진 및 배너 사진 변경
+	@PostMapping("/uploadImage")
 	public ResponseEntity<String> uploadProfileImage(
 		     @RequestPart("file") MultipartFile file,  // FormData에서 이미지 파일을 받음
-		     @RequestParam("member_seq") int member_seq
+		     @RequestParam("member_seq") int member_seq,
+		     @RequestParam("type") String type
 		) {
 		    try {
 		    	// 1. fileService를 통해 GCS에 이미지 업로드
-		        String code = "F1"; // 프로필 이미지 코드
+		    	String code = type.equals("profile") ? "F1" : "F7"; // 타입에 따라 코드 지정		    	
 		        String uploadResult = fileServ.upload(file, member_seq, code);
-		        System.out.println(uploadResult + " 업로드 결과 확인");
 
 		        // 2. 이미지가 성공적으로 업로드되었는지 확인
 		        if (!uploadResult.equals("fail")) {
 		        	// 3. DB에 이미지 정보 저장
-		        	 int updateResult = memServ.updateProfileImage(member_seq, uploadResult);
+		        	 int updateResult = type.equals("profile")
+		        		? memServ.updateProfileImage(member_seq, uploadResult)  // 프로필 이미지 업데이트
+		        		:  memServ.updateBannerImage(member_seq, uploadResult); // 배너 이미지 업데이트
 		        	 
 		        	 if (updateResult > 0) {
 		                    return ResponseEntity.ok(uploadResult); // 업로드된 이미지 URL 반환
@@ -168,12 +170,17 @@ public class MemberController {
 		}
 	
 	// 프로필 사진 삭제
-	@DeleteMapping("/deleteProfileImage")
-	public ResponseEntity<String> deleteProfileImage(@RequestParam("member_seq") int member_seq) {
+	@DeleteMapping("/deleteImage")
+	public ResponseEntity<String> deleteProfileImage(
+			@RequestParam("member_seq") int member_seq,
+			 @RequestParam("type") String type) {
 	    try {
-	        // 1. 먼저 member_seq로 해당 사용자의 현재 프로필 이미지 URL을 가져옵니다.
-	        String sysName = memServ.getProfileImageUrl(member_seq); // 이미지 URL 가져오는 메소드  
-	        System.out.println("삭제할 sysname : " + sysName);
+	        // 1. member_seq로 해당 사용자의 현재 프로필 또는 배너 이미지 URL 가져오기
+	    	 String sysName = type.equals("profile") 
+                     ? memServ.getProfileImageUrl(member_seq)  // 프로필 이미지 URL 가져오기
+                     : memServ.getBannerImageUrl(member_seq);  // 배너 이미지 URL 가져오기
+	    	 System.out.println("삭제할 sysname : " + sysName);
+
 	        
 	        if (sysName != null) {
 	        	// 1-1. URL에서 마지막 슬래시 뒤의 파일명만 추출
@@ -181,12 +188,16 @@ public class MemberController {
 	            System.out.println("삭제할 파일명 : " + fileName);
 	        	
 	        	// 2. fileService를 통해 GCS에서 파일 삭제
-	            String result = fileServ.deleteFile(sysName, "F1");
+	            String result = fileServ.deleteFile(fileName, type.equals("profile") ? "F1" : "F7");
 	            System.out.println("삭제 결과 : " + result);
 
 	            // 3. DB에서 member 테이블의 member_avatar를 NULL로 설정
 	            if (!result.equals("fail")) {
-	                memServ.updateProfileImageToNull(member_seq); // member_avatar를 NULL로 설정
+	                if (type.equals("profile")) {
+	                    memServ.updateProfileImageToNull(member_seq); // member_avatar를 NULL로 설정
+	                } else {
+	                    memServ.updateBannerImageToNull(member_seq); // member_banner를 NULL로 설정
+	                }
 	                return ResponseEntity.ok("이미지가 성공적으로 삭제되었습니다.");
 	            } else {
 	                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("GCS 이미지 삭제 실패");
@@ -264,9 +275,6 @@ public class MemberController {
     // 팔로워, 팔로잉 수 가져오기
     @GetMapping("/countFollow")
     public ResponseEntity<Map<String, BigDecimal>> countFollow(@RequestParam("member_seq") int member_seq){
-    	
-    	System.out.println("팔로우, 팔로잉 수 시퀀스 ::: "+ member_seq);
-    	
     	Map<String, BigDecimal> result = memServ.countFollow(member_seq);
     	return ResponseEntity.ok(result);
     }
@@ -277,8 +285,6 @@ public class MemberController {
     	Boolean result = memServ.eachFollow(params);
     	return ResponseEntity.ok(result);
     }
-    
-    
     
   
 	// 마이페이지 게시글(이미지) 출력
@@ -308,8 +314,6 @@ public class MemberController {
 		int result = memServ.countBookmark(member_id);
 		return ResponseEntity.ok(result);
 	}
-	
-	
 	
 	// ========================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
@@ -439,6 +443,12 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
+	// 연령대별 남녀 회원 수 조회
+	@GetMapping("/getAgeGenderDistribution")
+	public ResponseEntity<List<Map<String, Object>>> getAgeGenderDistribution() throws Exception {
+		List<Map<String, Object>> result = memServ.getAgeGenderDistribution();
+		return ResponseEntity.ok(result);
+	}
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {

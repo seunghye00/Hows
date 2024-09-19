@@ -53,7 +53,6 @@ public class HistoryService {
         return map;
     }
 
-
     /** Review 목록 **/
     public List<?> myReview (String memberId) {
         List<Map<String, Object>> list = reviewDAO.myReview(memberId);
@@ -70,8 +69,15 @@ public class HistoryService {
         return mapList;
     }
 
-    public List<?>  myPayment(int memberSeq) {
+    /** My 주문 & 결제 정보 **/
+    public List<?> myPayment(int memberSeq) {
         return paymentDAO.myPayment(memberSeq);
     }
 
+    /** My 주문 & 결제 취소 요청 **/
+    public String myPaymentCancel(Map<String, Object> map) {
+        map.put("payment_code", "P4");
+        int result = paymentDAO.updatePayment(map);
+        return result > 0 ? "ok" : "fail";
+    }
 }

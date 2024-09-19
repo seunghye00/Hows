@@ -1,5 +1,7 @@
 package com.hows.community.service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +34,23 @@ public class CommunityService {
 	public List<Map<String, Object>> selectAll() {
 		return communityDAO.selectAll();
 	}
-
+	
+    // 필터링 조건을 처리하여 DAO에 넘기는 메서드
+    public List<Map<String, Object>> selectCommunityPosts(int page, int limit, String keyword, String sort, String housingType, String spaceType, String areaSize, String color) {
+    	System.out.println(sort);
+        // 필터링 조건을 저장할 Map 생성
+        Map<String, Object> params = new HashMap<>();
+        params.put("keyword", keyword);
+        params.put("sort", sort);
+        params.put("housingType", housingType);
+        params.put("spaceType", spaceType);
+        params.put("areaSize", areaSize);
+        params.put("color", color);
+       
+        // DAO에서 필터링된 게시글 리스트 가져오기
+        return communityDAO.selectCommunityPosts(params);
+    }
+    
 	// 게시글 리스트 이미지 출력
 	public List<Map<String, Object>> selectAllImg() {
 		return communityDAO.selectAllImg();
@@ -52,7 +70,43 @@ public class CommunityService {
 	public List<Map<String, Object>> selectTagsAndProductInfo(int board_seq) {
 		return communityDAO.selectTagsAndProductInfo(board_seq);
 	}
+	
+    // 게시글 업데이트 (내용 수정 등)
+    public void updateWrite(CommunityDTO dto) throws Exception {
+        communityDAO.updateWrite(dto); // DAO를 통해 게시글 업데이트 실행
+    }
 
+    // 이미지 순서 업데이트
+    public void updateImageOrder(String imageUrl, int imageOrder) throws Exception {
+        communityDAO.updateImageOrder(imageUrl, imageOrder); // DAO를 통해 이미지 순서 업데이트
+    }
+    
+    // 게시글 수정 이미지 주소
+	public List<String> selectImagesUrls(int board_seq) {
+		return communityDAO.selectImagesUrls(board_seq);
+	}
+    
+    // 이미지 수정 시 삭제 
+    public void deleteImage(String imageUrl) {
+    	System.out.println("들어오는지 확인");
+        communityDAO.deleteImage(imageUrl);
+    }
+    
+    // DB에서 imageUrl로 board_image_seq를 조회하는 로직
+    public int selectBoardImageSeqByUrl(String imageUrl) {
+        return communityDAO.selectBoardImageSeqByUrl(imageUrl); 
+    }
+    
+    // 수정 시 태그정보 가져오는 로직     
+    public List<TagDTO> selectTagsByImageSeq(int boardImageSeq) {
+        return communityDAO.selectTagsByImageSeq(boardImageSeq);
+    }
+    
+    // 수정 시 태그정보 삭제
+    public void deleteTag(int tagSeq) {
+        communityDAO.deleteTag(tagSeq);
+    }
+    
 	// 사용자가 이미 좋아요를 눌렀는지 확인
 	public boolean checkIfUserLikedBoard(String memberId, int boardSeq) {
 		return communityDAO.checkIfUserLikedBoard(memberId, boardSeq);
@@ -114,6 +168,15 @@ public class CommunityService {
 		communityDAO.sendReport(boardSeq, reportCode, memberId); // 현재 조회수 반환
 	}
 
+	// 게시글 이미지 조회 
+	public List<String> getFileURLsForBoard(int board_seq) throws Exception {
+	    return communityDAO.getFileURLsByBoardSeq(board_seq); // board_seq로 URL 목록 가져오는 DAO 호출
+	}
+	
+	// 사용자 구매내역 
+	public List<Map<String, Object>> purchaseHistory(int member_seq) throws Exception {
+	    return communityDAO.purchaseHistory(member_seq); 
+	}
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) throws Exception {
@@ -137,5 +200,15 @@ public class CommunityService {
 		communityDAO.deleteCommunityReport(board_seq);
 		// 게시물 삭제
 		return communityDAO.deleteCommunity(board_seq);
+	}
+
+	// 카테고리별 게시글 수 조회
+	public Map<String, Object> getBoardNumByCategory() {
+		Map<String, Object> result = new HashMap<>();
+		result.put("postCountByHousingType", communityDAO.getPostCountByHousingType());
+		result.put("postCountBySpaceType", communityDAO.getPostCountBySpaceType());
+		result.put("postCountByAreaType", communityDAO.getPostCountByAreaSize());
+		result.put("postCountByColor", communityDAO.getPostCountByColor());
+		return result;
 	}
 }

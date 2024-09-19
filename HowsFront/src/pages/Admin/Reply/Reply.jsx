@@ -119,7 +119,7 @@ export const Reply = () => {
             <div className={styles.headerSection}>
                 <div className={styles.searchSection}>
                     <Search
-                        placeholder="내용 또는 작성자 검색"
+                        placeholder="게시글 또는 작성자 검색"
                         onSearch={handleSearch}
                     />
                 </div>
@@ -128,55 +128,63 @@ export const Reply = () => {
             <div className={styles.replylist}>
                 <div className={styles.replyHeader}>
                     <div className={styles.headerItem}>NO</div>
-                    <div className={styles.headerItem}>내용</div>
+                    <div className={styles.headerItem}>게시글</div>
                     <div className={styles.headerItem}>작성자</div>
-                    <div className={styles.headerItem}>작성날짜</div>
+                    <div className={styles.headerItem}>작성일시</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                {displayReplys.map((reply, index) => (
-                    <div
-                        className={styles.replyRow}
-                        key={reply.reply_seq || index}
-                    >
-                        <div className={styles.replyItem}>
-                            {startRow + index}
-                        </div>
+                {displayReplys.length > 0 ? (
+                    displayReplys.map((reply, index) => (
                         <div
-                            className={styles.replyItem}
-                            onClick={() => handleOpenReplyModal(reply)}
+                            className={styles.replyRow}
+                            key={reply.reply_seq || index}
                         >
-                            <span className={styles.span}>
-                                {reply.BOARD_CONTENTS}
-                            </span>
-                        </div>
-                        <div className={styles.replyItem}>{reply.NICKNAME}</div>
-                        <div className={styles.replyItem}>
-                            {reply.WRITE_DATE}
-                        </div>
+                            <div className={styles.replyItem}>
+                                {startRow + index}
+                            </div>
+                            <div
+                                className={styles.replyItem}
+                                onClick={() => handleOpenReplyModal(reply)}
+                            >
+                                <span className={styles.span}>
+                                    {reply.BOARD_CONTENTS}
+                                </span>
+                            </div>
+                            <div className={styles.replyItem}>
+                                {reply.NICKNAME}
+                            </div>
+                            <div className={styles.replyItem}>
+                                {reply.WRITE_DATE}
+                            </div>
 
-                        <div
-                            className={styles.replyItem}
-                            onClick={() =>
-                                handleOpenReportModal(reply.REPLY_SEQ)
-                            }
-                        >
-                            <span className={styles.reportcount}>
-                                {reply.REPORT_COUNT}
-                            </span>
-                        </div>
-                        <div className={styles.replyItem}>
-                            <Button
-                                size="s"
-                                title="삭제"
+                            <div
+                                className={styles.replyItem}
                                 onClick={() =>
-                                    handleDeleteReply(reply.REPLY_SEQ)
+                                    handleOpenReportModal(reply.REPLY_SEQ)
                                 }
-                            />
+                            >
+                                <span className={styles.reportcount}>
+                                    {reply.REPORT_COUNT}
+                                </span>
+                            </div>
+                            <div className={styles.replyItem}>
+                                <Button
+                                    size="s"
+                                    title="삭제"
+                                    onClick={() =>
+                                        handleDeleteReply(reply.REPLY_SEQ)
+                                    }
+                                />
+                            </div>
                         </div>
+                    ))
+                ) : (
+                    <div className={styles.empty}>
+                        신고 대댓글 목록이 없습니다
                     </div>
-                ))}
+                )}
             </div>
 
             <Paging
@@ -222,7 +230,7 @@ export const Reply = () => {
                             <div className={styles.tableHeader}>
                                 <div>신고자</div>
                                 <div>신고 사유</div>
-                                <div>신고 날짜</div>
+                                <div>신고 일시</div>
                             </div>
                             {replyReports.map(report => (
                                 <div

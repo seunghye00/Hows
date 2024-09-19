@@ -5,10 +5,7 @@ import com.hows.history.service.HistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -29,7 +26,6 @@ public class HistoryController {
     @GetMapping("/order/{seq}")
     public ResponseEntity<Map<String, Object>> orderList(@PathVariable("seq") int seq) {
         Map<String, Object> map = historyServ.orderDetail(seq);
-        System.out.println("map ==== " + map);
         return ResponseEntity.ok(map);
     }
 
@@ -45,4 +41,16 @@ public class HistoryController {
         return ResponseEntity.ok(list);
     }
 
+    @PutMapping("/payment")
+    public ResponseEntity<String> paymentList(@AuthenticationPrincipal CustomUserDetails user, @RequestBody Map<String, Object> map) {
+        map.put("member_seq", user.getMemberSeq());
+        String result = historyServ.myPaymentCancel(map);
+        return ResponseEntity.ok(result);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> exceptionHandler(Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.badRequest().body(null);
+    }
 }

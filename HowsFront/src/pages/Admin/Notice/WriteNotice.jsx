@@ -30,6 +30,25 @@ export const WriteNotice = () => {
 
     // 작성 완료 핸들러
     const handleSubmit = () => {
+        const { notice_title, notice_contents } = notice
+
+        // 제목 또는 내용이 비어있는 경우 경고 메시지 표시
+        if (!notice_title.trim()) {
+            SwalComp({
+                type: 'error',
+                text: '제목을 입력하세요.',
+            })
+            return
+        }
+
+        if (!notice_contents.trim()) {
+            SwalComp({
+                type: 'error',
+                text: '내용을 입력하세요.',
+            })
+            return
+        }
+
         const markdownContent = notice.notice_contents
 
         // 마크다운에서 이미지 URL 추출 (예시: 첫 번째 이미지만 추출)

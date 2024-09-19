@@ -5,6 +5,27 @@
 
 <mapper namespace="Product">
 
+	<!-- 베스트 상품 목록 -->
+    <select id="getBestProducts" resultType="com.hows.product.dto.ProductDTO">
+        SELECT p.product_seq, 
+               p.product_thumbnail, 
+               p.product_title, 
+               p.product_contents, 
+               p.price, 
+               p.quantity, 
+               COALESCE(SUM(ol.order_list_count), 0) AS total_sales <!-- 총 판매량, 주문이 없는 경우 0으로 표시 -->
+        FROM product p 
+        LEFT JOIN order_list ol <!-- 주문 리스트와 상품 조인 -->
+        ON p.product_seq = ol.product_seq 
+        GROUP BY p.product_seq, 
+                 p.product_thumbnail, 
+                 p.product_title, 
+                 p.product_contents, 
+                 p.price, 
+                 p.quantity 
+        ORDER BY total_sales DESC
+    </select>
+    
 	<resultMap id="myReviewMap" type="java.util.HashMap">
 		<result property="review_seq" column="review_seq"/>
 		<result property="rating" column="rating"/>
@@ -15,29 +36,38 @@
 		<result property="member_id" column="member_id"/>
 	</resultMap>
 
-	<select id="getProducts"
-		resultType="com.hows.product.dto.ProductDTO">
+	<select id="getProducts" resultType="com.hows.product.dto.ProductDTO">
 		SELECT *
 		FROM PRODUCT ORDER BY product_seq
 	</select>
 
-	<select id="getProductByCategory" parameterType="String"
-		resultType="com.hows.product.dto.ProductDTO">
+	<!-- <select id="getProductByCategory" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
 		SELECT *
 		FROM PRODUCT
 		WHERE product_category_code = #{product_category_code}
+	</select> -->
+	
+	<select id="getProductByCategory" parameterType="String" resultType="map">
+		  SELECT 
+		    p.*,
+		    NVL(pl.like_count, 0) AS like_count
+		  FROM PRODUCT p
+		  LEFT JOIN (
+		    SELECT product_seq, COUNT(*) AS like_count
+		    FROM product_like
+		    GROUP BY product_seq
+		  ) pl ON p.product_seq = pl.product_seq
+		  WHERE p.product_category_code = #{product_category_code}
 	</select>
 
-	<select id="getProductDetaile" parameterType="String"
-		resultType="com.hows.product.dto.ProductDTO">
+	<select id="getProductDetaile" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
 		SELECT *
 		FROM PRODUCT
 		WHERE product_seq = #{product_seq}
 	</select>
 
 	<!-- 리뷰등록 -->
-	<insert id="insertReview"
-		parameterType="com.hows.product.dto.ReviewDTO">
+	<insert id="insertReview" parameterType="com.hows.product.dto.ReviewDTO">
 		INSERT INTO review (review_seq, rating, review_contents, review_date,
 		product_seq, member_id)
 		VALUES (review_seq.nextval, #{rating}, #{review_contents}, SYSDATE,
@@ -45,16 +75,14 @@
 	</insert>
 	
 	<!-- 리뷰 이미지 등 -->
-	<insert id="insertReviewImage"
-		parameterType="com.hows.product.dto.ImageDTO">
+	<insert id="insertReviewImage" parameterType="com.hows.product.dto.ImageDTO">
 		insert into review_image
 		(review_image_seq, review_seq, image_url, image_order)
 		values (review_image_seq.nextval, #{review_seq}, #{image_url}, #{image_order})
 	</insert>
 		
 	<!-- 리뷰 시퀀스 가져오기 -->
-	<select id="selectLastReviewSeq"
-			resultType="int">
+	<select id="selectLastReviewSeq" resultType="int">
 		select max(review_seq) from review
 	</select>
 	
@@ -63,7 +91,7 @@
 	 	select IMAGE_URL from REVIEW_IMAGE where review_seq = #{reviewSeq}
 	</select>
 	
-	<!-- 리뷰 목록 출력 (페이징) -->
+	<!-- 리뷰 목록 출력 (페이지네이션) -->
 	<select id="getReviewList" resultType="map">
 		 SELECT 
 		    r.*,
@@ -85,21 +113,70 @@
 		WHERE r.rn BETWEEN #{startRow} AND #{endRow}
 	</select>
 	
-	<!-- 삭제 -->
+	<select id="getReviewListByBest" resultType="map">
+		SELECT 
+	    r.*,
+	    (SELECT COUNT(*) FROM REVIEW WHERE product_seq = #{product_seq}) AS total_count,
+	    NVL(r.like_count, 0) AS like_count
+		FROM (
+		    SELECT
+		        r.PRODUCT_SEQ,
+		        r.REVIEW_SEQ,
+		        r.RATING,
+		        r.REVIEW_CONTENTS,
+		        TO_CHAR(r.REVIEW_DATE, 'YYYY-MM-DD HH24:MI:SS') AS REVIEW_DATE,
+		        r.MEMBER_ID,
+		        NVL(rl.like_count, 0) AS like_count,
+		        ROW_NUMBER() OVER (ORDER BY NVL(rl.like_count, 0) DESC, r.REVIEW_DATE DESC) AS rn
+		    FROM REVIEW r
+		    LEFT JOIN (
+		        SELECT review_seq, COUNT(*) AS like_count
+		        FROM review_like
+		        GROUP BY review_seq
+		    ) rl ON r.REVIEW_SEQ = rl.review_seq
+		    WHERE r.product_seq = #{product_seq}
+		) r
+		WHERE r.rn BETWEEN #{startRow} AND #{endRow}
+	</select>
+
+	
+	<!-- 이미지 삭제 -->
+	<delete id="delReviewImage" parameterType="String">
+		DELETE FROM review_image WHERE image_url = #{image_url}
+	</delete>
+	
 	<delete id="delReviewImages" parameterType="int">
-	    DELETE FROM review_images WHERE review_seq = #{review_seq}
+	    DELETE FROM review_image WHERE review_seq = #{review_seq}
 	</delete>
 	
 	<delete id="delReview" parameterType="int">
 	    DELETE FROM reviews WHERE review_seq = #{review_seq}
 	</delete>
+	
+	<!-- 리뷰 신고 -->
+	<insert id="sendReviewReport">
+	    INSERT 
+	    	INTO review_report
+	    VALUES 
+	    	(review_report_seq.NEXTVAL, #{report_code}, SYSDATE, #{review_seq}, #{member_id})
+	</insert>
 
-    
+	<!-- 리뷰 수정 -->
+	<update id="updateReview" parameterType="map">
+		UPDATE 
+			review
+		SET 
+		    rating = #{rating}, 
+		    review_contents = #{review_contents}, 
+		    review_date = SYSDATE
+		WHERE 
+	    	review_seq = #{review_seq}
+	</update>   
 	
-	
-	
-	
-	
+	<!-- 전체 별점 --> 
+	<select id="getRatings" resultType="com.hows.product.dto.ReviewDTO">
+		select rating from REVIEW where product_seq = #{product_seq}
+	</select>
 	
 	<!-- My 리뷰 목록 -->
 	<select id="myReview" resultMap="myReviewMap">
@@ -122,9 +199,7 @@
 			review_seq = #{review_seq}
 	</select>
 
-
-
-
+	<!-- 상품 등록 -->
 	<insert id="insert">
 		<selectKey keyProperty="product_seq" resultType="int"
 			order="AFTER">
@@ -135,10 +210,12 @@
 		#{product_category_code})
 	</insert>
 	
+	<!-- 상품 삭제 -->
 	<delete id="deleteProduct">
 		delete from product where product_seq = #{productSeq}
 	</delete>
 
+	<!-- 상품 대표이미지 변경 -->
 	<update id="updateThumbNail">
 		update product set product_thumbnail = #{url} where product_seq = #{seq}
 	</update>
@@ -149,12 +226,13 @@
     SELECT *
     FROM (
         SELECT 
-            r.review_seq,                  <!-- 리뷰 번호 -->
-            p.product_title,               <!-- 상품 제목 -->
-            m.nickname,        			   <!-- 리뷰 작성자 (닉네임) -->
-            r.review_contents,             <!-- 리뷰 내용 추가 -->
+            r.review_seq,                      <!-- 리뷰 번호 -->
+            p.product_title,                   <!-- 상품 제목 -->
+            m.nickname,                        <!-- 리뷰 작성자 (닉네임) -->
+            r.review_contents,                 <!-- 리뷰 내용 -->
             TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 변환 -->
             COUNT(rr.review_report_seq) AS report_count,  <!-- 신고 횟수 -->
+            ri.image_url,                      <!-- 리뷰 이미지 URL -->
             ROW_NUMBER() OVER (ORDER BY r.review_seq DESC) AS row_num  <!-- 각 행에 순번 부여 -->
         FROM 
             review r
@@ -162,12 +240,14 @@
             product p ON r.product_seq = p.product_seq
         JOIN 
             member m ON r.member_id = m.member_id
+        LEFT JOIN 
+            review_image ri ON r.review_seq = ri.review_seq  <!-- 리뷰 이미지 조인 -->
         JOIN 
             review_report rr ON r.review_seq = rr.review_seq  <!-- 신고 기록 조인 -->
         GROUP BY 
-            r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
-    )
-    WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
+            r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date, ri.image_url
+    	)
+    	WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
 	</select>
 	
 	<!-- 페이지네비를 위한 신고 리뷰 카운트 (관리자) -->
@@ -215,4 +295,13 @@
 	<update id="updateByQuantity">
 		update product set quantity = #{quantity} where product_seq = #{productSeq}
 	</update>
+	
+	<!-- 카테고리별 상품 수 조회 -->
+	<select id="getProductNumByCategory" resultType="map"> 
+		select c.product_category_title as category_title, 
+           count(p.product_category_code) as product_count
+    	from product_category c
+    	left join product p on p.product_category_code = c.product_category_code
+    	group by c.product_category_title
+	</select>
 </mapper>

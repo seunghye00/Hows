@@ -131,7 +131,61 @@ export const getReplies = async (commentSeq, member_id) => {
         throw error
     }
 }
+// 답글 수정하는 API
+export const updateReplyAPI = async (replySeq, content) => {
+    try {
+        const response = await api.put(`/comment/update/reply`, {
+            reply_seq: replySeq,
+            reply_contents: content, // 수정된 답글 내용
+        })
+        return response.data // 서버에서 수정된 답글 결과 반환
+    } catch (error) {
+        console.error('답글 수정 중 오류 발생:', error)
+        throw error
+    }
+}
 
+// 답글 삭제하는 API
+export const deleteReplyAPI = async replySeq => {
+    try {
+        const response = await api.delete(
+            `/comment/deleteReply/reply/${replySeq}`
+        )
+        return response.data
+    } catch (error) {
+        console.error('답글 삭제 중 오류 발생:', error)
+        throw error
+    }
+}
+
+// 답글 좋아요 API 호출 함수
+export const toggleLikeReply = async (reply_seq, member_id) => {
+    try {
+        const response = await api.post(`/comment/reply/${reply_seq}/like`, {
+            member_id,
+        })
+        console.log(response)
+        return response
+    } catch (error) {
+        console.error('좋아요 처리 중 오류 발생:', error)
+        throw error
+    }
+}
+
+// 답글 신고 처리 API 호출 함수
+export const sendReplyReport = async (replySeq, reportCode, memberId) => {
+    try {
+        const response = await api.post('/comment/report/reply', {
+            reply_seq: replySeq,
+            report_code: reportCode,
+            member_id: memberId,
+        })
+        return response.data
+    } catch (error) {
+        console.error('신고 요청 중 오류 발생:', error)
+        throw error
+    }
+}
 /************************************  [ 관리자 기능 ] /************************************/
 
 // 신고 댓글 조회 (관리자)

@@ -1,6 +1,7 @@
 package com.hows.product.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,18 +15,27 @@ public class ProductService {
 	@Autowired
 	private ProductDAO productDAO;
 	
-	// 전체 목록 출력 
-	public List<ProductDTO> getProducts () throws Exception{
+	// 상품 '베스트' 목록 출력
+    public List<ProductDTO> getBestProducts() {
+        return productDAO.getBestProducts();
+    }
+	
+    // 상품 '전체' 목록 출력
+	public List<ProductDTO> getProducts () {
 		return productDAO.getProducts();
 	}
 	
-	// 카테고리별 목록 출력
-	public List<ProductDTO> getProductByCategory (String product_category_code) throws Exception {
+	// 상품 '카테고리'별 목록 출력
+//	public List<ProductDTO> getProductByCategory (String product_category_code) {
+//		return productDAO.getProductByCategory(product_category_code);
+//	}
+	
+	public List<Map<String, Object>> getProductByCategory (String product_category_code) {
 		return productDAO.getProductByCategory(product_category_code);
 	}
 	
-	// 디테일 출력
-	public ProductDTO getProductByDetail (String product_seq) throws Exception {
+	// 상품 '디테일' 출력
+	public ProductDTO getProductByDetail (String product_seq) {
 		return productDAO.getProductDetaile(product_seq);
 	}
 
@@ -47,5 +57,10 @@ public class ProductService {
 	// 상품 수량 변경
 	public boolean updateByQuantity(int productSeq, int quantity) {
 		return productDAO.updateByQuantity(productSeq, quantity);
+	}
+
+	// 카테고리별 상품 수 조회
+	public List<Map<String, Object>> getProductNumByCategory() {
+		return productDAO.getProductNumByCategory();
 	}
 }

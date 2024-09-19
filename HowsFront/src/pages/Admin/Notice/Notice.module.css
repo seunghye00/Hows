@@ -166,8 +166,8 @@
     justify-content: center;
     align-items: center;
     position: fixed;
-    top: 85%;
-    left: 53%;
+    top: 88%;
+    left: 52%;
 }
 
 .pagination button {
@@ -183,8 +183,17 @@
     cursor: pointer;
 }
 
-.image {
-    max-width: 100%;
+.img {
+    max-width: 500px;
     display: block;
     margin-bottom: 20px;
+}
+
+.empty{
+    display: flex;
+    font-size: 20px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    top: 40%;
 }

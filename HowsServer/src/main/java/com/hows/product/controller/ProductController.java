@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hows.File.service.FileService;
 import com.hows.product.dto.ImageDTO;
 import com.hows.product.dto.ProductDTO;
+import com.hows.product.dto.ReviewDTO;
 import com.hows.product.dto.ReviewReportDTO;
 import com.hows.product.service.ProductService;
 import com.hows.product.service.ReviewService;
@@ -42,35 +44,117 @@ public class ProductController {
 	@Autowired
 	private FileService fileServ;
 
-	// 전체 목록 출력
+    // 상품 '베스트' 목록 출력
+    @GetMapping("/getBestProducts")
+    public ResponseEntity<List<ProductDTO>> getBestProducts() 
+    throws Exception{
+        List<ProductDTO> bestProducts = productServ.getBestProducts();
+        return ResponseEntity.ok(bestProducts);
+    }
+
+	// 상품 '전체' 목록 출력
 	@GetMapping
-	public ResponseEntity<List<ProductDTO>> getProducts() throws Exception {
+	public ResponseEntity<List<ProductDTO>> getProducts() 
+	throws Exception {
 		List<ProductDTO> products = productServ.getProducts();
 		return ResponseEntity.ok(products);
 	}
 
-	// 카테고리별 목록 출력
+	// 상품 '카테고리'별 목록 출력
+//	@GetMapping("/category/{product_category_code}")
+//	public ResponseEntity<List<ProductDTO>> getProductByCategory(@PathVariable String product_category_code)
+//	throws Exception {
+//		List<ProductDTO> products = productServ.getProductByCategory(product_category_code);
+//		return ResponseEntity.ok(products);
+//	}
+	
 	@GetMapping("/category/{product_category_code}")
-	public ResponseEntity<List<ProductDTO>> getProductByCategory(@PathVariable String product_category_code)
-			throws Exception {
-		List<ProductDTO> products = productServ.getProductByCategory(product_category_code);
+	public ResponseEntity<List<Map<String, Object>>> getProductByCategory(@PathVariable String product_category_code)
+	throws Exception {
+		List<Map<String, Object>> products = productServ.getProductByCategory(product_category_code);
 		return ResponseEntity.ok(products);
 	}
 
-	// 디테일 출력
+	// 상품 '디테일' 출력
 	@GetMapping("/detail/{product_seq}")
-	public ResponseEntity<ProductDTO> getProductByDetail(@PathVariable String product_seq) throws Exception {
+	public ResponseEntity<ProductDTO> getProductByDetail(@PathVariable String product_seq) 
+	throws Exception {
 		ProductDTO detaile = productServ.getProductByDetail(product_seq);
 		return ResponseEntity.ok(detaile);
 	}
 
-	// ==================
+	// 리뷰 수정
+	@PostMapping("/reviewMod")
+	@Transactional
+	public ResponseEntity<String> modReview (
+	        @RequestParam(value = "existImages", required = false) List<String> existImages, // 기존 GCS 이미지 URL
+	        @RequestParam(value = "newImages", required = false) MultipartFile[] newImages, // 새로 업로드된 이미지 파일
+	        @RequestParam("reviewData") String reviewData,
+	        @RequestParam(value = "imageOrders", required = false) int[] imageOrders) 
+	throws Exception {
+
+	    System.out.println("existImages : " + existImages);
+	    System.out.println("newImages : " + newImages);
+	    System.out.println("reviewData : " + reviewData);
+	    System.out.println("imageOrders : " + imageOrders);
+
+	    ObjectMapper mapper = new ObjectMapper();
+
+	    try {
+	        // JSON 형식의 리뷰 데이터를 파싱
+	        JsonNode jsonNode = mapper.readTree(reviewData);
+	        int review_seq = jsonNode.get("review_seq").asInt();
+	        int rating = jsonNode.get("rating").asInt();
+	        String review_contents = jsonNode.get("review_contents").asText();
+	        String memberId = jsonNode.get("member_id").asText();
+	        int productSeq = jsonNode.get("product_seq").asInt();
+
+	        // 기존 이미지 갱신
+	        List<Map<String, String>> imgList = reviewServ.getReviewImgList(review_seq);
+	        
+	        for (Map<String, String> img : imgList) {
+	            if (!existImages.contains(img.get("IMAGE_URL"))) {
+	                reviewServ.delReviewImage(img.get("IMAGE_URL"));
+	            }
+	        }
+	        
+	        // 새로운 이미지 등록
+	        if (newImages != null && newImages.length > 0) {
+	        	for (int i = 0; i < newImages.length; i++) {
+	        		String imageUrl = fileServ.upload(newImages[i], productSeq, "F4");
+	        		
+	        		System.out.println(imageUrl + " : " + review_seq);
+	        		// imageUrl : GCS에 등록된 이미지 URL
+	        		// review_image 테이블에 등록
+	        		if (!imageUrl.equals("fail")) {
+	        			System.out.println("test !!!");
+	        			ImageDTO imageDTO = new ImageDTO(0, review_seq, imageUrl, imageOrders[i]);
+	        			reviewServ.insertReviewImage(imageDTO);
+	        		}
+	        	}
+	        }
+
+	        // 리뷰 업데이트
+	        reviewServ.updateReview(review_seq, rating, review_contents);
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        throw new RuntimeException("리뷰 수정 중 오류 발생", e);
+	    }
+
+	    return ResponseEntity.ok().build();
+	}
+	
 	// 리뷰 등록
 	@PostMapping("/reviewAdd")
 	@Transactional
-	public ResponseEntity<String> submitReview(@RequestParam("images") MultipartFile[] images, // 여러 이미지 파일
+	public ResponseEntity<String> submitReview(
+			@RequestParam("images") MultipartFile[] images, // 여러 이미지 파일
 			@RequestParam("reviewData") String reviewData, // 리뷰 데이터 (JSON)
-			@RequestParam("image_orders") int[] imageOrders) throws Exception {
+			@RequestParam("image_orders") int[] imageOrders) 
+	throws Exception {
+		//System.out.println("images : " + images);
+		
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			// JSON 형식의 리뷰 데이터를 파싱
@@ -108,12 +192,14 @@ public class ProductController {
 
 	// 리뷰 이미지 가져오기
 	@GetMapping("/getReviewImgList/{review_seq}")
-	public ResponseEntity<Map<String, Object>> getReviewImgList(@PathVariable int review_seq,
-			@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int itemsPerPage)
-			throws Exception {
+	public ResponseEntity<Map<String, Object>> getReviewImgList(
+			@PathVariable int review_seq,
+			@RequestParam(defaultValue = "1") int page, 
+			@RequestParam(defaultValue = "10") int itemsPerPage)
+	throws Exception {
 
 		// 페이징된 리뷰 목록 조회
-		List<String> reviewImgList = reviewServ.getReviewImgList(review_seq);
+		List<Map<String, String>> reviewImgList = reviewServ.getReviewImgList(review_seq);
 
 		// 페이징 정보와 리뷰 목록을 함께 반환
 		Map<String, Object> response = new HashMap<>();
@@ -122,7 +208,7 @@ public class ProductController {
 		return ResponseEntity.ok(response);
 	}
 	
-	// 리뷰 출력 (페이징)
+	// 리뷰 목록 출력 (페이징)
 	@GetMapping("/getReviewList/{product_seq}")
 	public ResponseEntity<Map<String, Object>> getReviewList(
 			@PathVariable int product_seq,
@@ -140,14 +226,63 @@ public class ProductController {
 		return ResponseEntity.ok(response);
 	}
 	
+	@GetMapping("/getReviewListByBest/{product_seq}")
+	public ResponseEntity<Map<String, Object>> getReviewListByBest(
+			@PathVariable int product_seq,
+			@RequestParam(defaultValue = "1") int page, 
+			@RequestParam(defaultValue = "10") int itemsPerPage)
+	throws Exception {
+
+		// 페이징된 리뷰 목록 조회
+		List<Map<String, Object>> reviewList = reviewServ.getReviewListByBest(product_seq, page, itemsPerPage);
+
+		// 페이징 정보와 리뷰 목록을 함께 반환
+		Map<String, Object> response = new HashMap<>();
+		response.put("reviews", reviewList);
+
+		return ResponseEntity.ok(response);
+	}
+	
 	// 리뷰 삭제
 	@DeleteMapping("/delReview/{review_seq}")
-	public ResponseEntity<String> delReview(@PathVariable int review_seq) throws Exception {
+	public ResponseEntity<String> delReview(@PathVariable int review_seq) 
+	throws Exception {
 	    reviewServ.deleteReview(review_seq);
 	    return ResponseEntity.ok().build();
 	}
+	
+	// 리뷰 신고
+    @PostMapping("/review/report")
+    public ResponseEntity<Void> sendReviewReport(@RequestBody Map<String, Object> reportData) 
+    throws Exception{
+        int review_seq = (Integer) reportData.get("review_seq");
+        String report_code = (String) reportData.get("report_code");
+        String member_id = (String) reportData.get("member_id");
 
+        // System.out.println("review_seq=" + review_seq + ", report_code=" + report_code + ", member_id=" + member_id);
+        if (report_code == null || report_code.length() > 2) {
+            return ResponseEntity.badRequest().build(); // 잘못된 요청 반환
+        }
+        
+        reviewServ.sendReviewReport(review_seq,report_code, member_id);
+        return ResponseEntity.ok().build();
+    }
+    
+    // 리뷰 전체 별점
+    @GetMapping("/review/getRatings/{product_seq}")
+    public ResponseEntity<List<ReviewDTO>> getRatings (@PathVariable int product_seq) 
+    throws Exception{
+    	List<ReviewDTO> result = reviewServ.getRatings(product_seq);
+    	return ResponseEntity.ok(result);
+    }
 
+    
+//    @GetMapping("/getBestProducts")
+//    public ResponseEntity<List<ProductDTO>> getBestProducts() 
+//    throws Exception{
+//        List<ProductDTO> bestProducts = productServ.getBestProducts();
+//        return ResponseEntity.ok(bestProducts);
+//    }
 
 	// ==================
 	// 상품 추가
@@ -271,7 +406,14 @@ public class ProductController {
 		}
 		return ResponseEntity.ok("success");
 	}
-
+	
+	// 카테고리별 상품 수 조회
+	@GetMapping("/getProductNumByCategory")
+	public ResponseEntity<List<Map<String, Object>>> getProductNumByCategory() throws Exception {
+		List<Map<String, Object>> result = productServ.getProductNumByCategory();
+		return ResponseEntity.ok(result);
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

@@ -1,0 +1,105 @@
+.replyInputContainer {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+
+.imgBox {
+    width: 40px;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.imgBox img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.replyItem {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 16px 0px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: var(--hows-gray);
+}
+
+.replyHeader {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.replyNickname {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.replyBox {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 50px;
+}
+
+.replyBtnBox {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.replyLeft {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.replyRight {
+    display: flex;
+    gap: 10px;
+}
+
+.replyTextCont {
+    word-break: keep-all;
+    word-wrap: break-word;
+    font-size: 16px;
+}
+
+.replyLike {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.replyTextarea {
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+.replyTxt {
+    resize: none;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-size: 16px;
+    letter-spacing: .7px;
+    color: var(--hows-gray-700);
+    border-radius: 8px;
+    padding: 5px;
+}
+
+/* 수정 모드일 때 스타일 */
+.editing {
+    border-radius: 8px;
+}
+
+.replyDate {
+    word-wrap: break-word;
+    word-break: keep-all;
+    white-space: nowrap;
+}

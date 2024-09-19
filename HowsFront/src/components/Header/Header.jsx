@@ -3,10 +3,10 @@ import styles from './Header.module.css'
 import logo from '../../assets/images/logo_how.png'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore, useMemberStore } from './../../store/store'
-import profile from '../../assets/images/마이페이지_프로필사진.jpg'
+import profile from '../../assets/images/기본사진.jpg'
 import { throttle } from 'lodash'
 import { api } from './../../config/config' // API 요청을 위한 경로
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2'
 
 export const Header = () => {
     const navigate = useNavigate()
@@ -16,7 +16,7 @@ export const Header = () => {
     const { isAuth, login, logout, setIsAuth } = useAuthStore()
     const [profileMenu, setProfileMenu] = useState(false)
     const [profileImage, setProfileImage] = useState('') // 프로필 사진 상태
-    const { currentUser } = useMemberStore();
+    const { currentUser } = useMemberStore()
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
@@ -25,7 +25,7 @@ export const Header = () => {
         } else if (menuName === 'HowStory') {
             navigate('/communities')
         } else if (menuName === 'HowShare') {
-            navigate('/')
+            navigate('/csservice')
         }
     }
 
@@ -62,17 +62,16 @@ export const Header = () => {
             showCancelButton: true,
             confirmButtonText: '확인',
             cancelButtonText: '취소',
-        }).then((result) => {
+        }).then(result => {
             if (result.isConfirmed) {
-                logout();
-                sessionStorage.removeItem('token');
-                sessionStorage.removeItem('member_id');
-                setIsAuth(false);
-                navigate('/');
+                logout()
+                sessionStorage.removeItem('token')
+                sessionStorage.removeItem('member_id')
+                setIsAuth(false)
+                navigate('/')
             }
-        });
-    };
-
+        })
+    }
 
     useEffect(() => {
         const token = sessionStorage.getItem('token')
@@ -116,9 +115,11 @@ export const Header = () => {
     return (
         <div className="header">
             <div className={styles.headerWrap}>
+                {isFixed && <div className={styles.headerSpacer}></div>}
                 <div
-                    className={`${styles.headerCont} ${isFixed ? styles.fixed : ''
-                        }`}
+                    className={`${styles.headerCont} ${
+                        isFixed ? styles.fixed : ''
+                    }`}
                 >
                     <div className={styles.mainNavi}>
                         <div className={styles.menuBox}>
@@ -129,28 +130,31 @@ export const Header = () => {
                             </div>
                             <div className={styles.naviMenuList}>
                                 <div
-                                    className={`${styles.naviMenu} ${activeMenu === 'HowShop'
-                                        ? styles.active
-                                        : ''
-                                        }`}
+                                    className={`${styles.naviMenu} ${
+                                        activeMenu === 'HowShop'
+                                            ? styles.active
+                                            : ''
+                                    }`}
                                     onClick={() => handleMenuClick('HowShop')}
                                 >
                                     <a>HowShop</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${activeMenu === 'HowStory'
-                                        ? styles.active
-                                        : ''
-                                        }`}
+                                    className={`${styles.naviMenu} ${
+                                        activeMenu === 'HowStory'
+                                            ? styles.active
+                                            : ''
+                                    }`}
                                     onClick={() => handleMenuClick('HowStory')}
                                 >
                                     <a>HowStory</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${activeMenu === 'HowShare'
-                                        ? styles.active
-                                        : ''
-                                        }`}
+                                    className={`${styles.naviMenu} ${
+                                        activeMenu === 'HowShare'
+                                            ? styles.active
+                                            : ''
+                                    }`}
                                     onClick={() => handleMenuClick('HowShare')}
                                 >
                                     <a>HowShare</a>
@@ -188,9 +192,16 @@ export const Header = () => {
                                     <div>
                                         <div className={styles.profileImg}>
                                             <img
-                                                src={currentUser.member_avatar || profile} // 프로필 사진이 없으면 기본 이미지 사용
+                                                src={
+                                                    currentUser.member_avatar ||
+                                                    profile
+                                                } // 프로필 사진이 없으면 기본 이미지 사용
                                                 alt="User"
                                                 onClick={handleProfileClick}
+                                                onError={e => {
+                                                    // 이미지 로드 실패 시 기본 이미지로 대체
+                                                    e.target.src = profile // 기본 이미지 경로로 변경
+                                                }}
                                             />
                                         </div>
                                         {profileMenu && (
@@ -200,7 +211,6 @@ export const Header = () => {
                                                         styles.profileMenuItem
                                                     }
                                                     onClick={() => {
-                                                        // navigate('/mypage')
                                                         handleMyPageClick()
                                                         handleItemClick()
                                                     }}
@@ -212,7 +222,7 @@ export const Header = () => {
                                                         styles.profileMenuItem
                                                     }
                                                     onClick={() => {
-                                                        navigate('/history');
+                                                        navigate('/history')
                                                     }}
                                                 >
                                                     My History

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Return">
+	<update id="updateStatus">
+		update return set return_code = #{return_code} where return_seq = #{return_seq}
+	</update>
+</mapper>

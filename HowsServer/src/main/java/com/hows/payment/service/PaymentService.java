@@ -95,9 +95,13 @@ public class PaymentService {
     }
 
     /** 결제 취소 **/
-    public String paymentCancel(Map<String, Object> map){
-        String paymentId = (String) map.get("id");
-        String reason = (String) map.get("reason");
+    public String paymentCancel(Map<String, Object> map) {
+        String paymentId = (String) map.get("payment_id");
+        String reason = (String) map.get("payment_text");
+        String type = null;
+        if(map.get("type") != null) {
+            type = (String) map.get("type");
+        }
         String result = "fail";
 
         try {
@@ -121,16 +125,17 @@ public class PaymentService {
             String status = (String) cancellation.get("status");
             Integer totalAmount = (Integer) cancellation.get("totalAmount");
 
+            // 성공 시 데이터베이스 수정
             if(status.equals("SUCCEEDED")){
-                // 결제 내역 취소로 변경
-                // order 취소 or 환불로 변경
-                result = "ok";
+                if(type != null){
+                    // 결제 내역 취소로 변경
+                    map.put("payment_code", "P5");
+                } else {
+                    // 결제 오류로 발생 시 자동 결제 취소
+                    int cancel = paymentDAO.cancelPayment(paymentId);
+                    return cancel > 0 ? "ok" : "fail";
+                }
             }
-
-            if (!paymentResponse.getStatusCode().is2xxSuccessful()) {
-                throw new RuntimeException("Failed to retrieve payment details: " + paymentResponse.getBody());
-            }
-
 
         } catch (Exception e) {
             e.printStackTrace();

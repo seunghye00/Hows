@@ -160,52 +160,58 @@ export const Review = () => {
                     <div className={styles.headerItem}>NO</div>
                     <div className={styles.headerItem}>상품 제목</div>
                     <div className={styles.headerItem}>리뷰 작성자</div>
-                    <div className={styles.headerItem}>작성날짜</div>
+                    <div className={styles.headerItem}>작성일시</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                {displayReviews.map((review, index) => (
-                    <div
-                        className={styles.reviewRow}
-                        key={review.review_seq || index}
-                    >
-                        <div className={styles.reviewItem}>
-                            {startRow + index}
-                        </div>
+                {displayReviews.length > 0 ? (
+                    displayReviews.map((review, index) => (
                         <div
-                            className={styles.reviewItem}
-                            onClick={() => selectReview(review)}
+                            className={styles.reviewRow}
+                            key={review.review_seq || index}
                         >
-                            <span className={styles.span}>
-                                {review.PRODUCT_TITLE}
-                            </span>
+                            <div className={styles.reviewItem}>
+                                {startRow + index}
+                            </div>
+                            <div
+                                className={styles.reviewItem}
+                                onClick={() => selectReview(review)}
+                            >
+                                <span className={styles.span}>
+                                    {review.PRODUCT_TITLE}
+                                </span>
+                            </div>
+                            <div className={styles.reviewItem}>
+                                {review.NICKNAME}
+                            </div>
+                            <div className={styles.reviewItem}>
+                                {formatDate(review.REVIEW_DATE)}
+                            </div>
+                            <div
+                                className={styles.reviewItem}
+                                onClick={() => selectReport(review.REVIEW_SEQ)}
+                            >
+                                <span className={styles.reportcount}>
+                                    {review.REPORT_COUNT}
+                                </span>
+                            </div>
+                            <div className={styles.reviewItem}>
+                                <Button
+                                    size="s"
+                                    title="삭제"
+                                    onClick={() =>
+                                        handleDeleteReview(review.REVIEW_SEQ)
+                                    }
+                                />
+                            </div>
                         </div>
-                        <div className={styles.reviewItem}>
-                            {review.NICKNAME}
-                        </div>
-                        <div className={styles.reviewItem}>
-                            {formatDate(review.REVIEW_DATE)}
-                        </div>
-                        <div
-                            className={styles.reviewItem}
-                            onClick={() => selectReport(review.REVIEW_SEQ)}
-                        >
-                            <span className={styles.reportcount}>
-                                {review.REPORT_COUNT}
-                            </span>
-                        </div>
-                        <div className={styles.reviewItem}>
-                            <Button
-                                size="s"
-                                title="삭제"
-                                onClick={() =>
-                                    handleDeleteReview(review.REVIEW_SEQ)
-                                }
-                            />
-                        </div>
+                    ))
+                ) : (
+                    <div className={styles.empty}>
+                        신고 리뷰 목록이 없습니다
                     </div>
-                ))}
+                )}
             </div>
 
             {/* 페이징 컴포넌트 */}
@@ -225,7 +231,9 @@ export const Review = () => {
                         <h3>신고당한 리뷰</h3>
                         <div className={styles.reviewDetail}>
                             <img
-                                src={selectedReview.imageUrl || test}
+                                src={
+                                    selectedReview.IMAGE_URL || test
+                                } /* 리뷰 이미지 URL 사용 */
                                 alt="리뷰 이미지"
                             />
                             <div>{selectedReview.REVIEW_CONTENTS}</div>
@@ -248,7 +256,7 @@ export const Review = () => {
                             <div className={styles.tableHeader}>
                                 <div>신고자</div>
                                 <div>신고 사유</div>
-                                <div>신고 날짜</div>
+                                <div>신고 일시</div>
                             </div>
                             {reportData.map(report => (
                                 <div

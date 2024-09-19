@@ -16,18 +16,27 @@ public class ProductDAO {
 	@Autowired
 	private SqlSession myBatis;
 	
+	// 베스트 상품 목록 출력
+    public List<ProductDTO> getBestProducts() {
+        return myBatis.selectList("Product.getBestProducts");
+    }
+    
 	// 전체 목록 출력
-	public List<ProductDTO> getProducts () throws Exception{
+	public List<ProductDTO> getProducts () {
 		return myBatis.selectList("Product.getProducts");
 	}
 	
 	// 카테고리별 목록 출력
-	public List<ProductDTO> getProductByCategory (String product_category_code) throws Exception{
+//	public List<ProductDTO> getProductByCategory (String product_category_code) {
+//		return myBatis.selectList("Product.getProductByCategory", product_category_code);
+//	}
+	
+	public List<Map<String, Object>> getProductByCategory (String product_category_code) {
 		return myBatis.selectList("Product.getProductByCategory", product_category_code);
 	}
 	
 	// 디테일 출력
-	public ProductDTO getProductDetaile (String product_seq) throws Exception{
+	public ProductDTO getProductDetaile (String product_seq) {
 		return myBatis.selectOne("Product.getProductDetaile", product_seq);
 	}
 
@@ -56,5 +65,9 @@ public class ProductDAO {
 		params.put("quantity", quantity);
 		return myBatis.update("Product.updateByQuantity", params) > 0;
 	}
-	
+
+	// 카테고리별 상품 수 조회
+	public List<Map<String, Object>> getProductNumByCategory() {
+	    return myBatis.selectList("Product.getProductNumByCategory", "category_title");
+	}
 }

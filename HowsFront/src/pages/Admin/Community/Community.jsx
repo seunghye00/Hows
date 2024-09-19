@@ -10,6 +10,7 @@ import {
 } from '../../../api/community'
 import Swal from 'sweetalert2'
 import { formatDate } from '../../../commons/commons'
+import test from '../../../assets/images/푸바오.png'
 
 export const Community = () => {
     const [boardReportModalOpen, setBoardReportModalOpen] = useState(false)
@@ -20,6 +21,7 @@ export const Community = () => {
     const [page, setPage] = useState(1) // 현재 페이지 상태
     const [itemsPerPage] = useState(10) // 페이지당 항목 수
     const [searchResults, setSearchResults] = useState([]) // 검색 결과 상태
+    const [boardDetailModalOpen, setBoardDetailModalOpen] = useState(false) // 게시물 상세 모달 상태
 
     // 페이징에 따른 startRow와 endRow 계산
     const startRow = (page - 1) * itemsPerPage + 1
@@ -51,16 +53,14 @@ export const Community = () => {
     // 게시물 신고 내역을 서버에서 가져오는 함수
     const loadBoardReport = async board_seq => {
         try {
-            // board_seq 확인을 위한 콘솔 로그 추가
             console.log('신고된 게시물 번호 (board_seq):', board_seq)
 
             const resp = await CommunityReport(board_seq)
 
-            // 서버에서 받은 데이터 확인을 위한 콘솔 로그 추가
             console.log('서버에서 받은 신고 내역 데이터:', resp.data)
 
             setReportData(resp.data) // 서버에서 받은 신고 내역을 상태에 저장
-            setBoardReportModalOpen(true) // 모달 열기
+            setBoardReportModalOpen(true) // 신고 모달 열기
         } catch (error) {
             console.error('신고 내역을 불러오는데 실패했습니다.', error)
         }
@@ -104,9 +104,15 @@ export const Community = () => {
         })
     }
 
-    // 신고 모달 열기
-    const selectReport = board_seq => {
-        loadBoardReport(board_seq)
+    // 게시물 상세 모달 열기
+    const openBoardDetailModal = board => {
+        setSelectedBoard(board) // 선택된 게시물 저장
+        setBoardDetailModalOpen(true) // 게시물 상세 모달 열기
+    }
+
+    // 게시물 상세 모달 닫기
+    const closeBoardDetailModal = () => {
+        setBoardDetailModalOpen(false)
     }
 
     // 신고 모달 닫기
@@ -137,7 +143,7 @@ export const Community = () => {
             <div className={styles.headerSection}>
                 <div className={styles.searchSection}>
                     <Search
-                        placeholder="내용 또는 작성자 검색"
+                        placeholder="게시글 또는 작성자 검색"
                         onSearch={handleSearch}
                     />
                 </div>
@@ -148,47 +154,99 @@ export const Community = () => {
                     <div className={styles.headerItem}>NO</div>
                     <div className={styles.headerItem}>게시글</div>
                     <div className={styles.headerItem}>작성자</div>
-                    <div className={styles.headerItem}>작성날짜</div>
+                    <div className={styles.headerItem}>작성일시</div>
                     <div className={styles.headerItem}>누적 신고횟수</div>
                     <div className={styles.headerItem}>삭제</div>
                 </div>
 
-                {displayBoards.map((post, index) => (
-                    <div className={styles.communityRow} key={index}>
-                        <div className={styles.communityItem}>
-                            {startRow + index}
+                {displayBoards.length > 0 ? (
+                    displayBoards.map((post, index) => (
+                        <div className={styles.communityRow} key={index}>
+                            <div className={styles.communityItem}>
+                                {startRow + index}
+                            </div>
+                            <div
+                                className={styles.communityItem}
+                                onClick={() => openBoardDetailModal(post)}
+                            >
+                                <span className={styles.span}>
+                                    {post.BOARD_CONTENTS}
+                                </span>
+                            </div>
+                            <div className={styles.communityItem}>
+                                {post.MEMBER_ID}
+                            </div>
+                            <div className={styles.communityItem}>
+                                {formatDate(post.BOARD_WRITE_DATE)}
+                            </div>
+                            <div
+                                className={styles.communityItem}
+                                onClick={() => loadBoardReport(post.BOARD_SEQ)}
+                            >
+                                <span className={styles.reportcount}>
+                                    {post.REPORT_COUNT}
+                                </span>
+                            </div>
+                            <div className={styles.communityItem}>
+                                <Button
+                                    size="s"
+                                    title="삭제"
+                                    onClick={() =>
+                                        handleDeleteBoard(post.BOARD_SEQ)
+                                    }
+                                />
+                            </div>
                         </div>
-                        <div className={styles.communityItem}>
-                            <span className={styles.span}>
-                                {post.BOARD_CONTENTS}
+                    ))
+                ) : (
+                    <div className={styles.empty}>
+                        신고 게시물 목록이 없습니다
+                    </div>
+                )}
+            </div>
+
+            {/* 게시물 상세 모달창 */}
+            {boardDetailModalOpen && (
+                <div className={styles.reportModal}>
+                    <div className={styles.detailmodalContent}>
+                        <div className={styles.boardDetails}>
+                            {/* 작성자 정보 */}
+                            <div className={styles.authorInfo}>
+                                <img
+                                    src={selectedBoard.MEMBER_AVATAR || test}
+                                    alt="회원 아바타"
+                                    className={styles.avatar}
+                                />
+                                <span className={styles.nickname}>
+                                    {selectedBoard.MEMBER_ID}
+                                </span>
+                            </div>
+                            {/* 첨부된 이미지 */}
+                            <span className={styles.imageSection}>
+                                <img
+                                    src={
+                                        selectedBoard.IMAGE_URL
+                                            ? selectedBoard.IMAGE_URL
+                                            : test
+                                    } // null 또는 빈 문자열일 때 기본 이미지 사용
+                                    alt="게시물 이미지"
+                                    className={styles.boardImage}
+                                />
                             </span>
-                        </div>
-                        <div className={styles.communityItem}>
-                            {post.MEMBER_ID}
-                        </div>
-                        <div className={styles.communityItem}>
-                            {post.BOARD_WRITE_DATE}
-                        </div>
-                        <div
-                            className={styles.communityItem}
-                            onClick={() => selectReport(post.BOARD_SEQ)}
-                        >
-                            <span className={styles.reportcount}>
-                                {post.REPORT_COUNT}
-                            </span>
-                        </div>
-                        <div className={styles.communityItem}>
-                            <Button
-                                size="s"
-                                title="삭제"
-                                onClick={() =>
-                                    handleDeleteBoard(post.BOARD_SEQ)
-                                }
-                            />
+                            <div className={styles.boardContent}>
+                                <div>{selectedBoard.BOARD_CONTENTS}</div>
+                            </div>
+                            <div className={styles.close}>
+                                <Button
+                                    size="s"
+                                    title="닫기"
+                                    onClick={closeBoardDetailModal}
+                                />
+                            </div>
                         </div>
                     </div>
-                ))}
-            </div>
+                </div>
+            )}
 
             {/* 신고 모달창 */}
             {boardReportModalOpen && (
@@ -199,7 +257,7 @@ export const Community = () => {
                             <div className={styles.tableHeader}>
                                 <div>신고자</div>
                                 <div>신고 사유</div>
-                                <div>신고 날짜</div>
+                                <div>신고 일시</div>
                             </div>
                             {reportData.map((report, index) => (
                                 <div className={styles.tableRow} key={index}>

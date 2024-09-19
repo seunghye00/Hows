@@ -9,6 +9,7 @@
         <result property="payment_seq" column="payment_seq"/>
         <result property="member_seq" column="member_seq"/>
         <result property="order_seq" column="order_seq"/>
+        <result property="payment_code" column="payment_code"/>
         <result property="payment_price" column="payment_price"/>
         <result property="payment_date" column="payment_date" javaType="java.sql.Timestamp"/>
         <result property="payment_id" column="payment_id"/>
@@ -30,6 +31,7 @@
             p.payment_seq,
             p.member_seq,
             p.order_seq,
+            p.payment_code,
             p.payment_price,
             p.payment_date,
             p.payment_id,
@@ -41,6 +43,8 @@
             JOIN orders o ON p.order_seq = o.order_seq
         WHERE
             p.member_seq = #{member_seq}
+        ORDER BY
+            p.payment_seq DESC
     </select>
 
 
@@ -59,8 +63,28 @@
             <if test="payment_code != 'P1'">
                 sysdate,
             </if>
-            #{payment_id}
+            #{payment_id},
+            null
         )
     </insert>
+
+    <update id="updatePayment">
+        UPDATE
+            payment
+        SET
+            payment_code = #{payment_code},
+            payment_text = #{payment_text}
+        WHERE
+            payment_seq = #{payment_seq}
+        AND
+            member_seq = #{member_seq}
+    </update>
+
+    <delete id="cancelPayment">
+        DELETE FROM
+            payment
+        WHERE
+            payment_id = #{payment_id}
+    </delete>
 
 </mapper>

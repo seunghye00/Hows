@@ -137,16 +137,33 @@ public class MemberService implements UserDetailsService {
 		
 	    return memDao.updateProfileImage(map);
 	}
+
+	// 배너 사진 변경
+	public int updateBannerImage(int memberSeq, String imageUrl) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("member_seq", memberSeq);
+		map.put("member_banner", imageUrl);
+		
+		return memDao.updateBannerImage(map);
+	}
 	
 	// 현재 프로필 사진 URL 가져오기
 	public String getProfileImageUrl(int member_seq) {
 	    return memDao.getProfileImageUrl(member_seq); // member 테이블에서 member_avatar 가져오는 쿼리
 	}
+	// 현재 배너 사진 URL 가져오기
+	public String getBannerImageUrl(int member_seq) {
+		return memDao.getBannerImageUrl(member_seq); // member 테이블에서 member_avatar 가져오는 쿼리
+	}
 
 	// 프로필 삭제 시 member_avatar => null 
-	 public void updateProfileImageToNull(int member_seq) {
-		 memDao.updateProfileImageToNull(member_seq);
-	    }
+	public void updateProfileImageToNull(int member_seq) {
+		memDao.updateProfileImageToNull(member_seq);
+	}
+	// 배너 삭제 시 member_banner => null 
+	public void updateBannerImageToNull(int member_seq) {
+		memDao.updateBannerImageToNull(member_seq);
+	}
 
 
 	// 비밀번호 변경시 기존 비밀번호 확인
@@ -295,5 +312,10 @@ public class MemberService implements UserDetailsService {
 	public int getMemberSeq() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	// 연령대별 남녀 회원 수 조회
+	public List<Map<String, Object>> getAgeGenderDistribution() {
+		return memDao.getAgeGenderDistribution();
 	}
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.hows.order.dto.OrderDTO;
 import com.hows.order.dto.OrderInfoListDTO;
+import com.hows.order.dto.ReturnDTO;
 import com.hows.order.service.OrderService;
 
 @RestController
@@ -37,6 +38,13 @@ public class OrderController {
 	@GetMapping("/listByStatus")
 	public ResponseEntity<List<OrderInfoListDTO>> getOrdersByStatus(@RequestParam String status) throws Exception {
 		List<OrderInfoListDTO> list = orderServ.getOrdersByStatus(status);
+		return ResponseEntity.ok(list);
+	}
+	
+	// 반품 목록 조회
+	@GetMapping("/getReturnList")
+	public ResponseEntity<List<ReturnDTO>> getReturnList() throws Exception {
+		List<ReturnDTO> list = orderServ.getReturnList();
 		return ResponseEntity.ok(list);
 	}
 
@@ -100,6 +108,25 @@ public class OrderController {
 		return ResponseEntity.ok("success");
 	}
 
+	// 주문 내역 삭제
+	@Transactional
+	@DeleteMapping
+	public ResponseEntity<String> deleteOrder(@RequestParam String seqs) throws Exception {
+		String[] orderSeqs = seqs.split(","); // seqs를 배열로 변환
+		for(String orderSeq : orderSeqs) {
+			try {
+				int order_seq = Integer.parseInt(orderSeq);
+				if(!orderServ.deleteOrder(order_seq)) {
+					throw new RuntimeException("주문 삭제 실패");
+				}
+            } catch (Exception e) {
+                // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+                throw new RuntimeException("주문 삭제 실패", e);
+            }
+		}
+		return ResponseEntity.ok("success");
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

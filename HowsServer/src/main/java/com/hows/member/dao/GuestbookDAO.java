@@ -32,8 +32,8 @@ public class GuestbookDAO {
 	
     
 	// [마이페이지] 방문글 갯수
-    public int countGuestbook(String member_id){
-    	return mybatis.selectOne("Guestbook.countGuestbook", member_id);
+    public int countGuestbook(int member_seq){
+    	return mybatis.selectOne("Guestbook.countGuestbook", member_seq);
     }
 	
 

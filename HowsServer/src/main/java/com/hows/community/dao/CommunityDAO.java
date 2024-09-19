@@ -211,6 +211,12 @@ public class CommunityDAO {
     public List<String> getFileURLsByBoardSeq(int board_seq) {
         return mybatis.selectList("Community.getFileURLsByBoardSeq",board_seq);
     }
+    
+    // 사용자 구매내역 
+ 	public List<Map<String, Object>> purchaseHistory(int member_seq) {
+ 	    return mybatis.selectList("Community.purchaseHistory", member_seq); 
+ 	}
+ 	
 	// 관리자
 	// 신고된 게시물 조회 DAO
 	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) {

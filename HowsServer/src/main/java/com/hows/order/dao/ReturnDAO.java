@@ -17,5 +17,8 @@ public class ReturnDAO {
 		return mybatis.update("Return.updateStatus", dto);
 	}
 
-
+	// 반품 내역 생성
+	public int insert(ReturnDTO dto) {
+		return mybatis.insert("insert", dto);
+	}
 }

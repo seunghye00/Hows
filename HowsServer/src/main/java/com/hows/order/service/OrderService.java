@@ -92,4 +92,9 @@ public class OrderService {
 	public boolean deleteOrder(int orderSeq) {
 		return orderDAO.deleteOrder(orderSeq);
 	}
+	
+	// 주문 상태 조회
+	public String getOrderCode(int orderSeq) {
+		return orderDAO.getOrderCode(orderSeq);
+	}
 }

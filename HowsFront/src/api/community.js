@@ -234,3 +234,8 @@ export const deleteCommunity = board_seq => {
 export const getBoardNumByCategory = () => {
     return api.get('/community/getBoardNumByCategory')
 }
+
+// 오늘 작성된 게시글 수 조회
+export const todayBoardNum = () => {
+    return api.get('/community/todayBoardNum')
+}

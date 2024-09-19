@@ -129,18 +129,18 @@ public class PaymentService {
             if(status.equals("SUCCEEDED")){
                 if(type != null){
                     // 결제 내역 취소로 변경
-                    map.put("payment_code", "P5");
+                    if(!paymentDAO.doneCancel(paymentId)) {
+                    	throw new RuntimeException("DB 업데이트 오류");
+                    }
                 } else {
                     // 결제 오류로 발생 시 자동 결제 취소
                     int cancel = paymentDAO.cancelPayment(paymentId);
                     return cancel > 0 ? "ok" : "fail";
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return result;
     }
 

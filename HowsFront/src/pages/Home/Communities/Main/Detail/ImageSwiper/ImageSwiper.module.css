@@ -5,7 +5,8 @@
 
 .imageSwiper {
     width: 100%;
-    height: 933px;
+    aspect-ratio: 3 / 4;
+    /* 3:4 비율 설정 */
 }
 
 :global(.swiper-slide) {

@@ -9,18 +9,18 @@ import { useEffect, useState } from 'react';
 import { useAuthStore, useMemberStore } from './store/store';
 import { jwtDecode } from 'jwt-decode'; // import 수정
 import { api } from './config/config';
+import { getRoleCode } from './api/member';
 
 function App() {
     const [session, setSession] = useState(true);
     const { isAuth, login } = useAuthStore();
-    const { currentUser, setCurrentUser } = useMemberStore();
+    const { setCurrentUser } = useMemberStore();
 
     // 로그인 상태 체크
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         if (token != null) {
             const decoded = jwtDecode(token);
-            const member_id = sessionStorage.getItem("member_id");
             const nickname = sessionStorage.getItem("nickname");
             const profile = sessionStorage.getItem("member_avatar");
 
@@ -28,7 +28,6 @@ function App() {
                 "nickname": nickname,
                 "member_avatar": profile
             });
-
             login(token);
         }
     }, [login, setCurrentUser]);
@@ -37,9 +36,7 @@ function App() {
     useEffect(() => {
         if (isAuth) {
             // 회원 정보 가져오기 (role_code 확인)
-            api.get(`/member/getRoleCode`).then(resp => {
-                console.log("누구니 ~:: ", resp.data);
-
+            getRoleCode().then(resp => {
                 if (resp.data === 'R1') setSession(false);
                 else if (resp.data === 'R2') setSession(true);
             })

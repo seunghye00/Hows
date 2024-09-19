@@ -13,6 +13,11 @@ export const userInfo = member_id => {
     }
 }
 
+// 관리자 권한 가져오기
+export const getRoleCode = () => {
+    return api.get(`/member/getRoleCode`)
+}
+
 // 로그인
 export const loginUser = user => {
     return axios.post(`${host}/auth`, user)

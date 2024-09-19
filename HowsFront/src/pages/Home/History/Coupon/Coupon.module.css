@@ -41,6 +41,10 @@
 }
 
 .container .couponBox .expiredDate {
-  padding-left: 5px;
-  font-size: 20px;
+  font-size: 18px;
+}
+
+.container .couponBox .useDate {
+  font-size: 18px;
+  color: var(--hows-gray-300);
 }

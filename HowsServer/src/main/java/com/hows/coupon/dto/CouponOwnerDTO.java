@@ -61,9 +61,10 @@ public class CouponOwnerDTO {
 
     public CouponOwnerDTO() {}
 
-    public CouponOwnerDTO(int member_seq, int coupon_seq) {
-        this.member_seq = member_seq;
-        this.coupon_seq = coupon_seq;
+    public CouponOwnerDTO(int order_seq, int coupon_owner_seq) {
+        this.order_seq = order_seq;
+        this.coupon_owner_seq = coupon_owner_seq;
+
     }
 
     public CouponOwnerDTO(int coupon_owner_seq, int member_seq, int coupon_seq, int order_seq, Timestamp get_date, Timestamp use_date) {

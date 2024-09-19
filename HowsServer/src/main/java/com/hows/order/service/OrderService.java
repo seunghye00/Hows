@@ -3,6 +3,8 @@ package com.hows.order.service;
 import java.util.List;
 import java.util.Map;
 
+import com.hows.coupon.dao.CouponDAO;
+import com.hows.coupon.dto.CouponOwnerDTO;
 import com.hows.order.dto.OrderListDTO;
 import com.hows.order.dto.ReturnDTO;
 
@@ -19,6 +21,9 @@ public class OrderService {
 
     @Autowired
     private OrderDAO orderDAO;
+
+    @Autowired
+    private CouponDAO couponDAO;
 
     /** 주문 목록 **/
     public List<OrderDTO> orderList() throws Exception {
@@ -37,12 +42,17 @@ public class OrderService {
             String zipCode = (String) map.get("zipCode");
             String address = (String) map.get("address");
             String detailAddress = (String) map.get("detailAddress");
+            int couponOwnerSeq = Integer.parseInt(map.get("couponOwnerSeq").toString());
 
             orderSeq = orderDAO.addOrder(new OrderDTO(memberSeq, orderName, totalAmount, name, phone, zipCode, address, detailAddress));
 
+            /** 쿠폰 사용 시 쿠폰 차감 **/
+            if(couponOwnerSeq > 0) {
+                couponDAO.useMyCoupon(new CouponOwnerDTO(orderSeq, couponOwnerSeq));
+            }
+
             /** 주문 목록 등록 **/
             List<Map<String, ?>> param = (List<Map<String, ?>>) map.get("orderProducts");
-            System.out.println("param ===== " + param);
             if(param.size() > 0) {
                 for(Map<String, ?> dto : param) {
                     int productSeq = Integer.parseInt(dto.get("product_seq").toString());

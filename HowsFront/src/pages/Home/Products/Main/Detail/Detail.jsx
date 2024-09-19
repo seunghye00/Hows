@@ -9,12 +9,7 @@ import StarRating from '../../../../../components/StarRating/StarRating';
 import { useAuthStore } from '../../../../../store/store';
 import Swal from "sweetalert2";
 import { useOrderStore } from '../../../../../store/orderStore';
-import { 
-    getReviewList , 
-    getProductDetail,
-    getLikeCount,
-    getLikeCheck,
-} from '../../../../../api/product';
+import { getReviewList , getProductDetail, getLikeCount, getRatings} from '../../../../../api/product';
 
 
 
@@ -37,6 +32,8 @@ export const Detail = () => {
     const [averageRating, setAverageRating] = useState(0); // 평균 별점 상태 추가
 
     const { setOrderProducts, setOrderPrice } = useOrderStore(); // 구매 관련
+    
+    const [ ratingsCount, setRatingsCount ] = useState({5: 0,4: 0,3: 0,2: 0,1: 0}); // 별점 평균
     // ======================================== 상태 ========================================
 
 
@@ -56,12 +53,33 @@ export const Detail = () => {
         // 좋아요 개수
         getLikeCount(product_seq)
         .then(resp => {
-            console.log("Like Count Response:", resp.data);
             setLikeCount(resp.data); // 서버에서 받은 좋아요 개수 상태로 설정
         })
         .catch((error) => {
             console.error('좋아요 개수 불러오기 실패', error);
         });
+        // 리뷰 목록과 별점 정보 가져오기
+        const fetchRatingsAndReviews = async () => {
+            try {
+                const ratingResp = await getRatings(product_seq); // 별점 정보 가져오기
+                const reviewResp = await getReviewList(product_seq); // 리뷰 목록 가져오기
+                // const reviewList = reviewResp.data.reviews;
+                const ratingsData = ratingResp.data; // 별점 정보
+
+                // 평균 별점 계산
+                const totalRating = ratingsData.reduce((acc, review) => acc + review.rating, 0);
+                const average = totalRating / ratingsData.length;
+                setAverageRating(average); // 평균 별점 상태 업데이트
+
+                // 별점 카운트 업데이트
+                const newRatingsCount = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+                ratingsData.forEach(review => newRatingsCount[review.rating]++);
+                setRatingsCount(newRatingsCount);
+            } catch (error) {
+                console.error("리뷰 및 별점 정보 불러오기 오류", error);
+            }
+        };
+        fetchRatingsAndReviews();
 
         // 리뷰 목록을 가져와 평균 별점 계산
         getReviewList(product_seq)
@@ -80,7 +98,6 @@ export const Detail = () => {
         });
 
         // 사용자가 이미 좋아요를 눌렀는지 확인 (로그인 상태일 경우만)
-        
         if (memberId) {
             axios.get(`${host}/likes/check`, { params: { product_seq, member_id: memberId } })
                 .then((resp) => {
@@ -126,17 +143,12 @@ export const Detail = () => {
     const handleLikeClick = () => {
 
         if(!isAuth) {
-
             Swal.fire({
                 icon: "warning",
                 title: "로그인을 먼저 해주세요.",
                 showConfirmButton: true,
-            }).then(()=>{
-                //로그인이 안된 경우 로그인 페이지로 이동
-                navi('/signIn')
-            })
+            }).then(()=>{ navi('/signIn') }) //로그인이 안된 경우 로그인 페이지로 이동
             return ;
-
         }else{
             if (!liked) {
                 // 좋아요 추가 
@@ -146,8 +158,7 @@ export const Detail = () => {
                 api.post(`/likes/insert`, {
                     product_seq: product_seq,
                     member_id: memberId 
-                }).then(() => {
-                    setLiked(true); // 좋아요 상태를 true로 변경
+                }).then(() => { setLiked(true);
                 }).catch((error) => {
                     console.error('좋아요 추가 실패:', error);
                     setLiked(false);
@@ -163,8 +174,7 @@ export const Detail = () => {
                         product_seq: product_seq,
                         member_id: memberId 
                     }
-                }).then(() => {
-                    setLiked(false); // 좋아요 상태를 false로 변경
+                }).then(() => { setLiked(false); 
                 }).catch((error) => {
                     console.error('좋아요 취소 실패:', error);
                     setLiked(true);
@@ -175,18 +185,14 @@ export const Detail = () => {
         }
     };
     
-    
-    // 구매하기
+    // 구매하기 버튼 클릭 시 호출되는 함수
     const handleGet = () => {
         if (!memberId || !isAuth) {
             Swal.fire({
                 icon: "warning",
                 title: "로그인을 먼저 해주세요.",
                 showConfirmButton: true,
-            }).then(() => {
-                // 로그인이 안된 경우 로그인 페이지로 이동
-                navi('/signIn');
-            });
+            }).then(() => { navi('/signIn');}); // 로그인이 안된 경우 로그인 페이지로 이동
             return;
         }
 
@@ -197,7 +203,7 @@ export const Detail = () => {
                 title: "상품 정보를 불러오는 중 오류가 발생했습니다.",
                 text: "다시 시도해 주세요.",
             });
-                return;
+            return;
         }
 
         let order = [];
@@ -208,8 +214,8 @@ export const Detail = () => {
             product_seq: product_seq,
             product_title: list.product_title,
             product_image: list.product_thumbnail,
-            product_quantity: quantity,  // 수량
-            product_total_price: totalPrice, // 가격
+            product_quantity: quantity, 
+            product_total_price: totalPrice, 
         }
         console.log(data)
 
@@ -219,15 +225,15 @@ export const Detail = () => {
 
         setOrderPrice(orderPrice);
         setOrderProducts(order);
+
         // 세션에 저장
         sessionStorage.setItem("howsOrder", JSON.stringify(order));
         sessionStorage.setItem("howsPrice", orderPrice);
 
-        // 결제 페이지로 이동
-        navi("/payment");
+        navi("/payment"); // 결제 페이지로 이동
     };
 
-    // 장바구니 
+    // 장바구니 버튼 클릭 시 호출되는 함수
     const handleCart = () => {
 
         if (!memberId || !isAuth) {
@@ -235,11 +241,7 @@ export const Detail = () => {
                 icon: "warning",
                 title: "로그인을 먼저 해주세요.",
                 showConfirmButton: true,
-            }).then(()=>{
-
-                //로그인이 안된 경우 로그인 페이지로 이동
-                navi('/signIn')
-            })
+            }).then(()=>{ navi('/signIn') }) // 로그인 페이지로 이동
             return ;
         }
 

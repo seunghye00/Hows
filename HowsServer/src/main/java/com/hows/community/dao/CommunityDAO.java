@@ -39,12 +39,12 @@ public class CommunityDAO {
 	public List<Map<String, Object>> selectAll() {
 		return mybatis.selectList("Community.selectAll");
 	}
-	
-    // selectCommunityPosts를 호출하여 게시글 리스트를 가져오는 메서드
-    public List<Map<String, Object>> selectCommunityPosts(Map<String, Object> params) {
-        return mybatis.selectList("Community.selectCommunityPosts", params); 
-    }
-    
+
+	// selectCommunityPosts를 호출하여 게시글 리스트를 가져오는 메서드
+	public List<Map<String, Object>> selectCommunityPosts(Map<String, Object> params) {
+		return mybatis.selectList("Community.selectCommunityPosts", params);
+	}
+
 	// 게시글 리스트 이미지 출력
 	public List<Map<String, Object>> selectAllImg() {
 		return mybatis.selectList("Community.selectAllImg");
@@ -64,44 +64,45 @@ public class CommunityDAO {
 	public List<Map<String, Object>> selectTagsAndProductInfo(int board_seq) {
 		return mybatis.selectList("Community.selectTagsAndProductInfo", board_seq);
 	}
-	
-    // 게시글 업데이트
-    public void updateWrite(CommunityDTO dto) throws Exception {
-        mybatis.update("Community.updateWrite", dto); // 게시글 업데이트 SQL 실행
-    }
 
-    // 이미지 수정 시 삭제 
-    public void deleteImage(String imageUrl) {
-        mybatis.delete("Community.deleteImage", imageUrl);
-    }
-    
-    // 이미지 순서 업데이트
-    public void updateImageOrder(String imageUrl, int imageOrder) throws Exception {
-        Map<String, Object> params = new HashMap<>();
-        params.put("image_url", imageUrl);
-        params.put("image_order", imageOrder);
-        mybatis.update("Community.updateImageOrder", params); // 이미지 순서 업데이트 SQL 실행
-    }
-    
-    // 게시글 수정 이미지 주소
+	// 게시글 업데이트
+	public void updateWrite(CommunityDTO dto) throws Exception {
+		mybatis.update("Community.updateWrite", dto); // 게시글 업데이트 SQL 실행
+	}
+
+	// 이미지 수정 시 삭제
+	public void deleteImage(String imageUrl) {
+		mybatis.delete("Community.deleteImage", imageUrl);
+	}
+
+	// 이미지 순서 업데이트
+	public void updateImageOrder(String imageUrl, int imageOrder) throws Exception {
+		Map<String, Object> params = new HashMap<>();
+		params.put("image_url", imageUrl);
+		params.put("image_order", imageOrder);
+		mybatis.update("Community.updateImageOrder", params); // 이미지 순서 업데이트 SQL 실행
+	}
+
+	// 게시글 수정 이미지 주소
 	public List<String> selectImagesUrls(int board_seq) {
 		return mybatis.selectList("Community.selectImagesUrls", board_seq);
 	}
-    // DB에서 imageUrl로 board_image_seq를 조회하는 로직
-    public int selectBoardImageSeqByUrl(String imageUrl) {
-        return mybatis.selectOne("Community.selectBoardImageSeqByUrl", imageUrl);
-    }
-    
-    // 수정 시 태그정보 가져오는 로직 
-    public List<TagDTO> selectTagsByImageSeq(int boardImageSeq) {
-        return mybatis.selectList("Community.selectTagsByImageSeq", boardImageSeq);
-    }
-    
-    // 수정 시 태그정보 삭제
-    public void deleteTag(int tagSeq) {
-        mybatis.delete("Community.deleteTag", tagSeq);
-    }
-    
+
+	// DB에서 imageUrl로 board_image_seq를 조회하는 로직
+	public int selectBoardImageSeqByUrl(String imageUrl) {
+		return mybatis.selectOne("Community.selectBoardImageSeqByUrl", imageUrl);
+	}
+
+	// 수정 시 태그정보 가져오는 로직
+	public List<TagDTO> selectTagsByImageSeq(int boardImageSeq) {
+		return mybatis.selectList("Community.selectTagsByImageSeq", boardImageSeq);
+	}
+
+	// 수정 시 태그정보 삭제
+	public void deleteTag(int tagSeq) {
+		mybatis.delete("Community.deleteTag", tagSeq);
+	}
+
 	// 사용자가 특정 게시글에 좋아요를 눌렀는지 확인
 	public boolean checkIfUserLikedBoard(String member_id, int board_seq) {
 		Map<String, Object> params = new HashMap<>();
@@ -211,6 +212,12 @@ public class CommunityDAO {
     public List<String> getFileURLsByBoardSeq(int board_seq) {
         return mybatis.selectList("Community.getFileURLsByBoardSeq",board_seq);
     }
+    
+    // 사용자 구매내역 
+ 	public List<Map<String, Object>> purchaseHistory(int member_seq) {
+ 	    return mybatis.selectList("Community.purchaseHistory", member_seq); 
+ 	}
+ 	
 	// 관리자
 	// 신고된 게시물 조회 DAO
 	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) {
@@ -235,6 +242,26 @@ public class CommunityDAO {
 	// 게시판 삭제 (관리자)
 	public int deleteCommunity(int board_seq) throws Exception {
 		return mybatis.delete("Community.deleteCommunity", board_seq);
+	}
+
+	// 주거 형태별 게시글 수 조회
+	public List<Map<String, Object>> getPostCountByHousingType() {
+		return mybatis.selectList("Community.getPostCountByHousingType");
+	}
+
+	// 주거 형태별 게시글 수 조회
+	public List<Map<String, Object>> getPostCountBySpaceType() {
+		return mybatis.selectList("Community.getPostCountBySpaceType");
+	}
+
+	// 주거 형태별 게시글 수 조회
+	public List<Map<String, Object>> getPostCountByAreaSize() {
+		return mybatis.selectList("Community.getPostCountByAreaSize");
+	}
+
+	// 주거 형태별 게시글 수 조회
+	public List<Map<String, Object>> getPostCountByColor() {
+		return mybatis.selectList("Community.getPostCountByColor");
 	}
 
 }

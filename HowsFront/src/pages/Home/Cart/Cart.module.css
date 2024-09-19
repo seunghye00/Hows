@@ -195,3 +195,9 @@
     font-size: 16px;
     font-weight: 900;
 }
+
+.noneItem {
+    width: 80%;
+    border-top: 1px solid var(--hows-gray-300);
+    padding: 20px;
+}

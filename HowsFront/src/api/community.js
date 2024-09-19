@@ -72,29 +72,54 @@ export const updatePostData = async (board_seq, formData) => {
 
 // 게시글 좋아요 토글
 export const toggleLike = (board_seq, member_id) => {
-    return api.post(`/community/${board_seq}/like`, { member_id })
+    try {
+        return api.post(`/community/${board_seq}/like`, { member_id })
+    } catch (error) {
+        console.error('게시글 좋아요 토글 중 오류 발생:', error)
+        throw error
+    }
 }
 
 // 게시글 북마크 토글
 export const toggleBookmark = (board_seq, member_id) => {
-    return api.post(`/community/${board_seq}/bookmark`, { member_id })
+    try {
+        return api.post(`/community/${board_seq}/bookmark`, { member_id })
+    } catch (error) {
+        console.error('게시글 북마크 토글 중 오류 발생:', error)
+        throw error
+    }
 }
 
 // 게시글 데이터 가져오기
 export const getPostData = (board_seq, member_id) => {
-    return api.get(`/community/${board_seq}`, {
-        params: { member_id },
-    })
+    try {
+        return api.get(`/community/${board_seq}`, {
+            params: { member_id },
+        })
+    } catch (error) {
+        console.error('게시글 데이터 가져오기 중 오류 발생:', error)
+        throw error
+    }
 }
 
 // 이미지 데이터 가져오기
 export const getImageData = board_seq => {
-    return api.get(`/community/images/${board_seq}`)
+    try {
+        return api.get(`/community/images/${board_seq}`)
+    } catch (error) {
+        console.error('이미지 데이터 가져오기 중 오류 발생:', error)
+        throw error
+    }
 }
 
 // 태그 및 상품 데이터 가져오기
 export const getTagData = board_seq => {
-    return api.get(`/community/images/${board_seq}`)
+    try {
+        return api.get(`/community/images/${board_seq}`)
+    } catch (error) {
+        console.error('태그 및 상품 데이터 가져오기 중 오류 발생:', error)
+        throw error
+    }
 }
 
 // 집 타입 옵션 가져오기
@@ -126,6 +151,7 @@ export const getAreaSizes = async () => {
         throw error
     }
 }
+
 // 컬러 타입 옵션 가져오기
 export const getColors = async () => {
     try {
@@ -135,6 +161,7 @@ export const getColors = async () => {
         throw error
     }
 }
+
 //  신고 옵션 가져오기
 export const getReport = async () => {
     try {
@@ -147,8 +174,14 @@ export const getReport = async () => {
 
 // 조회수 증가
 export const viewCounting = async board_seq => {
-    const response = await api.post(`/community/${board_seq}/increment-view`)
-    return response.data // 서버에서 반환된 최신 조회수 (int)
+    try {
+        const response = await api.post(
+            `/community/${board_seq}/increment-view`
+        )
+        return response.data // 서버에서 반환된 최신 조회수 (int)
+    } catch (error) {
+        throw error
+    }
 }
 
 // 게시글 신고
@@ -162,6 +195,16 @@ export const sendReport = async (board_seq, report_code, member_id) => {
         return response.data
     } catch (error) {
         console.error('신고 요청 중 오류 발생:', error)
+        throw error
+    }
+}
+
+// 구매내역 상품 불러오기
+export const purchaseHistory = async () => {
+    try {
+        const response = await api.get(`/community/purchaseHistory`)
+        return response.data
+    } catch (error) {
         throw error
     }
 }
@@ -185,4 +228,9 @@ export const CommunityReport = board_seq => {
 // 신고 게시판 삭제 (관리자)
 export const deleteCommunity = board_seq => {
     return api.delete(`/community/deleteCommunity/${board_seq}`)
+}
+
+// 카테고리별 게시글 수 조회
+export const getBoardNumByCategory = () => {
+    return api.get('/community/getBoardNumByCategory')
 }

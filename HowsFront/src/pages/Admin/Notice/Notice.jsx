@@ -77,12 +77,8 @@ export const Notice = () => {
                             text: '공지사항이 성공적으로 삭제되었습니다.',
                             icon: 'success',
                         })
-                        // 성공적으로 삭제된 경우 목록을 업데이트
-                        setNotices(prevNotices =>
-                            prevNotices.filter(
-                                notice => notice.notice_seq !== notice_seq
-                            )
-                        )
+                        // 공지사항 삭제 후 목록을 다시 불러옴
+                        loadNotices() // 목록을 다시 로드
                     } else {
                         Swal.fire({
                             title: '삭제 실패',
@@ -99,6 +95,15 @@ export const Notice = () => {
                 }
             }
         })
+    }
+
+    // 이미지와 텍스트 분리하는 함수
+    const formatNoticeContents = contents => {
+        const imageUrlRegex =
+            /(https:\/\/storage\.cloud\.google\.com\/hows-attachment\/[^\s]+)/
+        const imageUrl = contents.match(imageUrlRegex) // 이미지 URL 추출
+        const text = contents.replace(imageUrlRegex, '').trim() // URL 제외한 나머지 텍스트 추출
+        return { imageUrl: imageUrl ? imageUrl[0] : '', text }
     }
 
     // 공지사항 제목 클릭 시 모달 열기
@@ -230,24 +235,33 @@ export const Notice = () => {
                         <hr />
                         <div className={styles.modalBody}>
                             <div className={styles.contentContainer}>
-                                {selectedNotice.notice_image && (
-                                    <div className={styles.img}>
-                                        <span className={styles.ntcimg}>
-                                            <img
-                                                className={styles.ntcimg}
-                                                src={
-                                                    selectedNotice.notice_image
-                                                }
-                                                alt="공지사항 이미지"
-                                            />
-                                        </span>
+                                {/* 이미지가 있으면 출력 */}
+                                {formatNoticeContents(
+                                    selectedNotice.notice_contents
+                                ).imageUrl && (
+                                    <img
+                                        src={
+                                            formatNoticeContents(
+                                                selectedNotice.notice_contents
+                                            ).imageUrl
+                                        }
+                                        alt="공지사항 이미지"
+                                        className={styles.img}
+                                    />
+                                )}
+
+                                {/* 이미지 아래에 텍스트 출력 */}
+                                {formatNoticeContents(
+                                    selectedNotice.notice_contents
+                                ).text && (
+                                    <div>
+                                        {
+                                            formatNoticeContents(
+                                                selectedNotice.notice_contents
+                                            ).text
+                                        }
                                     </div>
                                 )}
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: selectedNotice.notice_contents,
-                                    }}
-                                />
                             </div>
                         </div>
                         <div className={styles.btn}>

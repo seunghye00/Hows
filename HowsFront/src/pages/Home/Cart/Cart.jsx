@@ -5,6 +5,7 @@ import {addCommas, shippingPrice, SwalComp} from "../../../commons/commons";
 import {useOrderStore} from "../../../store/orderStore";
 import {cartList, deleteCart, updateCart} from "../../../api/cart";
 import {useAuthStore} from "../../../store/store";
+import {TextBox} from "../History/TextBox/TextBox";
 
 export const Cart = () => {
 
@@ -180,59 +181,67 @@ export const Cart = () => {
       <div className={styles.title}>
         장바구니
       </div>
-      <div className={styles.cartInfo}>
-        <div className={styles.leftBox}>
-          <p>선택된 상품 ({total.count})</p>
-          <button onClick={handleOrder}>주문하기</button>
-        </div>
-        <div className={styles.rightBox}>
-          <div>
-            <p>상품 금액 : </p>
-            <p>배송비 : </p>
-            <p>주문 금액 : </p>
+      {
+        carts.length <= 0 ?
+          <div className={styles.noneItem}>
+            <TextBox text={"장바구니에 등록된 상품이"}/>
           </div>
-          <div>
-            <p>{ addCommas(total.price) }원</p>
-            <p>{ addCommas(shippingPrice(total.price)) }원</p>
-            <p>{ addCommas(total.price + shippingPrice(total.price)) }원</p>
-          </div>
-
-        </div>
-      </div>
-      <div className={styles.itemForm}>
-        <div className={styles.btnBox}>
-          <input type="checkbox" name="all" onChange={handleCheck} checked={allChecked}/>
-          <button onClick={handleDelete}>선택 삭제</button>
-        </div>
-        <div className={styles.items}>
-          {
-            checkCart.map(item => {
-              return (
-                <div className={styles.item} key={item.cart_seq}>
-                  <input type="checkbox" name={item.cart_seq} onChange={handleCheck} checked={item.checked}/>
-                  <div className={styles.itemImage}>
-                    <img src={item.product_thumbnail} alt="상품이미지"/>
-                  </div>
-                  <div className={styles.itemInfo}>
-                    <p onClick={() => navi(`/products/${item.product_seq}`)}>{item.product_title}</p>
-                    <div className={styles.itemCount}>
-                      <span> 수량 : </span>
-                      <button onClick={() => handleCount(item.cart_seq, "-")}>-</button>
-                      <span>{item.cart_quantity}</span>
-                      <button onClick={() => handleCount(item.cart_seq, "+")}>+</button>
-                    </div>
-                  </div>
-                  <div className={styles.itemPrice}>
-                    <p>{addCommas(item.cart_price)}원</p>
-                    <button onClick={() => handleOrder([item.cart_seq])}>구입</button>
-                    <button onClick={() => handleDelete([item.cart_seq])}>삭제</button>
-                  </div>
+        :
+          <>
+            <div className={styles.cartInfo}>
+              <div className={styles.leftBox}>
+                <p>선택된 상품 ({total.count})</p>
+                <button onClick={handleOrder}>주문하기</button>
+              </div>
+              <div className={styles.rightBox}>
+                <div>
+                  <p>상품 금액 : </p>
+                  <p>배송비 : </p>
+                  <p>주문 금액 : </p>
                 </div>
-              );
-            })
-          }
-        </div>
-      </div>
+                <div>
+                  <p>{addCommas(total.price)}원</p>
+                  <p>{addCommas(shippingPrice(total.price))}원</p>
+                  <p>{addCommas(total.price + shippingPrice(total.price))}원</p>
+                </div>
+              </div>
+            </div>
+            <div className={styles.itemForm}>
+              <div className={styles.btnBox}>
+                <input type="checkbox" name="all" onChange={handleCheck} checked={allChecked}/>
+                <button onClick={handleDelete}>선택 삭제</button>
+              </div>
+              <div className={styles.items}>
+                {
+                  checkCart.map(item => {
+                    return (
+                      <div className={styles.item} key={item.cart_seq}>
+                        <input type="checkbox" name={item.cart_seq} onChange={handleCheck} checked={item.checked}/>
+                        <div className={styles.itemImage}>
+                          <img src={item.product_thumbnail} alt="상품이미지"/>
+                        </div>
+                        <div className={styles.itemInfo}>
+                          <p onClick={() => navi(`/products/${item.product_seq}`)}>{item.product_title}</p>
+                          <div className={styles.itemCount}>
+                            <span> 수량 : </span>
+                            <button onClick={() => handleCount(item.cart_seq, "-")}>-</button>
+                            <span>{item.cart_quantity}</span>
+                            <button onClick={() => handleCount(item.cart_seq, "+")}>+</button>
+                          </div>
+                        </div>
+                        <div className={styles.itemPrice}>
+                          <p>{addCommas(item.cart_price)}원</p>
+                          <button onClick={() => handleOrder([item.cart_seq])}>구입</button>
+                          <button onClick={() => handleDelete([item.cart_seq])}>삭제</button>
+                        </div>
+                      </div>
+                    );
+                  })
+                }
+              </div>
+            </div>
+          </>
+      }
     </div>
   );
 }

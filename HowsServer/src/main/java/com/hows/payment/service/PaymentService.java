@@ -39,10 +39,6 @@ public class PaymentService {
             int totalAmount = paymentRequest.getTotalAmount();
             int orderSeq = paymentRequest.getOrderSeq();
 
-            System.out.println("paymentId ====== " + paymentId);
-            System.out.println("orderSeq ====== " + orderSeq);
-
-
             // 1. PortOne 결제내역 단건조회 API 호출
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();
@@ -102,7 +98,10 @@ public class PaymentService {
     public String paymentCancel(Map<String, Object> map) {
         String paymentId = (String) map.get("payment_id");
         String reason = (String) map.get("payment_text");
-        String type = (String) map.get("type");
+        String type = null;
+        if(map.get("type") != null) {
+            type = (String) map.get("type");
+        }
         String result = "fail";
 
         try {
@@ -128,12 +127,11 @@ public class PaymentService {
 
             // 성공 시 데이터베이스 수정
             if(status.equals("SUCCEEDED")){
-                if(type.equals("cancel")){
+                if(type != null){
                     // 결제 내역 취소로 변경
                     map.put("payment_code", "P5");
                 } else {
-                    // 자동 취소 시
-                    // 결제 내역 삭제
+                    // 결제 오류로 발생 시 자동 결제 취소
                     int cancel = paymentDAO.cancelPayment(paymentId);
                     return cancel > 0 ? "ok" : "fail";
                 }

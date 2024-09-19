@@ -8,6 +8,7 @@ import {userInfo} from "../../../api/member";
 import {Modal} from "../../../components/Modal/Modal";
 import DaumPostcode from "react-daum-postcode";
 import {useNavigate} from "react-router-dom";
+import {myCoupon} from "../../../api/history";
 
 export const Payment = () => {
 
@@ -83,11 +84,6 @@ export const Payment = () => {
     }
   }
 
-  /** 주문 내역 조회 **/
-  const handleOrderHistory = () => {
-
-  }
-
   /** 주문 정보 ( 이름, 전화번호, 주소, 결제방식, 쿠폰, 포인트 ) **/
   const handleData = (e) => {
     let { name, value } = e.target;
@@ -156,7 +152,8 @@ export const Payment = () => {
       phone: data.phone,
       zipCode: data.zip_code,
       address: data.address,
-      detailAddress: data.detail_address
+      detailAddress: data.detail_address,
+      couponOwnerSeq: data.coupon
     }
 
     // payment info setting
@@ -202,14 +199,14 @@ export const Payment = () => {
   useEffect(() => {
     let discount = "";
     coupon.forEach(item => {
-      if(parseInt(item.coupon_seq) === parseInt(data.coupon)) discount = item.coupon_discount;
+      if(parseInt(item.coupon_owner_seq) === parseInt(data.coupon)) discount = item.coupon_discount;
     });
     const result = `${orderPrice.toString()}${discount}`;
     setPaymentPrice(prev => {
       return {
         ...prev,
         coupon: paymentPrice.price-eval(result),
-        total: eval(result)
+        total: eval(result) + shippingPrice(eval(result))
       }
     });
 
@@ -217,9 +214,15 @@ export const Payment = () => {
 
   /** 새로고침 시 세션에서 order list 가져옴 **/
   useEffect(() => {
+    const item = sessionStorage.getItem("howsOrder");
+    const price = sessionStorage.getItem("howsPrice");
+
+    if(item === null || price === null) {
+      alert("선택한 상품이 없습니다.")
+      return navi("/cart");
+    }
+
     if(orderProducts.length <= 0){
-      const item = sessionStorage.getItem("howsOrder");
-      const price = sessionStorage.getItem("howsPrice");
       if(data !== null){
         const order = JSON.parse(item);
         setOrderProducts(order);
@@ -229,10 +232,9 @@ export const Payment = () => {
           ... prev,
           price: parseInt(price),
           shipping: shippingPrice(parseInt(price)),
-          total: parseInt(price)
-          // total: parseInt(price) + shippingPrice(price)
+          // total: parseInt(price)
+          total: parseInt(price) + shippingPrice(price)
         }));
-
       }
     }
 
@@ -240,25 +242,10 @@ export const Payment = () => {
     memberSet();
 
     // 2. 회원이 소유한 쿠폰 리스트
-    const couponData = [
-      {
-        coupon_owner_seq: 1,
-        member_seq: 1,
-        coupon_seq: 1,
-        coupon_title: "[ 5% 할인 ] 첫번째 이벤트",
-        coupon_type: "percent",
-        coupon_discount: "*0.95"
-      },
-      {
-        coupon_owner_seq: 2,
-        member_seq: 1,
-        coupon_seq: 2,
-        coupon_title: "[ 5000원 할인 ] 두번째 이벤트",
-        coupon_type: "price",
-        coupon_discount: "-5000"
-      },
-    ]
-    setCoupon(couponData);
+    myCoupon().then(res => {
+      setCoupon(res.data);
+    });
+
   }, []);
 
 
@@ -271,9 +258,9 @@ export const Payment = () => {
   }, [addressCheck, member]);
 
   useEffect(() => {
-    setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon}));
-    // setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon + shippingPrice(prev.price)}));
-  }, [data.point])
+    // setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon}));
+    setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon + shippingPrice(prev.price)}));
+  }, [data.point]);
 
   return (
     <div className={styles.container}>
@@ -348,7 +335,7 @@ export const Payment = () => {
             <div>
               <button name="CARD" style={ data.way === "CARD" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
               <button name="KAKAO" style={ data.way === "KAKAO" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카카오 페이</button>
-              <button name="TOSS" style={ data.way === "TOSS" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 패스</button>
+              <button name="TOSS" style={ data.way === "TOSS" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 페이</button>
             </div>
           </div>
           <div className={styles.payment}>
@@ -358,7 +345,7 @@ export const Payment = () => {
               {
                 coupon.map(item => {
                   return (
-                    <option value={item.coupon_seq} key={item.coupon_owner_seq}>
+                    <option value={item.coupon_owner_seq} key={item.coupon_owner_seq}>
                       {item.coupon_title}
                     </option>
                   );

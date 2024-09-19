@@ -9,12 +9,14 @@ import { api, host } from '../../../../../../config/config';
 import { formatDate } from '../../../../../../commons/commons'
 import { Paging } from '../../../../../../components/Pagination/Paging';
 import { userInfo } from '../../../../../../api/member' 
-import { getReviewList , getReviewImgList , reviewLike, reviewUnlike , getReviewLikeCount , checkReviewLikeStatus } from '../../../../../../api/product';
+import { getReviewList , getReviewImgList , reviewLike, reviewUnlike , getReviewLikeCount , checkReviewLikeStatus , getRatings} from '../../../../../../api/product';
 import ReportModal from '../ReportModal/ReportModal';
-import { json, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
+
 
 export const ReviewSection = ({ product_seq, isAuth }) => {
-    const memberId = sessionStorage.getItem("member_id") || null;
+    const memberId = sessionStorage.getItem("member_id"); // 세션에서 member_id 가져오기
     const navi = useNavigate(); //페이지 전환을 위한 훅
     
     // =============== 모달창 ===============
@@ -160,12 +162,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     const handleRemoveExistImage = (index) => {
         // 이미지 URL을 미리보기 배열에서 제거
         setExistImages((prevImages) => prevImages.filter((_, i) => i !== index));
-    
-        // 이미지 파일을 data.images에서 제거
-        // setData((prevData) => ({
-        //     ...prevData, // 기존의 데이터는 유지하고
-        //     images: prevData.images.filter((_, i) => i !== index) // 선택된 이미지만 삭제
-        // }));
     };
 
     const handleRemoveNewImage = (index) => {
@@ -387,7 +383,12 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
         const fetchReviews = async () => {
             try {
                 const resp = await getReviewList(product_seq, page, itemsPerPage, sortType);
+                const ratingResp = await getRatings(product_seq);
                 const reviewsData = resp.data.reviews;
+                const ratingsData = ratingResp.data;
+                // console.log("테스트중1"+JSON.stringify(reviewsData));
+                // console.log("테스트중2"+JSON.stringify(ratingsData));
+                
     
                 if (reviewsData.length > 0) {
                     // 각 리뷰에 이미지 데이터를 병합
@@ -430,15 +431,24 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     // 리뷰 상태 및 총 리뷰 수 설정
                     setReviews(reviewsWithImages);
                     setTotalReviews(reviewsData[0].TOTAL_COUNT);
+                    // console.log(reviewsData);
+                    
     
                     // 평균 별점 계산
-                    const totalRating = reviewsData.reduce((acc, review) => acc + review.RATING, 0);
-                    setAverageRating(totalRating / reviewsData.length);
-    
+                    const totalRating = ratingsData.reduce((acc, review) => acc + review.rating, 0); 
+                    const averageRating = totalRating / ratingsData.length; // 평균 계산
+                    setAverageRating(averageRating);
+
                     // 별점 카운트 업데이트
                     const newRatingsCount = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-                    reviewsData.forEach(review => newRatingsCount[review.RATING]++);
+                    ratingsData.forEach(review => newRatingsCount[review.rating]++);
                     setRatingsCount(newRatingsCount);
+                    // console.log("1: " + JSON.stringify(newRatingsCount));
+                    console.log("2: " + JSON.stringify(ratingsCount));
+                    console.log("2: " + JSON.stringify(ratingsData));
+
+                    
+                    
 
                     // 각 리뷰의 좋아요 수를 가져옴 
                     const likePromises = reviewsData.map(async (review) => {

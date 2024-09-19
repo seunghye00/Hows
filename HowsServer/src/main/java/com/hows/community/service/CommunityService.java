@@ -1,5 +1,6 @@
 package com.hows.community.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,6 +172,11 @@ public class CommunityService {
 	public List<String> getFileURLsForBoard(int board_seq) throws Exception {
 	    return communityDAO.getFileURLsByBoardSeq(board_seq); // board_seq로 URL 목록 가져오는 DAO 호출
 	}
+	
+	// 사용자 구매내역 
+	public List<Map<String, Object>> purchaseHistory(int member_seq) throws Exception {
+	    return communityDAO.purchaseHistory(member_seq); 
+	}
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	public List<Map<String, Object>> reportedCommunity(Map<String, Object> params) throws Exception {
@@ -194,5 +200,15 @@ public class CommunityService {
 		communityDAO.deleteCommunityReport(board_seq);
 		// 게시물 삭제
 		return communityDAO.deleteCommunity(board_seq);
+	}
+
+	// 카테고리별 게시글 수 조회
+	public Map<String, Object> getBoardNumByCategory() {
+		Map<String, Object> result = new HashMap<>();
+		result.put("postCountByHousingType", communityDAO.getPostCountByHousingType());
+		result.put("postCountBySpaceType", communityDAO.getPostCountBySpaceType());
+		result.put("postCountByAreaType", communityDAO.getPostCountByAreaSize());
+		result.put("postCountByColor", communityDAO.getPostCountByColor());
+		return result;
 	}
 }

@@ -793,33 +793,41 @@ export const Modify = () => {
                         onClose={() => setIsModalOpen(false)}
                     >
                         <div className={styles.tagModal}>
-                            <div className={styles.tagSearch}>
-                                <Search size="l" />
+                            <div className={styles.tagTitle}>
+                                <h2>구매 내역</h2>
                             </div>
                             <div className={styles.productList}>
-                                {searchResults.map(product => (
-                                    <div
-                                        key={product.product_seq}
-                                        className={styles.searchResultItem}
-                                    >
-                                        <div className={styles.productImg}>
-                                            <img
-                                                src={product.product_thumbnail}
-                                                alt={product.name}
-                                            />
+                                {searchResults.length > 0 ? (
+                                    searchResults.map(product => (
+                                        <div
+                                            key={product.product_seq}
+                                            className={styles.searchResultItem}
+                                        >
+                                            <div className={styles.productImg}>
+                                                <img
+                                                    src={
+                                                        product.product_thumbnail
+                                                    }
+                                                    alt={product.name}
+                                                />
+                                            </div>
+                                            <div className={styles.productInfo}>
+                                                <span>{product.name}</span>
+                                                <Button
+                                                    size="s"
+                                                    title="선택"
+                                                    onClick={() =>
+                                                        handleAddTag(product)
+                                                    }
+                                                />
+                                            </div>
                                         </div>
-                                        <div className={styles.productInfo}>
-                                            <span>{product.name}</span>
-                                            <Button
-                                                size="s"
-                                                title="선택"
-                                                onClick={() =>
-                                                    handleAddTag(product)
-                                                }
-                                            />
-                                        </div>
+                                    ))
+                                ) : (
+                                    <div className={styles.noProductsMessage}>
+                                        <p>구매한 상품이 없습니다.</p>
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
                     </Modal>

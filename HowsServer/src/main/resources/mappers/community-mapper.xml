@@ -448,6 +448,22 @@
 		select image_url from board_image where board_seq = #{board_seq}
 	</select> 
 	
+	<!-- 사용자 구매내역  -->
+	<select id="purchaseHistory" resultType="map">
+		select 
+		    p.product_seq,
+		    p.product_thumbnail,
+		    p.product_title
+		from 
+		    orders o 
+		join 
+		    order_list ol on o.order_seq  = ol.order_seq 
+		join
+		    product p on ol.product_seq = p.product_seq 
+		where 
+		    o.member_seq = #{member_seq} and o.order_code = 'O6'
+	</select>
+	
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->
 

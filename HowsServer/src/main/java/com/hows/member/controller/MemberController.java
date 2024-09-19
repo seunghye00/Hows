@@ -352,33 +352,28 @@ public class MemberController {
 		return ResponseEntity.ok(roles);
 	}
 
-	// 등급만 업데이트 (관리자)
-	@PutMapping("/updateGrade")
-	public ResponseEntity<Integer> updateGrade(@RequestBody Map<String, String> request) {
-		String memberId = request.get("member_id");
-		String newGradeCode = request.get("grade_code");
+	// 등급 및 역할 동시에 업데이트 (블랙리스트 등록 포함)
+	@PutMapping("/updateMemberStatus")
+	public ResponseEntity<Integer> updateMemberStatus(@RequestBody Map<String, String> request) {
+	    String memberId = request.get("member_id");
+	    String newGradeCode = request.get("grade_code");
+	    String newRoleCode = request.get("role_code");
 
-		if (newGradeCode == null || newGradeCode.isEmpty()) {
-			return ResponseEntity.badRequest().body(0); // 변환 실패 시 400 에러 반환
-		}
+	    // 새로운 역할이 블랙리스트일 경우 블랙리스트 사유 코드도 함께 처리
+	    String blacklistReasonCode = request.get("blacklist_reason_code");
 
-		int result = memServ.updateGrade(memberId, newGradeCode);
-		return ResponseEntity.ok(result);
-	}
+	    // 등급 업데이트
+	    int gradeResult = memServ.updateGrade(memberId, newGradeCode);
 
-	// 역할만 업데이트 (관리자)
-	@PutMapping("/updateRole")
-	public ResponseEntity<Integer> updateRole(@RequestBody Map<String, String> request) {
-		String memberId = request.get("member_id");
-		String newRoleCode = request.get("role_code");
-		System.out.println("컨트롤러(역할) : " + newRoleCode);
+	    // 역할 업데이트
+	    int roleResult = memServ.updateRole(memberId, newRoleCode);
 
-		if (newRoleCode == null || newRoleCode.isEmpty()) {
-			return ResponseEntity.badRequest().body(0);
-		}
+	    // 만약 역할이 블랙리스트로 지정되었다면, 블랙리스트 사유를 추가로 처리
+	    if ("R3".equals(newRoleCode) && blacklistReasonCode != null) {
+	        memServ.addBlacklist(memberId, blacklistReasonCode);
+	    }
 
-		int result = memServ.updateRole(memberId, newRoleCode);
-		return ResponseEntity.ok(result);
+	    return ResponseEntity.ok(gradeResult + roleResult); // 결과 반환
 	}
 
 	// 전체 블랙리스트 사유 가져오기 (관리자)
@@ -388,21 +383,7 @@ public class MemberController {
 		System.out.println("컨트롤러 사유 : " + blacklistreasons);
 		return ResponseEntity.ok(blacklistreasons);
 	}
-
-	// 블랙리스트 등록 (관리자)
-	@PostMapping("/addBlacklist")
-	public ResponseEntity<Integer> addBlacklist(@RequestBody Map<String, String> request) {
-		String memberId = request.get("member_id");
-		String reasonCode = request.get("blacklist_reason_code");
-
-		// 로그 출력으로 데이터 확인
-		System.out.println("Received member_id: " + memberId);
-		System.out.println("Received blacklist_reason_code: " + reasonCode);
-
-		int result = memServ.addBlacklist(memberId, reasonCode);
-		return ResponseEntity.ok(result);
-	}
-
+	
 	// 블랙리스트 조회 (관리자)
 	@GetMapping("/blacklist")
 	public ResponseEntity<Map<String, Object>> selectBlacklist(@RequestParam int startRow, @RequestParam int endRow,

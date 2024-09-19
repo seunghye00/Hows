@@ -122,6 +122,7 @@ export const Notice = () => {
     const closeModal = () => {
         setIsModalOpen(false)
         setSelectedNotice(null)
+        loadNotices()
     }
 
     // 검색 기능 구현

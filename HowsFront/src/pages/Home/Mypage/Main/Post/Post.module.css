@@ -38,3 +38,72 @@
   object-fit: cover;
   cursor: pointer;
 }
+
+@media (max-width: 1012px) {
+  .container .contents .feed {
+    width: 300px;
+    height: 300px;
+  }
+}
+@media (max-width: 930px) {
+  .container .contents .feed {
+    width: 280px;
+    height: 280px;
+  }
+}
+@media (max-width: 869px) {
+  .container .contents .feed {
+    width: 260px;
+    height: 260px;
+  }
+}
+@media (max-width: 809px) {
+  .container .contents .feed {
+    width: 250px;
+    height: 250px;
+  }
+}
+@media (max-width: 780px) {
+  .container .contents .feed {
+    width: 240px;
+    height: 240px;
+  }
+}
+
+@media (max-width: 768px) {
+  .container .contents .feed {
+    width: 230px;
+    height: 230px;
+  }
+}
+@media (max-width: 720px) {
+  .container .contents .feed {
+    width: 220px;
+    height: 220px;
+  }
+}
+@media (max-width: 689px) {
+  .container .contents .feed {
+    width: 210px;
+    height: 210px;
+  }
+}
+@media (max-width: 660px) {
+  .container .contents .feed {
+    width: 200px;
+    height: 200px;
+  }
+}
+@media (max-width: 630px) {
+  .container .contents .feed {
+    width: 190px;
+    height: 190px;
+  }
+}
+@media (max-width: 600px) {
+  .container .contents .feed {
+    width: 100%;
+    height: auto;
+    margin: 3px 50px;
+  }
+}

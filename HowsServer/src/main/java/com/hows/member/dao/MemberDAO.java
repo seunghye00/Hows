@@ -43,11 +43,6 @@ public class MemberDAO {
 		return count != null && count > 0;
 	}
 
-	// [로그인]비밀번호 찾기 - 비밀번호 변경
-//	public int changePw(Map<String, String> map) {
-//		return mybatis.update("Member.changePw", map);
-//	}
-
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
 		return mybatis.selectOne("Member.findId", map);

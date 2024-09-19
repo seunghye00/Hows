@@ -12,11 +12,6 @@
 		)
 	</insert>
 
-	<!-- 방금 삽입된 데이터 조회 -->
-	<!-- <select id="selectBySeq" resultType="com.hows.member.dto.GuestbookDTO" parameterType="int">
-	    select * from guestbook where guestbook_seq = ${guestbook_seq}
-	</select> -->
-
 	<!-- 전체 출력 -->
 	<select id="selectAll" resultType="com.hows.member.dto.GuestbookSubDTO">
 	    select g.*, m.nickname, m.member_avatar

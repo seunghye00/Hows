@@ -243,10 +243,6 @@ public class MemberService implements UserDetailsService {
 	public int countBookmark(String member_id) {
 		return comDao.countBookmark(member_id);
 	}
-
-    
-    
-
     
 	// ========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)

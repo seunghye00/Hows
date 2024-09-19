@@ -4,7 +4,6 @@ import { useMemberStore } from "../../../../../store/store";
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 
-import { api } from "../../../../../config/config";
 import { format } from "date-fns";
 import {
   deleteGuestbook,

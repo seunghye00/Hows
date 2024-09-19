@@ -85,9 +85,6 @@ public class MemberController {
 	public ResponseEntity<MemberDTO> selectInfo(
 			 @RequestParam(required = false) String member_id,
 			@AuthenticationPrincipal CustomUserDetails user) {
-
-		System.out.println("요청한 사용자의 ID : " + user.getUsername());
-
 		if (member_id == null || member_id.isEmpty()) {
 	        member_id = user.getUsername(); // member_id가 없을 경우 JWT에서 ID 가져오기
 	    }
@@ -179,17 +176,13 @@ public class MemberController {
 	    	 String sysName = type.equals("profile") 
                      ? memServ.getProfileImageUrl(member_seq)  // 프로필 이미지 URL 가져오기
                      : memServ.getBannerImageUrl(member_seq);  // 배너 이미지 URL 가져오기
-	    	 System.out.println("삭제할 sysname : " + sysName);
-
 	        
 	        if (sysName != null) {
 	        	// 1-1. URL에서 마지막 슬래시 뒤의 파일명만 추출
 	            String fileName = sysName.substring(sysName.lastIndexOf("/") + 1);
-	            System.out.println("삭제할 파일명 : " + fileName);
 	        	
 	        	// 2. fileService를 통해 GCS에서 파일 삭제
 	            String result = fileServ.deleteFile(fileName, type.equals("profile") ? "F1" : "F7");
-	            System.out.println("삭제 결과 : " + result);
 
 	            // 3. DB에서 member 테이블의 member_avatar를 NULL로 설정
 	            if (!result.equals("fail")) {

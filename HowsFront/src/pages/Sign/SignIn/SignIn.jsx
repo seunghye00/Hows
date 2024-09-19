@@ -38,8 +38,8 @@ export const SignIn = () => {
         sessionStorage.setItem("member_avatar", decoded.member_avatar); // 사용자 프로필사진 저장
 
         setCurrentUser({
-          "nickname": decoded.nickname,
-          "member_avatar": decoded.member_avatar
+          nickname: decoded.nickname,
+          member_avatar: decoded.member_avatar,
         });
 
         login(token);
@@ -76,7 +76,7 @@ export const SignIn = () => {
   return (
     <div className={styles.container}>
       <div className={styles.loginBox}>
-        <div className={styles.logo}>
+        <div className={styles.logo} onClick={() => navi("/")}>
           <img src={logo}></img>
           <h1 className={styles.title}>How's</h1>
         </div>

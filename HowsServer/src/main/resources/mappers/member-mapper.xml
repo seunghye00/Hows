@@ -5,6 +5,11 @@
 
 <mapper namespace="Member">
 
+	<!-- 로그인 시 role_code 가져오기 -->
+	<select id="getRoleCode" resultType="String">
+		select role_code from member where member_id = #{member_id}
+	</select>
+
 	<!-- 회원가입 -->
 	<insert id="insert">
 		insert into member values (

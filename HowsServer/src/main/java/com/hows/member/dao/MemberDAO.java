@@ -20,6 +20,11 @@ public class MemberDAO {
 	@Autowired
 	private SqlSession mybatis;
 
+	// 로그인 시 role_code 가져오기
+	public String getRoleCode(String member_id) {
+		return mybatis.selectOne("Member.getRoleCode", member_id);
+	}
+	
 	// 회원가입
 	public void insert(MemberDTO dto) {
 		mybatis.insert("Member.insert", dto);

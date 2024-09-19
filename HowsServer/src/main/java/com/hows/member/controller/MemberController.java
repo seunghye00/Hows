@@ -47,6 +47,20 @@ public class MemberController {
 	@Autowired
 	private PasswordEncoder pwEncoder;
 
+	// 로그인 시 role_code 확인
+	@GetMapping("/getRoleCode")
+	public ResponseEntity<String> getRoleCode(@AuthenticationPrincipal CustomUserDetails user){
+		
+		System.out.println("유저 있어?? : " + user);
+		
+		String member_id = user.getUsername();
+		String result = memServ.getRoleCode(member_id);
+		
+		System.out.println("결과 :::: "+ result);
+		
+		return ResponseEntity.ok(result);
+	}
+	
 	// 암호화 회원가입
 	@PostMapping
 	public ResponseEntity<Void> insert(@RequestBody MemberDTO dto) {

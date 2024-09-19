@@ -22,6 +22,7 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 40px;
+  cursor: pointer;
 }
 .container .loginBox .logo > img {
   width: 90px;

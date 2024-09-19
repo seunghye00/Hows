@@ -1,14 +1,9 @@
-/* div {
-  border: 1px solid black;
-} */
-
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 30px 0 60px;
+  padding: 70px 0 70px;
   height: 100%;
-  /* background-color: #e7f3ed;  */
 }
 
 .container .signUpBox {

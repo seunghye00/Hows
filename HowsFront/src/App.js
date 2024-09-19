@@ -1,28 +1,26 @@
-import './App.css'
-import { Home } from './pages/Home/Home'
-import { Admin } from './pages/Admin/Admin'
-import { Side } from './components/Side/Side'
-import { Header } from './components/Header/Header'
-import { Footer } from './components/Footer/Footer'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import './App.css';
+import { Home } from './pages/Home/Home';
+import { Admin } from './pages/Admin/Admin';
+import { Side } from './components/Side/Side';
+import { Header } from './components/Header/Header';
+import { Footer } from './components/Footer/Footer';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { useAuthStore, useMemberStore } from './store/store';
-import { jwtDecode } from 'jwt-decode'
-
+import { jwtDecode } from 'jwt-decode'; // import 수정
+import { api } from './config/config';
 
 function App() {
     const [session, setSession] = useState(true);
     const { isAuth, login } = useAuthStore();
-    const { setCurrentUser } = useMemberStore();
+    const { currentUser, setCurrentUser } = useMemberStore();
 
-    // 로딩
-
-    // if login
+    // 로그인 상태 체크
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         if (token != null) {
             const decoded = jwtDecode(token);
-            sessionStorage.getItem("member_id");
+            const member_id = sessionStorage.getItem("member_id");
             const nickname = sessionStorage.getItem("nickname");
             const profile = sessionStorage.getItem("member_avatar");
 
@@ -33,26 +31,55 @@ function App() {
 
             login(token);
         }
-    }, [])
+    }, [login, setCurrentUser]);
+
+
+    useEffect(() => {
+        if (isAuth) {
+            // 회원 정보 가져오기 (role_code 확인)
+            api.get(`/member/getRoleCode`).then(resp => {
+                console.log("누구니 ~:: ", resp.data);
+
+                if (resp.data === 'R1') setSession(false);
+                else if (resp.data === 'R2') setSession(true);
+            })
+        }
+    }, [isAuth])
+
+
+    // Router 내부에서 useLocation 사용
+    return (
+        <Router>
+            <AppContent session={session} />
+        </Router>
+    );
+}
+
+function AppContent({ session }) {
+    const location = useLocation();
+
+    // 특정 경로에서 Header와 Footer 숨기기
+    const hideHeaderFooter = location.pathname === '/signIn' || location.pathname === '/signUp';
 
     return (
         <div className={session ? 'App' : 'Admin'}>
-            <Router>
-                {session ? (
-                    <>
-                        <Header />
-                        <Home />
-                        <Footer />
-                    </>
-                ) : (
-                    <>
-                        <Side />
-                        <Admin />
-                    </>
-                )}
-            </Router>
+            {session ? (
+                <>
+                    {!hideHeaderFooter && <Header />}
+                    <Routes>
+                        <Route path="/*" element={<Home />} />
+                        {/* 추가 라우트들 */}
+                    </Routes>
+                    {!hideHeaderFooter && <Footer />}
+                </>
+            ) : (
+                <>
+                    <Side />
+                    <Admin />
+                </>
+            )}
         </div>
-    )
+    );
 }
 
-export default App
+export default App;

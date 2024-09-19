@@ -12,7 +12,6 @@ import banner from '../../../../assets/images/마이페이지_가로배너.jpg'
 import profile from '../../../../assets/images/기본사진.jpg'
 
 import { useEffect, useState, useRef } from "react";
-import { api } from "./../../../../config/config";
 import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
 import { Modal } from "../../../../components/Modal/Modal"
@@ -45,7 +44,6 @@ export const Main = () => {
     const [followerData, setFollowerData] = useState([]); // 팔로워 데이터
     const [followingData, setFollowingData] = useState([]); // 팔로잉 데이터
 
-    const { isAuth } = useAuthStore() // 로그인 여부 확인
     const { currentUser, setCurrentUser } = useMemberStore();
     const session_member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
     const session_member_seq = jwtDecode(sessionStorage.getItem("token")).member_seq // token에서 member_seq 가져오기

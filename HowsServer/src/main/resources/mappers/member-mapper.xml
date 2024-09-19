@@ -50,12 +50,6 @@
 		where email = #{email}
 	</select>
 
-	<!-- [로그인]비밀번호 찾기 - 비밀번호 변경 -->
-<!-- 	<update id="changePw">
-		update member set pw = #{pw} where member_id =
-		#{member_id} and email = #{email}
-	</update> -->
-
 	<!-- 회원정보 가져오기 -->
 	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
 		select * from member where
@@ -124,7 +118,6 @@
 	    update member set member_banner = null where member_seq = ${member_seq}
 	</update>
 	
-
 	<!-- 비밀번호 변경 시 기존 비밀번호 확인 -->
 	<select id="getPasswordById" resultType="string">
 		select pw from member
@@ -214,7 +207,6 @@
 	    WHERE 
 	        f.from_member_seq = ${member_seq}
 	</select>
-
     
     <!-- 팔로워, 팔로잉 수 가져오기 -->
     <select id="countFollow" resultType="map">

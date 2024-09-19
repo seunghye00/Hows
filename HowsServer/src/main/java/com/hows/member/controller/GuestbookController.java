@@ -68,7 +68,6 @@ public class GuestbookController {
     	return ResponseEntity.ok(result);
     }
 	
-	
 	// 마이페이지 방문글 갯수
 	@GetMapping("/countGuestbook")
 	public ResponseEntity<Integer> countGuestbook(@RequestParam int member_seq){
@@ -76,10 +75,6 @@ public class GuestbookController {
 		return ResponseEntity.ok(result);
 	}
 
-    
-    
-    
-    
 	@ExceptionHandler(Exception.class)
 	   public ResponseEntity<String> exceptionHandler(Exception e) {
 	      e.printStackTrace();

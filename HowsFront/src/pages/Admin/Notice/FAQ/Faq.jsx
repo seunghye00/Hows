@@ -46,7 +46,7 @@ const Faq = () => {
 
     // FAQ 추가
     const addFaqItem = () => {
-        const newFaq = { faq_title: '제목', faq_contents: '답변 :' }
+        const newFaq = { faq_title: '제목', faq_contents: '답변 :       ' }
         setFaqList([...faqList, newFaq])
         setIsAdd(true)
         setEditIndex(faqList.length)

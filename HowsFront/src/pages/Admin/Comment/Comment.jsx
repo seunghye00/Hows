@@ -150,7 +150,7 @@ export const Comment = () => {
                                 {comment.NICKNAME}
                             </div>
                             <div className={styles.commentItem}>
-                                {comment.WRITE_DATE}
+                                {formatDate(comment.WRITE_DATE)}
                             </div>
 
                             <div
@@ -181,12 +181,14 @@ export const Comment = () => {
                 )}
             </div>
 
-            <Paging
-                page={page}
-                count={totalComments}
-                perpage={itemsPerPage}
-                setPage={setPage}
-            />
+            <div className={styles.pagination}>
+                <Paging
+                    page={page}
+                    count={totalComments}
+                    perpage={itemsPerPage}
+                    setPage={setPage}
+                />
+            </div>
 
             {isCommentModalOpen && (
                 <div className={styles.reportModal}>

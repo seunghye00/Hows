@@ -245,4 +245,9 @@ public class MemberDAO {
 		return mybatis.update("Member.modifyBlacklist", member_id);
 	}
 
+	// 연령대별 남녀 회원 수 조회
+	public List<Map<String, Object>> getAgeGenderDistribution() {
+		return mybatis.selectList("Member.getAgeGenderDistribution");
+	}
+
 }

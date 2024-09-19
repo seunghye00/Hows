@@ -284,7 +284,6 @@ public class ProductController {
 //        return ResponseEntity.ok(bestProducts);
 //    }
 
-
 	// ==================
 	// 상품 추가
 	@PostMapping
@@ -407,7 +406,14 @@ public class ProductController {
 		}
 		return ResponseEntity.ok("success");
 	}
-
+	
+	// 카테고리별 상품 수 조회
+	@GetMapping("/getProductNumByCategory")
+	public ResponseEntity<List<Map<String, Object>>> getProductNumByCategory() throws Exception {
+		List<Map<String, Object>> result = productServ.getProductNumByCategory();
+		return ResponseEntity.ok(result);
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

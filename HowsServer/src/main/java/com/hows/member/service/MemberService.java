@@ -313,4 +313,9 @@ public class MemberService implements UserDetailsService {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	// 연령대별 남녀 회원 수 조회
+	public List<Map<String, Object>> getAgeGenderDistribution() {
+		return memDao.getAgeGenderDistribution();
+	}
 }

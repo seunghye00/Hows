@@ -1,0 +1,8 @@
+.eventContainer {
+    flex: 9 1;
+    height: 100%;
+    overflow-y: auto;
+    margin-left: 95px;
+    width: 1440px;
+    box-sizing: border-box;
+}

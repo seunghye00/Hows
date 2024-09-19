@@ -91,4 +91,7 @@
         update payment set payment_code = 'P5' where payment_id = #{paymentId}
     </update>
 
+	<select id="getOrderSeq" resultType="int">
+		select order_seq from payment where payment_seq = #{payment_seq}
+	</select>
 </mapper>

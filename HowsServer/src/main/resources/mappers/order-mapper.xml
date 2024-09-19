@@ -139,4 +139,9 @@
 	<delete id="delete">
 		delete from orders where order_seq = #{orderSeq}
 	</delete>
+	
+	<!-- 주문 상태 조회 -->
+	<select id="getOrderCode">
+		select order_code from orders where order_seq = #{orderSeq}
+	</select>
 </mapper>

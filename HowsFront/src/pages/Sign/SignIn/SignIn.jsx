@@ -1,13 +1,10 @@
 import styles from "./SignIn.module.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import logo from "../../../assets/images/logo_how.png";
-import axios from "axios";
+import logo from "../../../assets/images/로그인_로고.png";
 import { jwtDecode } from "jwt-decode";
 import { useAuthStore, useMemberStore } from "./../../../store/store";
-import { host } from "./../../../config/config";
 import { FindId } from "./FindId/FindId";
-import { FindPw } from "./FindPw/FindPw";
 import { loginUser } from "../../../api/member";
 import Swal from "sweetalert2";
 
@@ -78,7 +75,7 @@ export const SignIn = () => {
       <div className={styles.loginBox}>
         <div className={styles.logo} onClick={() => navi("/")}>
           <img src={logo}></img>
-          <h1 className={styles.title}>How's</h1>
+          {/* <h1 className={styles.title}>How's</h1> */}
         </div>
         <input
           type="text"

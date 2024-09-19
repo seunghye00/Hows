@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Coupon">
+
+    <resultMap id="myCouponMap" type="java.util.HashMap">
+        <result property="coupon_owner_seq" column="coupon_owner_seq"/>
+        <result property="member_seq" column="member_seq"/>
+        <result property="coupon_seq" column="coupon_seq"/>
+        <result property="order_seq" column="order_seq"/>
+        <result property="get_date" column="get_date" javaType="java.sql.Timestamp"/>
+        <result property="use_date" column="use_date" javaType="java.sql.Timestamp"/>
+        <result property="coupon_title" column="coupon_title"/>
+        <result property="coupon_type" column="coupon_type"/>
+        <result property="coupon_discount" column="coupon_discount"/>
+        <result property="expired_date" column="expired_date" javaType="java.sql.Timestamp"/>
+    </resultMap>
+
+    <select id="getCoupon" resultType="com.hows.coupon.dto.CouponDTO">
+        SELECT
+            *
+        FROM
+            coupon
+        WHERE
+            coupon_seq = #{coupon_seq}
+    </select>
+
+    <insert id="addCoupon">
+        INSERT INTO
+            coupon
+        VALUES(
+            coupon_seq.nextval,
+            #{coupon_title},
+            #{coupon_type},
+            #{coupon_discount},
+            #{expired_date}
+        )
+    </insert>
+
+    <delete id="delCoupon">
+        DELETE FROM
+            coupon
+        WHERE
+            coupon_seq = #{coupon_seq}
+    </delete>
+
+    <select id="getMyCoupon" resultMap="myCouponMap">
+        SELECT
+            co.*,
+            c.coupon_title,
+            c.coupon_type,
+            c.coupon_discount,
+            c.expired_date
+        FROM
+            coupon_owner co
+            JOIN coupon c ON co.coupon_seq = c.coupon_seq
+        WHERE
+            member_seq = #{member_seq}
+    </select>
+
+    <insert id="addMyCoupon">
+        INSERT INTO
+            coupon_owner
+        VALUES(
+            coupon_owner_seq.nextval,
+            #{member_seq},
+            #{coupon_seq},
+            null,
+            sysdate,
+            null
+        )
+    </insert>
+
+    <update id="useMyCoupon">
+        UPDATE
+            coupon_owner
+        SET
+            order_seq = #{order_seq},
+            use_date = sysdate
+        WHERE
+            coupon_owner_seq = #{coupon_owner_seq}
+    </update>
+
+    <delete id="delMyCoupon">
+        DELETE FROM
+            coupon_owner
+        WHERE
+            coupon_owner_seq = #{coupon_owner_seq}
+    </delete>
+
+</mapper>

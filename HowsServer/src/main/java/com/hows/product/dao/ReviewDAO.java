@@ -94,6 +94,11 @@ public class ReviewDAO {
     	params.put("review_contents", review_contents);
     	myBatis.update("Product.updateReview", params);
     }
+    
+    // 리뷰 전체 별점
+    public List<ReviewDTO> getRatings(int product_seq) {
+    	return myBatis.selectList("Product.getRatings", product_seq);
+    }
  
     //  =============== 사용자 기능 ===============
     

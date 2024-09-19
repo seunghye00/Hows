@@ -5,11 +5,21 @@
 
 .imageSwiper {
     width: 100%;
+    aspect-ratio: 3 / 4;
+    /* 3:4 비율 설정 */
+}
+
+:global(.swiper-slide) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .ImageBox {
+    width: 100%;
     border-radius: 20px;
     overflow: hidden;
+    position: relative;
 }
 
 .slideImage {

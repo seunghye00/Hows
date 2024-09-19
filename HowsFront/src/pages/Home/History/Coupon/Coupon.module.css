@@ -4,6 +4,18 @@
   /* background-color: aliceblue; */
 }
 
+.container > .couponFormTop {
+  width: 97%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: auto;
+}
+
+.container > .couponFormTop > .countCoupons > select {
+  width: 200px;
+}
+
 .container .countCoupons {
   padding: 5px 0 10px 15px;
   font-size: 20px;

@@ -31,6 +31,7 @@ import {
 import { userInfo } from '../../../../../api/member' // API 함수 불러오기
 import { useAuthStore } from '../../../../../store/store'
 import { BiMessageRounded } from 'react-icons/bi'
+import defaultProfile from '../../../../../assets/images/defaultProfile.png'
 
 export const Detail = () => {
     const navigate = useNavigate() // 페이지 이동을 위한 navigate 함수
@@ -96,9 +97,23 @@ export const Detail = () => {
                 setComments(commentsData.comments) // 댓글 목록 상태 업데이트
                 setTotalCommentsCount(commentsData.totalCount) // 전체 댓글 수 업데이트
 
-                // 유저 정보 불러오기 (세션에서 가져온 member_id로)
-                const response = await userInfo(member_id)
-                setUserProfile(response.data.member_avatar) // 유저 아바타 정보 가져오기
+                // member_id가 있는 경우에만 유저 정보를 가져옴
+                if (member_id) {
+                    try {
+                        // 유저 정보 불러오기 (세션에서 가져온 member_id로)
+                        const response = await userInfo(member_id)
+                        setUserProfile(response.data.member_avatar) // 유저 아바타 정보 가져오기
+                    } catch (error) {
+                        console.error(
+                            '멤버 정보를 가져오는 중 오류 발생:',
+                            error
+                        )
+                    }
+                } else {
+                    console.log(
+                        '로그인하지 않은 사용자입니다. 유저 정보를 가져오지 않습니다.'
+                    )
+                }
             } catch (error) {
                 console.error('데이터를 가져오는 중 오류 발생:', error)
             }
@@ -469,7 +484,7 @@ export const Detail = () => {
             )}
             <div className={styles.commentInput}>
                 <div className={styles.writerProfile}>
-                    <img src={userProfile} alt="profile" />
+                    <img src={userProfile || defaultProfile} alt="profile" />
                 </div>
                 <textarea
                     placeholder="댓글을 입력하세요 (최대 300자)"
@@ -517,12 +532,17 @@ export const Detail = () => {
                 )}
             </div>
 
-            <Paging
-                page={page}
-                count={totalCommentsCount}
-                setPage={handlePageChange}
-                perpage={itemsPerPage}
-            />
+            {/*  댓글 없으면 페이지네이션 출력 X */}
+            {comments.length > 0 ? (
+                <Paging
+                    page={page}
+                    count={totalCommentsCount}
+                    setPage={handlePageChange}
+                    perpage={itemsPerPage}
+                />
+            ) : (
+                <></>
+            )}
 
             <ReportModal
                 isModalOpen={isModalOpen}

@@ -448,6 +448,22 @@
 		select image_url from board_image where board_seq = #{board_seq}
 	</select> 
 	
+	<!-- 사용자 구매내역  -->
+	<select id="purchaseHistory" resultType="map">
+		select 
+		    p.product_seq,
+		    p.product_thumbnail,
+		    p.product_title
+		from 
+		    orders o 
+		join 
+		    order_list ol on o.order_seq  = ol.order_seq 
+		join
+		    product p on ol.product_seq = p.product_seq 
+		where 
+		    o.member_seq = #{member_seq} and o.order_code = 'O6'
+	</select>
+	
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->
 	<select id="reportedCommunity" parameterType="map" resultType="map">
@@ -519,5 +535,36 @@
 		br ON b.board_seq = br.board_seq
 	</select>
 
+	<!-- 주거 형태별 게시글 수 조회 -->
+	<select id="getPostCountByHousingType" resultType="map">
+		select h.housing_type_title, count(b.board_seq) as post_count
+		from housing_type h
+		left join board b on h.housing_type_code = b.housing_type_code
+		group by h.housing_type_title
+	</select>
+	
+	<!-- 공간별 게시글 수 조회 -->
+	<select id="getPostCountBySpaceType" resultType="map">
+		select s.space_type_title, count(b.board_seq) as post_count
+		from space_type s
+		left join board b on s.space_type_code = b.space_type_code
+		group by s.space_type_title
+	</select>
+	
+	<!-- 평수별 게시글 수 조회 -->
+	<select id="getPostCountByAreaSize" resultType="map">
+		select a.area_size_title, count(b.board_seq) as post_count
+		from area_size a
+		left join board b on a.area_size_code = b.area_size_code
+		group by a.area_size_title
+	</select>
+	
+	<!-- 컬러별 게시글 수 조회 -->
+	<select id="getPostCountByColor" resultType="map">
+		select c.color_title, count(b.board_seq) as post_count
+		from color c
+		left join board b on c.color_code = b.color_code
+		group by c.color_title
+	</select>
 
 </mapper>

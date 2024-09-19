@@ -210,3 +210,8 @@ export const selectBlacklist = (
 export const modifyBlacklist = ({ member_id }) => {
     return api.put(`${baseUrl}/modifyBlacklist`, { member_id })
 }
+
+// 연령대별 남녀 멤버 수 조회
+export const getAgeGenderDistribution = () => {
+    return axios.get(`${baseUrl}/getAgeGenderDistribution`)
+}

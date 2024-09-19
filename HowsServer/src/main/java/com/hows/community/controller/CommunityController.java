@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hows.File.service.FileService; // FileService 클래스 import
+import com.hows.common.CustomUserDetails;
 import com.hows.community.dto.BoardReportDTO;
 import com.hows.community.dto.CommunityDTO; // CommunityDTO import
 import com.hows.community.dto.ImageDTO; // ImageDTO import
@@ -520,6 +522,14 @@ public class CommunityController {
 		return ResponseEntity.ok().build();
 	}
 
+	// 사용자 구매내역 
+	@GetMapping("/purchaseHistory")
+	public ResponseEntity<List<Map<String, Object>>> purchaseHistory(@AuthenticationPrincipal CustomUserDetails user) throws Exception {
+		int member_seq = user.getMemberSeq();
+		List<Map<String, Object>> list = communityServ.purchaseHistory(member_seq);
+		return ResponseEntity.ok(list);
+	}
+	
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	@GetMapping("/reportedCommunity")
@@ -595,6 +605,13 @@ public class CommunityController {
 	    }
 	    // 마지막 슬래시 뒤에 있는 파일명만 추출
 	    return fileURL.substring(fileURL.lastIndexOf("/") + 1);
+	}
+	
+	// 카테고리 별 게시글 수 조회
+	@GetMapping("/getBoardNumByCategory")
+	public ResponseEntity<Map<String, Object>> getBoardNumByCategory() throws Exception {
+		Map<String, Object> result = communityServ.getBoardNumByCategory();
+		return ResponseEntity.ok(result);
 	}
 	
 	@ExceptionHandler(Exception.class)

@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { Editor, EditorState, ContentState } from 'draft-js'
-import 'draft-js/dist/Draft.css'
 import styles from './Reply.module.css'
 import { toggleLikeReply } from '../../../../../../../api/comment' // 좋아요 API 가져오기
 import { PiSiren } from 'react-icons/pi'
@@ -39,20 +37,10 @@ export const Reply = ({
 }) => {
     const { isAuth } = useAuthStore() // 로그인 여부를 확인하는 전역 상태
     const navigate = useNavigate() // 페이지 이동을 위한 네비게이션 훅
-    const [editorState, setEditorState] = useState(() =>
-        EditorState.createWithContent(
-            ContentState.createFromText(replyData.REPLY_CONTENTS)
-        )
-    )
+    const [replyContent, setReplyContent] = useState(replyData.REPLY_CONTENTS) // 답글 내용 상태
     const [isLiked, setIsLiked] = useState(replyData.isLiked) // 좋아요 상태 초기화
     const [likeCount, setLikeCount] = useState(replyData.LIKE_COUNT) // 좋아요 수 초기화
-
-    // 수정 모드 전환 시 커서 끝으로 이동
-    useEffect(() => {
-        if (editingReplySeq === replyData.REPLY_SEQ) {
-            setEditorState(EditorState.moveFocusToEnd(editorState))
-        }
-    }, [editingReplySeq])
+    const [charCount, setCharCount] = useState(replyData.REPLY_CONTENTS.length) // 글자수 상태
 
     // 수정 모드 토글 (내용 그대로 유지)
     const toggleEditMode = () => {
@@ -65,7 +53,17 @@ export const Reply = ({
 
     // 수정된 내용을 서버로 제출하는 함수
     const handleSaveEdit = async () => {
-        const content = editorState.getCurrentContent().getPlainText()
+        const content = replyContent.trim()
+
+        if (content.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: '내용을 입력해주세요.',
+                showConfirmButton: true,
+            })
+            return
+        }
+
         try {
             await handleUpdateReply(replyData.REPLY_SEQ, content)
             setEditingReplySeq(null) // 수정 모드 종료
@@ -123,6 +121,15 @@ export const Reply = ({
         toggleReply(replyData.REPLY_SEQ)
     }
 
+    // 글자수 제한 함수
+    const handleInputChange = e => {
+        const input = e.target.value
+        if (input.length <= 300) {
+            setReplyContent(input)
+            setCharCount(input.length)
+        }
+    }
+
     return (
         <div className={styles.replyItem}>
             <div className={styles.replyHeader}>
@@ -139,10 +146,19 @@ export const Reply = ({
                 }`}
             >
                 {editingReplySeq === replyData.REPLY_SEQ ? (
-                    <Editor
-                        editorState={editorState}
-                        onChange={setEditorState}
+                    <textarea
+                        className={styles.replyTxt}
+                        value={replyContent}
+                        onChange={handleInputChange}
                         placeholder="수정할 내용을 입력하세요."
+                        rows={3}
+                        maxLength={300} // 300글자 제한
+                        onKeyDown={e => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                // Enter로 줄바꿈 허용
+                                return
+                            }
+                        }}
                     />
                 ) : (
                     replyData.REPLY_CONTENTS
@@ -175,7 +191,7 @@ export const Reply = ({
                                 <>
                                     <div
                                         className={styles.btnSave}
-                                        onClick={handleSaveEdit} // 수정 저장 시 서버에 제출
+                                        onClick={handleSaveEdit}
                                     >
                                         저장
                                     </div>
@@ -196,7 +212,7 @@ export const Reply = ({
                                     </div>
                                     <div
                                         className={styles.btnDelete}
-                                        onClick={handleDelete} // 삭제 처리
+                                        onClick={handleDelete}
                                     >
                                         삭제
                                     </div>

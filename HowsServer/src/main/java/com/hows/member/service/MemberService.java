@@ -243,10 +243,6 @@ public class MemberService implements UserDetailsService {
 	public int countBookmark(String member_id) {
 		return comDao.countBookmark(member_id);
 	}
-
-    
-    
-
     
 	// ========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
@@ -312,5 +308,10 @@ public class MemberService implements UserDetailsService {
 	public int getMemberSeq() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	// 연령대별 남녀 회원 수 조회
+	public List<Map<String, Object>> getAgeGenderDistribution() {
+		return memDao.getAgeGenderDistribution();
 	}
 }

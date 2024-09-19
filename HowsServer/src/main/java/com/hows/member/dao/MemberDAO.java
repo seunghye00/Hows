@@ -43,11 +43,6 @@ public class MemberDAO {
 		return count != null && count > 0;
 	}
 
-	// [로그인]비밀번호 찾기 - 비밀번호 변경
-//	public int changePw(Map<String, String> map) {
-//		return mybatis.update("Member.changePw", map);
-//	}
-
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
 		return mybatis.selectOne("Member.findId", map);
@@ -243,6 +238,11 @@ public class MemberDAO {
 	// 블랙리스트 수정 (관리자)
 	public int modifyBlacklist(String member_id) {
 		return mybatis.update("Member.modifyBlacklist", member_id);
+	}
+
+	// 연령대별 남녀 회원 수 조회
+	public List<Map<String, Object>> getAgeGenderDistribution() {
+		return mybatis.selectList("Member.getAgeGenderDistribution");
 	}
 
 }

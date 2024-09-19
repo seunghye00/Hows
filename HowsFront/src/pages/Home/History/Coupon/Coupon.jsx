@@ -6,26 +6,60 @@ import {myCoupon} from "../../../../api/history";
 
 export const Coupon = () => {
   const [myCoupons, setMyCoupons] = useState([]);
+  const [selectCoupon, setSelectCoupon] = useState([]);
+  const [select, setSelect] = useState(0);
+
+  const handleSelect = (e) => {
+    console.log(e.target.value);
+    setSelect(parseInt(e.target.value));
+  }
+
+  useEffect(() => {
+    setSelectCoupon(myCoupons);
+    if(select === 1) {
+      setSelectCoupon(prev =>
+        prev.filter(item => {
+          return item.use_date === undefined
+        })
+      )
+    }
+    if(select === 2) {
+      setSelectCoupon(prev =>
+        prev.filter(item => {
+          return item.use_date !== undefined
+        })
+      )
+    }
+  }, [select]);
 
   useEffect(() => {
     myCoupon().then(res => {
-      console.log(res.data);
       setMyCoupons(res.data);
+      setSelectCoupon(res.data);
     });
   }, []);
 
 
   return (
     <div className={styles.container}>
+      <div className={styles.couponFormTop}>
+        <div className={styles.countCoupons}>
+          <select onChange={handleSelect}>
+            <option value={0}>전체 쿠폰</option>
+            <option value={1}>사용 가능</option>
+            <option value={2}>사용한 쿠폰</option>
+          </select>
+        </div>
+        <div className={styles.countCoupons}>
+          <span>{selectCoupon.length}</span>
+          <span>개의 쿠폰</span>
+        </div>
+      </div>
       {
-        myCoupons.length > 0 ?
+        selectCoupon.length > 0 ?
           <>
-            <div className={styles.countCoupons}>
-              <span>{myCoupons.length}</span>
-              <span>개의 쿠폰</span>
-            </div>
             {
-              myCoupons.map((item, i) => {
+              selectCoupon.map(item => {
                 return (
                   <div className={styles.couponBox} key={item.coupon_owner_seq}>
                     {
@@ -43,9 +77,7 @@ export const Coupon = () => {
                           </div>
                           <span className={styles.useDate}>{formatDate(item.use_date)} 사용</span>
                         </>
-
                     }
-
                   </div>
                 )
               })

@@ -78,7 +78,7 @@ export const Delivery = () => {
         {
           myPayment.length > 0 ?
             myPayment.map(item => (
-              <div className={styles.shippingRow} key={item.order_seq}>
+              <div className={styles.shippingRow} key={item.order_seq} style={item.payment_code === "P4" ? {color: "var(--hows-gray-300)"} : item.payment_code === "P5" ? {color: "var(--hows-gray-300)", textDecoration: "line-through"} : {}}>
                 <div className={styles.shippingItem}>How's-order_{item.order_seq}</div>
                 <div className={styles.shippingItem}>
                   <p onClick={() => handleDetail(item.order_seq, item.payment_seq, item.payment_code)}>{item.order_name}</p>

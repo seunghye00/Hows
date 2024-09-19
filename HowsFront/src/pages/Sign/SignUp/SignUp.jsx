@@ -590,7 +590,7 @@ export const SignUp = () => {
                 </div>
                 <div className={styles.btns}>
                     <button onClick={handleSubmit}>회원가입</button>
-                    <button>취소</button>
+                    <button onClick={() => navi('/')}>홈으로</button>
                 </div>
                 <div className={styles.login}>
                     <span>이미 아이디가 있으신가요? </span>

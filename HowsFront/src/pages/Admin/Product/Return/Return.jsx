@@ -129,11 +129,17 @@ export const Return = () => {
         }).then(result => {
             if (result.isConfirmed) {
                 // 환불 완료 요청
-                doneReturn(selectedOrders.map(order => order.return_seq))
+                doneReturn(
+                    selectedOrders.map(order => ({
+                        return_seq: order.return_seq,
+                        payment_id: order.payment_id,
+                        payment_text: order.payment_text,
+                    }))
+                )
                     .then(resp => {
                         console.log(resp)
                         const currentTimestamp = new Date().toISOString()
-                        // 구매 확정 후 주문 목록 업데이트
+                        // 환불 완료 후 주문 목록 업데이트
                         const updatedOrders = orders.map(order =>
                             selectedOrders.some(
                                 selected =>
@@ -143,7 +149,7 @@ export const Return = () => {
                                       ...order,
                                       return_code: 'R6',
                                       done_return_date: currentTimestamp,
-                                  } // 구매 확정 상태로 변경
+                                  } // 환불 완료 상태로 변경
                                 : order
                         )
                         setOrders(
@@ -436,6 +442,57 @@ export const Return = () => {
                     </div>
                 </div>
             </div>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                <h2 className={styles.modalTitle}>주문 상세 정보</h2>
+                <div className={styles.dateInfo}>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>주문일</div>
+                        <div>{formatDate(viewOrder.order_date)}</div>
+                    </div>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>결재일</div>
+                        <div>{formatDate(viewOrder.payment_date)}</div>
+                    </div>
+                </div>
+                <div className={styles.dateInfo}>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>환불 요청일</div>
+                        <div>{formatDate(viewOrder.return_date)}</div>
+                    </div>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>환불 완료일</div>
+                        <div>{formatDate(viewOrder.done_return_date)}</div>
+                    </div>
+                </div>
+                <div className={styles.orderInfo}>
+                    <div className={styles.name}>
+                        <div className={styles.subTitle}>주문명</div>
+                        <div>{viewOrder.order_name}</div>
+                    </div>
+                    <div className={styles.price}>
+                        <div className={styles.subTitle}>주문 금액</div>
+                        <div>{addCommas(viewOrder.order_price)}원</div>
+                    </div>
+                    <div className={styles.price}>
+                        <div className={styles.subTitle}>결재 금액</div>
+                        <div>{addCommas(viewOrder.payment_price)}원</div>
+                    </div>
+                </div>
+                <div className={styles.memberInfo}>
+                    <div className={styles.member}>
+                        <div className={styles.subTitle}>회원 등급</div>
+                        <div>{viewOrder.grade_title}</div>
+                    </div>
+                    <div className={styles.member}>
+                        <div className={styles.subTitle}>회원명</div>
+                        <div>{viewOrder.name}</div>
+                    </div>
+                    <div className={styles.member}>
+                        <div className={styles.subTitle}>전화 번호</div>
+                        <div>{viewOrder.orderer_phone}</div>
+                    </div>
+                </div>
+            </Modal>
         </>
     )
 }

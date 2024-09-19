@@ -86,5 +86,9 @@
         WHERE
             payment_id = #{payment_id}
     </delete>
+    
+    <update id="doneCancel">
+        update payment set payment_code = 'P5' where payment_id = #{paymentId}
+    </update>
 
 </mapper>

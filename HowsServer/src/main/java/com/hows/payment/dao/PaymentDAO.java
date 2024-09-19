@@ -39,4 +39,8 @@ public class PaymentDAO {
         return mybatis.delete("Payment.cancelPayment", id);
     }
 
+    // 결제 취소 상태로 업데이트
+	public boolean doneCancel(String paymentId) {
+		return mybatis.update("Payment.doneCancel", paymentId) > 0;
+	}
 }

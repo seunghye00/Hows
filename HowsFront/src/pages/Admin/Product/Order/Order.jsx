@@ -56,7 +56,7 @@ export const Order = () => {
         }
         // 상태별로 주문 목록 필터링
         filtered = filtered.filter(
-            order => status === 'delivery' || order.order_code === status
+            order => status === 'product' || order.order_code === status
         )
         // 최종 필터링된 목록 설정
         setFilteredOrders(filtered)

@@ -20,6 +20,4 @@ public class ReturnService {
 		int result = returnDAO.updateReturn(dto);
         return result > 0 ? "ok" : "fail";
 	}
-
-
 }

@@ -218,8 +218,9 @@ export const Payment = () => {
     const price = sessionStorage.getItem("howsPrice");
 
     if(item === null || price === null) {
+
       alert("선택한 상품이 없습니다.")
-      return navi("/cart");
+      return navi("/");
     }
 
     if(orderProducts.length <= 0){

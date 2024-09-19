@@ -642,6 +642,36 @@ increment by 1
 nomaxvalue
 nocache;
 
+-- FAQ
+create table faq (
+faq_seq number primary key,
+faq_title varchar2(100) not null,
+faq_contents varchar2(4000) not null,
+notice_code char(2) default 'N2' not null
+);
+
+create sequence faq_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
+
+-- 이벤트
+create table event (
+event_seq number primary key,
+event_title varchar2(100) not null,
+event_contents varchar2(4000) not null,
+event_date timestamp default sysdate,
+view_count number default 0 not null,
+notice_code char(2) default 'N3' not null
+);
+
+create sequence event_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
+
 -- 공지 코드
 create table notice_code (
     notice_code char(2) primary key,
@@ -664,20 +694,6 @@ is_visible char(1) default 'N' not null
 );
 
 create sequence banner_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
--- FAQ
-create table faq (
-faq_seq number primary key,
-faq_title varchar2(100) not null,
-faq_contents varchar2(4000) not null,
-notice_code char(2) default 'N2' not null
-);
-
-create sequence faq_seq
 start with 1
 increment by 1
 nomaxvalue
@@ -760,9 +776,9 @@ SELECT * FROM product_like;
 SELECT * FROM review;
 SELECT * FROM review_like;
 SELECT * FROM review_report;
-SELECT * FROM inventory;
+SELECT * FROM review_image;
 
--- 결제 관련 - 11개
+-- 결제 관련 - 12개
 SELECT * FROM cart;
 SELECT * FROM orders;
 SELECT * FROM order_status;
@@ -771,15 +787,16 @@ SELECT * FROM coupon;
 SELECT * FROM coupon_owner;
 SELECT * FROM payment;
 SELECT * FROM payment_status;
-SELECT * FROM shipping;
-SELECT * FROM shipping_status;
+SELECT * FROM return; 
+SELECT * FROM return_status;  
 SELECT * FROM point_history;
 
--- 관리자 관련 - 7개
+-- 관리자 관련 - 8개
 SELECT * FROM notice;
+SELECT * FROM faq;
+SELECT * FROM event;
 SELECT * FROM notice_code;
 SELECT * FROM banner;
-SELECT * FROM faq;
 SELECT * FROM report;
 SELECT * FROM files;
 SELECT * FROM file_code;

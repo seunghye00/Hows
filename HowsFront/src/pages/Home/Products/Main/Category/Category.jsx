@@ -172,6 +172,7 @@ export const Category = () => {
 
   return (
     <div className={styles.container}>
+      <div style={{height: "70px"}}></div>
       <div className={styles.contents}>
         <div className={styles.side}>
           {categoriesList.map((item, i) => {
@@ -220,15 +221,15 @@ export const Category = () => {
 
               {/* 선택한 필터들 표시 */}
               <div className={styles.selectedOptions}>
-              {selectedSort !== "popular" && (
-                <div className={styles.selectedOption}>
-                  {selectedSort === "latest" && "최신순"}
-                  {selectedSort === "oldest" && "오래된순"}
-                  {selectedSort === "row_price" && "낮은가격순"}
-                  {selectedSort === "high_price" && "높은가격순"}
-                  <button onClick={() => removeSelectedOption("sort")}>X</button>
-                </div>
-              )}
+                {selectedSort !== "popular" && (
+                  <div className={styles.selectedOption}>
+                    {selectedSort === "latest" && "최신순"}
+                    {selectedSort === "oldest" && "오래된순"}
+                    {selectedSort === "row_price" && "낮은가격순"}
+                    {selectedSort === "high_price" && "높은가격순"}
+                    <button onClick={() => removeSelectedOption("sort")}>X</button>
+                  </div>
+                )}
 
                 {/* 선택한 필터들 표시 */}
                 {selectedPriceType && (
@@ -272,7 +273,7 @@ export const Category = () => {
                             }
                           >
                             <div className={styles.img}>
-                              <img src={item.PRODUCT_THUMBNAIL} alt="img" />
+                              <img src={item.PRODUCT_THUMBNAIL} alt="img"/>
                             </div>
                             <div className={styles.title}>
                               <div>
@@ -294,7 +295,7 @@ export const Category = () => {
           </div>
         </div>
       </div>
-      <ScrollTop />
+      <ScrollTop/>
     </div>
   );
 };

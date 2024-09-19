@@ -15,7 +15,7 @@ export const Header = () => {
     const [isFixed, setIsFixed] = useState(false)
     const { isAuth, login, logout, setIsAuth } = useAuthStore()
     const [profileMenu, setProfileMenu] = useState(false)
-    const [profileImage, setProfileImage] = useState('') // 프로필 사진 상태
+    const [setProfileImage] = useState('') // 프로필 사진 상태
     const { currentUser } = useMemberStore()
 
     const handleMenuClick = menuName => {
@@ -67,6 +67,8 @@ export const Header = () => {
                 logout()
                 sessionStorage.removeItem('token')
                 sessionStorage.removeItem('member_id')
+                sessionStorage.removeItem('member_avatar')
+                sessionStorage.removeItem('nickname')
                 setIsAuth(false)
                 navigate('/')
             }
@@ -117,9 +119,8 @@ export const Header = () => {
             <div className={styles.headerWrap}>
                 {isFixed && <div className={styles.headerSpacer}></div>}
                 <div
-                    className={`${styles.headerCont} ${
-                        isFixed ? styles.fixed : ''
-                    }`}
+                    className={`${styles.headerCont} ${isFixed ? styles.fixed : ''
+                        }`}
                 >
                     <div className={styles.mainNavi}>
                         <div className={styles.menuBox}>
@@ -130,31 +131,28 @@ export const Header = () => {
                             </div>
                             <div className={styles.naviMenuList}>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShop'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowShop'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowShop')}
                                 >
                                     <a>HowShop</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowStory'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowStory'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowStory')}
                                 >
                                     <a>HowStory</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShare'
-                                            ? styles.active
-                                            : ''
-                                    }`}
+                                    className={`${styles.naviMenu} ${activeMenu === 'HowShare'
+                                        ? styles.active
+                                        : ''
+                                        }`}
                                     onClick={() => handleMenuClick('HowShare')}
                                 >
                                     <a>HowShare</a>

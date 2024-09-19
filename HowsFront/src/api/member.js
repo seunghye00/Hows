@@ -13,6 +13,11 @@ export const userInfo = member_id => {
     }
 }
 
+// 관리자 권한 가져오기
+export const getRoleCode = () => {
+    return api.get(`/member/getRoleCode`)
+}
+
 // 로그인
 export const loginUser = user => {
     return axios.post(`${host}/auth`, user)
@@ -167,27 +172,26 @@ export const getAllRoles = () => {
     return api.get(`${baseUrl}/roles`)
 }
 
-// 등급 업데이트
-export const updateGrade = ({ member_id, grade_code }) => {
-    return api.put(`${baseUrl}/updateGrade`, { member_id, grade_code })
-}
+// 등급 및 역할 업데이트
+export const updateMemberStatus = ({
+    member_id,
+    grade_code,
+    role_code,
+    blacklist_reason_code,
+}) => {
+    const data = {
+        member_id,
+        grade_code,
+        role_code,
+        blacklist_reason_code, // 블랙리스트 등록 시 이유를 함께 전달
+    }
 
-// 역할 업데이트
-export const updateRole = ({ member_id, role_code }) => {
-    return api.put(`${baseUrl}/updateRole`, { member_id, role_code })
+    return api.put(`${baseUrl}/updateMemberStatus`, data) // 서버에서 이 API를 통해 업데이트
 }
 
 // 블랙리스트 사유 가져오기
 export const getAllBlacklistReasons = () => {
     return api.get(`${baseUrl}/blacklistreason`)
-}
-
-// 블랙리스트 등록
-export const addBlacklist = ({ member_id, blacklist_reason_code }) => {
-    return api.post(`${baseUrl}/addBlacklist`, {
-        member_id,
-        blacklist_reason_code,
-    })
 }
 
 // 블랙리스트 조회

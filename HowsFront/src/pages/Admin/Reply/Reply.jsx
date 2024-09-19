@@ -156,7 +156,7 @@ export const Reply = () => {
                                 {reply.NICKNAME}
                             </div>
                             <div className={styles.replyItem}>
-                                {reply.WRITE_DATE}
+                                {formatDate(reply.WRITE_DATE)}
                             </div>
 
                             <div
@@ -187,12 +187,14 @@ export const Reply = () => {
                 )}
             </div>
 
-            <Paging
-                page={page}
-                count={totalReplys}
-                perpage={itemsPerPage}
-                setPage={setPage}
-            />
+            <div className={styles.pagination}>
+                <Paging
+                    page={page}
+                    count={totalReplys}
+                    perpage={itemsPerPage}
+                    setPage={setPage}
+                />
+            </div>
 
             {isReplyModalOpen && selectedReply && (
                 <div className={styles.reportModal}>

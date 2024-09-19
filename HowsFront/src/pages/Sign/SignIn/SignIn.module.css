@@ -21,20 +21,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 40px;
+  margin: 0 10px 50px 10px;
+  cursor: pointer;
 }
 .container .loginBox .logo > img {
-  width: 90px;
-  height: 95px;
-  margin-right: 20px;
-}
-
-.container .loginBox .logo .title {
-  display: flex;
-  justify-content: center;
-  font-size: 65px;
-  padding-top: 45px;
-  color: var(--hows-point-color);
+  width: 100%;
 }
 
 .container .loginBox > input {

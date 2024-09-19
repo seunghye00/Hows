@@ -218,8 +218,25 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     
     // 모든 필드를 입력했는지 검사
     const isFormValid = () => {
+        // return rating && review_contents && images && ((data.images.length + existImages.length) > 0);
+
+
         const { rating, review_contents, images } = data;
-        return rating && review_contents && images && (images.length > 0 || existImages.length > 0);
+
+        if (!rating || !review_contents) {
+            return false;
+        }
+    
+        if ((!newImages || newImages.length === 0) && (!existImages || existImages.length === 0)) {
+            Swal.fire({
+                icon: "warning",
+                title: "이미지를 최소 한 장 이상 추가해 주세요.",
+                showConfirmButton: true,
+            });
+            return false;
+        }
+    
+        return true;
     };
 
     // 리뷰 수정 함수
@@ -229,7 +246,11 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
         setIsSubmitting(true);
     
         if (!isFormValid()) {
-            alert('별점, 리뷰 내용, 그리고 이미지를 모두 입력해 주세요.');
+            Swal.fire({
+                icon: "warning",
+                title: "별점, 리뷰 내용, 그리고 이미지를 모두 입력해 주세요.",
+                showConfirmButton: true,
+            });
             setIsSubmitting(false);
             return;
         }

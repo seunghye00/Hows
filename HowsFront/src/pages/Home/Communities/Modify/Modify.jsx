@@ -21,6 +21,7 @@ import {
     getImageData,
     getTagData,
     updatePostData,
+    purchaseHistory,
 } from '../../../../api/community' // 필요한 API 추가
 
 const ItemType = 'IMAGE'
@@ -43,21 +44,7 @@ export const Modify = () => {
     const [selectedSpaceType, setSelectedSpaceType] = useState('')
     const [selectedAreaSize, setSelectedAreaSize] = useState('')
     const [dominantColor, setDominantColor] = useState('C0') // 추출된 색상을 저장할 상태
-    const [searchResults, setSearchResults] = useState([
-        {
-            product_seq: 1,
-            product_thumbnail: img,
-            name: 'Hows 스테인리스 철제 프레임 데스크',
-        },
-        {
-            product_seq: 2,
-            product_thumbnail: img1,
-            name: 'Hows 철제 프레임 의자',
-        },
-        { product_seq: 3, product_thumbnail: img2, name: 'Hows 나무 책상' },
-        { product_seq: 4, product_thumbnail: img3, name: 'Hows 철제 책상' },
-        { product_seq: 5, product_thumbnail: img4, name: 'Hows 조명' },
-    ]) // 임시 상품 태그 데이터
+    const [searchResults, setSearchResults] = useState([]) // 구매 상품 태그 데이터
 
     // 좌표를 퍼센트로 변환하는 함수
     const convertToPercent = (x, y, imgWidth, imgHeight) => {
@@ -450,7 +437,6 @@ export const Modify = () => {
     }, [board_seq])
 
     // 게시글 수정 완료 처리 핸들러
-    // 게시글 수정 완료 처리 핸들러
     const handleSubmitPost = async () => {
         const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
 
@@ -604,6 +590,30 @@ export const Modify = () => {
             ? '상품 태그'
             : `상품 태그 ${totalTagCount}개`
     }
+
+    // 구매내역 불러오기
+    useEffect(() => {
+        if (isModalOpen) {
+            const fetchPurchaseHistory = async () => {
+                try {
+                    const data = await purchaseHistory()
+
+                    // 서버에서 대문자로 반환되는 필드를 소문자로 변환해서 저장
+                    const formattedData = data.map(item => ({
+                        product_seq: item.PRODUCT_SEQ,
+                        product_thumbnail: item.PRODUCT_THUMBNAIL,
+                        name: item.PRODUCT_TITLE,
+                    }))
+
+                    setSearchResults(formattedData)
+                } catch (error) {
+                    console.error('Error fetching purchase history:', error)
+                }
+            }
+
+            fetchPurchaseHistory()
+        }
+    }, [isModalOpen]) // isModalOpen이 변경될 때마다 실행
     return (
         <DndProvider backend={HTML5Backend}>
             <div className={styles.community}>

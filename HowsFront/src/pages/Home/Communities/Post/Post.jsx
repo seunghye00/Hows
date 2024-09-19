@@ -31,7 +31,7 @@ export const Post = () => {
     const [selectedImageIndex, setSelectedImageIndex] = useState(0) // 태그 모달을 연 이미지의 인덱스
     const [tagPosition, setTagPosition] = useState({}) // 태그 위치 저장
     const [dominantColor, setDominantColor] = useState('C0') // 추출된 색상을 저장할 상태
-    const [searchResults, setSearchResults] = useState([]) // 임시 상품 태그 데이터
+    const [searchResults, setSearchResults] = useState([]) // 구매 상품 태그 데이터
 
     const [postContent, setPostContent] = useState('') // 글 내용
     const MAX_IMAGE_SIZE_BYTES = 1024 * 1024 * 2

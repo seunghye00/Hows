@@ -95,4 +95,5 @@
 .replyDate {
     word-wrap: break-word;
     word-break: keep-all;
+    white-space: nowrap;
 }

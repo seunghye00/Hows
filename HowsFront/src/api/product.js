@@ -12,14 +12,27 @@ export const getBestProducts = () => {
 }
 
 // 리뷰 목록 요청 함수
-export const getReviewList = (product_seq, page, itemsPerPage) => {
-    return axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
-        params: {
-            page : page, // 페이지 번호 전달
-            itemsPerPage : itemsPerPage, // 페이지당 항목 수 전달
-        }
-    })
+export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
+    return sortType === 'latest'
+        ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            }
+        })
+        : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            }
+        });
+};
+
+// 별점
+export const getRatings = (product_seq) => {
+    return axios.get(`${baseUrl}/review/getRatings/${product_seq}`)
 }
+
 // 상품 상세 정보 요청 함수
 export const getProductDetail = (product_seq) => {
     return axios.get(`${baseUrl}/detail/${product_seq}`)
@@ -34,10 +47,66 @@ export const getLikeCount = (product_seq) => {
     })
 }
 
+// 리뷰 좋아요 
+export const reviewLike = (reviewSeq, memberId) => {
+    return api.post(`likes/review/insert`, {
+        review_seq : reviewSeq,
+        member_id : memberId
+    });
+};
+
+// 리뷰 좋아요 취소
+export const reviewUnlike = (reviewSeq, memberId) => {
+    return api.delete(`likes/review/delete`, {
+        data: {
+            review_seq: reviewSeq,
+            member_id: memberId
+        }
+    });
+};
+
+// 리뷰 좋아요 수 가져오기
+export const getReviewLikeCount = (reviewSeq) => {
+    return axios.get(`${likeUrl}/review/count`, {
+        params: {
+            review_seq: reviewSeq
+        }
+    });
+};
+
+// 리뷰 좋아요 상태 확인
+export const checkReviewLikeStatus = (reviewSeq, memberId) => {
+    return axios.get(`${likeUrl}/review/check`, {
+        params: {
+            review_seq: reviewSeq,
+            member_id: memberId
+        }
+    });
+};
+
 // 리뷰 이미지 
 export const getReviewImgList = (reviewSeq) => {
     return axios.get(`${baseUrl}/getReviewImgList/${reviewSeq}`);
 }
+
+// 리뷰 신고 옵션 불러오기
+export const getReport = async () => {
+    try {
+        const response = await api.get('/option/report')
+        return response.data
+    } catch (error) {
+        throw error
+    }
+}
+
+// 리뷰 신고 요청
+export const sendReviewReport = (reviewSeq,selectedReason,memberId) => {
+    return api.post(`product/review/report`, {
+        review_seq: reviewSeq,
+        report_code: selectedReason,
+        member_id: memberId,
+    });
+};
 
 
 

@@ -8,6 +8,7 @@ import {userInfo} from "../../../api/member";
 import {Modal} from "../../../components/Modal/Modal";
 import DaumPostcode from "react-daum-postcode";
 import {useNavigate} from "react-router-dom";
+import {myCoupon} from "../../../api/history";
 
 export const Payment = () => {
 
@@ -83,11 +84,6 @@ export const Payment = () => {
     }
   }
 
-  /** 주문 내역 조회 **/
-  const handleOrderHistory = () => {
-
-  }
-
   /** 주문 정보 ( 이름, 전화번호, 주소, 결제방식, 쿠폰, 포인트 ) **/
   const handleData = (e) => {
     let { name, value } = e.target;
@@ -107,7 +103,6 @@ export const Payment = () => {
 
   /** 결제 이벤트 **/
   const handlePayment = async () => {
-
     if(!validateName(data.name)) {
       SwalComp({type: "warning", text: "이름을 확인해주세요"});
       return false;
@@ -133,6 +128,7 @@ export const Payment = () => {
       return false;
     }
 
+    // payment parameter setting
     const name = orderProducts[0].product_title.length > 10 ? orderProducts[0].product_title.slice(0,9) + "..." : orderProducts[0].product_title;
     const count = orderProducts.length > 1 ? ` 외 ${orderProducts.length-1}종` :  "";
     const paymentId = `how-${uuidv4()}`
@@ -146,6 +142,7 @@ export const Payment = () => {
       email: data.email
     }
 
+    // order info setting
     const orderInfo = {
       orderName,
       totalAmount,
@@ -154,33 +151,37 @@ export const Payment = () => {
       phone: data.phone,
       zipCode: data.zip_code,
       address: data.address,
-      detailAddress: data.detail_address
+      detailAddress: data.detail_address,
+      couponOwnerSeq: data.coupon
     }
-    const paymentInfo = { paymentId, orderName, totalAmount, payMethod, customer };
-    console.log("paymentInfo ==== ", paymentInfo);
+
+    // payment info setting
+    const paymentInfo = {
+      paymentId,
+      orderName,
+      totalAmount, 
+      payMethod,
+      customer
+    };
 
     setPaymentInfo({ orderName, totalAmount });
 
     // 결제 진행
     const resultData = await requestPaymentEvent(paymentInfo, orderInfo);
-      if(resultData === "ok") {
-        SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
-          if(resp) navi("/history/relivery");
-          else navi("/");
-        });
-      } else {
-        // 실패 시 결제 취소
-        paymentCancel(paymentId).then(res => {
-          console.log("res.data ==== ", res.data);
-          alert("결제 실패");
-        });
-      }
-  }
-
-  const testCancelPayment = () => {
-    paymentCancel().then(res => {
-      console.log("주문 취소 테스트 ==== ", res.data);
-    });
+    
+    // 결제 상태
+    if(resultData === "ok") {
+      SwalComp({ type: "success", text: "구매내역 보기" }).then(resp => {
+        if(resp) navi("/history/delivery");
+        else navi("/");
+      });
+    } else {
+      // 실패 시 결제 취소
+      paymentCancel(paymentId).then(res => {
+        console.log("res.data ==== ", res.data);
+        alert("결제 실패");
+      });
+    }
   }
 
   /** 회원 정보 셋팅 **/
@@ -197,7 +198,7 @@ export const Payment = () => {
   useEffect(() => {
     let discount = "";
     coupon.forEach(item => {
-      if(parseInt(item.coupon_seq) === parseInt(data.coupon)) discount = item.coupon_discount;
+      if(parseInt(item.coupon_owner_seq) === parseInt(data.coupon)) discount = item.coupon_discount;
     });
     const result = `${orderPrice.toString()}${discount}`;
     setPaymentPrice(prev => {
@@ -235,25 +236,11 @@ export const Payment = () => {
     memberSet();
 
     // 2. 회원이 소유한 쿠폰 리스트
-    const couponData = [
-      {
-        coupon_owner_seq: 1,
-        member_seq: 1,
-        coupon_seq: 1,
-        coupon_title: "[ 5% 할인 ] 첫번째 이벤트",
-        coupon_type: "percent",
-        coupon_discount: "*0.95"
-      },
-      {
-        coupon_owner_seq: 2,
-        member_seq: 1,
-        coupon_seq: 2,
-        coupon_title: "[ 5000원 할인 ] 두번째 이벤트",
-        coupon_type: "price",
-        coupon_discount: "-5000"
-      },
-    ]
-    setCoupon(couponData);
+    myCoupon().then(res => {
+      console.log(res.data);
+      setCoupon(res.data);
+    });
+
   }, []);
 
 
@@ -272,7 +259,6 @@ export const Payment = () => {
 
   return (
     <div className={styles.container}>
-      <button onClick={testCancelPayment}>결제 취소</button>
       <div className={styles.title}> 주문하기 </div>
       <div className={styles.subTitle}> 선택한 상품 및 배송 정보 </div>
 
@@ -354,7 +340,7 @@ export const Payment = () => {
               {
                 coupon.map(item => {
                   return (
-                    <option value={item.coupon_seq} key={item.coupon_owner_seq}>
+                    <option value={item.coupon_owner_seq} key={item.coupon_owner_seq}>
                       {item.coupon_title}
                     </option>
                   );

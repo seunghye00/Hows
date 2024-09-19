@@ -4,9 +4,6 @@ import { BuyList } from "./BuyList/BuyList";
 import { Review } from './Review/Review';
 import { Delivery } from './Delivery/Delivery';
 import { Coupon } from './Coupon/Coupon';
-// import { Qna } from './Qna/Qna';
-import { TextBox } from './TextBox/TextBox';
-import {useEffect, useState} from 'react';
 
 export const History = () => {
   const navi = useNavigate();
@@ -21,63 +18,47 @@ export const History = () => {
         <span>포인트 : </span>
         <span>{data.point}</span>
       </div>
-      <div className={styles.menus}>
-        <div className={styles.buyList}>
+        <div className={styles.menus}>
+            {/*<div className={styles.buyList}>*/}
+            {/*            <span*/}
+            {/*              onClick={() => navi("buyList")}*/}
+            {/*              className={location.pathname.includes("buyList") ? styles.active : ""}*/}
+            {/*            >*/}
+            {/*                구매내역*/}
+            {/*            </span>*/}
+            {/*</div>*/}
+            <div className={styles.delivery}>
                     <span
-                      onClick={() => navi("buyList")}
-                      className={location.pathname.includes("buyList") ? styles.active : ""}
-                    >
-                        구매내역
-                    </span>
-        </div>
-        <div className={styles.review}>
-                    <span
-                      onClick={() => navi("review")}
-                      className={location.pathname.includes("review") ? styles.active : ""}
-                    >
-                        구매후기
-                    </span>
-        </div>
-        <div className={styles.relivery}>
-                    <span
-                      onClick={() => navi("relivery")}
-                      className={location.pathname.includes("relivery") ? styles.active : ""}
+                        onClick={() => navi("delivery")}
+                        className={location.pathname.includes("delivery") ? styles.active : ""}
                     >
                         주문 & 결제
                     </span>
-        </div>
-        <div className={styles.coupon}>
+            </div>
+            <div className={styles.review}>
                     <span
-                      onClick={() => navi("coupon")}
-                      className={location.pathname.includes("coupon") ? styles.active : ""}
+                        onClick={() => navi("review")}
+                        className={location.pathname.includes("review") ? styles.active : ""}
+                    >
+                        구매후기
+                    </span>
+            </div>
+            <div className={styles.coupon}>
+                    <span
+                        onClick={() => navi("coupon")}
+                        className={location.pathname.includes("coupon") ? styles.active : ""}
                     >
                         보유쿠폰
                     </span>
+            </div>
         </div>
-        {/* <div className={styles.qna}>
-                    <span
-                        onClick={() => navi("qna")}
-                        className={location.pathname.includes("qna") ? styles.active : ""}
-                    >
-                        문의내역
-                    </span>
-                </div> */}
-      </div>
-      <div className={styles.body}>
-        {/* <Routes>
-                    <Route path="/" element={<Navigate to="buyList" replace />} />
-                    <Route path="buyList/*" element={buyListData.length > 0 ? <BuyList data={buyListData} /> : <TextBox text="구매내역" />} />
-                    <Route path="review/*" element={reviewData.length > 0 ? <Review data={reviewData} /> : <TextBox text="리뷰작성내역" />} />
-                    <Route path="relivery/*" element={deliveryData.length > 0 ? <Delivery data={deliveryData} /> : <TextBox text="주문배송목록" />} />
-                    <Route path="coupon/*" element={couponData.length > 0 ? <Coupon data={couponData} /> : <TextBox text="보유쿠폰" />} />
-                </Routes> */}
-        <Routes>
-          <Route path="/" element={<Navigate to="buyList" replace />} />
-          <Route path="buyList/*" element={<BuyList />} />
-          <Route path="review/*" element={<Review />} />
-          <Route path="relivery/*" element={<Delivery />} />
-          <Route path="coupon/*" element={<Coupon />} />
-          {/* <Route path="qna/*" element={<Qna />} /> */}
+        <div className={styles.body}>
+            <Routes>
+                <Route path="/" element={<Navigate to="delivery" replace/>}/>
+                {/*<Route path="buyList/*" element={<BuyList/>}/>*/}
+                <Route path="delivery/*" element={<Delivery/>}/>
+                <Route path="review/*" element={<Review/>}/>
+                <Route path="coupon/*" element={<Coupon />} />
         </Routes>
       </div>
     </div>

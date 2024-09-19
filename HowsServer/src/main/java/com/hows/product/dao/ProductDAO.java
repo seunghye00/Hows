@@ -22,17 +22,21 @@ public class ProductDAO {
     }
     
 	// 전체 목록 출력
-	public List<ProductDTO> getProducts () throws Exception{
+	public List<ProductDTO> getProducts () {
 		return myBatis.selectList("Product.getProducts");
 	}
 	
 	// 카테고리별 목록 출력
-	public List<ProductDTO> getProductByCategory (String product_category_code) throws Exception{
+//	public List<ProductDTO> getProductByCategory (String product_category_code) {
+//		return myBatis.selectList("Product.getProductByCategory", product_category_code);
+//	}
+	
+	public List<Map<String, Object>> getProductByCategory (String product_category_code) {
 		return myBatis.selectList("Product.getProductByCategory", product_category_code);
 	}
 	
 	// 디테일 출력
-	public ProductDTO getProductDetaile (String product_seq) throws Exception{
+	public ProductDTO getProductDetaile (String product_seq) {
 		return myBatis.selectOne("Product.getProductDetaile", product_seq);
 	}
 

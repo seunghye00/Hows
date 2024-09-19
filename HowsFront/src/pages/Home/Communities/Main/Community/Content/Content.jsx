@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import styles from './Content.module.css'
 import axios from 'axios'
 import {
@@ -18,6 +18,7 @@ import { toggleFollow, userInfo } from '../../../../../../api/member'
 import Swal from 'sweetalert2'
 
 export const Content = () => {
+    const [searchParams] = useSearchParams() // URL의 쿼리 파라미터 가져오기
     const [contentList, setContentList] = useState([]) // 전체 콘텐츠 리스트
     const [hasMore, setHasMore] = useState(true) // 더 불러올 데이터가 있는지 여부
     const [page, setPage] = useState(1) // 현재 페이지
@@ -29,7 +30,14 @@ export const Content = () => {
     const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
     const isOwner = isAuth && member_id === contentList?.MEMBER_ID
 
+    const sort = searchParams.get('sort') || 'default'
+    const housingType = searchParams.get('housingType') || ''
+    const spaceType = searchParams.get('spaceType') || ''
+    const areaSize = searchParams.get('areaSize') || ''
+    const color = searchParams.get('color') || ''
+    const keyword = searchParams.get('keyword') || ''
     // 로그인한 사용자의 member_seq 가져오기
+
     useEffect(() => {
         const fetchMemberInfo = async () => {
             if (!member_id) {
@@ -38,6 +46,7 @@ export const Content = () => {
             }
             try {
                 const response = await userInfo(member_id) // API 호출
+
                 setMemberSeq(response.data.member_seq) // 멤버 데이터 상태에 저장
             } catch (error) {
                 console.error('멤버 정보를 가져오는 중 오류 발생:', error)
@@ -46,20 +55,39 @@ export const Content = () => {
         fetchMemberInfo()
     }, [member_id])
 
+    // 데이터를 가져오는 함수 (정렬 및 필터링 조건 추가)
     const fetchData = async (page, limit = 20) => {
         try {
-            const data = await getCommunityPosts(page, limit)
+            const member_id = sessionStorage.getItem('member_id') // member_id 가져오기
 
-            // 데이터가 undefined인 경우 빈 배열로 처리
+            // 모든 필요한 파라미터 설정
+            const params = {
+                page,
+                limit,
+                sort,
+                housingType,
+                spaceType,
+                areaSize,
+                color,
+                keyword,
+                member_id, // 로그인한 사용자의 ID 추가
+            }
+            console.log('Sending params to API:', params) // 요청을 보내기 전에 파라미터 로그 출력
+
+            // API 요청
+            const data = await getCommunityPosts(params) // 파라미터를 함께 전달
+
+            // 데이터가 없을 경우 스크롤 중지
             if (!data || data.length === 0) {
-                console.log('데이터가 없습니다.')
                 setHasMore(false)
                 return []
             }
 
+            // 가져온 데이터가 limit보다 적으면 더 이상 불러올 데이터가 없다고 판단
             if (data.length < limit) {
                 setHasMore(false)
             }
+
             return data
         } catch (error) {
             console.error('데이터 가져오는 중 오류 발생:', error)
@@ -87,7 +115,7 @@ export const Content = () => {
             console.log('Initial load complete, hasMore:', hasMore)
         }
         loadInitialData()
-    }, [])
+    }, [sort, housingType, spaceType, areaSize, color, keyword])
 
     // 데이터 추가 로드
     const loadMoreData = async () => {
@@ -230,9 +258,11 @@ export const Content = () => {
     }
 
     // 마이페이지로 이동
-    const goToUserPage = nickname => {
-        navigate(`/user/${nickname}`) // nickname을 기반으로 마이페이지로 이동
+    const goToUserPage = member_id => {
+        console.log('Navigating to user page:', member_id) // member_id 확인 로그
+        navigate(`/mypage/main/${member_id}/post`) // member_id를 기반으로 마이페이지 경로 설정
     }
+
     // 1초 후 loader 숨기기
     useEffect(() => {
         if (hasMore) {
@@ -257,6 +287,7 @@ export const Content = () => {
     return (
         <div className={styles.contentWrap}>
             <InfiniteScroll
+                className={styles.infiniteScroll}
                 dataLength={contentList.length}
                 next={loadMoreData}
                 hasMore={hasMore}
@@ -279,7 +310,7 @@ export const Content = () => {
                                     className={styles.profile}
                                     onClick={e => {
                                         e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
-                                        goToUserPage(content.NICKNAME) // 마이페이지로 이동
+                                        goToUserPage(content.MEMBER_ID) // 마이페이지로 이동
                                     }}
                                 >
                                     <div className={styles.profileImg}>
@@ -293,31 +324,25 @@ export const Content = () => {
                                     </div>
                                 </div>
                                 <div className={styles.followBtn}>
-                                    {isOwner ? (
-                                        <>
-                                            <Button
-                                                title={
-                                                    content.isFollowing
-                                                        ? '팔로잉'
-                                                        : '팔로우'
-                                                }
-                                                size="s"
-                                                isChecked={
-                                                    content.isFollowing
-                                                        ? 'Y'
-                                                        : 'N'
-                                                }
-                                                onClick={e => {
-                                                    e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
-                                                    handleFollow(
-                                                        content.MEMBER_SEQ
-                                                    ) // 팔로우할 대상의 MEMBER_SEQ를 전달
-                                                }}
-                                            />
-                                        </>
-                                    ) : (
-                                        <></>
-                                    )}
+                                    {/* 각 콘텐츠의 MEMBER_ID와 현재 로그인한 사용자 ID를 비교 */}
+                                    {content.MEMBER_ID !== member_id ? ( // 로그인한 사용자와 다른 사람의 콘텐츠일 때만 팔로우 버튼 표시
+                                        <Button
+                                            title={
+                                                content.isFollowing
+                                                    ? '팔로잉'
+                                                    : '팔로우'
+                                            }
+                                            size="s"
+                                            isChecked={
+                                                content.isFollowing ? 'Y' : 'N'
+                                            }
+                                            onClick={e => {
+                                                e.stopPropagation() // 클릭 시 상세 페이지로 가지 않도록 중단
+                                                handleFollow(content.MEMBER_SEQ) // 팔로우할 대상의 MEMBER_SEQ를 전달
+                                            }}
+                                        />
+                                    ) : null}{' '}
+                                    {/* 자기 자신일 때는 아무것도 렌더링하지 않음 */}
                                 </div>
                             </div>
 

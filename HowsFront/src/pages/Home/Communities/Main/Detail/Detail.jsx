@@ -18,6 +18,7 @@ import {
     viewCounting,
     getReport,
     sendReport,
+    deleteCommunity,
 } from '../../../../../api/community' // API 함수 불러오기
 import {
     sendComments,
@@ -131,6 +132,49 @@ export const Detail = () => {
         }
     }
 
+    // 게시글 삭제
+    const handleDeletePost = async () => {
+        try {
+            const result = await Swal.fire({
+                title: '게시글을 삭제하시겠습니까?',
+                text: '삭제 후에는 복구할 수 없습니다.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: '삭제',
+                cancelButtonText: '취소',
+            })
+
+            if (result.isConfirmed) {
+                await deleteCommunity(board_seq) // 게시글 삭제 API 호출
+
+                Swal.fire({
+                    icon: 'success',
+                    title: '게시글이 삭제되었습니다.',
+                    showConfirmButton: false,
+                    timer: 1500,
+                })
+
+                navigate('/communities') // 삭제 후 커뮤니티 목록 페이지로 이동
+            }
+        } catch (error) {
+            console.error('게시글 삭제 중 오류 발생:', error)
+            Swal.fire({
+                icon: 'error',
+                title: '오류 발생',
+                text: '게시글 삭제 중 문제가 발생했습니다.',
+                showConfirmButton: true,
+            })
+        }
+    }
+
+    // 게시글 수정
+    const handleModify = () => {
+        navigate(`/communities/modify/${board_seq}`) // board_seq를 path에 포함하여 Modify로 이동
+    }
+
+    // 북마크 기능
     const toggleBookmarkHandler = async () => {
         if (!member_id || !isAuth) {
             Swal.fire({
@@ -168,6 +212,7 @@ export const Detail = () => {
         })
     }
 
+    // 게시글 신고
     const handleOpenReportModal = () => {
         if (!member_id || !isAuth) {
             // 로그인되지 않은 경우 SweetAlert 경고 후 로그인 페이지로 이동
@@ -198,22 +243,6 @@ export const Detail = () => {
             })
         } else {
             setSelectedCommentSeq(commentSeq) // 댓글 신고 시 해당 댓글 시퀀스 설정
-            setIsModalOpen(true) // 모달 열기
-        }
-    }
-
-    // 답글 신고하기 버튼 클릭 시 호출되는 함수
-    const handleOpenReportModalForReply = replySeq => {
-        if (!member_id || !isAuth) {
-            Swal.fire({
-                icon: 'warning',
-                title: '로그인 후 이용할 수 있습니다.',
-                showConfirmButton: true,
-            }).then(() => {
-                navigate('/signIn')
-            })
-        } else {
-            setSelectedReplySeq(replySeq) // 답글 신고 시 해당 답글 시퀀스 설정
             setIsModalOpen(true) // 모달 열기
         }
     }
@@ -264,6 +293,7 @@ export const Detail = () => {
 
     // 댓글 작성 처리 함수
     const handleCommentSubmit = async () => {
+        // 로그인 여부 확인
         if (!member_id) {
             Swal.fire({
                 icon: 'warning',
@@ -273,6 +303,7 @@ export const Detail = () => {
             return
         }
 
+        // 댓글 입력 여부 확인
         if (!comment.trim()) {
             Swal.fire({
                 icon: 'warning',
@@ -281,15 +312,30 @@ export const Detail = () => {
             })
             return
         }
+
         try {
+            // 댓글 전송
             await sendComments(board_seq, member_id, comment.trim())
-            onCommentSubmit() // 댓글 제출 후 목록 새로고침
-            setComment('') // 댓글 필드 초기화
+
+            // 댓글 제출 후 목록 새로고침 함수 호출
+            onCommentSubmit()
+
+            // 댓글 입력 필드 초기화
+            setComment('')
+
+            Swal.fire({
+                icon: 'success',
+                title: '댓글이 성공적으로 작성되었습니다.',
+                showConfirmButton: false,
+                timer: 1500,
+            })
         } catch (error) {
             console.error('댓글 작성 중 오류 발생:', error)
+
             Swal.fire({
                 icon: 'error',
                 title: '댓글 작성 중 오류가 발생했습니다.',
+                text: '다시 시도해주세요.',
                 showConfirmButton: true,
             })
         }
@@ -304,6 +350,8 @@ export const Detail = () => {
                 page,
                 itemsPerPage
             )
+
+            // 댓글 목록을 불러온 후 상태 업데이트
             setComments(response.comments)
             setTotalCommentsCount(response.totalCount)
         } catch (error) {
@@ -326,8 +374,11 @@ export const Detail = () => {
             })
 
             if (result.isConfirmed) {
-                await deleteComment(comment_seq) // 백엔드에서 댓글 삭제 API 호출
-                onCommentSubmit() // 삭제 후 목록 새로고침
+                await deleteComment(comment_seq) // 댓글 삭제 API 호출
+
+                // 삭제 후 댓글 목록 다시 불러오기
+                await onCommentSubmit()
+
                 Swal.fire({
                     icon: 'success',
                     title: '댓글이 삭제되었습니다.',
@@ -384,7 +435,11 @@ export const Detail = () => {
         <div className={styles.container}>
             {postData && (
                 <>
-                    <ProfileSection profileData={postData} />
+                    <ProfileSection
+                        profileData={postData}
+                        handleDeletePost={handleDeletePost} // 삭제 함수 전달
+                        handleModify={handleModify} // 수정 함수 전달
+                    />
                     <div className={styles.imageSection}>
                         <ImageSwiper images={imagesData} tags={tagsData} />
                     </div>
@@ -399,6 +454,9 @@ export const Detail = () => {
                         copyLinkToClipboard={copyLinkToClipboard}
                         handleOpenReportModal={handleOpenReportModal}
                     />
+                    <div className={styles.mainContent}>
+                        {postData.BOARD_CONTENTS}
+                    </div>
                     <div className={styles.commentInfo}>
                         <div className={styles.commetIcon}>
                             <BiMessageRounded />

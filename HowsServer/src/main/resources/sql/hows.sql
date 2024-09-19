@@ -576,32 +576,34 @@ insert into payment_status (payment_code, payment_title) values ('P3', '결제�
 insert into payment_status (payment_code, payment_title) values ('P4', '취소요청');
 insert into payment_status (payment_code, payment_title) values ('P5', '결제취소');
 
--- 배송
-create table shipping (
-    shipping_seq number primary key,
+-- 반품
+create table return (
+    return_seq number primary key,
     order_seq number not null,
-    shipping_code char(2) not null,
-    shipping_address varchar2(255) not null,
-    shipping_detail_address varchar2(255) not null
+    payment_seq number not null,
+    return_code char(2) not null,
+	return_date timestamp not null,	-- 결재 취소 or 반품 요청일
+	done_return_Date timestamp		-- 환불 완료일
 );
 
-create sequence shipping_seq
+create sequence return_seq
 start with 1
 increment by 1
 nomaxvalue
 nocache;
 
--- 배송 상태
-create table shipping_status (
-    shipping_code char(2) primary key,
-    shipping_title varchar2(50)
+-- 반품 상태
+create table return_status (
+    return_code char(2) primary key,
+    return_title varchar2(50)
 );
 
-insert into shipping_status (shipping_code, shipping_title) values ('S1', '준비중');
-insert into shipping_status (shipping_code, shipping_title) values ('S2', '배송중');
-insert into shipping_status (shipping_code, shipping_title) values ('S3', '배송완료');
-insert into shipping_status (shipping_code, shipping_title) values ('S4', '반송 처리중');
-insert into shipping_status (shipping_code, shipping_title) values ('S5', '반송 완료');
+insert into return_status (return_code, return_title) values ('R1', '결재 취소 요청');
+insert into return_status (return_code, return_title) values ('R2', '반품 요청');
+insert into return_status (return_code, return_title) values ('R3', '상품 검수');
+insert into return_status (return_code, return_title) values ('R4', '반품 불가');
+insert into return_status (return_code, return_title) values ('R5', '반품 확정');
+insert into return_status (return_code, return_title) values ('R6', '환불 완료');
 
 -- 포인트 내역 테이블
 create table point_history (

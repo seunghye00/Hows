@@ -1,12 +1,8 @@
 import styles from './Return.module.css'
 import { Button } from '../../../../components/Button/Button'
 import { Search } from '../../../../components/Search/Search'
-import {
-    orderList,
-    updateOrder,
-    doneReturn,
-    deleteOrder,
-} from '../../../../api/order'
+import { returnList, deleteOrder } from '../../../../api/order'
+import { updateReturn, doneReturn } from '../../../../api/return'
 import { useEffect, useState } from 'react'
 import { Modal } from '../../../../components/Modal/Modal'
 import { formatDate, addCommas, SwalComp } from '../../../../commons/commons'
@@ -18,7 +14,6 @@ export const Return = () => {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [viewOrder, setViewOrder] = useState({
         order_date: '',
-        payment_price: '',
         order_name: '',
         order_price: 0,
         payment_price: 0,
@@ -31,7 +26,7 @@ export const Return = () => {
     const [status, setStatus] = useState('return')
 
     useEffect(() => {
-        orderList(status)
+        returnList(status)
             .then(resp => {
                 console.log(resp.data)
                 const beforOrders = resp.data.map(order => ({
@@ -56,7 +51,7 @@ export const Return = () => {
         }
         // 상태별로 주문 목록 필터링
         filtered = filtered.filter(
-            order => status === 'delivery' || order.order_code === status
+            order => status === 'return' || order.return_code === status
         )
         // 최종 필터링된 목록 설정
         setFilteredOrders(filtered)
@@ -72,7 +67,7 @@ export const Return = () => {
         }
         // 상태별로 주문 목록 필터링
         filtered = filtered.filter(
-            order => status === 'delivery' || order.order_code === status
+            order => status === 'return' || order.return_code === status
         )
         // 최종 필터링된 목록 설정 및 체크박스 상태 초기화
         setFilteredOrders(filtered.map(order => ({ ...order, checked: false })))
@@ -86,23 +81,17 @@ export const Return = () => {
     }
 
     // 주문 상태 변경 핸들러
-    const handleChangeStatus = (e, order_seq) => {
-        const order_code = e.target.value
-        updateOrder(order_seq, order_code)
+    const handleChangeStatus = (e, return_seq) => {
+        const return_code = e.target.value
+        updateReturn(return_seq, return_code)
             .then(resp => {
-                // console.log(resp)
-                const currentTimestamp = new Date().toISOString()
-
+                console.log(resp)
                 // 상태 변경 후 orders 배열 업데이트
                 const updatedOrders = orders.map(order =>
-                    order.order_seq === order_seq
+                    order.return_seq === return_seq
                         ? {
                               ...order,
-                              order_code,
-                              // order_code가 'O5'인 경우 done_delivery_date에 현재 시간을 추가
-                              ...(order_code === 'O5' && {
-                                  done_delivery_date: currentTimestamp,
-                              }),
+                              return_code,
                           }
                         : order
                 )
@@ -110,7 +99,7 @@ export const Return = () => {
                 setOrders(updatedOrders)
                 SwalComp({
                     type: 'success',
-                    text: '주문 상태를 성공적으로 변경했습니다.',
+                    text: '반품 상태를 성공적으로 변경했습니다.',
                 })
             })
             .catch(error => {
@@ -140,16 +129,21 @@ export const Return = () => {
         }).then(result => {
             if (result.isConfirmed) {
                 // 환불 완료 요청
-                doneReturn(selectedOrders.map(order => order.order_seq))
+                doneReturn(selectedOrders.map(order => order.return_seq))
                     .then(resp => {
-                        // console.log(resp)
+                        console.log(resp)
+                        const currentTimestamp = new Date().toISOString()
                         // 구매 확정 후 주문 목록 업데이트
                         const updatedOrders = orders.map(order =>
                             selectedOrders.some(
                                 selected =>
                                     selected.order_seq === order.order_seq
                             )
-                                ? { ...order, order_code: 'O6' } // 구매 확정 상태로 변경
+                                ? {
+                                      ...order,
+                                      return_code: 'R6',
+                                      done_return_date: currentTimestamp,
+                                  } // 구매 확정 상태로 변경
                                 : order
                         )
                         setOrders(
@@ -280,36 +274,50 @@ export const Return = () => {
                 <div className={styles.category}>
                     <span
                         onClick={handleSelectStatus}
-                        data-lable="return"
+                        data-label="return"
                         className={status === 'return' ? styles.active : ''}
                     >
                         전체
                     </span>
                     <span
                         onClick={handleSelectStatus}
-                        data-lable="R1"
+                        data-label="R1"
                         className={status === 'R1' ? styles.active : ''}
+                    >
+                        결재 취소 요청
+                    </span>
+                    <span
+                        onClick={handleSelectStatus}
+                        data-label="R2"
+                        className={status === 'R2' ? styles.active : ''}
                     >
                         반품 요청
                     </span>
                     <span
                         onClick={handleSelectStatus}
-                        data-lable="R2"
-                        className={status === 'R2' ? styles.active : ''}
+                        data-label="R3"
+                        className={status === 'R3' ? styles.active : ''}
                     >
                         상품 검수
                     </span>
                     <span
                         onClick={handleSelectStatus}
-                        data-lable="R3"
-                        className={status === 'R3' ? styles.active : ''}
+                        data-label="R4"
+                        className={status === 'R4' ? styles.active : ''}
+                    >
+                        반품 불가
+                    </span>
+                    <span
+                        onClick={handleSelectStatus}
+                        data-label="R5"
+                        className={status === 'R5' ? styles.active : ''}
                     >
                         반품 확정
                     </span>
                     <span
-                        onClick={handleChangeStatus}
-                        data-lable="R4"
-                        className={status === 'R4' ? styles.active : ''}
+                        onClick={handleSelectStatus}
+                        data-label="R6"
+                        className={status === 'R6' ? styles.active : ''}
                     >
                         환불 완료
                     </span>
@@ -350,7 +358,7 @@ export const Return = () => {
                                             checked={order.checked || false}
                                             onChange={() =>
                                                 handleCheckboxChange(
-                                                    order.orders_seq
+                                                    order.order_seq
                                                 )
                                             }
                                         />
@@ -361,7 +369,7 @@ export const Return = () => {
                                             handleViewInfo(order.order_seq)
                                         }
                                     >
-                                        {formatDate(order.order_date)}
+                                        {formatDate(order.return_date)}
                                     </div>
                                     <div
                                         className={styles.cols}
@@ -393,7 +401,34 @@ export const Return = () => {
                                             handleViewInfo(order.order_seq)
                                         }
                                     >
-                                        {order.order_title}
+                                        {order.return_code === 'R1' ? (
+                                            '결재 취소 요청'
+                                        ) : order.return_code === 'R6' ? (
+                                            '환불 완료'
+                                        ) : (
+                                            <select
+                                                value={order.return_code} // 현재 주문 상태를 기본 값으로 설정
+                                                onChange={e =>
+                                                    handleChangeStatus(
+                                                        e,
+                                                        order.return_seq
+                                                    )
+                                                } // e와 return_seq를 함께 전달
+                                            >
+                                                <option value="R2">
+                                                    반품 요청
+                                                </option>
+                                                <option value="R3">
+                                                    상품 검수
+                                                </option>
+                                                <option value="R4">
+                                                    반품 불가
+                                                </option>
+                                                <option value="R5">
+                                                    반품 확정
+                                                </option>
+                                            </select>
+                                        )}
                                     </div>
                                 </div>
                             ))

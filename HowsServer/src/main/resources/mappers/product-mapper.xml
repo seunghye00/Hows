@@ -36,29 +36,39 @@
 		<result property="member_id" column="member_id"/>
 	</resultMap>
 
-	<select id="getProducts"
-		resultType="com.hows.product.dto.ProductDTO">
+	<select id="getProducts" resultType="com.hows.product.dto.ProductDTO">
 		SELECT *
 		FROM PRODUCT ORDER BY product_seq
 	</select>
 
-	<select id="getProductByCategory" parameterType="String"
-		resultType="com.hows.product.dto.ProductDTO">
+	<!-- <select id="getProductByCategory" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
 		SELECT *
 		FROM PRODUCT
 		WHERE product_category_code = #{product_category_code}
+	</select> -->
+	
+	<select id="getProductByCategory" parameterType="String" resultType="map">
+		  SELECT 
+		    p.*,
+		    NVL(pl.like_count, 0) AS like_count
+		  FROM PRODUCT p
+		  LEFT JOIN (
+		    SELECT product_seq, COUNT(*) AS like_count
+		    FROM product_like
+		    GROUP BY product_seq
+		  ) pl ON p.product_seq = pl.product_seq
+		  WHERE p.product_category_code = #{product_category_code}
 	</select>
+	
 
-	<select id="getProductDetaile" parameterType="String"
-		resultType="com.hows.product.dto.ProductDTO">
+	<select id="getProductDetaile" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
 		SELECT *
 		FROM PRODUCT
 		WHERE product_seq = #{product_seq}
 	</select>
 
 	<!-- 리뷰등록 -->
-	<insert id="insertReview"
-		parameterType="com.hows.product.dto.ReviewDTO">
+	<insert id="insertReview" parameterType="com.hows.product.dto.ReviewDTO">
 		INSERT INTO review (review_seq, rating, review_contents, review_date,
 		product_seq, member_id)
 		VALUES (review_seq.nextval, #{rating}, #{review_contents}, SYSDATE,
@@ -66,16 +76,14 @@
 	</insert>
 	
 	<!-- 리뷰 이미지 등 -->
-	<insert id="insertReviewImage"
-		parameterType="com.hows.product.dto.ImageDTO">
+	<insert id="insertReviewImage" parameterType="com.hows.product.dto.ImageDTO">
 		insert into review_image
 		(review_image_seq, review_seq, image_url, image_order)
 		values (review_image_seq.nextval, #{review_seq}, #{image_url}, #{image_order})
 	</insert>
 		
 	<!-- 리뷰 시퀀스 가져오기 -->
-	<select id="selectLastReviewSeq"
-			resultType="int">
+	<select id="selectLastReviewSeq" resultType="int">
 		select max(review_seq) from review
 	</select>
 	
@@ -84,7 +92,7 @@
 	 	select IMAGE_URL from REVIEW_IMAGE where review_seq = #{reviewSeq}
 	</select>
 	
-	<!-- 리뷰 목록 출력 (페이징) -->
+	<!-- 리뷰 목록 출력 (페이지네이션) -->
 	<select id="getReviewList" resultType="map">
 		 SELECT 
 		    r.*,
@@ -106,16 +114,70 @@
 		WHERE r.rn BETWEEN #{startRow} AND #{endRow}
 	</select>
 	
-	<!-- 삭제 -->
+	<select id="getReviewListByBest" resultType="map">
+		SELECT 
+	    r.*,
+	    (SELECT COUNT(*) FROM REVIEW WHERE product_seq = #{product_seq}) AS total_count,
+	    NVL(r.like_count, 0) AS like_count
+		FROM (
+		    SELECT
+		        r.PRODUCT_SEQ,
+		        r.REVIEW_SEQ,
+		        r.RATING,
+		        r.REVIEW_CONTENTS,
+		        TO_CHAR(r.REVIEW_DATE, 'YYYY-MM-DD HH24:MI:SS') AS REVIEW_DATE,
+		        r.MEMBER_ID,
+		        NVL(rl.like_count, 0) AS like_count,
+		        ROW_NUMBER() OVER (ORDER BY NVL(rl.like_count, 0) DESC, r.REVIEW_DATE DESC) AS rn
+		    FROM REVIEW r
+		    LEFT JOIN (
+		        SELECT review_seq, COUNT(*) AS like_count
+		        FROM review_like
+		        GROUP BY review_seq
+		    ) rl ON r.REVIEW_SEQ = rl.review_seq
+		    WHERE r.product_seq = #{product_seq}
+		) r
+		WHERE r.rn BETWEEN #{startRow} AND #{endRow}
+	</select>
+
+	
+	<!-- 이미지 삭제 -->
+	<delete id="delReviewImage" parameterType="String">
+		DELETE FROM review_image WHERE image_url = #{image_url}
+	</delete>
+	
 	<delete id="delReviewImages" parameterType="int">
-	    DELETE FROM review_images WHERE review_seq = #{review_seq}
+	    DELETE FROM review_image WHERE review_seq = #{review_seq}
 	</delete>
 	
 	<delete id="delReview" parameterType="int">
 	    DELETE FROM reviews WHERE review_seq = #{review_seq}
 	</delete>
+	
+	<!-- 리뷰 신고 -->
+	<insert id="sendReviewReport">
+	    INSERT 
+	    	INTO review_report
+	    VALUES 
+	    	(review_report_seq.NEXTVAL, #{report_code}, SYSDATE, #{review_seq}, #{member_id})
+	</insert>
 
-    
+	<!-- 리뷰 수정 -->
+	<update id="updateReview" parameterType="map">
+		UPDATE 
+			review
+		SET 
+		    rating = #{rating}, 
+		    review_contents = #{review_contents}, 
+		    review_date = SYSDATE
+		WHERE 
+	    	review_seq = #{review_seq}
+	</update>   
+	
+	<!-- 전체 별점 --> 
+	<select id="getRatings" resultType="com.hows.product.dto.ReviewDTO">
+		select rating from REVIEW where product_seq = #{product_seq}
+	</select>
 	
 	
 	

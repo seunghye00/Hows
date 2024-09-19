@@ -131,8 +131,7 @@ public class PaymentService {
                     // 결제 내역 취소로 변경
                     map.put("payment_code", "P5");
                 } else {
-                    // 자동 취소 시
-                    // 결제 내역 삭제
+                    // 결제 오류로 발생 시 자동 결제 취소
                     int cancel = paymentDAO.cancelPayment(paymentId);
                     return cancel > 0 ? "ok" : "fail";
                 }

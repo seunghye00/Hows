@@ -172,7 +172,12 @@
 		    review_date = SYSDATE
 		WHERE 
 	    	review_seq = #{review_seq}
-	</update>    
+	</update>   
+	
+	<!-- 전체 별점 --> 
+	<select id="getRatings" resultType="com.hows.product.dto.ReviewDTO">
+		select rating from REVIEW where product_seq = #{product_seq}
+	</select>
 	
 	
 	

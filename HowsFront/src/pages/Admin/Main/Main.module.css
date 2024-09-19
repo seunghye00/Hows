@@ -33,7 +33,13 @@
 .contBox {
     flex: 1;
     border: 1px solid black;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 20px;
 }
+
+
 
 .leftBox .listBox {
     flex: 7;

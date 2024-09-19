@@ -146,4 +146,9 @@ public class PaymentService {
 	public int getOrderSeq(int payment_seq) {
 		return paymentDAO.getOrderSeq(payment_seq);
 	}
+
+	// 오늘 매출 조회
+	public int todayPaymentPrice() {
+		return paymentDAO.todayPaymentPrice();
+	}
 }

@@ -48,4 +48,9 @@ public class PaymentDAO {
 	public int getOrderSeq(int payment_seq) {
 		return mybatis.selectOne("Payment.getOrderSeq", payment_seq);
 	}
+
+	// 오늘 매출 조회
+	public int todayPaymentPrice() {
+		return mybatis.selectOne("Payment.todayPaymentPrice");
+	}
 }

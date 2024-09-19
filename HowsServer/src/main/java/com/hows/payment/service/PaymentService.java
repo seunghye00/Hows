@@ -126,6 +126,7 @@ public class PaymentService {
             String status = (String) cancellation.get("status");
             Integer totalAmount = (Integer) cancellation.get("totalAmount");
 
+            // 성공 시 데이터베이스 수정
             if(status.equals("SUCCEEDED")){
                 if(type.equals("cancel")){
                     // 결제 내역 취소로 변경

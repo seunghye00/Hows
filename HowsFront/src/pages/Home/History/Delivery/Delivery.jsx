@@ -129,7 +129,7 @@ export const Delivery = () => {
             </div>
             {
               selectPayment.paymentCode === "P1" || selectPayment.paymentCode === "P2" ?
-                  <button className={styles.cancelBtn} onClick={() => handleReasonWrite(selectPayment)}>구매 취소 & 환불
+                  <button className={styles.cancelBtn} onClick={() => handleReasonWrite(selectPayment.paymentSeq)}>구매 취소 & 환불
                     요청</button>
                   :
                   <></>
@@ -139,7 +139,7 @@ export const Delivery = () => {
                 <Modal isOpen={isModalOpen} onClose={() => setReasonOpen(false)}>
                 <div className={styles.cancelReason}>
                   <textarea onChange={handleReason} value={reason || ""} placeholder="취소 사유를 적어주세요"/>
-                  <button onClick={() => handleSaleCancel(selectPayment)}>구매 취소 요청</button>
+                  <button onClick={() => handleSaleCancel(selectPayment.paymentSeq)}>구매 취소 요청</button>
                 </div>
               </Modal>
             }

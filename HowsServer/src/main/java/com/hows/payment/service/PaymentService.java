@@ -129,7 +129,6 @@ public class PaymentService {
             if(status.equals("SUCCEEDED")){
                 if(type != null){
                     // 결제 내역 취소로 변경
-                    map.put("payment_code", "P5");
                     if(!paymentDAO.doneCancel(paymentId)) {
                     	throw new RuntimeException("DB 업데이트 오류");
                     }

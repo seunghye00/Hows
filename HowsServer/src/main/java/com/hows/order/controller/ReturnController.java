@@ -39,6 +39,7 @@ public class ReturnController {
     public ResponseEntity<String> doneOrder(@RequestBody List<Map<String, Object>> data) throws Exception {
         try {
             for (Map<String, Object> item : data) {
+            	item.put("type", "cancel");
                 String result = payServ.paymentCancel(item);
                 if(result.equals("fail")) {
                 	throw new RuntimeException("환불 실패 : 결재 취소 오류");

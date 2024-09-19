@@ -196,10 +196,56 @@
     top: 40%;
 }
 
+/*게시물 상세*/
+.detailmodalContent {
+    background-color: var(--hows-white);
+    padding: 20px;
+    border-radius: 10px;
+    width: 40%;
+    height: 70%;
+    text-align: center;
+    border: 2px solid var(--hows-point-color);
+}
 
+.authorInfo {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    position: relative;
+    left: 115px;
+}
 
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 10px;
+    border: 1px solid var(--hows-point-color);
+}
 
+.nickname {
+    font-size: 18px;
+}
 
+.boardContent {
+    margin-top: 15px;
+    font-size: 16px;
+}
 
+.boardImage {
+    width: 70%;
+    height: auto;
+    border-radius: 10px;
+    position: relative;
+    top: 10px;
+}
+
+.close{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    top: 80px;
+}
 
 

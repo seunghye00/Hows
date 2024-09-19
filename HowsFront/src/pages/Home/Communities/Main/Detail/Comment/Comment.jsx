@@ -1,14 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import {
-    Editor,
-    EditorState,
-    ContentState,
-    Modifier,
-    RichUtils,
-    CompositeDecorator,
-    getDefaultKeyBinding,
-} from 'draft-js'
-import 'draft-js/dist/Draft.css'
+import React, { useState, useEffect, useCallback } from 'react'
 import styles from './Comment.module.css'
 import { PiSiren } from 'react-icons/pi'
 import { useNavigate } from 'react-router-dom'
@@ -23,46 +13,6 @@ import {
 import { userInfo } from '../../../../../../api/member'
 import { Reply } from './Reply/Reply'
 import Swal from 'sweetalert2'
-
-// 링크 스타일을 적용하는 컴포넌트 (Draft.js에서 `@태그`에 스타일을 적용)
-const TagLink = props => {
-    const navigate = useNavigate()
-    return (
-        <span
-            className={styles.tagLink}
-            onClick={() =>
-                navigate(
-                    `/profile/${
-                        props.contentState.getEntity(props.entityKey).getData()
-                            .id
-                    }`
-                )
-            } // 태그된 엔티티에서 ID를 추출 후 프로필로 이동
-            style={{ color: 'blue', cursor: 'pointer' }}
-        >
-            {props.children} {/* `@태그`로 표시되는 텍스트 */}
-        </span>
-    )
-}
-
-// Draft.js 데코레이터: `@태그`를 감지해서 스타일을 적용
-const findTagEntities = (contentBlock, callback, contentState) => {
-    const text = contentBlock.getText() // 블록의 텍스트를 가져옴
-    const tagRegex = /@\w+/g // `@`로 시작하는 단어를 찾는 정규식
-    let matchArr, start
-    while ((matchArr = tagRegex.exec(text)) !== null) {
-        start = matchArr.index
-        callback(start, start + matchArr[0].length) // 태그의 시작과 끝 인덱스를 반환
-    }
-}
-
-// Draft.js 데코레이터 설정: `@태그`를 인식해서 스타일을 적용
-const decorator = new CompositeDecorator([
-    {
-        strategy: findTagEntities,
-        component: TagLink, // 태그된 텍스트를 링크로 표시
-    },
-])
 
 // 날짜 형식을 처리하는 유틸리티 함수
 const formatDate = dateString => {
@@ -96,26 +46,12 @@ export const Comment = ({
     const [isEditing, setIsEditing] = useState(false) // 댓글 수정 모드 여부
     const [isLiked, setIsLiked] = useState(commentData.isLiked || false) // 좋아요 여부
     const [likeCount, setLikeCount] = useState(commentData.LIKE_COUNT || 0) // 좋아요 개수
-    const [isAlertShown, setIsAlertShown] = useState(false)
-
-    // 댓글 수정 시의 Draft.js 에디터 상태 (댓글 내용을 에디터로 관리)
-    const [editedComment, setEditedComment] = useState(
-        EditorState.createWithContent(
-            ContentState.createFromText(commentData.COMMENT_CONTENTS), // 댓글 내용을 Draft.js의 ContentState로 변환
-            decorator // 태그 데코레이터 적용
-        )
-    )
-
-    // 답글 작성 시의 Draft.js 에디터 상태
-    const [replyContent, setReplyContent] = useState(
-        EditorState.createEmpty(decorator) // 빈 상태로 시작하며, 태그 데코레이터 적용
-    )
-
+    const [replyContent, setReplyContent] = useState('') // 답글 입력 상태
     const [replies, setReplies] = useState([]) // 답글 목록을 상태로 관리
     const [activeReplySeq, setActiveReplySeq] = useState(null) // 활성화된 답글 입력창의 댓글 번호
     const [userProfile, setUserProfile] = useState('') // 유저 프로필 이미지
     const [showAllReplies, setShowAllReplies] = useState(false) // 모든 답글을 보여줄지 여부
-    const [editingReplySeq, setEditingReplySeq] = useState(null) // 현재 수정 중인 답글의 seq 관리
+    const [editingReplySeq, setEditingReplySeq] = useState(null)
 
     // 유저 프로필 정보 불러오기
     useEffect(() => {
@@ -204,35 +140,18 @@ export const Comment = ({
         setActiveReplySeq(prevSeq =>
             prevSeq === commentData.COMMENT_SEQ ? null : commentData.COMMENT_SEQ
         )
-        // 현재 에디터에 있는 텍스트 확인
-        const currentContent = replyContent.getCurrentContent().getPlainText()
 
-        // 이미 @태그가 있는지 확인
-        if (!currentContent.includes(`@${commentData.NICKNAME}`)) {
-            const taggedContent = `@${commentData.NICKNAME} ` // 답글 작성 시 태그된 내용
-            const newState = Modifier.insertText(
-                replyContent.getCurrentContent(),
-                replyContent.getSelection(),
-                taggedContent
-            ) // Draft.js에서 답글 입력창에 태그된 텍스트 삽입
-            const newEditorState = EditorState.push(
-                replyContent,
-                newState,
-                'insert-characters'
-            )
-            setReplyContent(EditorState.moveFocusToEnd(newEditorState)) // 답글 입력창에 포커스 이동
+        // 자동 태그 추가
+        if (!replyContent.includes(`@${commentData.NICKNAME}`)) {
+            setReplyContent(`@${commentData.NICKNAME} `) // 답글 작성 시 태그된 내용 추가
         }
     }
 
     // 답글 작성 함수
     const handleReplySubmit = async replySeq => {
-        // 최신 에디터 상태를 가져오기 위해 EditorState 업데이트 후 실행
-        const contentState = replyContent.getCurrentContent() // 현재 상태 가져오기
-        const content = contentState.getPlainText().trim() // 입력된 답글 내용 가져오기
+        const content = replyContent.trim() // 입력된 답글 내용 가져오기
 
-        console.log('Reply Submit - Content:', content) // 콘솔로 현재 답글 내용 출력
-
-        // 300글자 이상이면 처리하지 않음
+        if (!content) return // 내용이 없으면 처리하지 않음
         if (content.length > 300) {
             Swal.fire({
                 icon: 'error',
@@ -242,33 +161,12 @@ export const Comment = ({
             return
         }
 
-        // 이미지 삽입 여부 체크
-        const blockMap = contentState.getBlockMap()
-        const hasImage = blockMap.some(block => {
-            const entityKey = block.getEntityAt(0)
-            return (
-                entityKey &&
-                contentState.getEntity(entityKey).getType() === 'IMAGE'
-            )
-        })
-
-        if (hasImage) {
-            Swal.fire({
-                icon: 'error',
-                title: '이미지 첨부는 허용되지 않습니다.',
-                showConfirmButton: true,
-            })
-            return
-        }
-
-        if (!content) return // 내용이 없으면 처리하지 않음
-
         try {
             // 서버로 전송
             await sendReply(replySeq, content, member_id)
 
             // 답글 입력창 초기화
-            setReplyContent(EditorState.createEmpty(decorator))
+            setReplyContent('')
 
             // 답글 입력창 닫기
             setActiveReplySeq(null)
@@ -291,8 +189,7 @@ export const Comment = ({
 
     // 댓글 수정 후 저장 처리
     const handleSaveEdit = () => {
-        const content = editedComment.getCurrentContent().getPlainText() // 수정된 댓글 내용 가져오기
-        handleUpdateComment(commentData.COMMENT_SEQ, content) // 수정된 댓글 저장
+        handleUpdateComment(commentData.COMMENT_SEQ, replyContent) // 수정된 댓글 저장
         setIsEditing(false) // 수정 모드 종료
     }
 
@@ -315,11 +212,10 @@ export const Comment = ({
                 cancelButtonText: '아니요, 취소할래요',
             })
 
-            // 사용자가 '네, 삭제할래요!'를 선택한 경우에만 삭제 처리
             if (result.isConfirmed) {
                 await deleteReply(replySeq) // 삭제 API 호출
 
-                // 삭제 후 상태 업데이트 (해당 replySeq만 제거)
+                // 삭제 후 상태 업데이트
                 setReplies(
                     replies.filter(reply => reply.REPLY_SEQ !== replySeq)
                 )
@@ -359,86 +255,6 @@ export const Comment = ({
         setSelectedReplySeq(replySeq) // 선택된 답글의 seq 저장
     }
 
-    // Draft.js 커맨드 처리 (답글 전송 처리)
-    const handleKeyCommand = (command, editorState) => {
-        if (command === 'submit-reply') {
-            const contentState = editorState.getCurrentContent() // 현재 상태 가져오기
-            const content = contentState.getPlainText().trim() // 입력된 텍스트를 가져오기
-
-            if (!content) {
-                return 'handled' // 내용이 없을 경우 처리하지 않음
-            }
-            handleReplySubmit(commentData.COMMENT_SEQ) // 답글 전송
-            return 'handled'
-        }
-        return 'not-handled'
-    }
-
-    // Shift + Enter로 줄바꿈 처리 (Delayed Newline Issue Fix)
-    const handleReturn = (e, editorState) => {
-        if (e.shiftKey) {
-            const contentState = editorState.getCurrentContent()
-            const selectionState = editorState.getSelection()
-
-            // 줄바꿈(\n) 추가
-            const newContentState = Modifier.insertText(
-                contentState,
-                selectionState,
-                '\n'
-            )
-
-            // 새 에디터 상태를 만듦
-            const newEditorState = EditorState.push(
-                editorState,
-                newContentState,
-                'insert-characters'
-            )
-
-            // 포커스 강제 이동
-            setReplyContent(EditorState.moveFocusToEnd(newEditorState))
-            document.getElementById('reply-editor').focus() // 포커스 설정
-
-            return 'handled'
-        }
-
-        handleReplySubmit(commentData.COMMENT_SEQ) // Enter만 누른 경우 답글 전송 처리
-        return 'handled'
-    }
-
-    // 키 바인딩 함수
-    const keyBindingFn = e => {
-        if (e.key === 'Enter') {
-            if (e.shiftKey) {
-                return 'insert-soft-newline' // 줄바꿈
-            }
-            return 'submit-reply' // 답글 전송
-        }
-        return getDefaultKeyBinding(e)
-    }
-
-    // 답글 작성 시의 Draft.js 에디터 상태 관리
-    const handleReplyChange = editorState => {
-        const contentState = editorState.getCurrentContent()
-        const contentLength = contentState.getPlainText().length
-        console.log('Reply Change - Content Length:', contentLength) // 상태 변경 시 글자 수 출력
-        console.log('Reply Change - Content:', contentState.getPlainText()) // 상태 변경 시 내용을 출력
-        // 300글자 이상 입력 시 경고창을 한 번만 띄우고 입력 차단
-        if (contentLength > 300) {
-            if (!isAlertShown) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: '답글은 300글자를 넘을 수 없습니다.',
-                    showConfirmButton: true,
-                })
-                setIsAlertShown(true) // 경고창을 한 번만 표시
-            }
-            return
-        }
-
-        setIsAlertShown(false) // 300글자 이내면 경고 상태 해제
-        setReplyContent(editorState) // 상태 업데이트
-    }
-
     return (
         <div className={styles.commentCont}>
             <div className={styles.commentInfo}>
@@ -460,9 +276,9 @@ export const Comment = ({
             <div className={styles.commentBox}>
                 <div className={styles.commentTxt}>
                     {isEditing ? (
-                        <Editor
-                            editorState={editedComment}
-                            onChange={setEditedComment} // 수정 중일 때 댓글 내용을 에디터로 표시
+                        <textarea
+                            value={replyContent}
+                            onChange={e => setReplyContent(e.target.value)} // 수정 중일 때 댓글 내용을 textarea로 표시
                         />
                     ) : (
                         commentData.COMMENT_CONTENTS // 수정 중이 아닐 때 댓글 내용 표시
@@ -573,11 +389,11 @@ export const Comment = ({
                                   activeReplySeq={activeReplySeq}
                                   handleReplySubmit={handleReplySubmit}
                                   replyContent={replyContent}
+                                  editingReplySeq={editingReplySeq}
+                                  setEditingReplySeq={setEditingReplySeq} // 답글 수정 전달
                                   setReplyContent={setReplyContent}
                                   isOwner={isOwner}
                                   member_id={member_id}
-                                  editingReplySeq={editingReplySeq}
-                                  setEditingReplySeq={setEditingReplySeq}
                                   handleUpdateReply={handleUpdateReply} // 답글 수정 처리
                                   handleDeleteReply={handleDeleteReply} // 답글 삭제 처리
                                   handleOpenReportModalForReply={
@@ -594,11 +410,11 @@ export const Comment = ({
                                   activeReplySeq={activeReplySeq}
                                   handleReplySubmit={handleReplySubmit}
                                   replyContent={replyContent}
+                                  editingReplySeq={editingReplySeq}
+                                  setEditingReplySeq={setEditingReplySeq} // 답글 수정 전달
                                   setReplyContent={setReplyContent}
                                   isOwner={isOwner}
                                   member_id={member_id}
-                                  editingReplySeq={editingReplySeq}
-                                  setEditingReplySeq={setEditingReplySeq}
                                   handleUpdateReply={handleUpdateReply} // 답글 수정 처리
                                   handleDeleteReply={handleDeleteReply} // 답글 삭제 처리
                                   handleOpenReportModalForReply={
@@ -615,16 +431,27 @@ export const Comment = ({
                         <div className={styles.imgBox}>
                             <img src={userProfile} alt="profile" />
                         </div>
-                        <div className={styles.replyTextarea}>
-                            <Editor
-                                editorState={replyContent} // Draft.js 에디터로 답글 입력창 관리
-                                onChange={handleReplyChange} // 300글자 체크 및 에디터 상태 변경
-                                keyBindingFn={keyBindingFn}
-                                handleReturn={handleReturn} // handleReturn으로 줄바꿈 처리
-                                handleKeyCommand={handleKeyCommand} // 엔터 키로 답글 전송 처리
-                                placeholder="답글을 입력하세요."
-                            />
-                        </div>
+                        <textarea
+                            className={styles.replyTextarea}
+                            value={replyContent}
+                            onChange={e => setReplyContent(e.target.value)} // 텍스트 입력 시 상태 업데이트
+                            onKeyDown={e => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault() // 기본 Enter 동작 막음
+                                    handleReplySubmit(commentData.COMMENT_SEQ) // 엔터 누르면 답글 전송
+                                }
+                            }}
+                            onInput={e => {
+                                e.target.style.height = 'auto'
+                                e.target.style.height = `${Math.min(
+                                    e.target.scrollHeight,
+                                    60
+                                )}px`
+                            }}
+                            placeholder="답글을 입력하세요."
+                            rows={2}
+                            maxLength={300} // 300글자 제한
+                        />
                     </div>
                 )}
             </div>

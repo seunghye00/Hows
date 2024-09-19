@@ -65,5 +65,9 @@ public class ProductDAO {
 		params.put("quantity", quantity);
 		return myBatis.update("Product.updateByQuantity", params) > 0;
 	}
-	
+
+	// 카테고리별 상품 수 조회
+	public List<Map<String, Object>> getProductNumByCategory() {
+	    return myBatis.selectList("Product.getProductNumByCategory", "category_title");
+	}
 }

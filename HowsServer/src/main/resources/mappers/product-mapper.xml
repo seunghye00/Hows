@@ -59,7 +59,6 @@
 		  ) pl ON p.product_seq = pl.product_seq
 		  WHERE p.product_category_code = #{product_category_code}
 	</select>
-	
 
 	<select id="getProductDetaile" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
 		SELECT *
@@ -174,11 +173,6 @@
 	    	review_seq = #{review_seq}
 	</update>    
 	
-	
-	
-	
-	
-	
 	<!-- My 리뷰 목록 -->
 	<select id="myReview" resultMap="myReviewMap">
 		SELECT
@@ -200,9 +194,7 @@
 			review_seq = #{review_seq}
 	</select>
 
-
-
-
+	<!-- 상품 등록 -->
 	<insert id="insert">
 		<selectKey keyProperty="product_seq" resultType="int"
 			order="AFTER">
@@ -213,10 +205,12 @@
 		#{product_category_code})
 	</insert>
 	
+	<!-- 상품 삭제 -->
 	<delete id="deleteProduct">
 		delete from product where product_seq = #{productSeq}
 	</delete>
 
+	<!-- 상품 대표이미지 변경 -->
 	<update id="updateThumbNail">
 		update product set product_thumbnail = #{url} where product_seq = #{seq}
 	</update>
@@ -296,4 +290,13 @@
 	<update id="updateByQuantity">
 		update product set quantity = #{quantity} where product_seq = #{productSeq}
 	</update>
+	
+	<!-- 카테고리별 상품 수 조회 -->
+	<select id="getProductNumByCategory" resultType="map"> 
+		select c.product_category_title as category_title, 
+           count(p.product_category_code) as product_count
+    	from product_category c
+    	left join product p on p.product_category_code = c.product_category_code
+    	group by c.product_category_title
+	</select>
 </mapper>

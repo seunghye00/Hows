@@ -597,6 +597,13 @@ public class CommunityController {
 	    return fileURL.substring(fileURL.lastIndexOf("/") + 1);
 	}
 	
+	// 카테고리 별 게시글 수 조회
+	@GetMapping("/getBoardNumByCategory")
+	public ResponseEntity<Map<String, Object>> getBoardNumByCategory() throws Exception {
+		Map<String, Object> result = communityServ.getBoardNumByCategory();
+		return ResponseEntity.ok(result);
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

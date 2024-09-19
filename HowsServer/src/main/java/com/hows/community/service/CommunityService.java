@@ -1,5 +1,6 @@
 package com.hows.community.service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -194,5 +195,15 @@ public class CommunityService {
 		communityDAO.deleteCommunityReport(board_seq);
 		// 게시물 삭제
 		return communityDAO.deleteCommunity(board_seq);
+	}
+
+	// 카테고리별 게시글 수 조회
+	public Map<String, Object> getBoardNumByCategory() {
+		Map<String, Object> result = new HashMap<>();
+		result.put("postCountByHousingType", communityDAO.getPostCountByHousingType());
+		result.put("postCountBySpaceType", communityDAO.getPostCountBySpaceType());
+		result.put("postCountByAreaType", communityDAO.getPostCountByAreaSize());
+		result.put("postCountByColor", communityDAO.getPostCountByColor());
+		return result;
 	}
 }

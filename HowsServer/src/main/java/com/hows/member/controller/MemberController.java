@@ -315,8 +315,6 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 	
-	
-	
 	// ========================================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
 	@GetMapping("/all")
@@ -445,6 +443,12 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
+	// 연령대별 남녀 회원 수 조회
+	@GetMapping("/getAgeGenderDistribution")
+	public ResponseEntity<List<Map<String, Object>>> getAgeGenderDistribution() throws Exception {
+		List<Map<String, Object>> result = memServ.getAgeGenderDistribution();
+		return ResponseEntity.ok(result);
+	}
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {

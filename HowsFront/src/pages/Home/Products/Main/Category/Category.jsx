@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { host } from "../../../../../config/config";
 
-import { json, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { ScrollTop } from "../../../../../components/ScrollTop/ScrollTop";
 import { addCommas } from "../../../../../commons/commons";
@@ -14,10 +14,10 @@ export const Category = () => {
   const { product_category_code } = useParams();
 
   const [categoriesList, setCategoriesList] = useState([]); // 카테고리 상태
-  const [data, setData] = useState([]); // 상품 List 상태
+  const [data, setData] = useState([]); // 상품 목록 상태
 
   const [selectedPriceType, setSelectedPriceType] = useState(""); // [옵션] 가격 상태
-  const [selectedSort, setSelectedSort] = useState("popular"); // [옵션] 정렬 상태, 기본값 'latest'
+  const [selectedSort, setSelectedSort] = useState("popular"); // [옵션] 정렬 상태, 기본값 'popular' 인기순
 
   const [productsList, setProductsList] = useState([]); // [무한 스크롤] 데이터
   const [hasMore, setHasMore] = useState(true); // [무한 스크롤] 더 불러올 데이터가 있는지 여부
@@ -28,69 +28,70 @@ export const Category = () => {
   const categoryCode = queryParams.get("code"); // 쿼리 파라미터에서 'code'이름의 값을 가져옴
 
   // 데이터를 4개씩 묶는 함수
-  const chunkArray = (array = [], size, sortType, priceType) => {
-    console.log("초기 배열:", array);
+  const chunkArray = (array = [], size, sortType, housingType) => {
+    // console.log("초기 배열:", array);
     if (!array || array.length === 0) return []; // 배열이 없거나 비어 있을 경우 빈 배열 반환
-
-    let filteredArray = array;
-
+  
+    let filteredArray = array; // 초기값을 전체 배열로 설정
+  
     // 가격 필터링
-    // 가격 필터링
-    if (priceType === "price1") {
-      filteredArray = array.filter((item) => item.PRICE <= 10000); // 10,000원 이하
-    } else if (priceType === "price2") {
-      filteredArray = array.filter((item) => item.PRICE > 10000 && item.PRICE <= 50000); // 10,000원 ~ 50,000원
-    } else if (priceType === "price3") {
-      filteredArray = array.filter((item) => item.PRICE > 50000 && item.PRICE <= 100000); // 50,000원 ~ 100,000원
-    } else if (priceType === "price4") {
-      filteredArray = array.filter((item) => item.PRICE > 100000 && item.PRICE <= 200000); // 100,000원 ~ 200,000원
-    } else if (priceType === "price5") {
-      filteredArray = array.filter((item) => item.PRICE > 200000 && item.PRICE <= 300000); // 200,000원 ~ 300,000원
-    } else if (priceType === "price6") {
-      filteredArray = array.filter((item) => item.PRICE > 300000 && item.PRICE <= 400000); // 300,000원 ~ 400,000원
-    } else if (priceType === "price7") {
-      filteredArray = array.filter((item) => item.PRICE > 400000); // 400,000원 이상
+    if (housingType === "price1") {
+      filteredArray = array.filter((item) => item.PRICE <= 10000);
+    } else if (housingType === "price2") {
+      filteredArray = array.filter((item) => item.PRICE > 10000 && item.PRICE <= 50000); 
+    } else if (housingType === "price3") {
+      filteredArray = array.filter((item) => item.PRICE > 50000 && item.PRICE <= 100000);
+    } else if (housingType === "price4") {
+      filteredArray = array.filter((item) => item.PRICE > 100000 && item.PRICE <= 150000); 
+    } else if (housingType === "price5") {
+      filteredArray = array.filter((item) => item.PRICE > 150000 && item.PRICE <= 200000); 
+    } else if (housingType === "price6") {
+      filteredArray = array.filter((item) => item.PRICE > 200000 );
+    } else if (housingType === "price") {
+      filteredArray = array;
+    }else {
+      filteredArray = array; // 가격 필터링이 없으면 전체 배열을 사용
     }
-    console.log("가격 배열", filteredArray);
-
-    let tmp = [];
-
+  
     // 정렬 옵션에 따른 데이터 정렬
+    let tmp = filteredArray.slice();
     if (sortType === "popular") {
-      tmp = array.slice().sort((a, b) => b.LIKE_COUNT - a.LIKE_COUNT); // 인기순
+      tmp = tmp.slice().sort((a, b) => b.LIKE_COUNT - a.LIKE_COUNT); // 인기순
     } else if (sortType === "latest") {
-      tmp = array.slice().sort((a, b) => b.PRODUCT_SEQ - a.PRODUCT_SEQ); // 최신순
+      tmp = tmp.slice().sort((a, b) => b.PRODUCT_SEQ - a.PRODUCT_SEQ); // 최신순
     } else if (sortType === "oldest") {
-      tmp = array.slice().sort((a, b) => a.PRODUCT_SEQ - b.PRODUCT_SEQ); // 오래된 순
+      tmp = tmp.slice().sort((a, b) => a.PRODUCT_SEQ - b.PRODUCT_SEQ); // 오래된 순
     } else if (sortType === "row_price") {
-      tmp = array.slice().sort((a, b) => a.PRICE - b.PRICE); // 낮은 가격순
+      tmp = tmp.slice().sort((a, b) => a.PRICE - b.PRICE); // 낮은 가격순
     } else if (sortType === "high_price") {
-      tmp = array.slice().sort((a, b) => b.PRICE - a.PRICE); // 높은 가격순
-    } else {
-      tmp = array; // 기본적으로는 인기순(서버에서 받아온 데이터)
-    }
-
-    console.log("정렬된 배열:", tmp); // 정렬된 배열 확인
-
+      tmp = tmp.slice().sort((a, b) => b.PRICE - a.PRICE); // 높은 가격순
+    } 
+  
+    // console.log("정렬된 배열:", tmp); // 정렬된 배열 확인
+  
     // 데이터를 4개씩 묶음
     const result = [];
     for (let i = 0; i < tmp.length; i += size) {
       result.push(tmp.slice(i, i + size));
     }
-    console.log("4개씩 묶인 배열:", result); // 묶은 후 배열 확인
+  
+    // console.log("4개씩 묶인 배열:", result); // 묶은 후 배열 확인
     return result;
   };
-
+  
   // 무한 스크롤로 데이터 추가 로드
   const loadMoreData = async () => {
     const nextPage = page + 1;
     const newContent = await fetchData(nextPage);
-
+  
+    // 중복된 데이터 제거
+    const combinedProducts = [...new Set([...productsList, ...newContent])]; 
+    setProductsList(combinedProducts);
+  
     // 더 이상 데이터가 없으면 종료
     if (newContent.length === 0) {
       setHasMore(false); // 더 이상 데이터가 없을 경우 무한 스크롤 중지
     } else {
-      setProductsList((prevList) => [...prevList, ...newContent]); // 데이터를 추가로 합침
       setPage(nextPage); // 페이지 증가
     }
   };
@@ -112,14 +113,6 @@ export const Category = () => {
     }
   }, [data]);
 
-  // // selectedSort 또는 productsList 변경 시 데이터 정렬
-  // useEffect(() => {
-  //   const chunkedList = chunkArray(productsList || [], 4, selectedSort);
-  //   // console.log("최종 정렬된 리스트 확인"+chunkedList);
-  // }, [selectedSort, productsList]); // 정렬 옵션과 productsList에 의존
-
-
-
   // 카테고리 메뉴 출력
   useEffect(() => {
     axios
@@ -129,47 +122,51 @@ export const Category = () => {
 
         if (categoryCode == null) handleMenuClick("P1");
         else handleMenuClick(categoryCode);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
 
+      }).catch((err) => {console.error(err);});
+  }, []);
+  
   // chunkedContentList 선언 및 상태 추적
   const chunkedContentList = chunkArray(productsList || [], 4, selectedSort); // undefined 방지
 
   // 카테고리 목록 출력
   const handleMenuClick = (product_category_code) => {
+    // console.log(product_category_code)
     // 기존 데이터 초기화
     setProductsList([]);
     axios.get(`${host}/product/category/${product_category_code}`) // 서버에서 기본적으로 인기순 데이터를 받아옴
-      .then((resp) => {setData(resp.data);})
+      .then((resp) => {
+        setData(resp.data);
+        // console.log(resp.data);
+        
+      })
       .catch((err) => {console.error(err);});
   };
-
+  // console.log(data);
+  
   useEffect(() => {
     handleMenuClick(product_category_code);
   }, [product_category_code]);
 
   // 상태값이 변경될 때마다 데이터를 다시 필터링
   useEffect(() => {
-    if (productsList.length > 0) {
-      const sortedAndFilteredList = chunkArray(productsList, 4, selectedSort, selectedPriceType); // 정렬 및 필터링 후 리스트 업데이트
-      setProductsList(sortedAndFilteredList.flat()); // 4개씩 묶은 후 다시 평탄화(flat)
+    if (data.length > 0) {
+        const sortedAndFilteredList = chunkArray(data, 4, selectedSort, selectedPriceType); // 정렬 및 필터링 후 리스트 업데이트
+        // console.log("필터링된 데이터: ", sortedAndFilteredList); // 필터링 후 데이터 확인
+        setProductsList(sortedAndFilteredList.flat()); // 4개씩 묶은 후 다시 평탄화(flat)
     }
-  }, [selectedSort, selectedPriceType, productsList]);  // 필터 값이 변경될 때 실행
-  
+  }, [selectedSort, selectedPriceType, data]);  // 필터 값이 변경될 때 실행
 
-  
-  
 
   // [옵션] 선택 해제 함수
   const removeSelectedOption = (optionType) => {
-    // if (optionType === "price") {
-    //   setSelectedPriceType(""); // 가격 필터 해제
-    // }
+    if (optionType === "price") {
+      setSelectedPriceType(""); // 가격 필터 해제
+      setProductsList(data); //전체 데이터로 초기화하고 필터 해제 후 전체 목록 표시
+    }
     if (optionType === "sort") {
       setSelectedSort("popular"); // 정렬 필터 해제, 인기순으로 기본값 설정
+      setProductsList(data);
     }
   };
 
@@ -191,7 +188,6 @@ export const Category = () => {
           <div>
             <div className={styles.option}>
               <div className={styles.sortBox}>
-                {/* 인기순/조회수순 선택 */}
                 <select
                   name="sortType"
                   value={selectedSort}
@@ -204,25 +200,22 @@ export const Category = () => {
                   <option value="row_price">낮은가격순</option>
                   <option value="high_price">높은가격순</option>
                 </select>
-                {/* 가격별 선택 */}
-                {/* <select
+                <select
                   name="housingType"
                   value={selectedPriceType}
                   onChange={(e) => {
-                    console.log("Selected price type:", e.target.value);
                     setSelectedPriceType(e.target.value)
                   }}
                 >
                   <option value="">가격</option>
+                  <option value="price">전체</option>
                   <option value="price1">10,000원 이하</option>
-                  <option value="price1">10,000원 ~ 50,000원</option>
-                  <option value="price2">50,000원 ~ 100,000원</option>
-                  <option value="price3">100,000원 ~ 200,000원</option>
-                  <option value="price4">200,000원 ~ 300,000원</option>
-                  <option value="price5">300,000원 ~ 400,000원</option>
-                  <option value="price6">400,000원 ~ 500,000원</option>
-                  <option value="price7">500,000원 이상</option>
-                </select> */}
+                  <option value="price2">10,000원 ~ 50,000원</option>
+                  <option value="price3">50,000원 ~ 100,000원</option>
+                  <option value="price4">100,000원 ~ 150,000원</option>
+                  <option value="price5">150,000원 ~ 200,000원</option>
+                  <option value="price6">200,000원 ~</option>
+                </select>
               </div>
 
               {/* 선택한 필터들 표시 */}
@@ -237,20 +230,19 @@ export const Category = () => {
                 </div>
               )}
 
-                {/* 선택한 필터들 표시
+                {/* 선택한 필터들 표시 */}
                 {selectedPriceType && (
                   <div className={styles.selectedOption}>
+                    {selectedPriceType === "price" && "전체"}
                     {selectedPriceType === "price1" && "10,000원 이하"}
                     {selectedPriceType === "price2" && "10,000원 ~ 50,000원"}
                     {selectedPriceType === "price3" && "50,000원 ~ 100,000원"}
-                    {selectedPriceType === "price4" && "100,000원 ~ 200,000원"}
-                    {selectedPriceType === "price5" && "200,000원 ~ 300,000원"}
-                    {selectedPriceType === "price6" && "300,000원 ~ 400,000원"}
-                    {selectedPriceType === "price7" && "400,000원 ~ 500,000원"}
-                    {selectedPriceType === "price8" && "500,000원 이상"}
+                    {selectedPriceType === "price4" && "100,000원 ~ 150,000원"}
+                    {selectedPriceType === "price5" && "150,000원 ~ 200,000원"}
+                    {selectedPriceType === "price6" && "200,000원 ~"}
                     <button onClick={() => removeSelectedOption("price")}>X</button>
                   </div>
-                )} */}
+                )}
               </div>
             </div>
             <div className={styles.length}>{productsList.length}개</div>

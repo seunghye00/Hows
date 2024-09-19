@@ -1,5 +1,6 @@
-import { useState } from "react"
+import {useEffect, useState} from "react"
 import styles from "./Coupon.module.css"
+import {api} from "../../../../config/config";
 
 export const Coupon = () => {
     const couponData = [
@@ -21,6 +22,11 @@ export const Coupon = () => {
         },
     ]
 
+    useEffect(() => {
+        api.get(`/coupon/owner`).then(res => {
+            console.log("res === ", res.data);
+        });
+    }, []);
 
 
     return (

@@ -31,6 +31,7 @@ public class PaymentDAO {
 
     /** 결제 상태 변경 **/
     public int updatePayment(Map<String, Object> map) {
+        System.out.println("map ====== " + map);
         return mybatis.update("Payment.updatePayment", map);
     }
 

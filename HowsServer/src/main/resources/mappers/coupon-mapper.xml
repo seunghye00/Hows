@@ -10,12 +10,12 @@
         <result property="member_seq" column="member_seq"/>
         <result property="coupon_seq" column="coupon_seq"/>
         <result property="order_seq" column="order_seq"/>
-        <result property="get_date" column="get_date"/>
-        <result property="use_date" column="use_date"/>
+        <result property="get_date" column="get_date" javaType="java.sql.Timestamp"/>
+        <result property="use_date" column="use_date" javaType="java.sql.Timestamp"/>
         <result property="coupon_title" column="coupon_title"/>
         <result property="coupon_type" column="coupon_type"/>
         <result property="coupon_discount" column="coupon_discount"/>
-        <result property="expired_date" column="expired_date"/>
+        <result property="expired_date" column="expired_date" javaType="java.sql.Timestamp"/>
     </resultMap>
 
     <select id="getCoupon" resultType="com.hows.coupon.dto.CouponDTO">

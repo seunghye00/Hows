@@ -124,7 +124,7 @@ public class OrderDTO {
 	public OrderDTO(int member_seq, String order_name, int order_price, String orderer_name, String orderer_phone,
 			String orderer_zip_code, String orderer_address, String orderer_detail_address) {
 		this.member_seq = member_seq;
-		this.order_code = "O1";
+		this.order_code = "O2";
 		this.order_name = order_name;
 		this.order_price = order_price;
 		this.orderer_name = orderer_name;

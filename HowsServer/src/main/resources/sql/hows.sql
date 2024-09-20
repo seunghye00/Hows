@@ -360,7 +360,7 @@ insert into product_category (product_category_code, product_category_title) val
 insert into product_category (product_category_code, product_category_title) values ('P3', '패브릭');
 insert into product_category (product_category_code, product_category_title) values ('P4', '수납정리');
 insert into product_category (product_category_code, product_category_title) values ('P5', '가전 및 디지털');
-insert into product_category (product_category_code, product_category_title) values ('P6', '주방용품!');
+insert into product_category (product_category_code, product_category_title) values ('P6', '주방용품');
 
 -- 상품 좋아요
 create table product_like (

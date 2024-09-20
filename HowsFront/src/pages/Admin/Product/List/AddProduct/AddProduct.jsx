@@ -13,7 +13,7 @@ export const AddProduct = () => {
     const [selectedCategory, setSelectedCategory] = useState('')
     const [selectedFiles, setSelectedFiles] = useState([])
     const [previews, setPreviews] = useState([])
-    const [selectedImage, setSelectedImage] = useState(0)
+    const [selectedImage, setSelectedImage] = useState(-1)
     const [product, setProduct] = useState({
         product_title: '',
         price: 0,
@@ -65,6 +65,7 @@ export const AddProduct = () => {
         setPreviews(prevPreviews => [...prevPreviews, ...newPreviews])
     }
 
+    // 미리보기 삭제 부분
     const handleDeletePreview = index => {
         setPreviews(prevPreviews => {
             const newPreviews = prevPreviews.filter((_, i) => i !== index)
@@ -94,7 +95,7 @@ export const AddProduct = () => {
 
     // 작성 완료
     const handleSubmit = () => {
-        if (selectedImage === 10) {
+        if (selectedImage === -1) {
             SwalComp({
                 type: 'warning',
                 text: '대표 사진을 등록해주세요.',
@@ -136,7 +137,20 @@ export const AddProduct = () => {
                 SwalComp({
                     type: 'success',
                     text: '상품이 추가되었습니다.',
-                }).then(navi('/admin/product/list'))
+                }).then(() => {
+                    // 성공 후 데이터 초기화
+                    setProduct({
+                        product_title: '',
+                        price: 0,
+                        product_category_code: '',
+                        quantity: 0,
+                        product_contents: '',
+                    })
+                    setSelectedFiles([])
+                    setPreviews([])
+                    setSelectedImage(-1) // 초기화
+                    navi('/admin/product/list')
+                })
             })
             .catch(error => {
                 console.error('업로드 실패 :', error)

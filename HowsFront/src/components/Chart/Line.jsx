@@ -41,7 +41,7 @@ export const LineChart = ({ category }) => {
     useEffect(() => {
         getBoardNumByCategory()
             .then(resp => {
-                console.log(resp.data)
+                // console.log(resp.data)
                 let data
                 let labels
 
@@ -94,6 +94,11 @@ export const LineChart = ({ category }) => {
             title: {
                 display: true,
                 text: '카테고리별 게시글 수',
+            },
+        },
+        scales: {
+            y: {
+                beginAtZero: true, // Y축 최솟값을 0으로 설정
             },
         },
     }

@@ -217,6 +217,12 @@ export const Member = () => {
         setPage(pageNumber)
     }
 
+    // 검색 실행 시 자동으로 chosung을 '전체'로 변경하고 검색 수행
+    const handleSearch = searchQuery => {
+        setSearchTerm(searchQuery)
+        setChosung('전체') // 검색 실행 시 필터를 전체로 설정
+    }
+
     return (
         <div className={styles.memberContainer}>
             {/* Header */}
@@ -253,7 +259,7 @@ export const Member = () => {
                 <div className={styles.searchSection}>
                     <Search
                         placeholder="아이디 또는 이름 검색"
-                        onSearch={setSearchTerm}
+                        onSearch={handleSearch}
                     />
                 </div>
             </div>

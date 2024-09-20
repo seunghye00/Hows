@@ -38,7 +38,7 @@ export const BarChart = () => {
     useEffect(() => {
         getAgeGenderDistribution()
             .then(resp => {
-                console.log(resp.data)
+                // console.log(resp.data)
                 const data = resp.data
                 // AGE_RANGE 값(연령대)을 추출하고 중복 제거
                 const labels = [...new Set(data.map(item => item.AGE_RANGE))]

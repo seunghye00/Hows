@@ -226,13 +226,17 @@
     SELECT *
     FROM (
         SELECT 
-            r.review_seq,                      <!-- 리뷰 번호 -->
-            p.product_title,                   <!-- 상품 제목 -->
-            m.nickname,                        <!-- 리뷰 작성자 (닉네임) -->
-            r.review_contents,                 <!-- 리뷰 내용 -->
-            TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 변환 -->
-            COUNT(rr.review_report_seq) AS report_count,  <!-- 신고 횟수 -->
-            COALESCE(ri.image_url, ' ') AS image_url,                      <!-- 리뷰 이미지 URL -->
+            r.review_seq,  <!-- 리뷰 번호 -->
+            p.product_title,  <!-- 상품 제목 -->
+            m.nickname,  <!-- 리뷰 작성자 (닉네임) -->
+            r.review_contents,  <!-- 리뷰 내용 -->
+            TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 작성 일시 -->
+            (
+                SELECT COUNT(DISTINCT rr.review_report_seq)
+                FROM review_report rr
+                WHERE rr.review_seq = r.review_seq
+            ) AS report_count,  <!-- 신고 횟수 (중복 제거) -->
+            COALESCE(LISTAGG(ri.image_url, ',') WITHIN GROUP (ORDER BY ri.image_order), ' ') AS image_urls,  <!-- 이미지 목록 -->
             ROW_NUMBER() OVER (ORDER BY r.review_seq DESC) AS row_num  <!-- 각 행에 순번 부여 -->
         FROM 
             review r
@@ -242,13 +246,12 @@
             member m ON r.member_id = m.member_id
         LEFT JOIN 
             review_image ri ON r.review_seq = ri.review_seq  <!-- 리뷰 이미지 조인 -->
-        JOIN 
-            review_report rr ON r.review_seq = rr.review_seq  <!-- 신고 기록 조인 -->
         GROUP BY 
-            r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date, ri.image_url
+            r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
     	)
     	WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
 	</select>
+
 	
 	<!-- 페이지네비를 위한 신고 리뷰 카운트 (관리자) -->
 	<select id="getReportedReviewsCount" resultType="int">

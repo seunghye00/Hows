@@ -12,6 +12,7 @@ import Swal from 'sweetalert2'
 
 const Faq = () => {
     const [faqList, setFaqList] = useState([]) // FAQ 리스트
+    const [charCount, setCharCount] = useState({}) // 각 항목의 글자 수
     const [expandedFaqIndex, setExpandedFaqIndex] = useState(null) // 펼쳐진 FAQ 인덱스
     const [isAdd, setIsAdd] = useState(false) // 추가 모드 상태
     const [editIndex, setEditIndex] = useState(null) // 수정 모드 인덱스
@@ -36,17 +37,37 @@ const Faq = () => {
 
     const handleInputChange = (e, index, field) => {
         const updatedFaqList = [...faqList]
-        const newValue = e.target.innerText
+        const newValue = e.target.value
 
-        if (updatedFaqList[index][field] !== newValue) {
-            updatedFaqList[index][field] = newValue
-            setFaqList(updatedFaqList)
+        // 100자 제한을 초과했을 경우 경고 메시지 표시
+        if (newValue.length > 100) {
+            Swal.fire({
+                title: '입력 제한',
+                text: `${
+                    field === 'faq_title' ? '제목' : '내용'
+                }은 최대 100자까지만 입력할 수 있습니다.`,
+                icon: 'warning',
+                confirmButtonText: '확인',
+            })
+            return
         }
+
+        updatedFaqList[index][field] = newValue
+        setFaqList(updatedFaqList)
+
+        // 글자 수 업데이트
+        setCharCount({
+            ...charCount,
+            [index]: {
+                ...charCount[index],
+                [field]: newValue.length,
+            },
+        })
     }
 
     // FAQ 추가
     const addFaqItem = () => {
-        const newFaq = { faq_title: '제목', faq_contents: '답변 :       ' }
+        const newFaq = { faq_title: '제목', faq_contents: '답변 : ' }
         setFaqList([...faqList, newFaq])
         setIsAdd(true)
         setEditIndex(faqList.length)
@@ -214,16 +235,20 @@ const Faq = () => {
                     >
                         <div className={styles.faqTitleContainer}>
                             {editIndex === index ? (
-                                <div
-                                    className={styles.faqTitle}
-                                    contentEditable
-                                    suppressContentEditableWarning={true}
-                                    onBlur={e =>
-                                        handleInputChange(e, index, 'faq_title')
-                                    }
-                                >
-                                    {faq.faq_title}
-                                </div>
+                                <>
+                                    <textarea
+                                        className={styles.faqTitle}
+                                        value={faq.faq_title}
+                                        onChange={e =>
+                                            handleInputChange(
+                                                e,
+                                                index,
+                                                'faq_title'
+                                            )
+                                        }
+                                        maxLength="100"
+                                    />
+                                </>
                             ) : (
                                 <div className={styles.faqTitle}>
                                     {faq.faq_title || '제목 없음'}
@@ -243,20 +268,25 @@ const Faq = () => {
                         {expandedFaqIndex === index && (
                             <div className={styles.faqText}>
                                 {editIndex === index ? (
-                                    <div
-                                        className={styles.faqContent}
-                                        contentEditable
-                                        suppressContentEditableWarning={true}
-                                        onBlur={e =>
-                                            handleInputChange(
-                                                e,
-                                                index,
-                                                'faq_contents'
-                                            )
-                                        }
-                                    >
-                                        {faq.faq_contents}
-                                    </div>
+                                    <>
+                                        <textarea
+                                            className={styles.faqContent}
+                                            value={faq.faq_contents}
+                                            onChange={e =>
+                                                handleInputChange(
+                                                    e,
+                                                    index,
+                                                    'faq_contents'
+                                                )
+                                            }
+                                            maxLength="100"
+                                        />
+                                        <span className={styles.charCount}>
+                                            {charCount[index]?.faq_contents ||
+                                                0}
+                                            /100
+                                        </span>
+                                    </>
                                 ) : (
                                     <div className={styles.faqContent}>
                                         {faq.faq_contents || '내용 없음'}

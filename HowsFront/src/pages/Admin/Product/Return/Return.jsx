@@ -85,7 +85,7 @@ export const Return = () => {
         const return_code = e.target.value
         updateReturn(return_seq, return_code)
             .then(resp => {
-                console.log(resp)
+                // console.log(resp)
                 // 상태 변경 후 orders 배열 업데이트
                 const updatedOrders = orders.map(order =>
                     order.return_seq === return_seq
@@ -179,7 +179,7 @@ export const Return = () => {
     // 주문 삭제 핸들러
     const handleDeleteOrder = () => {
         const selectedOrders = filteredOrders.filter(order => order.checked)
-        console.log(selectedOrders)
+        // console.log(selectedOrders)
         if (selectedOrders.length === 0) {
             SwalComp({
                 type: 'warning',
@@ -195,7 +195,7 @@ export const Return = () => {
             if (result.isConfirmed) {
                 deleteOrder(selectedOrders.map(order => order.order_seq))
                     .then(resp => {
-                        console.log(resp)
+                        // console.log(resp)
                         setOrders(orders.filter(order => !order.checked))
                         console.log('삭제 직후', orders)
                         SwalComp({

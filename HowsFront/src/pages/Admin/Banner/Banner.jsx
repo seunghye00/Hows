@@ -2,10 +2,9 @@ import styles from './Banner.module.css'
 import { Button } from '../../../components/Button/Button'
 import { bannerList, addBanner, deleteBanners } from '../../../api/banner'
 import { useEffect, useState } from 'react'
-import { formatDateForInput } from '../../../commons/commons'
+import { formatDateForInput, SwalComp } from '../../../commons/commons'
 import { Modal } from '../../../components/Modal/Modal'
 import { BiCamera } from 'react-icons/bi'
-import Swal from 'sweetalert2'
 
 export const Banner = () => {
     const [banners, setBanners] = useState([])
@@ -29,7 +28,7 @@ export const Banner = () => {
     useEffect(() => {
         bannerList()
             .then(resp => {
-                console.log(resp.data)
+                // console.log(resp.data)
                 const beforBanners = resp.data.map(banner => ({
                     ...banner,
                     checked: false, // 초기 체크 상태
@@ -59,11 +58,9 @@ export const Banner = () => {
         if (file) {
             // 이미지 파일인지 확인
             if (!file.type.startsWith('image/')) {
-                Swal.fire({
-                    title: '경고 !',
+                SwalComp({
+                    type: 'warning',
                     text: '이미지 파일만 선택 가능합니다.',
-                    icon: 'warning',
-                    confirmButtonText: '확인',
                 })
                 return
             }
@@ -81,7 +78,6 @@ export const Banner = () => {
 
     const handleChangeBanner = e => {
         const { name, value } = e.target
-        console.log(name, value)
         setBanner(prev => ({
             ...prev,
             [name]: value,
@@ -91,11 +87,9 @@ export const Banner = () => {
     const handleUpload = () => {
         // 이미지 파일이 존재하는 지 확인
         if (!selectedFile) {
-            Swal.fire({
-                title: '경고 !',
+            SwalComp({
+                type: 'warning',
                 text: '이미지 파일을 먼저 선택해주세요.',
-                icon: 'warning',
-                confirmButtonText: '확인',
             })
             return
         }
@@ -108,7 +102,7 @@ export const Banner = () => {
 
         addBanner(formData)
             .then(resp => {
-                console.log('업로드 성공 :', resp.data)
+                // console.log('업로드 성공 :', resp.data)
                 bannerList().then(resp => {
                     const updatedBanners = resp.data.map(banner => ({
                         ...banner,
@@ -116,23 +110,18 @@ export const Banner = () => {
                     }))
                     setBanners(updatedBanners)
                 })
-                Swal.fire({
-                    title: '업로드 완료',
+                SwalComp({
+                    type: 'success',
                     text: '선택한 배너가 업로드되었습니다.',
-                    icon: 'success',
-                    confirmButtonText: '확인',
                 })
                 handleCloseModal()
             })
             .catch(error => {
                 console.error('업로드 실패 :', error)
-                Swal.fire({
-                    title: '업로드 실패',
+                SwalComp({
+                    type: 'error',
                     text: '배너 업로드에 실패했습니다.',
-                    icon: 'error',
-                    confirmButtonText: '확인',
                 })
-
                 handleCloseModal()
             })
     }
@@ -163,45 +152,34 @@ export const Banner = () => {
         // 체크된 배너가 존재하는 지 확인
         const selectedBanners = banners.filter(banner => banner.checked)
         if (selectedBanners.length === 0) {
-            Swal.fire({
-                title: '경고 !',
+            SwalComp({
+                type: 'warning',
                 text: '삭제할 배너를 선택해주세요.',
-                icon: 'warning',
-                confirmButtonText: '확인',
             })
             return
         }
 
         // 삭제 확인
-        Swal.fire({
-            title: '삭제 확인',
+        SwalComp({
+            type: 'question',
             text: '정말로 삭제하시겠습니까?',
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: '확인',
-            cancelButtonText: '취소',
         }).then(result => {
             if (result.isConfirmed) {
                 // 배너 삭제 요청
                 deleteBanners(selectedBanners.map(banner => banner.banner_seq))
                     .then(() => {
-                        Swal.fire({
-                            title: '삭제 완료',
+                        SwalComp({
+                            type: 'success',
                             text: '선택한 배너가 삭제되었습니다.',
-                            icon: 'success',
-                            confirmButtonText: '확인',
                         })
                         setBanners(banners.filter(banner => !banner.checked))
                         setSelectAll(false)
                     })
                     .catch(error => {
-                        Swal.fire({
-                            title: '삭제 실패',
+                        SwalComp({
+                            type: 'error',
                             text: '배너 삭제에 실패했습니다.',
-                            icon: 'error',
-                            confirmButtonText: '확인',
                         })
-
                         console.error('삭제 실패 :', error)
                     })
             }

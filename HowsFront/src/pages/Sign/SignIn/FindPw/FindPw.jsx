@@ -1,7 +1,7 @@
 import styles from "./FindPw.module.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../../../assets/images/logo_how.png";
+import logo from "../../../../assets/images/로그인_로고.png";
 import { verifyUser } from "../../../../api/member";
 import Swal from "sweetalert2";
 
@@ -41,8 +41,9 @@ export const FindPw = () => {
         <div className={styles.container}>
             <div className={styles.findPwBox}>
                 <div className={styles.logo}>
-                    <img src={logo} alt="logo" />
-                    <h1 className={styles.title}>How's</h1>
+                    <div className={styles.logoBox}>
+                        <img src={logo} onClick={() => navi("/")} />
+                    </div>
                 </div>
                 <span className={styles.subTitle}>비밀번호 찾기</span>
                 <input

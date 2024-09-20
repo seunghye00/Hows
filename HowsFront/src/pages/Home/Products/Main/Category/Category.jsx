@@ -9,6 +9,13 @@ import { ScrollTop } from "../../../../../components/ScrollTop/ScrollTop";
 import { addCommas } from "../../../../../commons/commons";
 import { useLocation } from "react-router-dom";
 
+import kitchen from '../../../../../assets/images/kitchen.png'
+import lighting from '../../../../../assets/images/lighting.png'
+import digital from '../../../../../assets/images/digital.png'
+import furniture from '../../../../../assets/images/furniture.png'
+import fabric from '../../../../../assets/images/fabric.png'
+import acceptance from '../../../../../assets/images/acceptance.png'
+
 export const Category = () => {
   const navi = useNavigate();
   const { product_category_code } = useParams();
@@ -26,6 +33,9 @@ export const Category = () => {
   const location = useLocation(); // 현재 URL의 정보를 가져옴(subCategory)
   const queryParams = new URLSearchParams(location.search); //URL의 쿼리 문자열을 분석하여 쿼리 파라미터를 추출할 수 있는 URLSearchParams 객체 생성
   const categoryCode = queryParams.get("code"); // 쿼리 파라미터에서 'code'이름의 값을 가져옴
+
+  // 사이드 카테고리 이미지
+  const images = [furniture, lighting, fabric, acceptance, digital, kitchen]
 
   // 데이터를 4개씩 묶는 함수
   const chunkArray = (array = [], size, sortType, housingType) => {
@@ -170,6 +180,10 @@ export const Category = () => {
     }
   };
 
+
+
+
+  
   return (
     <div className={styles.container}>
       <div style={{height: "70px"}}></div>
@@ -179,6 +193,9 @@ export const Category = () => {
             return (
               <ul className={styles.list} key={i}>
                 <li onClick={() => handleMenuClick(item.product_category_code)}>
+                  <div className={styles.imagesBox}>
+                    <img src={images[i]} alt={`category-${i}`} className={styles.image}/>
+                  </div>
                   {item.product_category_title}
                 </li>
               </ul>
@@ -190,6 +207,7 @@ export const Category = () => {
             <div className={styles.option}>
               <div className={styles.sortBox}>
                 <select
+                  style={{ width: '200px' }}
                   name="sortType"
                   value={selectedSort}
                   onChange={(e) => setSelectedSort(e.target.value)}
@@ -202,6 +220,7 @@ export const Category = () => {
                   <option value="high_price">높은가격순</option>
                 </select>
                 <select
+                  style={{ width: '200px' }}
                   name="housingType"
                   value={selectedPriceType}
                   onChange={(e) => {

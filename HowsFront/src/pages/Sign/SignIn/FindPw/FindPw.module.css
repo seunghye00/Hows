@@ -23,12 +23,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 40px;
+  margin: 0 10px 40px 10px;
+  cursor: pointer;
 }
-.container .logo > img {
-  width: 90px;
-  height: 95px;
-  margin-right: 20px;
+
+.container .logo .logoBox {
+  width: 260px;
+  overflow: hidden;
+  object-fit: cover;
+}
+
+.container .logo .logoBox > img {
+  width: 100%;
 }
 
 .container .logo .title {

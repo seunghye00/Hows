@@ -4,8 +4,8 @@ import { Carousel } from "react-responsive-carousel";
 import { useEffect, useState } from 'react';
 import { bannerList } from '../../../../../api/banner';
 import testBanner1 from '../../../../../assets/images/banner_test1.png'
-import testBanner2 from '../../../../../assets/images/banner_test2.jpg'
-import testBanner3 from '../../../../../assets/images/banner_test3.jpg'
+import testBanner2 from '../../../../../assets/images/banner_test2.png'
+import testBanner3 from '../../../../../assets/images/banner_test3.png'
 
 
 export const Banner = () => {

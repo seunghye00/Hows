@@ -21,6 +21,9 @@
 	
 	<!-- 배너 추가 -->
 	<insert id="insert">
+		<selectKey keyProperty="banner_seq" resultType="int" order="AFTER">
+			select banner_seq.currval from dual
+		</selectKey>
 		insert into banner values (banner_seq.nextval, #{file_seq}, #{banner_url}, #{start_date}, #{end_date}, #{banner_order}, default)
 	</insert>
 	

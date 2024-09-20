@@ -28,10 +28,10 @@ public class BannerController {
 
 	@Autowired
 	private BannerService bannServ;
-	
+
 	@Autowired
 	private FileService fileServ;
-	
+
 	@GetMapping
 	public ResponseEntity<List<BannerDTO>> getAllBanners() throws Exception {
 		List<BannerDTO> list = bannServ.getAllBannersByAdmin();
@@ -40,10 +40,10 @@ public class BannerController {
 
 	@PostMapping
 	public ResponseEntity<String> addBanner(@RequestParam("file") MultipartFile file, String startDate, String endDate, int banner_order) throws Exception {
-		
+
 		// 파일을 서버와 DB에 저장하고 반환받은 파일 정보에 대한 JSON 문자열
 		String bannerInfo = fileServ.upload(file, 0, "F5");
-		
+
 		// 문자열을 Map으로 변환
 		Map<String, Object> map = new ObjectMapper().readValue(bannerInfo, new TypeReference<Map<String, Object>>() {});
 		int file_seq = (int) map.get("file_seq");
@@ -51,35 +51,36 @@ public class BannerController {
 		String banner_url = (String) map.get("banner_url");
 
 		BannerDTO dto = new BannerDTO(0, file_seq, banner_url, DateFormat.convertToDate(startDate), DateFormat.convertToDate(endDate), banner_order);
-		
-		if (bannServ.addBanner(dto)) {
-			return ResponseEntity.ok("success");
-		} else {
-			// banner에 대한 정보를 DB에 저장하는데 실패했을 경우 file 관련 정보 삭제
-			fileServ.deleteFile(sysName, "F5");
-			return ResponseEntity.badRequest().body("fail");
+		if (bannServ.addBanner(dto) > 0) {
+			int bannerSeq = dto.getBanner_seq();
+			if (fileServ.updateParentSeq(bannerSeq, file_seq)) {
+				return ResponseEntity.ok("success");
+			}
 		}
+		// banner에 대한 정보를 DB에 저장하는데 실패했을 경우 file 관련 정보 삭제
+		fileServ.deleteFile(sysName, "F5");
+		return ResponseEntity.badRequest().body("fail");
 	}
 
 	@DeleteMapping
 	@Transactional
 	public ResponseEntity<String> deleteBanner(@RequestParam String seqs) throws Exception {
 		String[] bannerSeqs = seqs.split(","); // seqs를 배열로 변환
-		for(String bannerSeq : bannerSeqs) {
+		for (String bannerSeq : bannerSeqs) {
 			try {
 				int banner_seq = Integer.parseInt(bannerSeq);
-				if(!bannServ.deleteBanner(banner_seq)) {
+				if (!bannServ.deleteBanner(banner_seq)) {
 					throw new RuntimeException("배너 삭제 실패");
 				}
-                String sysName = fileServ.getSysNames(banner_seq).get(0);
-                String result = fileServ.deleteFile(sysName, "F5");
-                if (result.equals("fail")) {
-                    throw new RuntimeException("파일 삭제 실패: " + sysName);
-                }
-            } catch (Exception e) {
-                // 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
-                throw new RuntimeException("배너 삭제 실패", e);
-            }
+				String sysName = fileServ.getSysNames(banner_seq, "F5").get(0);
+				String result = fileServ.deleteFile(sysName, "F5");
+				if (result.equals("fail")) {
+					throw new RuntimeException("파일 삭제 실패: " + sysName);
+				}
+			} catch (Exception e) {
+				// 예외 발생 시 롤백이 자동으로 이루어지도록 하기 위해 런타임 예외를 생성.
+				throw new RuntimeException("배너 삭제 실패", e);
+			}
 		}
 		return ResponseEntity.ok("success");
 	}

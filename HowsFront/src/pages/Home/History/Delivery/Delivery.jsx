@@ -128,7 +128,7 @@ export const Delivery = () => {
               }
             </div>
             {
-              selectPayment.paymentCode === "P1" || selectPayment.paymentCode === "P2" ?
+              selectPayment.paymentCode === "P1" || selectPayment.paymentCode === "P2" || orderDetail.orderDetail.order_code !== "O4" ?
                   <button className={styles.cancelBtn} onClick={() => handleReasonWrite(selectPayment.paymentSeq)}>구매 취소 & 환불
                     요청</button>
                   :

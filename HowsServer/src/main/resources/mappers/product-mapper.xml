@@ -232,7 +232,7 @@
             r.review_contents,                 <!-- 리뷰 내용 -->
             TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 변환 -->
             COUNT(rr.review_report_seq) AS report_count,  <!-- 신고 횟수 -->
-            COALESCE(ri.image_url, ' ') AS image_url,                      <!-- 리뷰 이미지 URL -->
+            LISTAGG(ri.image_url, ',') WITHIN GROUP (ORDER BY ri.image_order) AS image_urls,
             ROW_NUMBER() OVER (ORDER BY r.review_seq DESC) AS row_num  <!-- 각 행에 순번 부여 -->
         FROM 
             review r

@@ -54,6 +54,7 @@ export const Blacklist = () => {
     // 검색 기능 처리
     const handleSearch = query => {
         setSearchTerm(query) // 검색어 상태 업데이트
+        setChosung('전체')
     }
 
     // 초성 필터 변경 처리

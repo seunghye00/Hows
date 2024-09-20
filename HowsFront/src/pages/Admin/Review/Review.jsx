@@ -230,12 +230,19 @@ export const Review = () => {
                     <div className={styles.modalContent}>
                         <h3>신고당한 리뷰</h3>
                         <div className={styles.reviewDetail}>
-                            <img
-                                src={
-                                    selectedReview.IMAGE_URL || test
-                                } /* 리뷰 이미지 URL 사용 */
-                                alt="리뷰 이미지"
-                            />
+                            {selectedReview.IMAGE_URLS ? (
+                                selectedReview.IMAGE_URLS.split(',').map(
+                                    (url, index) => (
+                                        <img
+                                            key={index}
+                                            src={url}
+                                            alt={`리뷰 이미지 ${index + 1}`}
+                                        />
+                                    )
+                                )
+                            ) : (
+                                <img src={test} alt="기본 이미지" />
+                            )}
                             <div>{selectedReview.REVIEW_CONTENTS}</div>
                         </div>
                         <Button

@@ -50,30 +50,31 @@
 		#{board_image_seq}, #{product_seq},
 		#{left_position}, #{top_position})
 	</insert>
-	
-    <!-- 이미지 URL로 board_image_seq 조회 로그인 필요 -->
-    <select id="selectBoardImageSeqByUrl" resultType="int">
-        select board_image_seq
-        from board_image
-        where image_url = #{imageUrl}
-    </select>
-    
-    <!-- 특정 이미지에 연결된 태그를 조회하는 쿼리 로그인 필요 -->
-    <select id="selectTagsByImageSeq" resultType="com.hows.community.dto.TagDTO">
-        select 
-			*
-        from 
-            board_tag
-        where 
-            board_image_seq = #{boardImageSeq}
-    </select>
 
-    <!-- 태그를 삭제하는 쿼리 로그인 필요 -->
-    <delete id="deleteTag">
-        delete from board_tag
-        where board_tag_seq = #{tagSeq}
-    </delete>
-    
+	<!-- 이미지 URL로 board_image_seq 조회 로그인 필요 -->
+	<select id="selectBoardImageSeqByUrl" resultType="int">
+		select board_image_seq
+		from board_image
+		where image_url = #{imageUrl}
+	</select>
+
+	<!-- 특정 이미지에 연결된 태그를 조회하는 쿼리 로그인 필요 -->
+	<select id="selectTagsByImageSeq"
+		resultType="com.hows.community.dto.TagDTO">
+		select
+		*
+		from
+		board_tag
+		where
+		board_image_seq = #{boardImageSeq}
+	</select>
+
+	<!-- 태그를 삭제하는 쿼리 로그인 필요 -->
+	<delete id="deleteTag">
+		delete from board_tag
+		where board_tag_seq = #{tagSeq}
+	</delete>
+
 	<!-- 게시글 리스트 출력 로그인 없어도 됌 -->
 	<select id="selectAll" resultType="map">
 		select b.board_seq,
@@ -98,94 +99,97 @@
 		b.board_contents
 		order by b.board_seq desc
 	</select>
-	
+
 	<!-- 검색 조건에 따른 리스트 출력 및 정렬 -->
 	<select id="selectCommunityPosts" resultType="map">
-	    select 
-	        b.board_seq,
-	        b.board_contents,
-	        b.view_count,
-	        b.housing_type_code,
-	        b.space_type_code,
-	        b.area_size_code,
-	        b.color_code,
-	        m.nickname,
-	        m.member_id,
-	        m.member_seq,
-	        m.member_avatar,
-	        count(distinct bl.board_like_seq) as like_count,  <!-- 좋아요 개수 -->
-	        (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments_count  <!-- 댓글 및 답글 개수 -->
-	    from board b
-	    join member m on b.member_id = m.member_id
-	    left join board_like bl on b.board_seq = bl.board_seq  <!-- 좋아요 조인 -->
-	    left join comments c on b.board_seq = c.board_seq
-	    left join reply r on c.comment_seq = r.comment_seq
-	    
-	    <where>
-	        <if test="housingType != null and housingType != ''">
-	            and b.housing_type_code = #{housingType}
-	        </if>
-	        <if test="spaceType != null and spaceType != ''">
-	            and b.space_type_code = #{spaceType}
-	        </if>
-	        <if test="areaSize != null and areaSize != ''">
-	            and b.area_size_code = #{areaSize}
-	        </if>
-	        <if test="color != null and color != ''">
-	            and b.color_code = #{color}
-	        </if>
-	        <if test="keyword != null and keyword != ''">
-	            and b.board_contents like '%' || #{keyword} || '%'
-	        </if>
-	    </where>
-	
-	    <!-- GROUP BY 절에서 select 절에 있는 모든 컬럼 포함 -->
-	    group by 
-	        b.board_seq,
-	        b.board_contents,
-	        b.view_count,
-	        b.housing_type_code,
-	        b.space_type_code,
-	        b.area_size_code,
-	        b.color_code,
-	        m.nickname,
-	        m.member_id,
-	        m.member_seq,
-	        m.member_avatar
-	
-	    <!-- 동적 정렬 기준 -->
-	     order by
-		    <choose>
-		        <when test="sort == 'likes'">
-		            like_count desc  <!-- 좋아요 순으로 정렬 -->
-		        </when>
-		        <when test="sort == 'views'">
-		            b.view_count desc  <!-- 조회수 순으로 정렬 -->
-		        </when>
-		        <otherwise>
-		            b.board_seq desc  <!-- 최신순 정렬 (기본값) -->
-		        </otherwise>
-		    </choose>
+		select
+		b.board_seq,
+		b.board_contents,
+		b.view_count,
+		b.housing_type_code,
+		b.space_type_code,
+		b.area_size_code,
+		b.color_code,
+		m.nickname,
+		m.member_id,
+		m.member_seq,
+		m.member_avatar,
+		count(distinct bl.board_like_seq) as like_count,  <!-- 좋아요 개수 -->
+		(count(distinct c.comment_seq) + count(distinct r.reply_seq)) as
+		comments_count  <!-- 댓글 및 답글 개수 -->
+		from board b
+		join member m on b.member_id = m.member_id
+		left join board_like bl on b.board_seq = bl.board_seq  <!-- 좋아요 조인 -->
+		left join comments c on b.board_seq = c.board_seq
+		left join reply r on c.comment_seq = r.comment_seq
+
+		<where>
+			<if test="housingType != null and housingType != ''">
+				and b.housing_type_code = #{housingType}
+			</if>
+			<if test="spaceType != null and spaceType != ''">
+				and b.space_type_code = #{spaceType}
+			</if>
+			<if test="areaSize != null and areaSize != ''">
+				and b.area_size_code = #{areaSize}
+			</if>
+			<if test="color != null and color != ''">
+				and b.color_code = #{color}
+			</if>
+			<if test="keyword != null and keyword != ''">
+				and b.board_contents like '%' || #{keyword} || '%'
+			</if>
+		</where>
+
+		<!-- GROUP BY 절에서 select 절에 있는 모든 컬럼 포함 -->
+		group by
+		b.board_seq,
+		b.board_contents,
+		b.view_count,
+		b.housing_type_code,
+		b.space_type_code,
+		b.area_size_code,
+		b.color_code,
+		m.nickname,
+		m.member_id,
+		m.member_seq,
+		m.member_avatar
+
+		<!-- 동적 정렬 기준 -->
+		order by
+		<choose>
+			<when test="sort == 'likes'">
+				like_count desc  <!-- 좋아요 순으로 정렬 -->
+			</when>
+			<when test="sort == 'views'">
+				b.view_count desc  <!-- 조회수 순으로 정렬 -->
+			</when>
+			<otherwise>
+				b.board_seq desc  <!-- 최신순 정렬 (기본값) -->
+			</otherwise>
+		</choose>
 	</select>
-	
-	<!-- 게시글 태그로 정렬 로그인 없어도 됌-->
+
+	<!-- 게시글 태그로 정렬 로그인 없어도 됌 -->
 	<select id="selectByTag" resultType="map">
-	    select b.board_seq,
-	           b.view_count,
-	           m.nickname,
-	           m.member_id,
-	           m.member_seq,
-	           m.member_avatar,
-	           count(distinct bl.board_like_seq) as like_count,
-	           (count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments_count,
-	           b.board_contents
-	    from board b
-	    join member m on b.member_id = m.member_id
-	    left join board_like bl on b.board_seq = bl.board_seq
-	    left join comments c on b.board_seq = c.board_seq
-	    left join reply r on c.comment_seq = r.comment_seq
-	    where lower(b.board_contents) like '%' || lower(#{tag}) || '%'  <!-- 게시글 내용에 태그 포함 -->
-	    group by b.board_seq, b.view_count, m.nickname, m.member_avatar, m.member_id, m.member_seq, b.board_contents
+		select b.board_seq,
+		b.view_count,
+		m.nickname,
+		m.member_id,
+		m.member_seq,
+		m.member_avatar,
+		count(distinct bl.board_like_seq) as like_count,
+		(count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments_count,
+		b.board_contents
+		from board b
+		join member m on b.member_id = m.member_id
+		left join board_like bl on b.board_seq = bl.board_seq
+		left join comments c on b.board_seq = c.board_seq
+		left join reply r on c.comment_seq = r.comment_seq
+		where lower(b.board_contents) like '%' || lower(#{tag}) || '%'  <!-- 게시글 내용에 태그 
+			포함 -->
+		group by b.board_seq, b.view_count, m.nickname, m.member_avatar,
+		m.member_id, m.member_seq, b.board_contents
 		order by b.board_seq desc
 	</select>
 
@@ -198,40 +202,48 @@
 
 	<!-- 게시글 디테일 조회 -->
 	<select id="selectAllSeq" resultType="map">
-		select 
+		select
 		b.board_seq,
 		b.board_contents,
 		b.view_count,
 		to_char(b.board_write_date, 'YYYY-MM-DD
 		HH24:MI:SS') as board_write_date,
 		b.member_id,
-        b.housing_type_code,
-        b.space_type_code,
-        b.area_size_code,
+		b.housing_type_code,
+		b.space_type_code,
+		b.area_size_code,
 		m.nickname,
 		m.member_id,
 		m.member_avatar,
 		m.member_seq,
-		count(distinct bl.board_like_seq) as
+		count(distinct
+		bl.board_like_seq) as
 		like_count,
-		(count(distinct c.comment_seq) + count(distinct
+		(count(distinct c.comment_seq) +
+		count(distinct
 		r.reply_seq)) as comments_count,
-		count(distinct bm.board_book_mark_seq)
+		count(distinct
+		bm.board_book_mark_seq)
 		as bookmark_count
 		from board b
-		join member m on b.member_id =
+		join member m on
+		b.member_id =
 		m.member_id
-		left join board_like bl on b.board_seq = bl.board_seq
+		left join board_like bl on b.board_seq =
+		bl.board_seq
 		left
 		join comments c on b.board_seq = c.board_seq
-		left join reply r on
+		left join
+		reply r on
 		c.comment_seq = r.comment_seq
 		left join board_book_mark bm on
 		b.board_seq = bm.board_seq
 		where b.board_seq = #{board_seq}
 		group by
-		b.board_seq, b.board_contents, b.view_count, b.board_write_date, b.housing_type_code, b.space_type_code, b.area_size_code,
-		b.member_id, m.nickname, m.member_avatar, m.member_id, m.member_seq
+		b.board_seq, b.board_contents, b.view_count, b.board_write_date,
+		b.housing_type_code, b.space_type_code, b.area_size_code,
+		b.member_id,
+		m.nickname, m.member_avatar, m.member_id, m.member_seq
 	</select>
 
 	<!-- 게시글 디테일 이미지 조회 -->
@@ -267,41 +279,41 @@
 		board_image_seq from board_image where board_seq =
 		#{board_seq})
 	</select>
-	
-   <!-- 게시글 업데이트 -->
-    <update id="updateWrite">
-        update board
-        set housing_type_code = #{housing_type_code},
-            space_type_code = #{space_type_code},
-            area_size_code = #{area_size_code},
-            board_contents = #{board_contents},
-            color_code = #{color_code},
-            board_write_date = sysdate
-        where board_seq = #{board_seq}
-    </update>
-    
-    <!-- 게시글 수정 이미지 주소  -->
+
+	<!-- 게시글 업데이트 -->
+	<update id="updateWrite">
+		update board
+		set housing_type_code = #{housing_type_code},
+		space_type_code = #{space_type_code},
+		area_size_code = #{area_size_code},
+		board_contents = #{board_contents},
+		color_code = #{color_code},
+		board_write_date = sysdate
+		where board_seq = #{board_seq}
+	</update>
+
+	<!-- 게시글 수정 이미지 주소 -->
 	<select id="selectImagesUrls" resultType="String">
 		select
 		image_url
 		from
 		board_image
 		where
-    	board_seq = #{board_seq}
+		board_seq = #{board_seq}
 	</select>
-	
-    <!-- 이미지 순서 업데이트 -->
-    <update id="updateImageOrder">
-        update board_image
-        set image_order = #{image_order}
-        where image_url = #{image_url}
-    </update>
-    
-    <!-- 이미지 수정 시 삭제 -->
-    <delete id="deleteImage">
-	    delete from board_image where image_url = #{imageUrl}
+
+	<!-- 이미지 순서 업데이트 -->
+	<update id="updateImageOrder">
+		update board_image
+		set image_order = #{image_order}
+		where image_url = #{image_url}
+	</update>
+
+	<!-- 이미지 수정 시 삭제 -->
+	<delete id="deleteImage">
+		delete from board_image where image_url = #{imageUrl}
 	</delete>
-	
+
 	<!-- 사용자가 해당 게시글에 좋아요를 눌렀는지 확인 -->
 	<select id="checkIfUserLikedBoard" resultType="int">
 		select count(*)
@@ -414,82 +426,85 @@
 		select count(*) from board
 		where member_id = #{member_id}
 	</select>
-	
+
 	<!-- [마이페이지] 북마크(이미지) 출력 -->
 	<select id="selectBookmarkByMemberId" resultType="map">
-	    select 
-	        b.board_seq,
-	        b.board_contents,
-	        to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date,
-	        b.view_count,
-	        b.member_id,
-	        m.name as member_name, 
-	        bi.image_url
-	    from 
-	        board_book_mark bbm
-	    inner join 
-	        board b on bbm.board_seq = b.board_seq
-	    inner join 
-	        member m on b.member_id = m.member_id
-	    left join 
-	        board_image bi on b.board_seq = bi.board_seq
-	    where 
-	        bbm.member_id = #{member_id}
-	    order by board_book_mark_seq desc
+		select
+		b.board_seq,
+		b.board_contents,
+		to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date,
+		b.view_count,
+		b.member_id,
+		m.name as member_name,
+		bi.image_url
+		from
+		board_book_mark bbm
+		inner join
+		board b on bbm.board_seq = b.board_seq
+		inner join
+		member m on b.member_id = m.member_id
+		left join
+		board_image bi on b.board_seq = bi.board_seq
+		where
+		bbm.member_id = #{member_id}
+		order by board_book_mark_seq desc
 	</select>
-	
+
 	<!-- [마이페이지] 사용자의 게시글 북마크 갯수 -->
 	<select id="countBookmark" resultType="int">
-		select count(*) from board_book_mark where member_id = #{member_id}
+		select count(*) from
+		board_book_mark where member_id = #{member_id}
 	</select>
-	
+
 	<!-- 게시글 이미지 조회 -->
 	<select id="getFileURLsByBoardSeq" resultType="java.lang.String">
-		select image_url from board_image where board_seq = #{board_seq}
-	</select> 
-	
-	<!-- 사용자 구매내역  -->
-	<select id="purchaseHistory" resultType="map">
-		select 
-		    p.product_seq,
-		    p.product_thumbnail,
-		    p.product_title
-		from 
-		    orders o 
-		join 
-		    order_list ol on o.order_seq  = ol.order_seq 
-		join
-		    product p on ol.product_seq = p.product_seq 
-		where 
-		    o.member_seq = #{member_seq} and o.order_code = 'O6'
+		select image_url
+		from board_image where board_seq = #{board_seq}
 	</select>
-	
+
+	<!-- 사용자 구매내역 -->
+	<select id="purchaseHistory" resultType="map">
+		select
+		p.product_seq,
+		p.product_thumbnail,
+		p.product_title
+		from
+		orders o
+		join
+		order_list ol on o.order_seq = ol.order_seq
+		join
+		product p on ol.product_seq = p.product_seq
+		where
+		o.member_seq = #{member_seq} and o.order_code = 'O6'
+	</select>
+
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->
-	<select id="reportedCommunity" parameterType="map" resultType="map">
-    SELECT *
-    FROM (
-        SELECT
-            b.board_seq, -- 게시판 게시물 번호
-            b.board_contents, -- 게시판 내용
-            TO_CHAR(b.board_write_date, 'YYYY-MM-DD') AS board_write_date, -- 작성 날짜
-            m.nickname AS member_id, -- 작성자 (닉네임)
-            m.member_avatar, -- 작성자 아바타 이미지
-            COUNT(br.board_report_seq) AS report_count, -- 신고 횟수
-            COALESCE(bi.image_url, ' ') AS image_url, 
-            ROW_NUMBER() OVER (ORDER BY b.board_seq DESC) AS row_num -- 각 행에 순번 부여
-        FROM
-            board b
-        JOIN
-            member m ON b.member_id = m.member_id -- 멤버 조인
-        JOIN
-            board_report br ON b.board_seq = br.board_seq -- 신고 기록 조인
-        LEFT JOIN
-            board_image bi ON b.board_seq = bi.board_seq -- 게시물 이미지 조인 (여러 개일 수 있으므로 LEFT JOIN 사용)
-        GROUP BY
-            b.board_seq, b.board_contents, b.board_write_date, m.nickname, m.member_avatar, bi.image_url
-    	)
-    	WHERE row_num BETWEEN #{startRow} AND #{endRow}
+	<select id="reportedCommunity" parameterType="map"
+		resultType="map">
+		SELECT *
+		FROM (
+		SELECT
+		b.board_seq,
+		b.board_contents,
+		TO_CHAR(b.board_write_date, 'YYYY-MM-DD') AS board_write_date,
+		m.nickname AS member_id,
+		m.member_avatar,
+		COUNT(br.board_report_seq) AS report_count, <!-- 신고 횟수 -->
+		 COALESCE(LISTAGG(bi.image_url, ',') WITHIN GROUP (ORDER BY bi.image_order), ' ') AS image_urls, <!-- 이미지 URL -->
+		ROW_NUMBER() OVER (ORDER BY b.board_seq DESC) AS row_num -- 행 번호 부여
+		FROM
+		board b
+		JOIN
+		member m ON b.member_id = m.member_id <!-- 작성자 조인 -->
+		JOIN
+		board_report br ON b.board_seq = br.board_seq <!-- 신고 기록 조인 -->
+		LEFT JOIN
+		board_image bi ON b.board_seq = bi.board_seq <!-- 게시물 이미지 조인 -->
+		GROUP BY
+		b.board_seq, b.board_contents, b.board_write_date, m.nickname, m.member_avatar
+		)
+		WHERE row_num BETWEEN #{startRow} AND #{endRow}
 	</select>
 
 	<!-- 게시물 신고내역 조회 (관리자) -->
@@ -537,33 +552,42 @@
 
 	<!-- 주거 형태별 게시글 수 조회 -->
 	<select id="getPostCountByHousingType" resultType="map">
-		select h.housing_type_title, count(b.board_seq) as post_count
-		from housing_type h
-		left join board b on h.housing_type_code = b.housing_type_code
+		select
+		h.housing_type_title, count(b.board_seq) as post_count
+		from
+		housing_type h
+		left join board b on h.housing_type_code =
+		b.housing_type_code
 		group by h.housing_type_title
 	</select>
-	
+
 	<!-- 공간별 게시글 수 조회 -->
 	<select id="getPostCountBySpaceType" resultType="map">
-		select s.space_type_title, count(b.board_seq) as post_count
+		select
+		s.space_type_title, count(b.board_seq) as post_count
 		from space_type s
 		left join board b on s.space_type_code = b.space_type_code
-		group by s.space_type_title
+		group by
+		s.space_type_title
 	</select>
-	
+
 	<!-- 평수별 게시글 수 조회 -->
 	<select id="getPostCountByAreaSize" resultType="map">
-		select a.area_size_title, count(b.board_seq) as post_count
+		select
+		a.area_size_title, count(b.board_seq) as post_count
 		from area_size a
 		left join board b on a.area_size_code = b.area_size_code
-		group by a.area_size_title
+		group by
+		a.area_size_title
 	</select>
-	
+
 	<!-- 컬러별 게시글 수 조회 -->
 	<select id="getPostCountByColor" resultType="map">
-		select c.color_title, count(b.board_seq) as post_count
+		select
+		c.color_title, count(b.board_seq) as post_count
 		from color c
-		left join board b on c.color_code = b.color_code
+		left join
+		board b on c.color_code = b.color_code
 		group by c.color_title
 	</select>
 

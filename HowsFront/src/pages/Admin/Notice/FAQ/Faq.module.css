@@ -32,26 +32,31 @@
 /* FAQ 제목 */
 .faqTitle {
     font-size: 18px;
-    cursor: text;
     font-family: Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    padding: 5px;
-    min-width: 100px;
     word-break: break-word;
+    width: 98%;
+    box-sizing: border-box;
+    background-color: transparent; 
+    resize: none; 
+    color: var(--hows-white);
+    border: 1px solid transparent;
 }
 
 /* FAQ 내용 */
 .faqContent {
-    margin: 10px 0;
+    margin: 5 0px;
     font-size: 18px;
     display: none;
     font-family: Arial, sans-serif;
-    line-height: 1.5;
+    width: 98%;
     word-break: break-word;
+    background-color: transparent;
+    resize: none;
+    color: var(--hows-white);
+    border: 1px solid transparent;
 }
 
-/* 지우면 토글 효과가 사라지네..?*/
+
 .faq.active .faqContent {
     display: block;
 }

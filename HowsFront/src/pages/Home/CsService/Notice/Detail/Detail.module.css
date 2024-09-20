@@ -31,6 +31,13 @@
     word-wrap: break-word;
 }
 
+.noticeImage {
+    display: block; 
+    margin-bottom: 20px; 
+    max-width: 100%; 
+    height: auto; 
+}
+
 .returnButton {
     text-align: center;
 }

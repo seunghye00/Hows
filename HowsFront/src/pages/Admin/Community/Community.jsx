@@ -12,6 +12,13 @@ import Swal from 'sweetalert2'
 import { formatDate } from '../../../commons/commons'
 import test from '../../../assets/images/푸바오.png'
 
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation, Pagination } from 'swiper/modules'
+
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/pagination'
+
 export const Community = () => {
     const [boardReportModalOpen, setBoardReportModalOpen] = useState(false)
     const [selectedBoard, setSelectedBoard] = useState({}) // 선택된 게시물 상태
@@ -221,18 +228,41 @@ export const Community = () => {
                                     {selectedBoard.MEMBER_ID}
                                 </span>
                             </div>
-                            {/* 첨부된 이미지 */}
-                            <span className={styles.imageSection}>
-                                <img
-                                    src={
-                                        selectedBoard.IMAGE_URL
-                                            ? selectedBoard.IMAGE_URL
-                                            : test
-                                    } // null 또는 빈 문자열일 때 기본 이미지 사용
-                                    alt="게시물 이미지"
-                                    className={styles.boardImage}
-                                />
-                            </span>
+                            {/* 첨부된 이미지 스와이프 */}
+                            <div className={styles.imageSection}>
+                                {selectedBoard.IMAGE_URLS &&
+                                selectedBoard.IMAGE_URLS.length > 0 ? (
+                                    <Swiper
+                                        modules={[Navigation, Pagination]}
+                                        navigation
+                                        pagination={{ clickable: true }}
+                                        spaceBetween={30}
+                                        slidesPerView={1}
+                                    >
+                                        {selectedBoard.IMAGE_URLS.split(',')
+                                            .filter(Boolean)
+                                            .map((url, index) => (
+                                                <SwiperSlide key={index}>
+                                                    <img
+                                                        src={url}
+                                                        alt={`게시물 이미지 ${
+                                                            index + 1
+                                                        }`}
+                                                        className={
+                                                            styles.boardImage
+                                                        }
+                                                    />
+                                                </SwiperSlide>
+                                            ))}
+                                    </Swiper>
+                                ) : (
+                                    <img
+                                        src={test}
+                                        alt="기본 이미지"
+                                        className={styles.boardImage}
+                                    />
+                                )}
+                            </div>
                             <div className={styles.boardContent}>
                                 <div>{selectedBoard.BOARD_CONTENTS}</div>
                             </div>

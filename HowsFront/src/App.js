@@ -11,48 +11,48 @@ import { jwtDecode } from 'jwt-decode'; // import 수정
 import { getRoleCode } from './api/member';
 
 function App() {
-    const [session, setSession] = useState(true);
-    const { isAuth, login } = useAuthStore();
-    const { setCurrentUser } = useMemberStore();
+    const [session, setSession] = useState(true)
+    const { isAuth, login } = useAuthStore()
+    const { setCurrentUser } = useMemberStore()
 
     // 로그인 상태 체크
     useEffect(() => {
-        const token = sessionStorage.getItem("token");
+        const token = sessionStorage.getItem('token')
         if (token != null) {
-            const decoded = jwtDecode(token);
-            const nickname = sessionStorage.getItem("nickname");
-            const profile = sessionStorage.getItem("member_avatar");
+            const decoded = jwtDecode(token)
+            const nickname = sessionStorage.getItem('nickname')
+            const profile = sessionStorage.getItem('member_avatar')
 
             setCurrentUser({
-                "nickname": nickname,
-                "member_avatar": profile
-            });
-            login(token);
+                nickname: nickname,
+                member_avatar: profile,
+            })
+            login(token)
         }
-    }, [login, setCurrentUser]);
-
+    }, [login, setCurrentUser])
 
     useEffect(() => {
         if (isAuth) {
             // 회원 정보 가져오기 (role_code 확인)
             getRoleCode().then(resp => {
-                if (resp.data === 'R1') setSession(false);
-                else if (resp.data === 'R2') setSession(true);
+                if (resp.data === 'R1') setSession(false)
+                else if (resp.data === 'R2') setSession(true)
             })
+        } else {
+            setSession(true)
         }
     }, [isAuth])
-
 
     // Router 내부에서 useLocation 사용
     return (
         <Router>
             <AppContent session={session} />
         </Router>
-    );
+    )
 }
 
 function AppContent({ session }) {
-    const location = useLocation();
+    const location = useLocation()
 
     // 특정 경로에서 Header와 Footer 숨기기
     // const hideHeaderFooter = location.pathname === '/signIn' || location.pathname === '/signUp' || location.pathname === '/findPw';
@@ -75,7 +75,7 @@ function AppContent({ session }) {
                 </>
             )}
         </div>
-    );
+    )
 }
 
-export default App;
+export default App

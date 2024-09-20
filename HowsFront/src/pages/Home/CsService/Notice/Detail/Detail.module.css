@@ -1,11 +1,7 @@
-.detailCont {
-    height: 100%;
-}
-
 .detailBox {
-    min-height: 500px;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 }
 
 .titleCont {

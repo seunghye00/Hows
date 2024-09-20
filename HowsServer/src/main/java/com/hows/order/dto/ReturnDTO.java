@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 public class ReturnDTO {
 	private int order_seq; // 주문 seq
 	private int return_seq; // 반품 seq
+	private int payment_seq; // 결제 seq
 	private Timestamp order_date; // 주문 일시
 	private Timestamp payment_date; // 결제 일시
 	private Timestamp done_delivery_date;	// 배송 완료 일시
@@ -30,6 +31,12 @@ public class ReturnDTO {
 	}
 	public void setReturn_seq(int return_seq) {
 		this.return_seq = return_seq;
+	}
+	public int getPayment_seq() {
+		return payment_seq;
+	}
+	public void setPayment_seq(int payment_seq) {
+		this.payment_seq = payment_seq;
 	}
 	public Timestamp getOrder_date() {
 		return order_date;
@@ -118,6 +125,13 @@ public class ReturnDTO {
 	public ReturnDTO(int return_seq, String return_code) {
 		super();
 		this.return_seq = return_seq;
+		this.return_code = return_code;
+	}
+	public ReturnDTO(int order_seq, int return_seq, int payment_seq, String return_code) {
+		super();
+		this.order_seq = order_seq;
+		this.return_seq = return_seq;
+		this.payment_seq = payment_seq;
 		this.return_code = return_code;
 	}
 	public ReturnDTO(int order_seq, int return_seq, Timestamp order_date, Timestamp payment_date,

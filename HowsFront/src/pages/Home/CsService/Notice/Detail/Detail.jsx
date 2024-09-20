@@ -36,7 +36,7 @@ export const Detail = () => {
     }
 
     return (
-        <div className={styles.detailCont}>
+        <>
             {notice ? (
                 <div className={styles.detailBox}>
                     <div>
@@ -64,6 +64,6 @@ export const Detail = () => {
             ) : (
                 <p>로딩 중...</p>
             )}
-        </div>
+        </>
     )
 }

@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,10 +19,14 @@ import com.hows.product.service.LikesService;
 @RestController
 @RequestMapping("/likes")
 public class LikesController {
+	
+	
 	@Autowired
 	private LikesService likesServ;
 	
-	// 상품 좋아요 추가
+	
+	// 상품 좋아요 추가, 로그인 필요함
+	@Transactional
     @PostMapping("/insert")
     public ResponseEntity<String> addLike(
     		@RequestBody Map<String, Object> requestData) 
@@ -31,10 +36,12 @@ public class LikesController {
          String member_id = (String) requestData.get("member_id");
 
          likesServ.addLike(product_seq, member_id);
-         return ResponseEntity.ok("Like");
+         return ResponseEntity.ok().build();
     }
     
-    // 상품 좋아요 취소
+    
+    // 상품 좋아요 취소, 로그인 필요함
+	@Transactional
     @DeleteMapping("/delete")
     public ResponseEntity<String> removeLike(
     		@RequestBody Map<String, Object> requestData) 
@@ -44,8 +51,9 @@ public class LikesController {
         String member_id = (String) requestData.get("member_id");
 
         likesServ.removeLike(product_seq, member_id);
-        return ResponseEntity.ok("Like removed");
+        return ResponseEntity.ok().build();
     }
+    
     
     // 상품 좋아요 개수 조회
     @GetMapping("/count")
@@ -57,7 +65,8 @@ public class LikesController {
         return ResponseEntity.ok(likeCount);
     }
     
-    // 상품 좋아요 확인
+    
+    // 상품 좋아요 확인, 로그인 필요함
     @GetMapping("/check")
     public ResponseEntity<Boolean> checkLikeStatus(
     		@RequestParam("product_seq") int product_seq,
@@ -66,28 +75,33 @@ public class LikesController {
     	
     	// 로그인하지 않은 상태일 때 처리
     	if (member_id == null || member_id.isEmpty()) {
-            System.out.println("로그인하지 않은 사용자입니다.");
-            return ResponseEntity.ok(false); // 좋아요 상태가 false로 전달
+    		// 좋아요 상태가 false로 전달
+            return ResponseEntity.ok(false); 
         }
     	
+    	// 사용자가 해당 상품에 좋아요를 눌렀는지 확인
         boolean isLiked = likesServ.isLiked(product_seq, member_id);
         return ResponseEntity.ok(isLiked);
     }
     
     
-    // 리뷰 좋아요 추가
+    // 리뷰 좋아요 추가, 로그인 필요함
+    @Transactional
     @PostMapping("/review/insert")
     public ResponseEntity<String> addReviewLike(
     		@RequestBody Map<String, Object> requestData) 
     throws Exception {
+    	
         int review_seq = Integer.parseInt(requestData.get("review_seq").toString());
         String member_id = (String) requestData.get("member_id");
 
         likesServ.addReviewLike(review_seq, member_id);
-        return ResponseEntity.ok("Review liked");
+        return ResponseEntity.ok().build();
     }
 
-    // 리뷰 좋아요 취소
+    
+    // 리뷰 좋아요 취소, 로그인 필요함
+    @Transactional
     @DeleteMapping("/review/delete")
     public ResponseEntity<String> removeReviewLike(
     		@RequestBody Map<String, Object> requestData) 
@@ -97,9 +111,10 @@ public class LikesController {
         String member_id = (String) requestData.get("member_id");
 
         likesServ.removeReviewLike(review_seq, member_id);
-        return ResponseEntity.ok("Review like removed");
+        return ResponseEntity.ok().build();
     }
 
+    
     // 리뷰 좋아요 개수 조회
     @GetMapping("/review/count")
     public ResponseEntity<Integer> getReviewLikeCount(
@@ -110,25 +125,20 @@ public class LikesController {
         return ResponseEntity.ok(likeCount);
     }
 
-    // 리뷰 좋아요 확인
+    
+    // 리뷰 좋아요 확인, 로그인 필요함
     @GetMapping("/review/check")
     public ResponseEntity<Boolean> checkReviewLikeStatus(
         @RequestParam("review_seq") int review_seq,
         @RequestParam(value = "member_id", required = false) String member_id)
     throws Exception {
-//    	System.out.println("likes/review/check");
-//    	System.out.println("review_seq : " + review_seq);
-//    	System.out.println("member_id : " + member_id);
     	
+    	// 초기 값으로 좋아요가 눌리지 않은 상태를 설정
         boolean isLiked = false;
+        // 사용자가 로그인한 상태인 경우 사용자가 해당 리뷰에 좋아요를 눌렀는지 확인
         if (member_id != null) isLiked = likesServ.isReviewLiked(review_seq, member_id);
-        
-//      System.out.println("isLiked : " + isLiked);
-        
         return ResponseEntity.ok(isLiked);
     }
-
-    
     
     
     // 예외 처리

@@ -20,8 +20,10 @@ public class CategoryController {
 	@Autowired
 	private CategoryService categoryServ;
 	
+	// 카테고리 목록 출력
 	@GetMapping
-	public ResponseEntity<List<CategoryDTO>> categoryList () throws Exception{ 
+	public ResponseEntity<List<CategoryDTO>> categoryList () 
+	throws Exception{ 
 		List<CategoryDTO> list = categoryServ.categoryList();
 		return ResponseEntity.ok(list);
 	} 

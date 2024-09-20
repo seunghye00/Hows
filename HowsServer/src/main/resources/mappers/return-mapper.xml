@@ -7,4 +7,8 @@
 	<update id="updateStatus">
 		update return set return_code = #{return_code} where return_seq = #{return_seq}
 	</update>
+	
+	<insert id="insert">
+		insert into return values (return_seq.nextval, #{order_seq}, #{payment_seq}, #{return_code}, sysdate, null)
+	</insert>
 </mapper>

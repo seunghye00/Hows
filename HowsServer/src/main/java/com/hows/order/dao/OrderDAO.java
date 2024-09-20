@@ -68,4 +68,9 @@ public class OrderDAO {
 	public boolean deleteOrder(int orderSeq) {
 		return mybatis.delete("Order.delete", orderSeq) > 0;
 	}
+
+	// 주문 상태 조회
+	public String getOrderCode(int orderSeq) {
+		return mybatis.selectOne("Order.getOrderCode", orderSeq);
+	}
 }

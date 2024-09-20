@@ -34,3 +34,22 @@
     outline: none;
     /* 클릭 시 outline 제거 */
 }
+
+/* 모바일 크기(576px) 이하일 때 1개 */
+@media screen and (max-width: 576px) {
+    .scrollToTop {
+        position: fixed;
+        bottom: 100px;
+        right: 10px;
+        z-index: 1000;
+    }
+
+    .scrollBtn::before {
+        content: "";
+        display: block;
+        background: url(../../assets/images/scrolltop.png) center no-repeat;
+        width: 14px;
+        height: 14px;
+        background-size: 24px;
+    }
+}

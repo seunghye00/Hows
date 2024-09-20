@@ -17,6 +17,7 @@ export const Header = () => {
     const [profileMenu, setProfileMenu] = useState(false)
     const [profileImage, setProfileImage] = useState('') // 프로필 사진 상태
     const { currentUser } = useMemberStore()
+    const [isMenuOpen, setIsMenuOpen] = useState(false) // 메뉴 열림/닫힘 상태
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
@@ -27,6 +28,7 @@ export const Header = () => {
         } else if (menuName === 'HowShare') {
             navigate('/csservice')
         }
+        toggleHamburgerMenu() // 메뉴 클릭 시 닫기
     }
 
     const handleScroll = throttle(() => {
@@ -112,6 +114,10 @@ export const Header = () => {
         }
     }, [location.pathname])
 
+    const toggleHamburgerMenu = () => {
+        setIsMenuOpen(!isMenuOpen)
+    }
+
     return (
         <div className="header">
             <div className={styles.headerWrap}>
@@ -123,8 +129,18 @@ export const Header = () => {
                 >
                     <div className={styles.mainNavi}>
                         <div className={styles.menuBox}>
+                            <div
+                                className={styles.hamburgerMenu}
+                                onClick={toggleHamburgerMenu}
+                            >
+                                <i className="bx bx-menu"></i>
+                            </div>
                             <div className={styles.mainLogo}>
-                                <a>
+                                <a
+                                    onClick={() => {
+                                        navigate('/')
+                                    }}
+                                >
                                     <img src={logo} alt="Logo" />
                                 </a>
                             </div>
@@ -139,6 +155,7 @@ export const Header = () => {
                                 >
                                     <a>HowShop</a>
                                 </div>
+
                                 <div
                                     className={`${styles.naviMenu} ${
                                         activeMenu === 'HowStory'
@@ -176,11 +193,11 @@ export const Header = () => {
                                     <i className="bx bx-cart"></i>
                                 </a>
                             </div>
-                            <div className={styles.infoIcon}>
+                            {/* <div className={styles.infoIcon}>
                                 <a>
                                     <i className="bx bx-bell"></i>
                                 </a>
-                            </div>
+                            </div> */}
                             <div
                                 className={
                                     isAuth
@@ -251,6 +268,38 @@ export const Header = () => {
                     </div>
                 </div>
             </div>
+            {isMenuOpen && (
+                <div className={styles.overlay}>
+                    <div className={styles.menuContent}>
+                        <span
+                            className={styles.closeButton}
+                            onClick={toggleHamburgerMenu}
+                        >
+                            &times;
+                        </span>
+                        <div className={styles.hamburgerLogo}>
+                            <a
+                                onClick={() => {
+                                    navigate('/')
+                                }}
+                            >
+                                <img src={logo} alt="Logo" />
+                            </a>
+                        </div>
+                        <ul className={styles.menuList}>
+                            <li onClick={() => handleMenuClick('HowShop')}>
+                                HowsShop
+                            </li>
+                            <li onClick={() => handleMenuClick('HowStory')}>
+                                HowStory
+                            </li>
+                            <li onClick={() => handleMenuClick('HowShare')}>
+                                HowShare
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

@@ -6,6 +6,7 @@ import { useAuthStore } from '../../../../../../store/store';
 import { getProductDetail } from '../../../../../../api/product';
 import { DeliveryInfo } from '../DeliveryInfo/DeliveryInfo';
 import { ReviewSection } from '../ReviewSection/ReviewSection';
+import { ScrollTop } from '../../../../../../components/ScrollTop/ScrollTop';
 
 
 
@@ -36,14 +37,14 @@ export const DetailPage = () => {
             <div className={styles.content}>
                 {activeTab === 'info' && (
                     <div className={styles.info}>
-                        <h2>상품 정보</h2>
-                        <div>{productContents}</div>
+                        <img src={productContents} alt={productContents}></img>
                     </div>
                 )}
                 {activeTab === 'reviews' && (<ReviewSection product_seq={product_seq} isAuth={isAuth}/>)}
 
                 {activeTab === 'deliveryInfo' && <DeliveryInfo/>}
             </div>
+            <ScrollTop />
         </div>
     )
 }

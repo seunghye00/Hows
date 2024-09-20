@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="Event">
+
+	<!-- 이벤트 등록 -->
+	<insert id="insertEvt">
+		INSERT INTO event (event_seq, event_title,
+		event_contents, event_date, view_count)
+		VALUES (EVENT_SEQ.NEXTVAL,
+		#{event_title}, #{event_contents}, SYSDATE, 0)
+	</insert>
+
+	<!-- 이벤트 조회 -->
+	<select id="selectEvt"
+		resultType="com.hows.event.dto.EventDTO">
+		SELECT *
+		FROM (
+		SELECT t.*, ROWNUM AS rn
+		FROM (
+		SELECT *
+		FROM
+		event
+		ORDER BY event_date DESC
+		) t
+		WHERE ROWNUM &lt;= #{endRow}
+		)
+		WHERE rn
+		&gt;= #{startRow}
+	</select>
+
+	<!-- 이벤트 전체 개수 조회 -->
+	<select id="EvtCount" resultType="int">
+		SELECT COUNT(*) FROM event
+	</select>
+
+	<!-- 이벤트 상세조회 -->
+	<select id="detailEvt"
+		resultType="com.hows.event.dto.EventDTO">
+		SELECT * FROM event WHERE event_seq = #{event_seq}
+	</select>
+
+	<!-- 이벤트 수정 -->
+	<update id="updateEvt">
+		UPDATE event
+		SET event_title = #{event_title},
+		event_contents = #{event_contents}
+		WHERE event_seq = #{event_seq}
+	</update>
+
+	<!-- 이벤트 삭제 -->
+	<delete id="deleteEvt">
+		DELETE FROM event WHERE event_seq = #{event_seq}
+	</delete>
+
+	<!-- 조회수 업데이트 -->
+	<update id="viewCount">
+		UPDATE event
+		SET view_count = view_count + 1
+		WHERE
+		event_seq = #{event_seq}
+	</update>
+
+
+</mapper>

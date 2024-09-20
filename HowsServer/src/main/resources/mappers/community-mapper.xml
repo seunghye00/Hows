@@ -53,7 +53,8 @@
 
 	<!-- 이미지 URL로 board_image_seq 조회 로그인 필요 -->
 	<select id="selectBoardImageSeqByUrl" resultType="int">
-		select board_image_seq
+		select
+		board_image_seq
 		from board_image
 		where image_url = #{imageUrl}
 	</select>
@@ -114,14 +115,17 @@
 		m.member_id,
 		m.member_seq,
 		m.member_avatar,
-		count(distinct bl.board_like_seq) as like_count,  <!-- 좋아요 개수 -->
+		count(distinct
+		bl.board_like_seq) as like_count,  <!-- 좋아요 개수 -->
 		(count(distinct c.comment_seq) + count(distinct r.reply_seq)) as
 		comments_count  <!-- 댓글 및 답글 개수 -->
 		from board b
 		join member m on b.member_id = m.member_id
-		left join board_like bl on b.board_seq = bl.board_seq  <!-- 좋아요 조인 -->
+		left join
+		board_like bl on b.board_seq = bl.board_seq  <!-- 좋아요 조인 -->
 		left join comments c on b.board_seq = c.board_seq
-		left join reply r on c.comment_seq = r.comment_seq
+		left join reply r on
+		c.comment_seq = r.comment_seq
 
 		<where>
 			<if test="housingType != null and housingType != ''">
@@ -179,15 +183,19 @@
 		m.member_seq,
 		m.member_avatar,
 		count(distinct bl.board_like_seq) as like_count,
-		(count(distinct c.comment_seq) + count(distinct r.reply_seq)) as comments_count,
+		(count(distinct c.comment_seq) + count(distinct r.reply_seq)) as
+		comments_count,
 		b.board_contents
 		from board b
-		join member m on b.member_id = m.member_id
-		left join board_like bl on b.board_seq = bl.board_seq
+		join member m on
+		b.member_id = m.member_id
+		left join board_like bl on b.board_seq =
+		bl.board_seq
 		left join comments c on b.board_seq = c.board_seq
-		left join reply r on c.comment_seq = r.comment_seq
-		where lower(b.board_contents) like '%' || lower(#{tag}) || '%'  <!-- 게시글 내용에 태그 
-			포함 -->
+		left join
+		reply r on c.comment_seq = r.comment_seq
+		where lower(b.board_contents)
+		like '%' || lower(#{tag}) || '%'  <!-- 게시글 내용에 태그 포함 -->
 		group by b.board_seq, b.view_count, m.nickname, m.member_avatar,
 		m.member_id, m.member_seq, b.board_contents
 		order by b.board_seq desc
@@ -232,18 +240,23 @@
 		left join board_like bl on b.board_seq =
 		bl.board_seq
 		left
-		join comments c on b.board_seq = c.board_seq
+		join comments
+		c on b.board_seq = c.board_seq
 		left join
 		reply r on
-		c.comment_seq = r.comment_seq
+		c.comment_seq =
+		r.comment_seq
 		left join board_book_mark bm on
 		b.board_seq = bm.board_seq
 		where b.board_seq = #{board_seq}
 		group by
-		b.board_seq, b.board_contents, b.view_count, b.board_write_date,
-		b.housing_type_code, b.space_type_code, b.area_size_code,
+		b.board_seq, b.board_contents,
+		b.view_count, b.board_write_date,
+		b.housing_type_code,
+		b.space_type_code, b.area_size_code,
 		b.member_id,
-		m.nickname, m.member_avatar, m.member_id, m.member_seq
+		m.nickname,
+		m.member_avatar, m.member_id, m.member_seq
 	</select>
 
 	<!-- 게시글 디테일 이미지 조회 -->
@@ -283,13 +296,15 @@
 	<!-- 게시글 업데이트 -->
 	<update id="updateWrite">
 		update board
-		set housing_type_code = #{housing_type_code},
+		set housing_type_code =
+		#{housing_type_code},
 		space_type_code = #{space_type_code},
 		area_size_code = #{area_size_code},
 		board_contents = #{board_contents},
 		color_code = #{color_code},
 		board_write_date = sysdate
-		where board_seq = #{board_seq}
+		where board_seq =
+		#{board_seq}
 	</update>
 
 	<!-- 게시글 수정 이미지 주소 -->
@@ -432,17 +447,21 @@
 		select
 		b.board_seq,
 		b.board_contents,
-		to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date,
+		to_char(b.board_write_date, 'YYYY-MM-DD
+		HH24:MI:SS') as board_write_date,
 		b.view_count,
 		b.member_id,
-		m.name as member_name,
+		m.name as
+		member_name,
 		bi.image_url
 		from
 		board_book_mark bbm
 		inner join
-		board b on bbm.board_seq = b.board_seq
+		board b on
+		bbm.board_seq = b.board_seq
 		inner join
-		member m on b.member_id = m.member_id
+		member m on b.member_id =
+		m.member_id
 		left join
 		board_image bi on b.board_seq = bi.board_seq
 		where
@@ -471,9 +490,11 @@
 		from
 		orders o
 		join
-		order_list ol on o.order_seq = ol.order_seq
+		order_list ol on
+		o.order_seq = ol.order_seq
 		join
-		product p on ol.product_seq = p.product_seq
+		product p on ol.product_seq =
+		p.product_seq
 		where
 		o.member_seq = #{member_seq} and o.order_code = 'O6'
 	</select>
@@ -485,22 +506,23 @@
 		SELECT *
 		FROM (
 		SELECT
-		b.board_seq,
-		b.board_contents,
-		TO_CHAR(b.board_write_date, 'YYYY-MM-DD') AS board_write_date,
-		m.nickname AS member_id,
-		m.member_avatar,
-		COUNT(br.board_report_seq) AS report_count, <!-- 신고 횟수 -->
-		 COALESCE(LISTAGG(bi.image_url, ',') WITHIN GROUP (ORDER BY bi.image_order), ' ') AS image_urls, <!-- 이미지 URL -->
+		b.board_seq, -- 게시물 번호
+		b.board_contents, -- 게시물 내용
+		TO_CHAR(b.board_write_date, 'YYYY-MM-DD') AS board_write_date, -- 작성일시
+		m.nickname AS member_id, -- 작성자 닉네임
+		m.member_avatar, -- 작성자 아바타
+		COUNT(DISTINCT br.board_report_seq) AS report_count, -- 신고 횟수 (중복 제거)
+		COALESCE(LISTAGG(bi.image_url, ',') WITHIN GROUP (ORDER BY
+		bi.image_order), ' ') AS image_urls, -- 이미지 목록
 		ROW_NUMBER() OVER (ORDER BY b.board_seq DESC) AS row_num -- 행 번호 부여
 		FROM
 		board b
 		JOIN
-		member m ON b.member_id = m.member_id <!-- 작성자 조인 -->
-		JOIN
-		board_report br ON b.board_seq = br.board_seq <!-- 신고 기록 조인 -->
+		member m ON b.member_id = m.member_id -- 작성자 조인
 		LEFT JOIN
-		board_image bi ON b.board_seq = bi.board_seq <!-- 게시물 이미지 조인 -->
+		board_report br ON b.board_seq = br.board_seq -- 신고 기록 조인
+		LEFT JOIN
+		board_image bi ON b.board_seq = bi.board_seq -- 게시물 이미지 조인
 		GROUP BY
 		b.board_seq, b.board_contents, b.board_write_date, m.nickname, m.member_avatar
 		)
@@ -590,8 +612,9 @@
 		board b on c.color_code = b.color_code
 		group by c.color_title
 	</select>
-	
+
 	<select id="todayBoardNum" resultType="int">
-		select count(*) from board where trunc(board_write_date) = trunc(sysdate)
+		select count(*) from board
+		where trunc(board_write_date) = trunc(sysdate)
 	</select>
 </mapper>

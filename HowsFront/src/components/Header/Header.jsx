@@ -8,6 +8,8 @@ import profile from '../../assets/images/기본사진.jpg'
 import { throttle } from 'lodash'
 import { api } from './../../config/config' // API 요청을 위한 경로
 import Swal from 'sweetalert2'
+import {useProductStore} from "../../store/productStore";
+import {SubHeader} from "../../pages/Home/Products/SubHeader/SubHeader";
 
 export const Header = () => {
     const navigate = useNavigate()
@@ -19,6 +21,8 @@ export const Header = () => {
     const [setProfileImage] = useState('') // 프로필 사진 상태
     const { currentUser } = useMemberStore()
     const [isMenuOpen, setIsMenuOpen] = useState(false) // 메뉴 열림/닫힘 상태
+
+    const { subHeader, setSubHeader } = useProductStore();
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
@@ -82,6 +86,14 @@ export const Header = () => {
             }
         })
     }
+
+    const handleMouseEnter = () => {
+        setSubHeader(true);
+    };
+
+    const handleMouseLeave = () => {
+        setSubHeader(false);
+    };
 
     useEffect(() => {
         const token = sessionStorage.getItem('token')
@@ -153,32 +165,37 @@ export const Header = () => {
                                 </a>
                             </div>
                             <div className={styles.naviMenuList}>
-                                <div
-                                    className={`${styles.naviMenu} ${
+                                <>
+                                    <div
+                                      className={`${styles.naviMenu} ${
                                         activeMenu === 'Shop'
-                                            ? styles.active
-                                            : ''
-                                    }`}
-                                    onClick={() => handleMenuClick('Shop')}
-                                >
-                                    <a>Shop</a>
-                                </div>
+                                          ? styles.active
+                                          : ''
+                                      }`}
+                                      onClick={() => handleMenuClick('Shop')}
+                                      onMouseEnter={handleMouseEnter}
+                                      onMouseLeave={handleMouseLeave}
+                                    >
+                                        <a>Shop</a>
+                                    </div>
+                                </>
+
 
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'Story'
-                                            ? styles.active
-                                            : ''
-                                    }`}
-                                    onClick={() => handleMenuClick('Story')}
+                                  className={`${styles.naviMenu} ${
+                                    activeMenu === 'Story'
+                                      ? styles.active
+                                      : ''
+                                  }`}
+                                  onClick={() => handleMenuClick('Story')}
                                 >
                                     <a>Story</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'Service'
-                                            ? styles.active
-                                            : ''
+                                  className={`${styles.naviMenu} ${
+                                    activeMenu === 'Service'
+                                      ? styles.active
+                                      : ''
                                     }`}
                                     onClick={() => handleMenuClick('Service')}
                                 >

@@ -8,8 +8,6 @@ export const SubHeader = () => {
 
     //로컬스토리지에서 activeMenu 값을 가져오거나 없으면 '쇼핑홈' 으로  초기화
     const [activeMenu, setActiveMenu] = useState('쇼핑홈')
-    
-    
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName);
@@ -29,20 +27,22 @@ export const SubHeader = () => {
 
     return (
         <div className={styles.container}>
-            <ul className={styles.menu}>
-                <li 
-                    className={`${styles.naviMenu} ${activeMenu === '쇼핑홈'? styles.active: ''}`}
-                    onClick={()=> handleMenuClick('쇼핑홈')}>쇼핑홈
-                </li>
-                <li 
-                    className={`${styles.naviMenu} ${activeMenu === '카테고리'? styles.active: ''}`}
-                    onClick={()=> handleMenuClick('카테고리')}>카테고리
-                </li>
-                <li 
-                    className={`${styles.naviMenu} ${activeMenu === '베스트'? styles.active: ''}`}
-                    onClick={()=> handleMenuClick('베스트')}>베스트
-                </li>
-            </ul>
+            <div className={styles.row}>
+                <ul className={styles.menu}>
+                    <li
+                      className={`${styles.naviMenu} ${activeMenu === '쇼핑홈' ? styles.active : ''}`}
+                      onClick={() => handleMenuClick('쇼핑홈')}>쇼핑홈
+                    </li>
+                    <li
+                      className={`${styles.naviMenu} ${activeMenu === '카테고리' ? styles.active : ''}`}
+                      onClick={() => handleMenuClick('카테고리')}>카테고리
+                    </li>
+                    <li
+                      className={`${styles.naviMenu} ${activeMenu === '베스트' ? styles.active : ''}`}
+                      onClick={() => handleMenuClick('베스트')}>베스트
+                    </li>
+                </ul>
+            </div>
         </div>
     );
 }

@@ -8,7 +8,6 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { useEffect, useState } from 'react';
 import { useAuthStore, useMemberStore } from './store/store';
 import { jwtDecode } from 'jwt-decode'; // import 수정
-import { api } from './config/config';
 import { getRoleCode } from './api/member';
 
 function App() {
@@ -56,8 +55,8 @@ function AppContent({ session }) {
     const location = useLocation();
 
     // 특정 경로에서 Header와 Footer 숨기기
-    const hideHeaderFooter = location.pathname === '/signIn' || location.pathname === '/signUp';
-
+    // const hideHeaderFooter = location.pathname === '/signIn' || location.pathname === '/signUp' || location.pathname === '/findPw';
+    const hideHeaderFooter = location.pathname.startsWith('/signIn') || location.pathname === '/signUp';
     return (
         <div className={session ? 'App' : 'Admin'}>
             {session ? (

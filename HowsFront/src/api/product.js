@@ -11,21 +11,76 @@ export const getBestProducts = () => {
     return axios.get(`${baseUrl}/getBestProducts`)
 }
 
+// 카테고리 목록 출력 함수
+export const handleMenusClick = (product_category_code, setProductsList, setData) => {
+    setProductsList([]); // 기존 데이터 초기화
+    return axios.get(`${baseUrl}/category/${product_category_code}`)
+        .then((resp) => {
+            setData(resp.data);
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+};
+
+
+// 카테고리 메뉴 출력
+export const fetchCategories = async (setCategoriesList, handleMenuClick, categoryCode) => {
+    try {
+        const resp = await axios.get(`${host}/category`);
+        setCategoriesList(resp.data);
+        
+        if (categoryCode == null) {
+            handleMenuClick("P1");
+        } else {
+            handleMenuClick(categoryCode);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+// 리뷰 구매 상태 확인
+export const checkPurchaseStatus = async (memberId, productSeq) => {
+    try {
+        const response = await axios.get(`${baseUrl}/review/checkPurchaseStatus`, {
+            params: { memberId, productSeq }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('구매 상태 확인 오류:', error);
+        return false;
+    }
+};
+
+// 리뷰 작성 가능 여부 확인
+export const checkCanWriteReview = async (memberId, productSeq) => {
+    try {
+        const response = await axios.get(`${baseUrl}/review/canWriteReview`, {
+            params: { memberId, productSeq }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('리뷰 작성 가능 여부 확인 오류:', error);
+        return false;
+    }
+};
+
 // 리뷰 목록 요청 함수
 export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
     return sortType === 'latest'
-        ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
-              params: {
-                  page: page, // 페이지 번호 전달
-                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-              },
-          })
-        : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
-              params: {
-                  page: page, // 페이지 번호 전달
-                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-              },
-          })
+    ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            },
+        })
+    : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            },
+        })
 }
 
 // 별점

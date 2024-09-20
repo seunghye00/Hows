@@ -26,10 +26,6 @@ public class ProductService {
 	}
 	
 	// 상품 '카테고리'별 목록 출력
-//	public List<ProductDTO> getProductByCategory (String product_category_code) {
-//		return productDAO.getProductByCategory(product_category_code);
-//	}
-	
 	public List<Map<String, Object>> getProductByCategory (String product_category_code) {
 		return productDAO.getProductByCategory(product_category_code);
 	}

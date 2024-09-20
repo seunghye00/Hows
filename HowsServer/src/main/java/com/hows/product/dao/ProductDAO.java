@@ -27,10 +27,6 @@ public class ProductDAO {
 	}
 	
 	// 카테고리별 목록 출력
-//	public List<ProductDTO> getProductByCategory (String product_category_code) {
-//		return myBatis.selectList("Product.getProductByCategory", product_category_code);
-//	}
-	
 	public List<Map<String, Object>> getProductByCategory (String product_category_code) {
 		return myBatis.selectList("Product.getProductByCategory", product_category_code);
 	}

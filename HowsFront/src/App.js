@@ -44,6 +44,8 @@ function App() {
                 if (resp.data === 'R1') setSession(false)
                 else if (resp.data === 'R2') setSession(true)
             })
+        } else {
+            setSession(true)
         }
     }, [isAuth])
 

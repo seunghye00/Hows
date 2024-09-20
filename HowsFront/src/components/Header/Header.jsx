@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styles from './Header.module.css'
 import logo from '../../assets/images/logo_how.png'
+import logo1 from '../../assets/images/로그인_로고.png'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore, useMemberStore } from './../../store/store'
 import profile from '../../assets/images/기본사진.jpg'
@@ -11,7 +12,7 @@ import Swal from 'sweetalert2'
 export const Header = () => {
     const navigate = useNavigate()
     const location = useLocation() // 현재 경로 확인
-    const [activeMenu, setActiveMenu] = useState('HowShop')
+    const [activeMenu, setActiveMenu] = useState('Shop')
     const [isFixed, setIsFixed] = useState(false)
     const { isAuth, login, logout, setIsAuth } = useAuthStore()
     const [profileMenu, setProfileMenu] = useState(false)
@@ -21,11 +22,17 @@ export const Header = () => {
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
-        if (menuName === 'HowShop') {
+
+        if (window.innerWidth <= 768) {
+            // 모바일 환경일 때만 메뉴 닫기
+            setIsMenuOpen(false)
+        }
+
+        if (menuName === 'Shop') {
             navigate('/')
-        } else if (menuName === 'HowStory') {
+        } else if (menuName === 'Story') {
             navigate('/communities')
-        } else if (menuName === 'HowShare') {
+        } else if (menuName === 'Service') {
             navigate('/csservice')
         }
     }
@@ -107,11 +114,11 @@ export const Header = () => {
     // 현재 URL에 맞춰서 활성화된 메뉴 설정
     useEffect(() => {
         if (location.pathname === '/') {
-            setActiveMenu('HowShop')
+            setActiveMenu('Shop')
         } else if (location.pathname.includes('/communities')) {
-            setActiveMenu('HowStory')
-        } else if (location.pathname.includes('/howshare')) {
-            setActiveMenu('HowShare')
+            setActiveMenu('Story')
+        } else if (location.pathname.includes('/csservice')) {
+            setActiveMenu('Service')
         }
     }, [location.pathname])
 
@@ -142,40 +149,40 @@ export const Header = () => {
                                         navigate('/')
                                     }}
                                 >
-                                    <img src={logo} alt="Logo" />
+                                    <img src={logo1} alt="Logo" />
                                 </a>
                             </div>
                             <div className={styles.naviMenuList}>
                                 <div
                                     className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShop'
+                                        activeMenu === 'Shop'
                                             ? styles.active
                                             : ''
                                     }`}
-                                    onClick={() => handleMenuClick('HowShop')}
+                                    onClick={() => handleMenuClick('Shop')}
                                 >
-                                    <a>HowShop</a>
+                                    <a>Shop</a>
                                 </div>
 
                                 <div
                                     className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowStory'
+                                        activeMenu === 'Story'
                                             ? styles.active
                                             : ''
                                     }`}
-                                    onClick={() => handleMenuClick('HowStory')}
+                                    onClick={() => handleMenuClick('Story')}
                                 >
-                                    <a>HowStory</a>
+                                    <a>Story</a>
                                 </div>
                                 <div
                                     className={`${styles.naviMenu} ${
-                                        activeMenu === 'HowShare'
+                                        activeMenu === 'Service'
                                             ? styles.active
                                             : ''
                                     }`}
-                                    onClick={() => handleMenuClick('HowShare')}
+                                    onClick={() => handleMenuClick('Service')}
                                 >
-                                    <a>HowShare</a>
+                                    <a>Service</a>
                                 </div>
                             </div>
                         </div>
@@ -288,14 +295,14 @@ export const Header = () => {
                             </a>
                         </div>
                         <ul className={styles.menuList}>
-                            <li onClick={() => handleMenuClick('HowShop')}>
-                                HowsShop
+                            <li onClick={() => handleMenuClick('Shop')}>
+                                Shop
                             </li>
-                            <li onClick={() => handleMenuClick('HowStory')}>
-                                HowStory
+                            <li onClick={() => handleMenuClick('Story')}>
+                                Story
                             </li>
-                            <li onClick={() => handleMenuClick('HowShare')}>
-                                HowShare
+                            <li onClick={() => handleMenuClick('Service')}>
+                                Service
                             </li>
                         </ul>
                     </div>

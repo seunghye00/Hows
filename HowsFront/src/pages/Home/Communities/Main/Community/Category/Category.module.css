@@ -35,8 +35,6 @@
     object-fit: cover;
     /* 이미지 비율을 유지하며 크기 조정 */
     margin-bottom: 5px;
-
-    border: 2px solid var(--hows-gray-500);
 }
 
 .categoryItem p {

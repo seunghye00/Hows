@@ -227,7 +227,7 @@ export const Review = () => {
             {/* 리뷰 모달창 */}
             {isReviewModalOpen && (
                 <div className={styles.reviewModal}>
-                    <div className={styles.modalContent}>
+                    <div className={styles.reviewmodalContent}>
                         <h3>신고당한 리뷰</h3>
                         <div className={styles.reviewDetail}>
                             {selectedReview.IMAGE_URLS ? (
@@ -243,13 +243,17 @@ export const Review = () => {
                             ) : (
                                 <img src={test} alt="기본 이미지" />
                             )}
-                            <div>{selectedReview.REVIEW_CONTENTS}</div>
                         </div>
-                        <Button
-                            size="s"
-                            title="닫기"
-                            onClick={closeReviewModal}
-                        />
+                        <div className={styles.reviewCtn}>
+                            {selectedReview.REVIEW_CONTENTS}
+                        </div>
+                        <div className={styles.closebtn}>
+                            <Button
+                                size="s"
+                                title="닫기"
+                                onClick={closeReviewModal}
+                            />
+                        </div>
                     </div>
                 </div>
             )}

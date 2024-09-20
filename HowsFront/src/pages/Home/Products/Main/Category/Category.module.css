@@ -14,11 +14,12 @@
 
 /* 목록 */
 .side {
-    height: 100%; flex: 2; min-width: 200px;
+    height: 100%; flex: 2; min-width: 250px;
     /* border-radius: 0 0 8px 8px; */
     border-radius: 10px;
     margin-top: 30px;
-    background-color: var(--hows-point-color-lightest);
+    background-color: #fbecddb9;
+
     position: sticky;
     top: 120px; /* 스크롤 시 상단에 고정 */
     font-size: 18px;
@@ -26,15 +27,12 @@
     letter-spacing: 1px;
 }
 .list {
-    /* border-radius: 10px;
-    background-color: red; */
+    /* background-color: red; */
 }
 .list > li{
-    height: 70px; 
+    height: 80px; 
     display: flex;justify-content: start;align-items: center;
     padding-left: 30px;
-    /* background-color: var(--hows-point-color-lightest); */
-    /* border: 1px solid var(--hows-point-color-lightest); */
     transition: all ease 0.1s;
     font-weight: bold;
     opacity: 1;
@@ -46,6 +44,17 @@
     /* border-radius: 0 0 10px 10px; */
 }
 
+.imagesBox {
+    width: 45px; height: 45px;
+    padding: 0 10px;
+}
+/* 이미지 */
+.imagesBox .image {
+    object-fit: contain; 
+    width: 100%; 
+    height: 100%;
+}
+
 
 
 /* 상품 */
@@ -53,7 +62,7 @@
     height: 100%; 
     flex: 8; 
     min-width: 1000px;
-    margin-left: 100px;
+    margin-left: 50px;
 }
 
 /* 상품 - 옵션 */
@@ -146,6 +155,10 @@
 .sortBox {
     display: flex;
     gap: 10px;
+}
+.sortBox select {
+    width: 300px;
+    background-color: red;
 }
 
 .selectedOptions {

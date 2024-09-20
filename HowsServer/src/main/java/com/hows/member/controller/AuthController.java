@@ -70,6 +70,10 @@ public class AuthController {
 		
 		String foundId = memServ.findId(map);
 		
+		if(foundId == null) {
+			return ResponseEntity.ok("false");
+		}
+		
 		return ResponseEntity.ok(foundId);
 	}
 	

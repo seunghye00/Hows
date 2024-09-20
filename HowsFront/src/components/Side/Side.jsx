@@ -1,8 +1,10 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from './Side.module.css'
 import logo from '../../assets/images/logo_how.png'
 import { useNavigate, Link } from 'react-router-dom' // useNavigate 임포트
 import { Button } from '../Button/Button'
+import { SwalComp } from '../../commons/commons'
+import { useAuthStore } from '../../store/store'
 
 export const Side = () => {
     const navigate = useNavigate() // useNavigate 사용
@@ -106,6 +108,25 @@ export const Side = () => {
             ],
         },
     ]
+
+    const { logout, setIsAuth } = useAuthStore()
+
+    const handleLogout = () => {
+        SwalComp({
+            type: 'question',
+            text: '정말 로그아웃을 하시겠습니까?',
+        }).then(result => {
+            if (result.isConfirmed) {
+                logout()
+                sessionStorage.removeItem('token')
+                sessionStorage.removeItem('member_id')
+                sessionStorage.removeItem('member_avatar')
+                sessionStorage.removeItem('nickname')
+                setIsAuth(false)
+                navigate('/')
+            }
+        })
+    }
 
     return (
         <div className="side">
@@ -247,7 +268,11 @@ export const Side = () => {
                         </div>
                     ))}
                     <div className={styles.btn}>
-                        <Button title="로그아웃" size={'s'} />
+                        <Button
+                            title="로그아웃"
+                            size={'s'}
+                            onClick={handleLogout}
+                        />
                     </div>
                 </div>
             </div>

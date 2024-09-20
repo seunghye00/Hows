@@ -12,19 +12,28 @@ import { api } from './config/config';
 import { getRoleCode } from './api/member';
 
 function App() {
-    const [session, setSession] = useState(true);
-    const { isAuth, login } = useAuthStore();
-    const { setCurrentUser } = useMemberStore();
+    const [session, setSession] = useState(false)
+    const { isAuth, login } = useAuthStore()
+    const { setCurrentUser } = useMemberStore()
 
     // 로그인 상태 체크
     useEffect(() => {
-        const token = sessionStorage.getItem("token");
+        const token = sessionStorage.getItem('token')
         if (token != null) {
+            const decoded = jwtDecode(token)
+            sessionStorage.getItem('member_id')
+            const nickname = sessionStorage.getItem('nickname')
+            const profile = sessionStorage.getItem('member_avatar')
             const decoded = jwtDecode(token);
             const nickname = sessionStorage.getItem("nickname");
             const profile = sessionStorage.getItem("member_avatar");
 
             setCurrentUser({
+                nickname: nickname,
+                member_avatar: profile,
+            })
+
+            login(token)
                 "nickname": nickname,
                 "member_avatar": profile
             });

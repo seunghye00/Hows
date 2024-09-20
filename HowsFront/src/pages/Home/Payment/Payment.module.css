@@ -148,8 +148,9 @@
 .orderInfo > .shipping > .address > .postcode > button {
     border: none;
     background-color: var(--hows-point-color);
+    border-radius: 5px;
     color: var(--hows-white);
-    padding: 5px;
+    padding: 6px;
 }
 
 .orderInfo > .shipping > .address > input {
@@ -301,6 +302,7 @@
     margin: 8px;
     border: none;
     background-color: var(--hows-point-color);
+    border-radius: 5px;
     color: var(--hows-white);
     font-size: 18px;
     font-weight: 900;

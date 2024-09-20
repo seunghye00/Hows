@@ -362,7 +362,7 @@ public class ProductController {
 				if (!productServ.deleteProduct(product_seq)) {
 					throw new RuntimeException("상품 삭제 실패: ");
 				}
-				List<String> sysNames = fileServ.getSysNames(product_seq);
+				List<String> sysNames = fileServ.getSysNames(product_seq, "F3");
 				// 해당 상품에 포함된 파일 전부 삭제
 				for (String sysName : sysNames) {
 					String result = fileServ.deleteFile(sysName, "F3");

@@ -1,6 +1,8 @@
 package com.hows.File.dao;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +34,19 @@ public class FileDAO {
 		return mybatis.delete("File.deleteFile", sysName);
 	}
 
-	// parent_seq로 파일 목록의 sysname 조회
-	public List<String> getSysNames(int parentSeq) {
-		return mybatis.selectList("File.getSysName", parentSeq);
+	// fileCode와 parent_seq로 파일의 sysname 조회
+	public List<String> getSysNames(int parentSeq, String fileCode) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("parentSeq", parentSeq);
+		params.put("fileCode", fileCode);
+		return mybatis.selectList("File.getSysName", params);
+	}
+
+	// parent_seq 업데이트
+	public boolean updateParentSeq(int parentSeq, int fileSeq) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("parentSeq", parentSeq);
+		params.put("fileSeq", fileSeq);
+		return mybatis.update("File.update", params) > 0;
 	}
 }

@@ -47,6 +47,15 @@ public class MemberController {
 	@Autowired
 	private PasswordEncoder pwEncoder;
 
+	// 로그인 시 role_code 확인 - 로그인 필요
+	@GetMapping("/getRoleCode")
+	public ResponseEntity<String> getRoleCode(@AuthenticationPrincipal CustomUserDetails user){
+		String member_id = user.getUsername();
+		String result = memServ.getRoleCode(member_id);
+		
+		return ResponseEntity.ok(result);
+	}
+	
 	// 암호화 회원가입
 	@PostMapping
 	public ResponseEntity<Void> insert(@RequestBody MemberDTO dto) {
@@ -80,7 +89,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	// 마이페이지 회원정보 출력
+	// 마이페이지 회원정보 출력 - 로그인 필요
 	@GetMapping("/selectInfo")
 	public ResponseEntity<MemberDTO> selectInfo(
 			 @RequestParam(required = false) String member_id,
@@ -94,14 +103,14 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	// 회원정보 수정
+	// 회원정보 수정 - 로그인 필요
 	@PutMapping("/updateInfo")
 	public ResponseEntity<Integer> updateInfo(@RequestBody MemberDTO dto) {
 		int result = memServ.updateInfo(dto);
 		return ResponseEntity.ok(result);
 	}
 
-	// 비밀번호 변경 시 기존 비밀번호 확인
+	// 비밀번호 변경 시 기존 비밀번호 확인 - 로그인 필요
 	@PostMapping("/checkPw")
 	public ResponseEntity<Boolean> checkPw(@AuthenticationPrincipal CustomUserDetails user,
 			@RequestBody Map<String, String> request) {
@@ -120,7 +129,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	// [로그인]비밀번호 찾기 / [마이페이지]비밀번호 변경
+	// [로그인]비밀번호 찾기 / [마이페이지]비밀번호 변경 - 로그인 필요
 	@PutMapping("/updatePw")
 	public ResponseEntity<Integer> updatePw(
 			@AuthenticationPrincipal CustomUserDetails user,
@@ -133,7 +142,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 	
-	// 프로필 사진 및 배너 사진 변경
+	// 프로필 사진 및 배너 사진 변경 - 로그인 필요
 	@PostMapping("/uploadImage")
 	public ResponseEntity<String> uploadProfileImage(
 		     @RequestPart("file") MultipartFile file,  // FormData에서 이미지 파일을 받음
@@ -166,7 +175,7 @@ public class MemberController {
 		    }
 		}
 	
-	// 프로필 사진 삭제
+	// 프로필 사진 삭제 - 로그인 필요
 	@DeleteMapping("/deleteImage")
 	public ResponseEntity<String> deleteProfileImage(
 			@RequestParam("member_seq") int member_seq,
@@ -204,14 +213,14 @@ public class MemberController {
 	    }
 	}
 
-	// 회원탈퇴
+	// 회원탈퇴 - 로그인 필요
 	@DeleteMapping("/deleteUser/{member_id}")
 	public ResponseEntity<Integer> deleteUser(@PathVariable("member_id") String member_id) {
 		int result = memServ.deleteUser(member_id);
 		return ResponseEntity.ok(result);
 	}
 	
-	// 팔로우 및 언팔로우 메서드
+	// 팔로우 및 언팔로우 메서드 - 로그인 필요
 	@PostMapping("/follow")
 	public ResponseEntity<Map<String, Object>> toggleFollow(
 	        @RequestBody Map<String, Object> requestBody
@@ -251,28 +260,28 @@ public class MemberController {
 	    }
 	}
 	
-	 // 팔로워 목록 가져오기
+	 // 팔로워 목록 가져오기 - 로그인 필요
     @GetMapping("/getFollower")
     public ResponseEntity<List<Map<String, Object>>> getFollower(@RequestParam("member_seq") int member_seq) {
     	List<Map<String, Object>> follower = memServ.getFollower(member_seq);
         return ResponseEntity.ok(follower);
     }
 
-    // 팔로잉 목록 가져오기
+    // 팔로잉 목록 가져오기 - 로그인 필요
     @GetMapping("/getFollowing")
     public ResponseEntity<List<Map<String, Object>>> getFollowing(@RequestParam("member_seq") int member_seq) {
     	List<Map<String, Object>> following = memServ.getFollowing(member_seq);
         return ResponseEntity.ok(following);
     }
     
-    // 팔로워, 팔로잉 수 가져오기
+    // 팔로워, 팔로잉 수 가져오기 - 로그인 필요
     @GetMapping("/countFollow")
     public ResponseEntity<Map<String, BigDecimal>> countFollow(@RequestParam("member_seq") int member_seq){
     	Map<String, BigDecimal> result = memServ.countFollow(member_seq);
     	return ResponseEntity.ok(result);
     }
     
-    // 맞팔 되어있는지
+    // 맞팔 되어있는지 - 로그인 필요
     @PostMapping("/eachFollow")
     public ResponseEntity<Boolean> eachFollow(@RequestBody Map<String, Integer> params){
     	Boolean result = memServ.eachFollow(params);
@@ -280,28 +289,28 @@ public class MemberController {
     }
     
   
-	// 마이페이지 게시글(이미지) 출력
+	// 마이페이지 게시글(이미지) 출력 - 로그인 필요
 	@GetMapping("/selectPost")
 	public ResponseEntity<List<Map<String, Object>> > selectPost(@RequestParam String member_id){
 		List<Map<String, Object>> result = memServ.selectPostByMemberId(member_id);
 		return ResponseEntity.ok(result);
 	}
 
-	// 마이페이지 게시글 갯수
+	// 마이페이지 게시글 갯수 - 로그인 필요
 	@GetMapping("/countPost")
 	public ResponseEntity<Integer> countPost(@RequestParam String member_id){
 		int result = memServ.countPost(member_id);
 		return ResponseEntity.ok(result);
 	}
 	
-	// 마이페이지 북마크(이미지) 출력
+	// 마이페이지 북마크(이미지) 출력 - 로그인 필요
 	@GetMapping("/selectBookmark")
 	public ResponseEntity<List<Map<String, Object>> > selectBookmark(@RequestParam String member_id){
 		List<Map<String, Object>> result = memServ.selectBookmarkByMemberId(member_id);
 		return ResponseEntity.ok(result);
 	}
 	
-	// 마이페이지 북마크 갯수
+	// 마이페이지 북마크 갯수 - 로그인 필요
 	@GetMapping("/countBookmark")
 	public ResponseEntity<Integer> countBookmark(@RequestParam String member_id){
 		int result = memServ.countBookmark(member_id);

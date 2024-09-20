@@ -273,6 +273,7 @@ export const Detail = () => {
 
     return (
         <div className={styles.contailer}>
+            <div style={{height: "70px"}}></div>
             <div className={styles.contents}>
                 <div className={styles.img}>
                     <img src={list.product_thumbnail} alt={list.product_title}></img>

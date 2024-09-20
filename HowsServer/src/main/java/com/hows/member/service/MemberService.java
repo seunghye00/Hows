@@ -35,6 +35,11 @@ public class MemberService implements UserDetailsService {
 	@Autowired
 	private PasswordEncoder pwEncoder;
 
+	// 로그인 시 role_code 가져오기
+	public String getRoleCode(String member_id) {
+		return memDao.getRoleCode(member_id);
+	}
+	
 	// 회원가입
 	public void insert(MemberDTO dto) {
 		memDao.insert(dto);

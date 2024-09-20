@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import styles from './Side.module.css'
 import logo from '../../assets/images/logo_how.png'
 import { useNavigate, Link } from 'react-router-dom' // useNavigate 임포트
+import { Button } from '../Button/Button'
 
 export const Side = () => {
     const navigate = useNavigate() // useNavigate 사용
@@ -245,6 +246,9 @@ export const Side = () => {
                             </ul>
                         </div>
                     ))}
+                    <div className={styles.btn}>
+                        <Button title="로그아웃" size={'s'} />
+                    </div>
                 </div>
             </div>
         </div>

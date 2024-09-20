@@ -590,5 +590,8 @@
 		board b on c.color_code = b.color_code
 		group by c.color_title
 	</select>
-
+	
+	<select id="todayBoardNum" resultType="int">
+		select count(*) from board where trunc(board_write_date) = trunc(sysdate)
+	</select>
 </mapper>

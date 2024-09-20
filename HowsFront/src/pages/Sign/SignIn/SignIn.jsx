@@ -1,13 +1,10 @@
 import styles from "./SignIn.module.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import logo from "../../../assets/images/logo_how.png";
-import axios from "axios";
+import logo from "../../../assets/images/로그인_로고.png";
 import { jwtDecode } from "jwt-decode";
 import { useAuthStore, useMemberStore } from "./../../../store/store";
-import { host } from "./../../../config/config";
 import { FindId } from "./FindId/FindId";
-import { FindPw } from "./FindPw/FindPw";
 import { loginUser } from "../../../api/member";
 import Swal from "sweetalert2";
 
@@ -38,8 +35,8 @@ export const SignIn = () => {
         sessionStorage.setItem("member_avatar", decoded.member_avatar); // 사용자 프로필사진 저장
 
         setCurrentUser({
-          "nickname": decoded.nickname,
-          "member_avatar": decoded.member_avatar
+          nickname: decoded.nickname,
+          member_avatar: decoded.member_avatar,
         });
 
         login(token);
@@ -76,9 +73,10 @@ export const SignIn = () => {
   return (
     <div className={styles.container}>
       <div className={styles.loginBox}>
-        <div className={styles.logo}>
-          <img src={logo}></img>
-          <h1 className={styles.title}>How's</h1>
+        <div className={styles.logo} onClick={() => navi("/")}>
+          <div className={styles.logoBox}>
+            <img src={logo} />
+          </div>
         </div>
         <input
           type="text"
@@ -91,13 +89,13 @@ export const SignIn = () => {
           type="password"
           name="pw"
           onChange={handleInputLogin}
+          onKeyDown={(e) => e.key === "Enter" && handleLoginBtn()}
           placeholder="비밀번호"
           className={styles.input}
         />
         <button className={styles.loginBtn} onClick={handleLoginBtn}>
           로그인
         </button>
-        {/* <button className={styles.kakaoLoginBtn}>카카오톡으로 로그인</button> */}
         <div className={styles.links}>
           <button
             onClick={() => handlePageChange("findId")}

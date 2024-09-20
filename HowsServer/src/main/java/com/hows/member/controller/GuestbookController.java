@@ -30,14 +30,14 @@ public class GuestbookController {
 	@Autowired
 	private GuestbookService guestServ;
 	
-	// 글 작성 위한 member_seq 뽑기
+	// 글 작성 위한 member_seq 뽑기 - 로그인 필요
     @GetMapping("/findMemberSeq")
     public ResponseEntity<Integer> findMemberSeq(@RequestParam String member_id) {
         int member_seq = memServ.findMemberSeq(member_id);
         return ResponseEntity.ok(member_seq); // member_seq 값을 응답으로 전달
     }
 	
-	// 글 작성
+	// 글 작성 - 로그인 필요
     @PostMapping("/insert")
     public ResponseEntity<Integer> insert(
             @AuthenticationPrincipal UserDetails user,
@@ -54,21 +54,21 @@ public class GuestbookController {
         }
     }
 	
-	// 전체 출력
+	// 전체 출력 - 로그인 필요
     @GetMapping("/list")
     public ResponseEntity<List<GuestbookSubDTO>> selectAll(@RequestParam int member_seq){
     	List<GuestbookSubDTO> list = guestServ.selectAll(member_seq);
     	return ResponseEntity.ok(list);
     }
     
-    // 글 삭제
+    // 글 삭제 - 로그인 필요
     @DeleteMapping("/{guestbook_seq}")
     public ResponseEntity<Integer> delete(@PathVariable int guestbook_seq){
     	int result = guestServ.delete(guestbook_seq);
     	return ResponseEntity.ok(result);
     }
 	
-	// 마이페이지 방문글 갯수
+	// 마이페이지 방문글 갯수 - 로그인 필요
 	@GetMapping("/countGuestbook")
 	public ResponseEntity<Integer> countGuestbook(@RequestParam int member_seq){
 		int result = guestServ.countGuestbook(member_seq);

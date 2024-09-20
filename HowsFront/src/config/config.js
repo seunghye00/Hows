@@ -20,16 +20,3 @@ api.interceptors.request.use(
     return config;
   }
 );
-
-
-// api.interceptors.response.use(
-//   (response) => response, // axios 응답이 정상응답일 때는 then으로 가게 방치
-//   (error) => {
-//     switch (error.response.status) {
-//       case 401:
-//         sessionStorage.removeItem("token");
-//         useAuthStore.getState().logout(); // useAuthStore에 있는 state값을 가져와서 logout 시키겠다.
-//         break;
-//     }
-//   }
-// );

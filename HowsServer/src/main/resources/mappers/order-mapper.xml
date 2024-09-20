@@ -122,6 +122,17 @@
 		)
 	</insert>
 
+	<select id="getTotalPrice" resultType="java.lang.Integer">
+		SELECT
+			sum(order_price)
+		FROM
+			orders
+		WHERE
+			member_seq = #{member_seq}
+		AND
+			order_code = 'O6'
+	</select>
+
 	<!-- 주문 상태 업데이트 -->
 	<update id="updateOrder">
 		UPDATE

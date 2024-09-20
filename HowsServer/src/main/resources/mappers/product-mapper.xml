@@ -307,4 +307,14 @@
     	left join product p on p.product_category_code = c.product_category_code
     	group by c.product_category_title
 	</select>
+
+	<!-- 수문 완료 시 재고 차감 -->
+	<update id="updateQuantity">
+		UPDATE
+			product
+		SET
+			quantity = quantity - #{order_list_count}
+		WHERE
+			product_seq = #{product_seq}
+	</update>
 </mapper>

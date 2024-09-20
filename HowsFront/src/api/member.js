@@ -140,9 +140,6 @@ export const eachFollow = (fromMemberSeq, toMemberSeq) => {
     return api.post('/member/eachFollow', params)
 }
 
-export const adminstart = () => {
-    // 여기서 밑 부터 관리자 기능!
-}
 /************************************  [ 관리자 기능 ] /************************************/
 
 // 전체 회원 조회

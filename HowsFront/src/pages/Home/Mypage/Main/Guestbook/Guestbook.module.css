@@ -85,6 +85,7 @@
 .visitPost .output > div .writer_writeDate > span:nth-child(1) {
   font-size: 24px;
   font-weight: 600;
+  cursor: pointer;
 }
 .visitPost .output > div .writer_writeDate > span:nth-child(2) {
   margin-left: 10px;

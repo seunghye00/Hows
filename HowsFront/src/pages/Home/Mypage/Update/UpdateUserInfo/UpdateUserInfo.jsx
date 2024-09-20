@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { api } from "../../../../../config/config";
 import { format } from "date-fns";
 import { useAuthStore } from "../../../../../store/store";
-import { checkNickname, userInfo } from "../../../../../api/member";
+import { checkNickname, deleteUser, userInfo } from "../../../../../api/member";
 import Swal from "sweetalert2";
 import DaumPostcode from "react-daum-postcode";
 import { SwalComp } from "../../../../../commons/commons";
@@ -272,11 +272,16 @@ export const UpdateUserInfo = () => {
   };
 
   const handleDelete = () => {
-    const confirmDelete = window.confirm("정말 탈퇴하시겠습니까?");
-    if (confirmDelete) {
-      api
-        .delete(`/member/deleteUser/${user.member_id}`)
-        .then((resp) => {
+    Swal.fire({
+      title: "확인",
+      text: "정말 탈퇴하시겠습니까?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "확인",
+      cancelButtonText: "취소",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        deleteUser(user.member_id).then((resp) => {
           if (resp.data > 0) {
             Swal.fire({
               title: "성공!",
@@ -285,16 +290,21 @@ export const UpdateUserInfo = () => {
               confirmButtonText: "확인",
             });
             sessionStorage.removeItem("token"); // 토큰 삭제
+            sessionStorage.removeItem("member_id");
+            sessionStorage.removeItem("nickname");
+            sessionStorage.removeItem("member_avatar");
+
             setIsAuth(false); // 인증 상태 업데이트
             navi("/");
           } else {
             console.log("탈퇴 중 오류 발생: ", resp.data);
           }
         })
-        .catch((error) => {
-          console.error("탈퇴 중 오류 발생: ", error);
-        });
-    }
+          .catch((error) => {
+            console.error("탈퇴 중 오류 발생: ", error);
+          });
+      }
+    });
   };
 
   const signup_date = new Date(user.signup_date);
@@ -305,15 +315,6 @@ export const UpdateUserInfo = () => {
   return (
     <div className={styles.container}>
       <div className={styles.updateInfo}>
-        {/* <div className={styles.profileBox}>
-                    <div className={styles.img}>
-                        <img src={profile}></img>
-                    </div>
-                    <div className={styles.profileBtns}>
-                        <button>변경</button>
-                        <button>삭제</button>
-                    </div>
-                </div> */}
         <div className={styles.idBox}>
           <span className={styles.title}>ID</span>
           <input

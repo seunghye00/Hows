@@ -13,13 +13,22 @@ export const FindId = ({ onBack }) => {
   const handleFindBtn = () => {
     findId(name, email)
       .then((resp) => {
-        Swal.fire({
-          title: "성공!",
-          text: `아이디는 ${resp.data}입니다.`,
-          icon: "success",
-          confirmButtonText: "확인",
-        });
-        onBack();
+        if (resp.data != false) {
+          Swal.fire({
+            title: "성공!",
+            text: `아이디는 ${resp.data}입니다.`,
+            icon: "success",
+            confirmButtonText: "확인",
+          });
+          onBack();
+        } else if (resp.data == false) {
+          Swal.fire({
+            title: "경고!",
+            text: "아이디를 찾을 수 없습니다. 입력하신 정보를 확인하세요.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        }
       })
       .catch((error) => {
         Swal.fire({

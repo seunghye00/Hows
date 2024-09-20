@@ -1,12 +1,11 @@
 import styles from './SignUp.module.css'
 import DaumPostcode from 'react-daum-postcode'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { host } from '../../../config/config'
 import Swal from 'sweetalert2'
 import { Modal } from './../../../components/Modal/Modal';
-import { SwalComp } from '../../../commons/commons'
 
 export const SignUp = () => {
     const navi = useNavigate()
@@ -74,7 +73,6 @@ export const SignUp = () => {
         // 중복확인 요청
         axios.post(`${host}/member/checkId`, { member_id: formData.member_id })
             .then(resp => {
-                console.log("id : ", resp.data);
                 setIdAvailable(resp.data);
                 setIdChecked(!resp.data);
                 setCheckIdStatus(resp.data ? "이미 사용 중인 ID입니다." : "사용 가능한 ID입니다.");
@@ -102,7 +100,6 @@ export const SignUp = () => {
         // 중복확인 요청
         axios.post(`${host}/member/checkNickname`, { nickname: formData.nickname })
             .then(resp => {
-                console.log("nickname : ", resp.data);
                 setNicknameAvailable(resp.data);
                 setNicknameChecked(!resp.data);
                 setCheckNicknameStatus(resp.data ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
@@ -593,7 +590,7 @@ export const SignUp = () => {
                 </div>
                 <div className={styles.btns}>
                     <button onClick={handleSubmit}>회원가입</button>
-                    <button>취소</button>
+                    <button onClick={() => navi('/')}>홈으로</button>
                 </div>
                 <div className={styles.login}>
                     <span>이미 아이디가 있으신가요? </span>

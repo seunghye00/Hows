@@ -466,28 +466,30 @@
 	
 	<!-- 관리자 -->
 	<!-- 게시물 신고조회 (관리자) -->
-
-	<select id="reportedCommunity" parameterType="map"
-		resultType="map">
-		SELECT *
-		FROM (
-		SELECT
-		b.board_seq, -- 게시판 게시물 번호
-		b.board_contents, -- 게시판 내용
-		TO_CHAR(b.board_write_date, 'YYYY-MM-DD') AS board_write_date, -- 작성 날짜
-		m.nickname AS member_id, -- 작성자 (닉네임)
-		COUNT(br.board_report_seq) AS report_count, -- 신고 횟수
-		ROW_NUMBER() OVER (ORDER BY b.board_seq DESC) AS row_num -- 각 행에 순번 부여
-		FROM
-		board b
-		JOIN
-		member m ON b.member_id = m.member_id
-		JOIN
-		board_report br ON b.board_seq = br.board_seq -- 신고 기록 조인
-		GROUP BY
-		b.board_seq, b.board_contents, b.board_write_date, m.nickname
-		)
-		WHERE row_num BETWEEN #{startRow} AND #{endRow}
+	<select id="reportedCommunity" parameterType="map" resultType="map">
+    SELECT *
+    FROM (
+        SELECT
+            b.board_seq, -- 게시판 게시물 번호
+            b.board_contents, -- 게시판 내용
+            TO_CHAR(b.board_write_date, 'YYYY-MM-DD') AS board_write_date, -- 작성 날짜
+            m.nickname AS member_id, -- 작성자 (닉네임)
+            m.member_avatar, -- 작성자 아바타 이미지
+            COUNT(br.board_report_seq) AS report_count, -- 신고 횟수
+            COALESCE(bi.image_url, ' ') AS image_url, 
+            ROW_NUMBER() OVER (ORDER BY b.board_seq DESC) AS row_num -- 각 행에 순번 부여
+        FROM
+            board b
+        JOIN
+            member m ON b.member_id = m.member_id -- 멤버 조인
+        JOIN
+            board_report br ON b.board_seq = br.board_seq -- 신고 기록 조인
+        LEFT JOIN
+            board_image bi ON b.board_seq = bi.board_seq -- 게시물 이미지 조인 (여러 개일 수 있으므로 LEFT JOIN 사용)
+        GROUP BY
+            b.board_seq, b.board_contents, b.board_write_date, m.nickname, m.member_avatar, bi.image_url
+    	)
+    	WHERE row_num BETWEEN #{startRow} AND #{endRow}
 	</select>
 
 	<!-- 게시물 신고내역 조회 (관리자) -->
@@ -533,5 +535,39 @@
 		br ON b.board_seq = br.board_seq
 	</select>
 
-
+	<!-- 주거 형태별 게시글 수 조회 -->
+	<select id="getPostCountByHousingType" resultType="map">
+		select h.housing_type_title, count(b.board_seq) as post_count
+		from housing_type h
+		left join board b on h.housing_type_code = b.housing_type_code
+		group by h.housing_type_title
+	</select>
+	
+	<!-- 공간별 게시글 수 조회 -->
+	<select id="getPostCountBySpaceType" resultType="map">
+		select s.space_type_title, count(b.board_seq) as post_count
+		from space_type s
+		left join board b on s.space_type_code = b.space_type_code
+		group by s.space_type_title
+	</select>
+	
+	<!-- 평수별 게시글 수 조회 -->
+	<select id="getPostCountByAreaSize" resultType="map">
+		select a.area_size_title, count(b.board_seq) as post_count
+		from area_size a
+		left join board b on a.area_size_code = b.area_size_code
+		group by a.area_size_title
+	</select>
+	
+	<!-- 컬러별 게시글 수 조회 -->
+	<select id="getPostCountByColor" resultType="map">
+		select c.color_title, count(b.board_seq) as post_count
+		from color c
+		left join board b on c.color_code = b.color_code
+		group by c.color_title
+	</select>
+	
+	<select id="todayBoardNum" resultType="int">
+		select count(*) from board where trunc(board_write_date) = trunc(sysdate)
+	</select>
 </mapper>

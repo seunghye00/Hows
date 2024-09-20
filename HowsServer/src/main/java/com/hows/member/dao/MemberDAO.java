@@ -20,6 +20,11 @@ public class MemberDAO {
 	@Autowired
 	private SqlSession mybatis;
 
+	// 로그인 시 role_code 가져오기
+	public String getRoleCode(String member_id) {
+		return mybatis.selectOne("Member.getRoleCode", member_id);
+	}
+	
 	// 회원가입
 	public void insert(MemberDTO dto) {
 		mybatis.insert("Member.insert", dto);
@@ -42,11 +47,6 @@ public class MemberDAO {
 		Integer count = mybatis.selectOne("Member.checkEmail", email);
 		return count != null && count > 0;
 	}
-
-	// [로그인]비밀번호 찾기 - 비밀번호 변경
-//	public int changePw(Map<String, String> map) {
-//		return mybatis.update("Member.changePw", map);
-//	}
 
 	// 아이디 찾기
 	public String findId(Map<String, String> map) {
@@ -243,6 +243,11 @@ public class MemberDAO {
 	// 블랙리스트 수정 (관리자)
 	public int modifyBlacklist(String member_id) {
 		return mybatis.update("Member.modifyBlacklist", member_id);
+	}
+
+	// 연령대별 남녀 회원 수 조회
+	public List<Map<String, Object>> getAgeGenderDistribution() {
+		return mybatis.selectList("Member.getAgeGenderDistribution");
 	}
 
 }

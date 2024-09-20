@@ -196,8 +196,8 @@
     justify-content: center;
     align-items: center;
     position: fixed;
-    top: 85%;
-    left: 53%;
+    top: 88%;
+    left: 50%;
 }
 
 .pagination button {
@@ -212,6 +212,7 @@
     font-size: 20px;
     cursor: pointer;
 }
+
 
 .empty{
     display: flex;

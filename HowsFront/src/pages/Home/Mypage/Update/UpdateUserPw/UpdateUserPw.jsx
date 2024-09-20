@@ -1,5 +1,4 @@
 import { checkCurrentPw, updatePw } from "../../../../../api/member";
-import { api } from "../../../../../config/config";
 import styles from "./UpdateUserPw.module.css";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -15,7 +14,6 @@ export const UpdateUserPw = () => {
   const [isCurrentPwValid, setIsCurrentPwValid] = useState(null); // 현재 비밀번호 확인 결과
   const [showNewPwFields, setShowNewPwFields] = useState(false); // 새 비밀번호 입력 필드 표시 여부
   const [currentPwValid, setCurrentPwValid] = useState(null); // 비밀번호 일치 여부 상태
-  const { member_id } = useParams(); // URL에서 member_id 가져오기
 
   const validatePassword = (newPw, newPw2) => {
     const isPasswordMatch = newPw === newPw2;

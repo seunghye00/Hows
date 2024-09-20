@@ -35,6 +35,11 @@ public class MemberService implements UserDetailsService {
 	@Autowired
 	private PasswordEncoder pwEncoder;
 
+	// 로그인 시 role_code 가져오기
+	public String getRoleCode(String member_id) {
+		return memDao.getRoleCode(member_id);
+	}
+	
 	// 회원가입
 	public void insert(MemberDTO dto) {
 		memDao.insert(dto);
@@ -243,10 +248,6 @@ public class MemberService implements UserDetailsService {
 	public int countBookmark(String member_id) {
 		return comDao.countBookmark(member_id);
 	}
-
-    
-    
-
     
 	// ========================================[ 관리자 ]
 	// 전체 회원조회 (관리자)
@@ -312,5 +313,10 @@ public class MemberService implements UserDetailsService {
 	public int getMemberSeq() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	// 연령대별 남녀 회원 수 조회
+	public List<Map<String, Object>> getAgeGenderDistribution() {
+		return memDao.getAgeGenderDistribution();
 	}
 }

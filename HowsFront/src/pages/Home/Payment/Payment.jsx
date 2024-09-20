@@ -103,6 +103,7 @@ export const Payment = () => {
 
   /** 결제 이벤트 **/
   const handlePayment = async () => {
+
     if(!validateName(data.name)) {
       SwalComp({type: "warning", text: "이름을 확인해주세요"});
       return false;
@@ -205,7 +206,7 @@ export const Payment = () => {
       return {
         ...prev,
         coupon: paymentPrice.price-eval(result),
-        total: eval(result)
+        total: eval(result) + shippingPrice(eval(result))
       }
     });
 
@@ -213,9 +214,16 @@ export const Payment = () => {
 
   /** 새로고침 시 세션에서 order list 가져옴 **/
   useEffect(() => {
+    const item = sessionStorage.getItem("howsOrder");
+    const price = sessionStorage.getItem("howsPrice");
+
+    if(item === null || price === null) {
+
+      alert("선택한 상품이 없습니다.")
+      return navi("/");
+    }
+
     if(orderProducts.length <= 0){
-      const item = sessionStorage.getItem("howsOrder");
-      const price = sessionStorage.getItem("howsPrice");
       if(data !== null){
         const order = JSON.parse(item);
         setOrderProducts(order);
@@ -225,10 +233,9 @@ export const Payment = () => {
           ... prev,
           price: parseInt(price),
           shipping: shippingPrice(parseInt(price)),
-          total: parseInt(price)
-          // total: parseInt(price) + shippingPrice(price)
+          // total: parseInt(price)
+          total: parseInt(price) + shippingPrice(price)
         }));
-
       }
     }
 
@@ -237,7 +244,6 @@ export const Payment = () => {
 
     // 2. 회원이 소유한 쿠폰 리스트
     myCoupon().then(res => {
-      console.log(res.data);
       setCoupon(res.data);
     });
 
@@ -253,9 +259,9 @@ export const Payment = () => {
   }, [addressCheck, member]);
 
   useEffect(() => {
-    setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon}));
-    // setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon + shippingPrice(prev.price)}));
-  }, [data.point])
+    // setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon}));
+    setPaymentPrice(prev => ({ ...prev, point: data.point, shipping: shippingPrice(prev.price), total: prev.price - prev.coupon + shippingPrice(prev.price)}));
+  }, [data.point]);
 
   return (
     <div className={styles.container}>
@@ -330,7 +336,7 @@ export const Payment = () => {
             <div>
               <button name="CARD" style={ data.way === "CARD" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카드</button>
               <button name="KAKAO" style={ data.way === "KAKAO" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>카카오 페이</button>
-              <button name="TOSS" style={ data.way === "TOSS" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 패스</button>
+              <button name="TOSS" style={ data.way === "TOSS" ? {backgroundColor:"var(--hows-point-color)", color: "white"} : null } onClick={handleWay}>토스 페이</button>
             </div>
           </div>
           <div className={styles.payment}>

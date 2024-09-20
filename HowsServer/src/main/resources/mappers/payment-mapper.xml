@@ -86,5 +86,16 @@
         WHERE
             payment_id = #{payment_id}
     </delete>
+    
+    <update id="doneCancel">
+        update payment set payment_code = 'P5' where payment_id = #{paymentId}
+    </update>
 
+	<select id="getOrderSeq" resultType="int">
+		select order_seq from payment where payment_seq = #{payment_seq}
+	</select>
+	
+	<select id="todayPaymentPrice" resultType="int">
+		select coalesce(sum(payment_price), 0) as total_payment from payment where trunc(payment_date) = trunc(sysdate)
+	</select>
 </mapper>

@@ -14,6 +14,7 @@ import Faq from './Notice/FAQ/Faq'
 import { Product } from './Product/Product'
 import { WriteNotice } from './Notice/WriteNotice'
 import { ModifyNotice } from './Notice/ModifyNotice'
+import Event from './Notice/Event/Event'
 
 export const Admin = () => {
     return (
@@ -105,6 +106,15 @@ export const Admin = () => {
                         <>
                             <Title title={'FAQ 관리'} />
                             <Faq />
+                        </>
+                    }
+                />
+                <Route
+                    path="/admin/notice/event"
+                    element={
+                        <>
+                            <Title title={'이벤트 관리'} />
+                            <Event />
                         </>
                     }
                 />

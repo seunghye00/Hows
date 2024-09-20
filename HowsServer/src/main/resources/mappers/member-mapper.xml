@@ -5,6 +5,11 @@
 
 <mapper namespace="Member">
 
+	<!-- 로그인 시 role_code 가져오기 -->
+	<select id="getRoleCode" resultType="String">
+		select role_code from member where member_id = #{member_id}
+	</select>
+
 	<!-- 회원가입 -->
 	<insert id="insert">
 		insert into member values (
@@ -49,12 +54,6 @@
 		select count(*) from member
 		where email = #{email}
 	</select>
-
-	<!-- [로그인]비밀번호 찾기 - 비밀번호 변경 -->
-<!-- 	<update id="changePw">
-		update member set pw = #{pw} where member_id =
-		#{member_id} and email = #{email}
-	</update> -->
 
 	<!-- 회원정보 가져오기 -->
 	<select id="findById" resultType="com.hows.member.dto.MemberDTO">
@@ -124,7 +123,6 @@
 	    update member set member_banner = null where member_seq = ${member_seq}
 	</update>
 	
-
 	<!-- 비밀번호 변경 시 기존 비밀번호 확인 -->
 	<select id="getPasswordById" resultType="string">
 		select pw from member
@@ -214,7 +212,6 @@
 	    WHERE 
 	        f.from_member_seq = ${member_seq}
 	</select>
-
     
     <!-- 팔로워, 팔로잉 수 가져오기 -->
     <select id="countFollow" resultType="map">
@@ -499,5 +496,42 @@
 		#{member_id}
 	</update>
 
+	<!-- 연령대별 남녀 회원 수 조회 -->
+	<select id="getAgeGenderDistribution" resultType="map">
+		with age_ranges as (
+    		select '10대' as age_range from dual
+    		union all select '20대' from dual
+    		union all select '30대' from dual
+    		union all select '40대' from dual
+    		union all select '50대' from dual
+    		union all select '60대 이상' from dual
+		), 
+		genders as (
+    		select 'M' as gender from dual
+    		union all select 'F' from dual
+		),
+		age_gender_counts as (
+    		select
+        	case
+           	 	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 10 and 19 then '10대'
+            	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 20 and 29 then '20대'
+            	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 30 and 39 then '30대'
+            	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 40 and 49 then '40대'
+            	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 50 and 59 then '50대'
+            	else '60대 이상'
+        	end as age_range, gender
+    		from member
+		),
+		all_combinations as (
+    		select a.age_range, g.gender
+    		from age_ranges a
+    		cross join genders g
+		)
+		select ac.age_range, ac.gender, coalesce(count(agc.age_range), 0) as count
+		from all_combinations ac
+		left join age_gender_counts agc on ac.age_range = agc.age_range and ac.gender = agc.gender
+		group by ac.age_range, ac.gender
+		order by ac.age_range, ac.gender
+	</select>
 
 </mapper>

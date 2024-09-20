@@ -9,15 +9,15 @@
 .container .row {
     flex: 5;
     display: flex;
-    gap: 10px;
-    padding: 10px;
+    gap: 5px;
+    padding: 8px;
 }
 
 .leftBox {
-    flex: 6;
+    flex: 8;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
 }
 
 .leftBox h1 {
@@ -27,13 +27,19 @@
 .leftBox .subBox {
     flex: 2;
     display: flex;
-    gap: 10px;
+    gap: 5px;
 }
 
 .contBox {
     flex: 1;
     border: 1px solid black;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 20px;
 }
+
+
 
 .leftBox .listBox {
     flex: 7;
@@ -41,11 +47,26 @@
 }
 
 .rightBox {
-    flex: 4;
+    flex: 2;
     border: 1px solid black;
+}
+
+.rightBox canvas {
+    height: 450px;
+    width: 450px;
 }
 
 .graphBox {
     flex: 1;
     border: 1px solid black;
+}
+
+.graphBox canvas {
+    height: 350px;
+}
+
+.swiper {
+    height: 389px;
+    width: 100%;
+    max-width: 760px;
 }

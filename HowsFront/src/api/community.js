@@ -229,3 +229,13 @@ export const CommunityReport = board_seq => {
 export const deleteCommunity = board_seq => {
     return api.delete(`/community/deleteCommunity/${board_seq}`)
 }
+
+// 카테고리별 게시글 수 조회
+export const getBoardNumByCategory = () => {
+    return api.get('/community/getBoardNumByCategory')
+}
+
+// 오늘 작성된 게시글 수 조회
+export const todayBoardNum = () => {
+    return api.get('/community/todayBoardNum')
+}

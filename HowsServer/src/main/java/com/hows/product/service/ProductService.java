@@ -58,4 +58,9 @@ public class ProductService {
 	public boolean updateByQuantity(int productSeq, int quantity) {
 		return productDAO.updateByQuantity(productSeq, quantity);
 	}
+
+	// 카테고리별 상품 수 조회
+	public List<Map<String, Object>> getProductNumByCategory() {
+		return productDAO.getProductNumByCategory();
+	}
 }

@@ -74,8 +74,9 @@ export const SignIn = () => {
     <div className={styles.container}>
       <div className={styles.loginBox}>
         <div className={styles.logo} onClick={() => navi("/")}>
-          <img src={logo}></img>
-          {/* <h1 className={styles.title}>How's</h1> */}
+          <div className={styles.logoBox}>
+            <img src={logo} />
+          </div>
         </div>
         <input
           type="text"
@@ -88,13 +89,13 @@ export const SignIn = () => {
           type="password"
           name="pw"
           onChange={handleInputLogin}
+          onKeyDown={(e) => e.key === "Enter" && handleLoginBtn()}
           placeholder="비밀번호"
           className={styles.input}
         />
         <button className={styles.loginBtn} onClick={handleLoginBtn}>
           로그인
         </button>
-        {/* <button className={styles.kakaoLoginBtn}>카카오톡으로 로그인</button> */}
         <div className={styles.links}>
           <button
             onClick={() => handlePageChange("findId")}

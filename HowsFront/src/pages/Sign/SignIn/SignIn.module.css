@@ -21,10 +21,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0 10px 50px 10px;
+  margin: 0 10px 40px 10px;
   cursor: pointer;
 }
-.container .loginBox .logo > img {
+
+.logoBox {
+  width: 260px;
+  overflow: hidden;
+  object-fit: cover;
+}
+
+.container .loginBox .logo .logoBox > img {
   width: 100%;
 }
 

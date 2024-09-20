@@ -56,7 +56,7 @@
 .mainLogo a {
   display: flex;
   object-fit: cover;
-  max-width: 40px;
+  max-width: 100px;
 }
 
 .mainLogo img {

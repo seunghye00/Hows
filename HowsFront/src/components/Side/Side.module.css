@@ -6,6 +6,7 @@
      display: flex;
      flex-direction: column;
      gap: 26px;
+     height: 100%;
  }
 
  .logoBox {
@@ -28,6 +29,7 @@
      display: flex;
      flex-direction: column;
      gap: 30px;
+     height: 760px;
  }
 
  .adminList:not(:last-child) {
@@ -87,4 +89,14 @@
 
  .noToggle {
      width: 15px;
+ }
+
+ .btn {
+     height: 100%;
+     display: flex;
+     align-items: flex-end;
+ }
+
+ .btn button {
+     width: 100%;
  }

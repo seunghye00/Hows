@@ -184,13 +184,16 @@
     background-color:var(--hows-point-color); 
 }
 
-/* 리뷰 이미지 */
 .reviewBox > div > div:last-child{
-    display: flex;gap: 20px;
+    display: flex;gap: 20px; 
+    
 }
 .reviewBox > div > div:last-child > div:first-child {
-    width: 800px; height: 200px;
+    width: 400px; height: 200px;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px; 
     display: flex;
+    justify-content: flex-start;
 }
 .reviewBox > div > div:last-child > div:first-child > div{
     width: 200px; height: 200px;
@@ -203,7 +206,7 @@
 .reviewBox > div > div:last-child > div:last-child {
     display: flex; flex-direction: column; flex-grow: 1;
     padding: 20px;box-sizing: border-box; 
-    width: 200px; height: 200px; 
+    width: 600px; height: 200px; 
     background-color: #f0f0f078;
     border-radius: 8px; 
 }

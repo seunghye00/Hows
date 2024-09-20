@@ -3,41 +3,38 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from "react-responsive-carousel";
 import { useEffect, useState } from 'react';
 import { bannerList } from '../../../../../api/banner';
-import testBanner from '../../../../../assets/images/banner_test.png'
-import testBanner2 from '../../../../../assets/images/banner_test2.jpg'
-import testBanner3 from '../../../../../assets/images/banner_test3.jpg'
-import testBanner4 from '../../../../../assets/images/banner_test4.jpg'
-import testBanner5 from '../../../../../assets/images/banner_test5.jpg'
-import testBanner7 from '../../../../../assets/images/banner_test7.jpg'
+import testBanner1 from '../../../../../assets/images/banner_test1.png'
+import testBanner2 from '../../../../../assets/images/banner_test2.png'
+import testBanner3 from '../../../../../assets/images/banner_test3.png'
+
 
 export const Banner = () => {
 
-    const [images, setImages] = useState([]);
-
+  const [images, setImages] = useState([]);
   const [testImage, setTestImage] = useState([]);
 
     useEffect(() => {
         // 배너 목록 요청
-        bannerList().then(resp => {
-                const imageUrls = resp.data.map(item => {
-                    let updatedUrl = item.banner_url.replace('https://storage.google.com/', 'https://storage.googleapis.com/');
-                    console.log(images)
-                    return updatedUrl;
-                });
-                
-                setImages(imageUrls); 
-                console.log(images)
-            })
-            .catch(error => {console.error('error', error);});
+        // bannerList().then(resp => {
+        //         const imageUrls = resp.data.map(item => {
+        //             let updatedUrl = item.banner_url.replace('https://storage.google.com/', 'https://storage.googleapis.com/');
+        //             console.log(images)
+        //             return updatedUrl;
+        //         });
+        //
+        //         setImages(imageUrls);
+        //         console.log(images)
+        //     })
+        //     .catch(error => {console.error('error', error);});
 
-      setTestImage([testBanner, testBanner2, testBanner3, testBanner4, testBanner5, testBanner7])
+      setTestImage([testBanner1, testBanner2, testBanner3]);
     
     }, []);
 
     //이미지가 로드되기 전 렌더링 방지
-    if(images.length === 0) {
-        return null;
-    }
+    // if(images.length === 0) {
+    //     return null;
+    // }
 
     return (
         <div className={styles.container}>

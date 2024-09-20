@@ -13,6 +13,9 @@ import { getReviewList , getReviewImgList , reviewLike, reviewUnlike , getReview
 import ReportModal from '../ReportModal/ReportModal';
 import { useNavigate } from 'react-router-dom';
 
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Navigation, Pagination } from 'swiper/modules'
+
 
 
 export const ReviewSection = ({ product_seq, isAuth }) => {
@@ -771,9 +774,27 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                     <div>
                                         <div>
                                         {(review.images || []).length > 0 ? (
-                                            review.images.map((img, imgIndex) => (
-                                                <div key={imgIndex}><img src={img.IMAGE_URL} alt='img'/></div>
-                                            ))
+                                            
+                                            <Swiper
+                                                modules={[Navigation, Pagination]}
+                                                navigation
+                                                pagination={{ clickable: true }}
+                                                spaceBetween={30}
+                                                slidesPerView={1}
+                                            >
+                                                {
+                                                review.images.map((img, imgIndex) => (
+                                                    <SwiperSlide key={index}>
+                                                        <div key={imgIndex}>
+                                                            <img src={img.IMAGE_URL} alt='img'/>
+                                                        </div>
+                                                    </SwiperSlide>
+                                                ))}
+                                            </Swiper>
+
+                                            // review.images.map((img, imgIndex) => (
+                                            //     <div key={imgIndex}><img src={img.IMAGE_URL} alt='img'/></div>
+                                            // ))
                                         ) : (
                                             <div>이미지가 없습니다.</div> 
                                         )}

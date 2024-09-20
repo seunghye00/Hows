@@ -33,7 +33,7 @@ export const Guestbook = () => {
 
   // "등록" 버튼
   const handleWriteBtn = () => {
-    const content = inputRef.current.innerText;
+    const content = inputRef.current.innerHTML;
     const MAX_CONTENT_LENGTH = 300;
 
     // 글자 수 확인 후 제출
@@ -59,7 +59,7 @@ export const Guestbook = () => {
           setOutputs(resp.data);
         });
         setContents("");
-        inputRef.current.innerText = "";
+        inputRef.current.innerHTML = "";
       }
     });
   };
@@ -100,7 +100,17 @@ export const Guestbook = () => {
             className={styles.inputText}
             contentEditable="true"
             suppressContentEditableWarning={true}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (!e.shiftKey) {
+                  e.preventDefault(); // 기본 Enter 동작(줄바꿈)을 막기
+                  handleWriteBtn(); // 글 작성 함수 호출
+                }
+                // Shift + Enter일 때는 기본 줄바꿈 동작이 그대로 작동함
+              }
+            }}
           />
+
           <button onClick={handleWriteBtn}>등록</button>
         </div>
 
@@ -121,19 +131,18 @@ export const Guestbook = () => {
                   <span>{output.nickname}</span>
                   <span> {write_currentDate}</span>
                 </div>
-                <div className={styles.content}>
-                  {output.guestbook_contents}
-                </div>
+                <div
+                  className={styles.content}
+                  dangerouslySetInnerHTML={{ __html: output.guestbook_contents }} // 줄바꿈 포함하여 렌더링
+                />
               </div>
-              {/* 로그인된 사용자와 댓글 작성자가 같은 경우에만 X 버튼 표시 */}
               {output.member_id === memberId && (
-                <button onClick={() => handleDelBtn(output.guestbook_seq)}>
-                  X
-                </button>
+                <button onClick={() => handleDelBtn(output.guestbook_seq)}>X</button>
               )}
             </div>
           );
         })}
+
       </div>
     </div>
   );

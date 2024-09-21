@@ -1,0 +1,9 @@
+.noticeCont {
+    max-width: 1300px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    min-height: 550px;
+}

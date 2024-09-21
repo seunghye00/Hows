@@ -1,0 +1,28 @@
+.title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.noticeList {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.eventItem {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--hows-gray-200);
+}
+
+.eventTitle {
+    font-size: 18px;
+    color: var(--hows-gray-800);
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.eventDate {
+    font-size: 14px;
+    color: var(--hows-gray-500);
+}

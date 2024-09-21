@@ -69,4 +69,24 @@
 
 
 /* 무한 스크롤 이미지 배치 */
-.itemBox {display: flex;}
+/* .itemBox {display: flex;} */
+
+
+/* 반응형 레이아웃 */
+@media (max-width: 1200px) {
+    .item {
+        width: calc(33.33% - 20px); /* 중간 화면에서는 3개씩 배치 */
+    }
+}
+
+@media (max-width: 900px) {
+    .item {
+        width: calc(50% - 20px); /* 작은 화면에서는 2개씩 배치 */
+    }
+}
+
+@media (max-width: 600px) {
+    .item {
+        width: calc(100% - 20px); /* 매우 작은 화면에서는 1개씩 배치 */
+    }
+}

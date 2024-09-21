@@ -114,7 +114,12 @@ export const getLikeCount = product_seq => {
 
 // 상품 좋아요 상태 확인
 export const checkLikeStatus = (product_seq, memberId) => {
-    return axios.get(`${likeUrl}/check`, { params: { product_seq, member_id: memberId } });
+    return axios.get(`${likeUrl}/check`, { 
+        params: { 
+            product_seq, 
+            member_id: memberId || '' // memberId가 없으면 빈 문자열 전달
+        } 
+    });
 };
 
 // 상품 좋아요 추가

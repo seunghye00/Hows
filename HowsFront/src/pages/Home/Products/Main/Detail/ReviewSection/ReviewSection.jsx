@@ -640,8 +640,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     const handleChangeSortType = (sortType) => {
         setSortType(sortType);
     }
-    console.log(JSON.stringify(reviews));
-    console.log(reviewAvatars);
     
     return (
         <div className={styles.container}>

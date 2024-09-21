@@ -25,6 +25,11 @@ public class ProductService {
 		return productDAO.getProducts();
 	}
 	
+	// 상품 리뷰 많은순 목록 출력 
+	public List<ProductDTO> getProductBytReview () {
+		return productDAO.getProductBytReview();
+	}
+	
 	// 상품 '카테고리'별 목록 출력
 	public List<Map<String, Object>> getProductByCategory (String product_category_code) {
 		return productDAO.getProductByCategory(product_category_code);

@@ -6,9 +6,19 @@ const categoryUrl = `${host}/category`
 const likeUrl = `${host}/likes`
 
 /************************************ [사용자 기능] ************************************/
+// 랜덤 상품 출력 함수 (내장함수 DBMS_RANDOM.VALUE 사용)
+export const getRandomProducts = () => {
+    return axios.get(`${baseUrl}`)
+}
+
 // 베스트 상품 출력 함수 (판매순)
 export const getBestProducts = () => {
     return axios.get(`${baseUrl}/getBestProducts`)
+}
+
+// 리뷰 많은 순 상품 출력 함수
+export const getProductBytReview = () => {
+    return axios.get(`${baseUrl}/getProductBytReview`)
 }
 
 // 카테고리 목록 출력 함수

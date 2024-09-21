@@ -27,8 +27,8 @@ public class BannerDAO {
 	}
 
 	// 배너 추가
-	public boolean addBanner(BannerDTO dto) {
-		return mybatis.insert("Banner.insert", dto) > 0;
+	public int addBanner(BannerDTO dto) {
+		return mybatis.insert("Banner.insert", dto);
 	}
 
 	// 배너 삭제

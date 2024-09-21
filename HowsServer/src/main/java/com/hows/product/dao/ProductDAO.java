@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.hows.order.dto.OrderListDTO;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -27,10 +28,6 @@ public class ProductDAO {
 	}
 	
 	// 카테고리별 목록 출력
-//	public List<ProductDTO> getProductByCategory (String product_category_code) {
-//		return myBatis.selectList("Product.getProductByCategory", product_category_code);
-//	}
-	
 	public List<Map<String, Object>> getProductByCategory (String product_category_code) {
 		return myBatis.selectList("Product.getProductByCategory", product_category_code);
 	}
@@ -69,5 +66,10 @@ public class ProductDAO {
 	// 카테고리별 상품 수 조회
 	public List<Map<String, Object>> getProductNumByCategory() {
 	    return myBatis.selectList("Product.getProductNumByCategory", "category_title");
+	}
+
+	/** 주문 시 상품 수량 변경 **/
+	public int updateQuantity(OrderListDTO dto) {
+		return myBatis.update("Product.updateQuantity", dto);
 	}
 }

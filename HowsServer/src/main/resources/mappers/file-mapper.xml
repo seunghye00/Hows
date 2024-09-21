@@ -30,7 +30,10 @@
     <select id="getSysName" resultType="String">
         select file_sysname 
         from files 
-		where parent_seq = #{parentSeq}
+		where parent_seq = #{parentSeq} and file_code = #{fileCode}
     </select>
-
+	
+	<update id="update">
+		update files set parent_seq = #{parentSeq} where file_seq = #{file_seq}
+	</update>
 </mapper>

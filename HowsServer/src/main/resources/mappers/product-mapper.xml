@@ -41,11 +41,6 @@
 		FROM PRODUCT ORDER BY product_seq
 	</select>
 
-	<!-- <select id="getProductByCategory" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
-		SELECT *
-		FROM PRODUCT
-		WHERE product_category_code = #{product_category_code}
-	</select> -->
 	
 	<select id="getProductByCategory" parameterType="String" resultType="map">
 		  SELECT 
@@ -66,6 +61,27 @@
 		WHERE product_seq = #{product_seq}
 	</select>
 
+	<!-- 특정 회원이 특정 상품을 구매 확정했는지 확인 -->
+    <select id="countCompletedOrders" resultType="int">
+        SELECT COUNT(*)
+        FROM orders o
+        JOIN member m ON o.member_seq = m.member_seq
+        JOIN order_list ol ON o.order_seq = ol.order_seq
+        JOIN order_status os ON o.order_code = os.order_code
+        WHERE m.member_id = #{memberId}
+        AND ol.product_seq = #{productSeq}
+        AND os.order_code = 'O6'  <!-- 구매 확정 상태 -->
+    </select>
+    
+	<!-- 특정 회원이 특정 상품에 작성한 리뷰 수 확인 -->
+	<select id="countUserReviews" resultType="int">
+	    SELECT COUNT(*)
+	    FROM review
+	    WHERE member_id = #{memberId}
+	    AND product_seq = #{productSeq}
+	</select>
+
+    
 	<!-- 리뷰등록 -->
 	<insert id="insertReview" parameterType="com.hows.product.dto.ReviewDTO">
 		INSERT INTO review (review_seq, rating, review_contents, review_date,
@@ -307,4 +323,14 @@
     	left join product p on p.product_category_code = c.product_category_code
     	group by c.product_category_title
 	</select>
+
+	<!-- 수문 완료 시 재고 차감 -->
+	<update id="updateQuantity">
+		UPDATE
+			product
+		SET
+			quantity = quantity - #{order_list_count}
+		WHERE
+			product_seq = #{product_seq}
+	</update>
 </mapper>

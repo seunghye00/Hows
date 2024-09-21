@@ -15,6 +15,8 @@ import { Product } from './Product/Product'
 import { WriteNotice } from './Notice/WriteNotice'
 import { ModifyNotice } from './Notice/ModifyNotice'
 import Event from './Notice/Event/Event'
+import { WriteEvent } from './Notice/Event/WriteEvent'
+import { ModifyEvent } from './Notice/Event/ModifyEvent'
 
 export const Admin = () => {
     return (
@@ -32,11 +34,19 @@ export const Admin = () => {
                     }
                 />
                 <Route path="/admin/product/*" element={<Product />} />
+
                 <Route path="/admin/notice/*" element={<WriteNotice />} />
                 <Route
                     path="/admin/notice/modifyNotice/:notice_seq"
                     element={<ModifyNotice />}
                 />
+
+                <Route path="/admin/event/*" element={<WriteEvent />} />
+                <Route
+                    path="/admin/event/modifyEvent/:event_seq"
+                    element={<ModifyEvent />}
+                />
+
                 <Route
                     path="/member"
                     element={

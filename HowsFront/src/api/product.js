@@ -11,21 +11,76 @@ export const getBestProducts = () => {
     return axios.get(`${baseUrl}/getBestProducts`)
 }
 
+// 카테고리 목록 출력 함수
+export const handleMenusClick = (product_category_code, setProductsList, setData) => {
+    setProductsList([]); // 기존 데이터 초기화
+    return axios.get(`${baseUrl}/category/${product_category_code}`)
+        .then((resp) => {
+            setData(resp.data);
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+};
+
+
+// 카테고리 메뉴 출력
+export const fetchCategories = async (setCategoriesList, handleMenuClick, categoryCode) => {
+    try {
+        const resp = await axios.get(`${host}/category`);
+        setCategoriesList(resp.data);
+        
+        if (categoryCode == null) {
+            handleMenuClick("P1");
+        } else {
+            handleMenuClick(categoryCode);
+        }
+    } catch (err) {
+        console.error(err);
+    }
+};
+
+// 리뷰 구매 상태 확인
+export const checkPurchaseStatus = async (memberId, productSeq) => {
+    try {
+        const response = await axios.get(`${baseUrl}/review/checkPurchaseStatus`, {
+            params: { memberId, productSeq }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('구매 상태 확인 오류:', error);
+        return false;
+    }
+};
+
+// 리뷰 작성 가능 여부 확인
+export const checkCanWriteReview = async (memberId, productSeq) => {
+    try {
+        const response = await axios.get(`${baseUrl}/review/canWriteReview`, {
+            params: { memberId, productSeq }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('리뷰 작성 가능 여부 확인 오류:', error);
+        return false;
+    }
+};
+
 // 리뷰 목록 요청 함수
 export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
     return sortType === 'latest'
-        ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
-              params: {
-                  page: page, // 페이지 번호 전달
-                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-              },
-          })
-        : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
-              params: {
-                  page: page, // 페이지 번호 전달
-                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-              },
-          })
+    ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            },
+        })
+    : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            },
+        })
 }
 
 // 별점
@@ -38,7 +93,7 @@ export const getProductDetail = product_seq => {
     return axios.get(`${baseUrl}/detail/${product_seq}`)
 }
 
-// 좋아요 개수
+// 상품 좋아요 개수
 export const getLikeCount = product_seq => {
     return axios.get(`${likeUrl}/count`, {
         params: {
@@ -47,9 +102,34 @@ export const getLikeCount = product_seq => {
     })
 }
 
+// 상품 좋아요 상태 확인
+export const checkLikeStatus = (product_seq, memberId) => {
+    return axios.get(`${likeUrl}/check`, { params: { product_seq, member_id: memberId } });
+};
+
+// 상품 좋아요 추가
+export const addLike = (product_seq, memberId) => {
+    return api.post(`${likeUrl}/insert`, { product_seq, member_id: memberId });
+};
+
+// 상품 좋아요 취소
+export const removeLike = (product_seq, memberId) => {
+    return api.delete(`${likeUrl}/delete`, {
+        data: {
+            product_seq,
+            member_id: memberId,
+        },
+    });
+};
+
+// 상품 장바구니에 상품 추가
+export const addToCartAPI = (data) => {
+    return api.post(`/cart`, data);
+};
+
 // 리뷰 좋아요
 export const reviewLike = (reviewSeq, memberId) => {
-    return api.post(`likes/review/insert`, {
+    return api.post(`${likeUrl}/review/insert`, {
         review_seq: reviewSeq,
         member_id: memberId,
     })
@@ -57,7 +137,7 @@ export const reviewLike = (reviewSeq, memberId) => {
 
 // 리뷰 좋아요 취소
 export const reviewUnlike = (reviewSeq, memberId) => {
-    return api.delete(`likes/review/delete`, {
+    return api.delete(`${likeUrl}/review/delete`, {
         data: {
             review_seq: reviewSeq,
             member_id: memberId,
@@ -101,7 +181,7 @@ export const getReport = async () => {
 
 // 리뷰 신고 요청
 export const sendReviewReport = (reviewSeq, selectedReason, memberId) => {
-    return api.post(`product/review/report`, {
+    return api.post(`${baseUrl}/review/report`, {
         review_seq: reviewSeq,
         report_code: selectedReason,
         member_id: memberId,

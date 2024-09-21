@@ -6,6 +6,7 @@ import axios from 'axios'
 import { host } from '../../../config/config'
 import Swal from 'sweetalert2'
 import { Modal } from './../../../components/Modal/Modal';
+import { checkEmailForSignUp, checkId, checkIdForSignUp, checkNicknameForSignUp } from '../../../api/member'
 
 export const SignUp = () => {
     const navi = useNavigate()
@@ -23,15 +24,26 @@ export const SignUp = () => {
         address: '',
         detail_address: '',
     })
+
+    /* 중복검사 (true일 경우 이미 사용 중) */
     const [idAvailable, setIdAvailable] = useState(null);
     const [nicknameAvailable, setNicknameAvailable] = useState(null);
     const [emailAvailable, setEmailAvailable] = useState(null);
+
+    /* 중복검사 후 보여지는 span 상태 */
     const [checkIdStatus, setCheckIdStatus] = useState('');
     const [checkNicknameStatus, setCheckNicknameStatus] = useState('');
+    const [checkEmailStatus, setCheckEmailStatus] = useState('');
+
+    /* 에러 메세지 */
     const [idErrorMessage, setIdErrorMessage] = useState('');
     const [nicknameErrorMessage, setNicknameErrorMessage] = useState('');
+    const [emailErrorMessage, setEmailErrorMessage] = useState('');
+
+    /* 중복확인 버튼 눌렀는지 (false일 경우 누르지 않은) */
     const [idChecked, setIdChecked] = useState(false); // 중복확인 상태 검사
     const [nicknameChecked, setNicknameChecked] = useState(false); // 중복확인 상태 검사
+    const [emailChecked, setEmailChecked] = useState(false); // 중복확인 상태 검사
 
     const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
     const [addressCheck, setAddressCheck] = useState({ default: true, direct: false }); // 주소 체크 항목
@@ -71,12 +83,13 @@ export const SignUp = () => {
         }
 
         // 중복확인 요청
-        axios.post(`${host}/member/checkId`, { member_id: formData.member_id })
-            .then(resp => {
-                setIdAvailable(resp.data);
-                setIdChecked(!resp.data);
-                setCheckIdStatus(resp.data ? "이미 사용 중인 ID입니다." : "사용 가능한 ID입니다.");
-            });
+        checkIdForSignUp(formData.member_id).then((resp) => {
+            setIdAvailable(resp.data);
+            setIdChecked(!resp.data);
+            setCheckIdStatus(
+                resp.data ? "이미 사용 중인 ID입니다." : "사용 가능한 ID입니다."
+            );
+        });
     }
 
     // 닉네임 중복확인 핸들러
@@ -98,13 +111,40 @@ export const SignUp = () => {
         }
 
         // 중복확인 요청
-        axios.post(`${host}/member/checkNickname`, { nickname: formData.nickname })
-            .then(resp => {
-                setNicknameAvailable(resp.data);
-                setNicknameChecked(!resp.data);
-                setCheckNicknameStatus(resp.data ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
-            });
+        checkNicknameForSignUp(formData.nickname).then(resp => {
+            setNicknameAvailable(resp.data);
+            setNicknameChecked(!resp.data);
+            setCheckNicknameStatus(resp.data ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
+        });
     }
+
+    // 이메일 중복확인 핸들러
+    const handleCheckEmail = () => {
+        // 이메일 유효성 검사
+        const emailPattern = /^[^\s@]+@[^\s@]+\.(com|net|org)$/;
+        if (!emailPattern.test(formData.email)) {
+            Swal.fire({
+                title: "경고!",
+                text: "이메일은 .com / .net / .org 형식의 이메일만 가능합니다.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
+            setEmailErrorMessage('다시 입력해주세요');
+            setEmailAvailable(null);
+            return;
+        } else {
+            setEmailErrorMessage(''); // 오류 메시지 초기화
+        }
+
+        // 중복확인 요청
+        checkEmailForSignUp(formData.email).then(resp => {
+            setEmailAvailable(resp.data);
+            setEmailChecked(!resp.data);
+            setCheckEmailStatus(resp.data ? "이미 사용 중인 닉네임입니다." : "사용 가능한 닉네임입니다.");
+        });
+    }
+
+
 
     // 주소 찾기
     const handleAddress = () => {
@@ -365,6 +405,15 @@ export const SignUp = () => {
             });
             return;
         }
+        if (emailAvailable === null) {
+            Swal.fire({
+                title: "경고!",
+                text: "이메일 중복 확인을 해주세요.",
+                icon: "warning",
+                confirmButtonText: "확인",
+            });
+            return;
+        }
 
         // 중복 확인 버튼 감지
         if (!idChecked) {
@@ -528,20 +577,23 @@ export const SignUp = () => {
                 <div className={styles.emailBox}>
                     <span className={styles.title}>이메일</span>
                     <span>.com / .net / .org 형식의 이메일만 가능합니다.</span>
-                    <input
-                        type="text"
-                        placeholder="이메일"
-                        name="email"
-                        onChange={handleChange}
-                        className={styles.inputEmail}
-                    ></input>
+                    <div className={styles.formGrop}>
+                        <input
+                            type="text"
+                            placeholder="이메일"
+                            name="email"
+                            onChange={handleChange}
+                            className={styles.inputEmail}
+                        ></input>
+                        <button className={styles.chkBtn} onClick={handleCheckEmail}>중복확인</button>
+                    </div>
+                    {emailAvailable === false && (
+                        <p style={{ color: 'green' }} className={styles.valid}>사용 가능한 이메일입니다.</p>
+                    )}
+                    {emailAvailable === true && (
+                        <p style={{ color: 'red' }} className={styles.valid}>이미 사용 중인 이메일입니다.</p>
+                    )}
                 </div>
-                {emailAvailable === false && (
-                    <p style={{ color: 'green' }} className={styles.valid}>사용 가능한 이메일입니다.</p>
-                )}
-                {emailAvailable === true && (
-                    <p style={{ color: 'red' }} className={styles.valid}>이미 사용 중인 이메일입니다.</p>
-                )}
                 <div className={styles.phoneBox}>
                     <span className={styles.title}>전화번호</span>
                     <input

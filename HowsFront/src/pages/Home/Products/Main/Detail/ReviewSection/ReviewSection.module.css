@@ -117,7 +117,7 @@
 /* 별점 */
 .reviewsStarRating {
     margin-bottom: 30px;
-    border: 2px solid var(--hows-gray-300);
+    border: 1px solid var(--hows-gray-200);
     margin: 30px 0; padding: 30px;
     display: flex;
 }
@@ -141,11 +141,13 @@
 .option{
     display: flex; 
     gap: 20px; 
+    height: 40px; line-height: 40px;
     font-weight: bold;
-    cursor: pointer;
 }
+.option > div { cursor: pointer}
 /* 리뷰 내용 */
 /* .reviewBox{border: 1px solid red;} */
+.reviewBox button {cursor: pointer;}
 .reviewBox > div {margin: 30px 0;}
 .reviewBox > div > div:first-child{
     display: flex; flex-direction: row;
@@ -184,13 +186,16 @@
     background-color:var(--hows-point-color); 
 }
 
-/* 리뷰 이미지 */
 .reviewBox > div > div:last-child{
-    display: flex;gap: 20px;
+    display: flex;gap: 20px; 
+    
 }
 .reviewBox > div > div:last-child > div:first-child {
-    width: 800px; height: 200px;
+    width: 400px; height: 200px;
+    border: 1px solid #f0f0f0;
+    border-radius: 8px; 
     display: flex;
+    justify-content: flex-start;
 }
 .reviewBox > div > div:last-child > div:first-child > div{
     width: 200px; height: 200px;
@@ -203,7 +208,7 @@
 .reviewBox > div > div:last-child > div:last-child {
     display: flex; flex-direction: column; flex-grow: 1;
     padding: 20px;box-sizing: border-box; 
-    width: 200px; height: 200px; 
+    width: 600px; height: 200px; 
     background-color: #f0f0f078;
     border-radius: 8px; 
 }

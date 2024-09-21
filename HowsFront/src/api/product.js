@@ -93,7 +93,7 @@ export const getProductDetail = product_seq => {
     return axios.get(`${baseUrl}/detail/${product_seq}`)
 }
 
-// 좋아요 개수
+// 상품 좋아요 개수
 export const getLikeCount = product_seq => {
     return axios.get(`${likeUrl}/count`, {
         params: {
@@ -102,9 +102,34 @@ export const getLikeCount = product_seq => {
     })
 }
 
+// 상품 좋아요 상태 확인
+export const checkLikeStatus = (product_seq, memberId) => {
+    return axios.get(`${likeUrl}/check`, { params: { product_seq, member_id: memberId } });
+};
+
+// 상품 좋아요 추가
+export const addLike = (product_seq, memberId) => {
+    return api.post(`${likeUrl}/insert`, { product_seq, member_id: memberId });
+};
+
+// 상품 좋아요 취소
+export const removeLike = (product_seq, memberId) => {
+    return api.delete(`${likeUrl}/delete`, {
+        data: {
+            product_seq,
+            member_id: memberId,
+        },
+    });
+};
+
+// 상품 장바구니에 상품 추가
+export const addToCartAPI = (data) => {
+    return api.post(`/cart`, data);
+};
+
 // 리뷰 좋아요
 export const reviewLike = (reviewSeq, memberId) => {
-    return api.post(`likes/review/insert`, {
+    return api.post(`${likeUrl}/review/insert`, {
         review_seq: reviewSeq,
         member_id: memberId,
     })
@@ -112,7 +137,7 @@ export const reviewLike = (reviewSeq, memberId) => {
 
 // 리뷰 좋아요 취소
 export const reviewUnlike = (reviewSeq, memberId) => {
-    return api.delete(`likes/review/delete`, {
+    return api.delete(`${likeUrl}/review/delete`, {
         data: {
             review_seq: reviewSeq,
             member_id: memberId,
@@ -156,7 +181,7 @@ export const getReport = async () => {
 
 // 리뷰 신고 요청
 export const sendReviewReport = (reviewSeq, selectedReason, memberId) => {
-    return api.post(`product/review/report`, {
+    return api.post(`${baseUrl}/review/report`, {
         review_seq: reviewSeq,
         report_code: selectedReason,
         member_id: memberId,

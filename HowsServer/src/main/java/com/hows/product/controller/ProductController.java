@@ -265,8 +265,42 @@ public class ProductController {
 	@DeleteMapping("/delReview/{review_seq}")
 	public ResponseEntity<String> delReview(@PathVariable int review_seq) 
 	throws Exception {
-	    reviewServ.deleteReview(review_seq);
-	    return ResponseEntity.ok().build();
+//	    reviewServ.deleteReview(review_seq);
+//	    return ResponseEntity.ok().build();
+	    
+	    try {
+	        // 1. 리뷰와 연관된 이미지 파일 URL들 가져오기
+	    	List<Map<String, String>> imageList = reviewServ.getReviewImgList(review_seq);
+
+	    	// 2. GCS에서 이미지 파일 삭제
+	        for (Map<String, String> image : imageList) {
+	        	if (image == null) continue;
+	        	
+	            String imageURL = image.get("IMAGE_URL");
+	            System.out.println("i url : " + image);
+	            
+	            String fileName = imageURL.substring(imageURL.lastIndexOf('/') + 1); // URL에서 파일 이름 추출
+	            String deleteResult = fileServ.deleteFile(fileName, "F4"); // 적절한 코드 사용
+
+	            if ("ok".equals(deleteResult)) {
+	                System.out.println("GCS 이미지 삭제 성공: " + fileName);
+	            } else {
+	                System.out.println("GCS 이미지 삭제 실패: " + fileName);
+	            }
+	            
+	            // 3. DB에서 이미지 정보 삭제
+	            reviewServ.delReviewImage(imageURL);
+	        }
+
+	        // 3. 리뷰 삭제
+	        reviewServ.deleteReview(review_seq);
+
+	        return ResponseEntity.ok("리뷰 및 이미지 삭제 완료"); // 성공 시 응답
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 삭제 중 오류 발생"); // 에러 시 응답
+	    }
 	}
 	
 	// 리뷰 신고, 로그인 필요함

@@ -117,7 +117,7 @@
 /* 별점 */
 .reviewsStarRating {
     margin-bottom: 30px;
-    border: 2px solid var(--hows-gray-300);
+    border: 1px solid var(--hows-gray-200);
     margin: 30px 0; padding: 30px;
     display: flex;
 }
@@ -141,11 +141,13 @@
 .option{
     display: flex; 
     gap: 20px; 
+    height: 40px; line-height: 40px;
     font-weight: bold;
-    cursor: pointer;
 }
+.option > div { cursor: pointer}
 /* 리뷰 내용 */
 /* .reviewBox{border: 1px solid red;} */
+.reviewBox button {cursor: pointer;}
 .reviewBox > div {margin: 30px 0;}
 .reviewBox > div > div:first-child{
     display: flex; flex-direction: row;

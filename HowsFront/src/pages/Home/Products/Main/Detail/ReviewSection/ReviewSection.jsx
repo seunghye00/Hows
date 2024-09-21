@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './ReviewSection.module.css'
 import axios from 'axios';
 import Swal from "sweetalert2";
-import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
+import img from '../../../../../../assets/images/기본사진.jpg'
 import StarRating from '../../../../../../components/StarRating/StarRating';
 import { Modal } from '../../../../../../components/Modal/Modal';
 import { api, host } from '../../../../../../config/config';
@@ -449,18 +449,14 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     
                     // 리뷰 작성자 프로필 이미지를 불러오는 부분
                     const avatarPromises = reviewsData.map(async (review) => {
-                        // member_id가 null 또는 "null"이 아닌 경우에만 호출
-                        if (memberId && review.MEMBER_ID && review.MEMBER_ID !== "null") { 
+                        if (review.MEMBER_ID) {
                             try {
-                                // 프로필 이미지 API 호출
                                 const profileResp = await userInfo(review.MEMBER_ID);
                                 return { memberId: review.MEMBER_ID, avatar: profileResp.data.member_avatar };
                             } catch (error) {
-                                console.error(`프로필 이미지를 불러오는 중 오류 발생: ${review.MEMBER_ID}`, error);
-                                return { memberId: review.MEMBER_ID, avatar: img }; // 오류 발생 시 기본 이미지
+                                console.error(`프로필 이미지 불러오기 오류: ${review.MEMBER_ID}`, error);
+                                return { memberId: review.MEMBER_ID, avatar: img };  // 기본 이미지
                             }
-                        } else {
-                            return { memberId: review.MEMBER_ID, avatar: img };  // member_id가 없으면 기본 이미지 반환
                         }
                     });
                     const avatarData = await Promise.all(avatarPromises);
@@ -644,7 +640,9 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     const handleChangeSortType = (sortType) => {
         setSortType(sortType);
     }
-
+    console.log(JSON.stringify(reviews));
+    console.log(reviewAvatars);
+    
     return (
         <div className={styles.container}>
             {/* 상품 리뷰 내용 */}
@@ -652,14 +650,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
             <div className={styles.reviewsBox}>
                 <div className={styles.reviewsHeader}>
                     <div>리뷰 {reviews.length} </div>
-                    
-                    {isAuth ? (
-                        // 로그인 상태일 때
-                        <div onClick={handleOpenReviewModal} style={{ cursor: 'pointer'}}>리뷰쓰기</div>
-                    ) : (
-                        // 로그인이 되어 있지 않을 때
-                        <div>로그인 후 리뷰를 작성할 수 있습니다.</div>
-                    )}
+                    <div onClick={handleOpenReviewModal} style={{ cursor: 'pointer'}}>리뷰쓰기</div>
 
                     {/* 리뷰 모달 */}
                     {isReviewModalOpen && (
@@ -747,8 +738,12 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                     <div>
                                         <div>
                                             <div>
-                                                {/* 리뷰 작성자의 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시 */}
-                                                <img src={reviewAvatars[review.MEMBER_ID] || img} alt="profile"/>
+                                            {/* 리뷰 작성자의 MEMBER_ID와 연결된 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시 */}
+                                            {reviewAvatars[review.MEMBER_ID] ? (
+                                                <img src={reviewAvatars[review.MEMBER_ID]} alt="profile" />
+                                            ) : (
+                                                <img src={img} alt="default profile" />
+                                            )}
                                             </div>
                                             <div>
                                                 <div>{review.MEMBER_ID} </div>
@@ -808,12 +803,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                                     </SwiperSlide>
                                                 ))}
                                             </Swiper>
-
-                                            // review.images.map((img, imgIndex) => (
-                                            //     <div key={imgIndex}><img src={img.IMAGE_URL} alt='img'/></div>
-                                            // ))
                                         ) : (
-                                            <div>이미지가 없습니다.</div> 
+                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#666'}}>이미지가 없습니다.</div> 
                                         )}
                                         </div>
                                         <div>

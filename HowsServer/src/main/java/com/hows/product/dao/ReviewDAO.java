@@ -14,25 +14,44 @@ import com.hows.product.dto.ReviewReportDTO;
 
 @Repository
 public class ReviewDAO {
+	
 	@Autowired
 	private SqlSession myBatis;
 
+	
+	// 특정 회원이 특정 상품을 구매 확정했는지 확인하는 메서드
+    public int countCompletedOrders(String memberId, int productSeq) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("memberId", memberId);
+        params.put("productSeq", productSeq);
+        return myBatis.selectOne("Product.countCompletedOrders", params);
+    }
+    
+    
+    // 특정 사용자의 특정 상품에 대한 리뷰 작성 여부 확인 (리뷰 작성 여부를 카운트)
+    public int countUserReviews(String memberId, int productSeq) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("memberId", memberId);
+        params.put("productSeq", productSeq);
+        return myBatis.selectOne("Product.countUserReviews", params);
+    }
+
+    
 	// 리뷰 저장
 	public void insertReview(ReviewDTO review) {
 		myBatis.insert("Product.insertReview", review);
 	}
 
+	
 	// 리뷰 이미지 저장
 	public void insertReviewImage(ImageDTO imageDTO) {
-		System.out.println("test 2");
 		myBatis.insert("Product.insertReviewImage", imageDTO);
 	}
 
+	
 	// 리뷰 목록 출력 (페이징)
 	public List<Map<String, Object>> getReviewList(int product_seq, int startRow, int endRow) {
-		System.out.println("getReviewList dao");
 
-		// 파라미터를 하나의 맵에 묶어서 전달
 		Map<String, Object> params = new HashMap<>();
 		params.put("product_seq", product_seq);
 		params.put("startRow", startRow);
@@ -41,10 +60,9 @@ public class ReviewDAO {
 		return myBatis.selectList("Product.getReviewList", params);
 	}
 	
+	
 	public List<Map<String, Object>> getReviewListByBest(int product_seq, int startRow, int endRow) {
-		System.out.println("getReviewList dao");
 
-		// 파라미터를 하나의 맵에 묶어서 전달
 		Map<String, Object> params = new HashMap<>();
 		params.put("product_seq", product_seq);
 		params.put("startRow", startRow);
@@ -53,25 +71,29 @@ public class ReviewDAO {
 		return myBatis.selectList("Product.getReviewListByBest", params);
 	}
 	
+	
 	// 리뷰 seq 가져오기
 	public int selectLastReviewSeq() throws Exception {
 		return myBatis.selectOne("Product.selectLastReviewSeq");
 	}
+	
 	
 	// 리뷰 이미지 삭제
 	public void delReviewImages(int review_seq) {
 	    myBatis.delete("Product.delReviewImages", review_seq);  
 	}
 	
+	
 	public void delReviewImage(String image_url) {
-		//System.out.println("image_url : " + image_url);
 		myBatis.delete("Product.delReviewImage", image_url);
 	}
 
+	
 	// 리뷰 삭제
 	public void delReview(int review_seq) {
 	    myBatis.delete("Product.delReview", review_seq); 
 	}
+	
 	
 	// 리뷰 신고 
     public void sendReviewReport(int review_seq, String report_code, String member_id) {
@@ -82,11 +104,13 @@ public class ReviewDAO {
         myBatis.insert("Product.sendReviewReport", params);
     }
     
+    
 	// 리뷰 이미지 가져오기
 	public List<Map<String, String>> getReviewImgList(int reviewSeq) {
 		return myBatis.selectList("Product.getReviewImgList", reviewSeq);
 	}
 
+	
     public void updateReview(int review_seq, int rating, String review_contents) {
     	Map<String, Object> params = new HashMap<>();
     	params.put("review_seq", review_seq);
@@ -95,12 +119,12 @@ public class ReviewDAO {
     	myBatis.update("Product.updateReview", params);
     }
     
+    
     // 리뷰 전체 별점
     public List<ReviewDTO> getRatings(int product_seq) {
     	return myBatis.selectList("Product.getRatings", product_seq);
     }
- 
-    //  =============== 사용자 기능 ===============
+    
     
     
     

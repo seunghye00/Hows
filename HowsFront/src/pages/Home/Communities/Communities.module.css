@@ -7,3 +7,11 @@
     margin: auto;
     padding: 30px 0 80px 0;
 }
+
+/* 모바일 크기(576px) 이하일 때 1개 */
+@media screen and (max-width: 576px) {
+    .container {
+        padding: 40px 20px;
+        width: auto;
+    }
+}

@@ -47,6 +47,15 @@ public class MemberController {
 	@Autowired
 	private PasswordEncoder pwEncoder;
 
+	// 로그인 시 role_code 확인 - 로그인 필요
+	@GetMapping("/getRoleCode")
+	public ResponseEntity<String> getRoleCode(@AuthenticationPrincipal CustomUserDetails user){
+		String member_id = user.getUsername();
+		String result = memServ.getRoleCode(member_id);
+		
+		return ResponseEntity.ok(result);
+	}
+	
 	// 암호화 회원가입
 	@PostMapping
 	public ResponseEntity<Void> insert(@RequestBody MemberDTO dto) {
@@ -80,14 +89,11 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	// 마이페이지 회원정보 출력
+	// 마이페이지 회원정보 출력 - 로그인 필요
 	@GetMapping("/selectInfo")
 	public ResponseEntity<MemberDTO> selectInfo(
 			 @RequestParam(required = false) String member_id,
 			@AuthenticationPrincipal CustomUserDetails user) {
-
-		System.out.println("요청한 사용자의 ID : " + user.getUsername());
-
 		if (member_id == null || member_id.isEmpty()) {
 	        member_id = user.getUsername(); // member_id가 없을 경우 JWT에서 ID 가져오기
 	    }
@@ -97,14 +103,14 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	// 회원정보 수정
+	// 회원정보 수정 - 로그인 필요
 	@PutMapping("/updateInfo")
 	public ResponseEntity<Integer> updateInfo(@RequestBody MemberDTO dto) {
 		int result = memServ.updateInfo(dto);
 		return ResponseEntity.ok(result);
 	}
 
-	// 비밀번호 변경 시 기존 비밀번호 확인
+	// 비밀번호 변경 시 기존 비밀번호 확인 - 로그인 필요
 	@PostMapping("/checkPw")
 	public ResponseEntity<Boolean> checkPw(@AuthenticationPrincipal CustomUserDetails user,
 			@RequestBody Map<String, String> request) {
@@ -123,7 +129,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	// [로그인]비밀번호 찾기 / [마이페이지]비밀번호 변경
+	// [로그인]비밀번호 찾기 / [마이페이지]비밀번호 변경 - 로그인 필요
 	@PutMapping("/updatePw")
 	public ResponseEntity<Integer> updatePw(
 			@AuthenticationPrincipal CustomUserDetails user,
@@ -136,7 +142,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 	
-	// 프로필 사진 및 배너 사진 변경
+	// 프로필 사진 및 배너 사진 변경 - 로그인 필요
 	@PostMapping("/uploadImage")
 	public ResponseEntity<String> uploadProfileImage(
 		     @RequestPart("file") MultipartFile file,  // FormData에서 이미지 파일을 받음
@@ -169,7 +175,7 @@ public class MemberController {
 		    }
 		}
 	
-	// 프로필 사진 삭제
+	// 프로필 사진 삭제 - 로그인 필요
 	@DeleteMapping("/deleteImage")
 	public ResponseEntity<String> deleteProfileImage(
 			@RequestParam("member_seq") int member_seq,
@@ -179,17 +185,13 @@ public class MemberController {
 	    	 String sysName = type.equals("profile") 
                      ? memServ.getProfileImageUrl(member_seq)  // 프로필 이미지 URL 가져오기
                      : memServ.getBannerImageUrl(member_seq);  // 배너 이미지 URL 가져오기
-	    	 System.out.println("삭제할 sysname : " + sysName);
-
 	        
 	        if (sysName != null) {
 	        	// 1-1. URL에서 마지막 슬래시 뒤의 파일명만 추출
 	            String fileName = sysName.substring(sysName.lastIndexOf("/") + 1);
-	            System.out.println("삭제할 파일명 : " + fileName);
 	        	
 	        	// 2. fileService를 통해 GCS에서 파일 삭제
 	            String result = fileServ.deleteFile(fileName, type.equals("profile") ? "F1" : "F7");
-	            System.out.println("삭제 결과 : " + result);
 
 	            // 3. DB에서 member 테이블의 member_avatar를 NULL로 설정
 	            if (!result.equals("fail")) {
@@ -211,20 +213,18 @@ public class MemberController {
 	    }
 	}
 
-	// 회원탈퇴
+	// 회원탈퇴 - 로그인 필요
 	@DeleteMapping("/deleteUser/{member_id}")
 	public ResponseEntity<Integer> deleteUser(@PathVariable("member_id") String member_id) {
 		int result = memServ.deleteUser(member_id);
 		return ResponseEntity.ok(result);
 	}
 	
-	// 팔로우 및 언팔로우 메서드
+	// 팔로우 및 언팔로우 메서드 - 로그인 필요
 	@PostMapping("/follow")
 	public ResponseEntity<Map<String, Object>> toggleFollow(
 	        @RequestBody Map<String, Object> requestBody
 	) {
-		System.out.println(requestBody.get("from_member_seq"));
-		System.out.println(requestBody.get("to_member_seq"));
 	    try {
 	        int fromMemberSeq = (int) requestBody.get("from_member_seq");
 	        int toMemberSeq = (int) requestBody.get("to_member_seq");
@@ -258,28 +258,28 @@ public class MemberController {
 	    }
 	}
 	
-	 // 팔로워 목록 가져오기
+	 // 팔로워 목록 가져오기 - 로그인 필요
     @GetMapping("/getFollower")
     public ResponseEntity<List<Map<String, Object>>> getFollower(@RequestParam("member_seq") int member_seq) {
     	List<Map<String, Object>> follower = memServ.getFollower(member_seq);
         return ResponseEntity.ok(follower);
     }
 
-    // 팔로잉 목록 가져오기
+    // 팔로잉 목록 가져오기 - 로그인 필요
     @GetMapping("/getFollowing")
     public ResponseEntity<List<Map<String, Object>>> getFollowing(@RequestParam("member_seq") int member_seq) {
     	List<Map<String, Object>> following = memServ.getFollowing(member_seq);
         return ResponseEntity.ok(following);
     }
     
-    // 팔로워, 팔로잉 수 가져오기
+    // 팔로워, 팔로잉 수 가져오기 - 로그인 필요
     @GetMapping("/countFollow")
     public ResponseEntity<Map<String, BigDecimal>> countFollow(@RequestParam("member_seq") int member_seq){
     	Map<String, BigDecimal> result = memServ.countFollow(member_seq);
     	return ResponseEntity.ok(result);
     }
     
-    // 맞팔 되어있는지
+    // 맞팔 되어있는지 - 로그인 필요
     @PostMapping("/eachFollow")
     public ResponseEntity<Boolean> eachFollow(@RequestBody Map<String, Integer> params){
     	Boolean result = memServ.eachFollow(params);
@@ -287,28 +287,28 @@ public class MemberController {
     }
     
   
-	// 마이페이지 게시글(이미지) 출력
+	// 마이페이지 게시글(이미지) 출력 - 로그인 필요
 	@GetMapping("/selectPost")
 	public ResponseEntity<List<Map<String, Object>> > selectPost(@RequestParam String member_id){
 		List<Map<String, Object>> result = memServ.selectPostByMemberId(member_id);
 		return ResponseEntity.ok(result);
 	}
 
-	// 마이페이지 게시글 갯수
+	// 마이페이지 게시글 갯수 - 로그인 필요
 	@GetMapping("/countPost")
 	public ResponseEntity<Integer> countPost(@RequestParam String member_id){
 		int result = memServ.countPost(member_id);
 		return ResponseEntity.ok(result);
 	}
 	
-	// 마이페이지 북마크(이미지) 출력
+	// 마이페이지 북마크(이미지) 출력 - 로그인 필요
 	@GetMapping("/selectBookmark")
 	public ResponseEntity<List<Map<String, Object>> > selectBookmark(@RequestParam String member_id){
 		List<Map<String, Object>> result = memServ.selectBookmarkByMemberId(member_id);
 		return ResponseEntity.ok(result);
 	}
 	
-	// 마이페이지 북마크 갯수
+	// 마이페이지 북마크 갯수 - 로그인 필요
 	@GetMapping("/countBookmark")
 	public ResponseEntity<Integer> countBookmark(@RequestParam String member_id){
 		int result = memServ.countBookmark(member_id);
@@ -359,33 +359,28 @@ public class MemberController {
 		return ResponseEntity.ok(roles);
 	}
 
-	// 등급만 업데이트 (관리자)
-	@PutMapping("/updateGrade")
-	public ResponseEntity<Integer> updateGrade(@RequestBody Map<String, String> request) {
-		String memberId = request.get("member_id");
-		String newGradeCode = request.get("grade_code");
+	// 등급 및 역할 동시에 업데이트 (블랙리스트 등록 포함)
+	@PutMapping("/updateMemberStatus")
+	public ResponseEntity<Integer> updateMemberStatus(@RequestBody Map<String, String> request) {
+	    String memberId = request.get("member_id");
+	    String newGradeCode = request.get("grade_code");
+	    String newRoleCode = request.get("role_code");
 
-		if (newGradeCode == null || newGradeCode.isEmpty()) {
-			return ResponseEntity.badRequest().body(0); // 변환 실패 시 400 에러 반환
-		}
+	    // 새로운 역할이 블랙리스트일 경우 블랙리스트 사유 코드도 함께 처리
+	    String blacklistReasonCode = request.get("blacklist_reason_code");
 
-		int result = memServ.updateGrade(memberId, newGradeCode);
-		return ResponseEntity.ok(result);
-	}
+	    // 등급 업데이트
+	    int gradeResult = memServ.updateGrade(memberId, newGradeCode);
 
-	// 역할만 업데이트 (관리자)
-	@PutMapping("/updateRole")
-	public ResponseEntity<Integer> updateRole(@RequestBody Map<String, String> request) {
-		String memberId = request.get("member_id");
-		String newRoleCode = request.get("role_code");
-		System.out.println("컨트롤러(역할) : " + newRoleCode);
+	    // 역할 업데이트
+	    int roleResult = memServ.updateRole(memberId, newRoleCode);
 
-		if (newRoleCode == null || newRoleCode.isEmpty()) {
-			return ResponseEntity.badRequest().body(0);
-		}
+	    // 만약 역할이 블랙리스트로 지정되었다면, 블랙리스트 사유를 추가로 처리
+	    if ("R3".equals(newRoleCode) && blacklistReasonCode != null) {
+	        memServ.addBlacklist(memberId, blacklistReasonCode);
+	    }
 
-		int result = memServ.updateRole(memberId, newRoleCode);
-		return ResponseEntity.ok(result);
+	    return ResponseEntity.ok(gradeResult + roleResult); // 결과 반환
 	}
 
 	// 전체 블랙리스트 사유 가져오기 (관리자)
@@ -395,21 +390,7 @@ public class MemberController {
 		System.out.println("컨트롤러 사유 : " + blacklistreasons);
 		return ResponseEntity.ok(blacklistreasons);
 	}
-
-	// 블랙리스트 등록 (관리자)
-	@PostMapping("/addBlacklist")
-	public ResponseEntity<Integer> addBlacklist(@RequestBody Map<String, String> request) {
-		String memberId = request.get("member_id");
-		String reasonCode = request.get("blacklist_reason_code");
-
-		// 로그 출력으로 데이터 확인
-		System.out.println("Received member_id: " + memberId);
-		System.out.println("Received blacklist_reason_code: " + reasonCode);
-
-		int result = memServ.addBlacklist(memberId, reasonCode);
-		return ResponseEntity.ok(result);
-	}
-
+	
 	// 블랙리스트 조회 (관리자)
 	@GetMapping("/blacklist")
 	public ResponseEntity<Map<String, Object>> selectBlacklist(@RequestParam int startRow, @RequestParam int endRow,

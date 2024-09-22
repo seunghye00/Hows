@@ -33,11 +33,86 @@
 .contBox {
     flex: 1;
     border: 1px solid black;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 20px;
 }
 
 .leftBox .listBox {
     flex: 7;
     border: 1px solid black;
+}
+
+.listBox .subTitle {
+    display: flex;
+    gap: 10px;
+    font-size: 18px;
+    padding-left: 10px;
+}
+
+.listBox .subTitle span {
+    cursor: pointer;
+}
+
+.listBox .subTitle span.active {
+    text-decoration: underline;
+    color: var(--hows-point-color-darkest);
+}
+
+.productList {
+    display: flex;
+    gap: 10px;
+}
+
+.productList .cols {
+    border: 1px solid #ddd;
+    padding: 10px;
+    max-height: 345px;
+}
+
+.productList .cols img {
+    width: 100%;
+    height: 300px;
+}
+
+.productList .info {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.productList .productTitle {
+    display: flex;
+    gap: 7px;
+}
+
+.productList .info.line .name {
+    text-decoration: line-through;
+}
+
+.productList .name {
+    height: 25px;
+    max-width: 197px;
+    white-space: nowrap;
+    /* 텍스트를 한 줄로 처리 */
+    overflow: hidden;
+    /* 넘치는 부분을 숨김 */
+    text-overflow: ellipsis;
+    /* 넘치는 텍스트를 '...'으로 표시 */
+}
+
+.productList .num {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+}
+
+.productList .num span {
+    position: absolute;
+    left: 0;
+    color: var(--hows-red);
 }
 
 .rightBox {

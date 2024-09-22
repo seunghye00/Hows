@@ -36,16 +36,21 @@
 		<result property="member_id" column="member_id"/>
 	</resultMap>
 
+	<!-- 메인 페이지 상품 랜덤으로 '전체' 목록 출력 -->
 	<select id="getProducts" resultType="com.hows.product.dto.ProductDTO">
-		SELECT *
-		FROM PRODUCT ORDER BY product_seq
+		SELECT * 
+		FROM PRODUCT 
+		ORDER BY DBMS_RANDOM.VALUE 
 	</select>
-
-	<!-- <select id="getProductByCategory" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
-		SELECT *
-		FROM PRODUCT
-		WHERE product_category_code = #{product_category_code}
-	</select> -->
+	
+	<!-- 메인페이지 '리뷰가 많은 순'으로 목록 출력 -->
+	<select id="getProductBytReview" resultType="com.hows.product.dto.ProductDTO">
+		SELECT p.product_seq, p.product_thumbnail, p.product_title, p.product_contents, p.price, p.product_category_code, COUNT(r.review_seq) AS review_count
+		FROM product p
+		LEFT JOIN review r ON p.product_seq = r.product_seq
+		GROUP BY p.product_seq, p.product_thumbnail, p.product_title, p.product_contents, p.price, p.product_category_code
+		ORDER BY review_count DESC
+	</select>
 	
 	<select id="getProductByCategory" parameterType="String" resultType="map">
 		  SELECT 
@@ -66,6 +71,26 @@
 		WHERE product_seq = #{product_seq}
 	</select>
 
+	<!-- 특정 회원이 특정 상품을 구매 확정했는지 확인 -->
+    <select id="countCompletedOrders" resultType="int">
+        SELECT COUNT(*)
+        FROM orders o
+        JOIN member m ON o.member_seq = m.member_seq
+        JOIN order_list ol ON o.order_seq = ol.order_seq
+        JOIN order_status os ON o.order_code = os.order_code
+        WHERE m.member_id = #{memberId}
+        AND ol.product_seq = #{productSeq}
+        AND os.order_code = 'O6'  <!-- 구매 확정 상태 -->
+    </select>
+    
+	<!-- 특정 회원이 특정 상품에 작성한 리뷰 수 확인 -->
+	<select id="countUserReviews" resultType="int">
+	    SELECT COUNT(*)
+	    FROM review
+	    WHERE member_id = #{memberId}
+	    AND product_seq = #{productSeq}
+	</select>
+    
 	<!-- 리뷰등록 -->
 	<insert id="insertReview" parameterType="com.hows.product.dto.ReviewDTO">
 		INSERT INTO review (review_seq, rating, review_contents, review_date,
@@ -226,13 +251,17 @@
     SELECT *
     FROM (
         SELECT 
-            r.review_seq,                      <!-- 리뷰 번호 -->
-            p.product_title,                   <!-- 상품 제목 -->
-            m.nickname,                        <!-- 리뷰 작성자 (닉네임) -->
-            r.review_contents,                 <!-- 리뷰 내용 -->
-            TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 변환 -->
-            COUNT(rr.review_report_seq) AS report_count,  <!-- 신고 횟수 -->
-            ri.image_url,                      <!-- 리뷰 이미지 URL -->
+            r.review_seq,  <!-- 리뷰 번호 -->
+            p.product_title,  <!-- 상품 제목 -->
+            m.nickname,  <!-- 리뷰 작성자 (닉네임) -->
+            r.review_contents,  <!-- 리뷰 내용 -->
+            TO_CHAR(r.review_date, 'YYYY-MM-DD HH24:MI:SS') AS review_date,  <!-- 작성 일시 -->
+            (
+                SELECT COUNT(DISTINCT rr.review_report_seq)
+                FROM review_report rr
+                WHERE rr.review_seq = r.review_seq
+            ) AS report_count,  <!-- 신고 횟수 (중복 제거) -->
+            COALESCE(LISTAGG(ri.image_url, ',') WITHIN GROUP (ORDER BY ri.image_order), ' ') AS image_urls,  <!-- 이미지 목록 -->
             ROW_NUMBER() OVER (ORDER BY r.review_seq DESC) AS row_num  <!-- 각 행에 순번 부여 -->
         FROM 
             review r
@@ -242,13 +271,12 @@
             member m ON r.member_id = m.member_id
         LEFT JOIN 
             review_image ri ON r.review_seq = ri.review_seq  <!-- 리뷰 이미지 조인 -->
-        JOIN 
-            review_report rr ON r.review_seq = rr.review_seq  <!-- 신고 기록 조인 -->
         GROUP BY 
-            r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date, ri.image_url
+            r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
     	)
     	WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
 	</select>
+
 	
 	<!-- 페이지네비를 위한 신고 리뷰 카운트 (관리자) -->
 	<select id="getReportedReviewsCount" resultType="int">
@@ -303,5 +331,53 @@
     	from product_category c
     	left join product p on p.product_category_code = c.product_category_code
     	group by c.product_category_title
+	</select>
+
+	<!-- 주문 완료 시 재고 차감 -->
+	<update id="updateQuantity">
+		UPDATE
+			product
+		SET
+			quantity = quantity - #{order_list_count}
+		WHERE
+			product_seq = #{product_seq}
+	</update>
+	
+	<!-- 판매량 순으로 5개까지만 조회 -->
+	<select id="getBestProductBySelling" resultType="com.hows.product.dto.ProductDTO">
+		select *
+		from (
+    		select p.product_seq, 
+           		p.product_title, 
+           		p.product_thumbnail,
+           		p.price,
+           		p.quantity,
+           		sum(ol.order_list_count) as total_sales
+    		from product p
+    		join order_list ol on p.product_seq = ol.product_seq
+    		join orders o on ol.order_seq = o.order_seq
+    		where o.order_code = 'O6'  -- 구매확정된 주문
+    		group by p.product_seq, p.product_title, p.product_thumbnail, p.price, p.quantity
+    		order by total_sales desc
+		) 
+		where rownum &lt;= 5
+	</select>
+	
+	<!-- 리뷰순으로 5개까지만 조회 -->
+	<select id="getBestProductByReview" resultType="com.hows.product.dto.ProductDTO">
+		select *
+		from (
+    		select p.product_seq, 
+           		p.product_title, 
+           		p.product_thumbnail,
+           		p.price,
+           		p.quantity, 
+           		count(r.review_seq) as review_count
+    		from product p
+    		left join review r on p.product_seq = r.product_seq
+    		group by p.product_seq, p.product_title, p.product_thumbnail, p.price, p.quantity
+    		order by review_count desc
+		)
+		where rownum &lt;= 5
 	</select>
 </mapper>

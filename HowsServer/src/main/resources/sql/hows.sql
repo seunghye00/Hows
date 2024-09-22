@@ -8,7 +8,7 @@ member_id varchar2(20) not null,
 pw varchar2(128) not null,
 name varchar2(30) not null,
 nickname varchar2(50) not null,
-birth varchar2(6) not null,
+birth varchar2(8) not null,
 gender char(1) not null,
 phone varchar2(11) not null,
 email varchar2(50) not null,
@@ -24,7 +24,7 @@ withdrawal_date timestamp default null,
 withdrawal_yn char(1) default 'N',
 member_banner varchar2(500) default null, 
 point number default 0,
-member_avatar varchar2(200) default null
+member_avatar varchar2(200) default 'https://storage.cloud.google.com/hows-attachment/F1/3adc3060-ce44-4d0a-ac27-f05d75023f76'
 );
 
 create sequence member_seq
@@ -360,7 +360,7 @@ insert into product_category (product_category_code, product_category_title) val
 insert into product_category (product_category_code, product_category_title) values ('P3', '패브릭');
 insert into product_category (product_category_code, product_category_title) values ('P4', '수납정리');
 insert into product_category (product_category_code, product_category_title) values ('P5', '가전 및 디지털');
-insert into product_category (product_category_code, product_category_title) values ('P6', '주방용품!');
+insert into product_category (product_category_code, product_category_title) values ('P6', '주방용품');
 
 -- 상품 좋아요
 create table product_like (
@@ -642,6 +642,36 @@ increment by 1
 nomaxvalue
 nocache;
 
+-- 이벤트
+create table event (
+event_seq number primary key,
+event_title varchar2(100) not null,
+event_contents varchar2(4000) not null,
+event_date timestamp default sysdate,
+view_count number default 0 not null,
+notice_code char(2) default 'N2' not null
+);
+
+create sequence event_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
+
+-- FAQ
+create table faq (
+faq_seq number primary key,
+faq_title varchar2(100) not null,
+faq_contents varchar2(4000) not null,
+notice_code char(2) default 'N3' not null
+);
+
+create sequence faq_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
+
 -- 공지 코드
 create table notice_code (
     notice_code char(2) primary key,
@@ -649,8 +679,8 @@ create table notice_code (
 );
 
 insert into notice_code (notice_code, notice_title) values ('N1', '공지사항');
-insert into notice_code (notice_code, notice_title) values ('N2', 'FAQ');
-insert into notice_code (notice_code, notice_title) values ('N3', '이벤트');
+insert into notice_code (notice_code, notice_title) values ('N2', '이벤트');
+insert into notice_code (notice_code, notice_title) values ('N3', 'FAQ');
 
 -- 배너
 create table banner (
@@ -664,20 +694,6 @@ is_visible char(1) default 'N' not null
 );
 
 create sequence banner_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
--- FAQ
-create table faq (
-faq_seq number primary key,
-faq_title varchar2(100) not null,
-faq_contents varchar2(4000) not null,
-notice_code char(2) default 'N2' not null
-);
-
-create sequence faq_seq
 start with 1
 increment by 1
 nomaxvalue
@@ -760,9 +776,9 @@ SELECT * FROM product_like;
 SELECT * FROM review;
 SELECT * FROM review_like;
 SELECT * FROM review_report;
-SELECT * FROM inventory;
+SELECT * FROM review_image;
 
--- 결제 관련 - 11개
+-- 결제 관련 - 12개
 SELECT * FROM cart;
 SELECT * FROM orders;
 SELECT * FROM order_status;
@@ -771,15 +787,16 @@ SELECT * FROM coupon;
 SELECT * FROM coupon_owner;
 SELECT * FROM payment;
 SELECT * FROM payment_status;
-SELECT * FROM shipping;
-SELECT * FROM shipping_status;
+SELECT * FROM return; 
+SELECT * FROM return_status;  
 SELECT * FROM point_history;
 
--- 관리자 관련 - 7개
+-- 관리자 관련 - 8개
 SELECT * FROM notice;
+SELECT * FROM faq;
+SELECT * FROM event;
 SELECT * FROM notice_code;
 SELECT * FROM banner;
-SELECT * FROM faq;
 SELECT * FROM report;
 SELECT * FROM files;
 SELECT * FROM file_code;

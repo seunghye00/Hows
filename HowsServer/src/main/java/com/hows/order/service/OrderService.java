@@ -8,6 +8,7 @@ import com.hows.coupon.dto.CouponOwnerDTO;
 import com.hows.order.dto.OrderListDTO;
 import com.hows.order.dto.ReturnDTO;
 
+import com.hows.product.dao.ProductDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,8 @@ public class OrderService {
 
     @Autowired
     private CouponDAO couponDAO;
+    @Autowired
+    private ProductDAO productDAO;
 
     /** 주문 목록 **/
     public List<OrderDTO> orderList() throws Exception {
@@ -58,8 +61,9 @@ public class OrderService {
                     int productSeq = Integer.parseInt(dto.get("product_seq").toString());
                     int orderListCount = Integer.parseInt(dto.get("product_quantity").toString());
                     int orderListPrice = Integer.parseInt(dto.get("product_total_price").toString());
-
-                    orderDAO.addOrderList(new OrderListDTO(0, orderSeq, productSeq, orderListCount, orderListPrice));
+                    OrderListDTO orderListDTO = new OrderListDTO(0, orderSeq, productSeq, orderListCount, orderListPrice);
+                    orderDAO.addOrderList(orderListDTO);
+                    productDAO.updateQuantity(orderListDTO);
                 }
                 return orderSeq;
             }
@@ -91,5 +95,10 @@ public class OrderService {
 	// 주문 내역 삭제
 	public boolean deleteOrder(int orderSeq) {
 		return orderDAO.deleteOrder(orderSeq);
+	}
+	
+	// 주문 상태 조회
+	public String getOrderCode(int orderSeq) {
+		return orderDAO.getOrderCode(orderSeq);
 	}
 }

@@ -3,6 +3,23 @@ import { api, host } from '../config/config'
 
 const baseUrl = `${host}/member`
 
+// 회원가입
+// ID 중복확인
+export const checkIdForSignUp = (memberId) => {
+    return axios.post(`${baseUrl}/checkId`, { member_id: memberId });
+};
+
+// 닉네임 중복확인
+export const checkNicknameForSignUp = (nickname) => {
+    return axios.post(`${baseUrl}/checkNickname`, { nickname: nickname });
+};
+
+// 이메일 중복확인
+export const checkEmailForSignUp = (email) => {
+    return axios.post(`${baseUrl}/checkEmail`, { email: email });
+};
+
+
 /** 유저 정보  **/
 export const userInfo = member_id => {
     console.log(member_id)
@@ -11,6 +28,11 @@ export const userInfo = member_id => {
     } else {
         return api.get(`/member/selectInfo`)
     }
+}
+
+// 관리자 권한 가져오기
+export const getRoleCode = () => {
+    return api.get(`/member/getRoleCode`)
 }
 
 // 로그인
@@ -135,6 +157,11 @@ export const eachFollow = (fromMemberSeq, toMemberSeq) => {
     return api.post('/member/eachFollow', params)
 }
 
+// 회원탈퇴
+export const deleteUser = (memberId) => {
+    return api.delete(`/member/deleteUser/${memberId}`);
+};
+
 export const adminstart = () => {
     // 여기서 밑 부터 관리자 기능!
 }
@@ -167,27 +194,26 @@ export const getAllRoles = () => {
     return api.get(`${baseUrl}/roles`)
 }
 
-// 등급 업데이트
-export const updateGrade = ({ member_id, grade_code }) => {
-    return api.put(`${baseUrl}/updateGrade`, { member_id, grade_code })
-}
+// 등급 및 역할 업데이트
+export const updateMemberStatus = ({
+    member_id,
+    grade_code,
+    role_code,
+    blacklist_reason_code,
+}) => {
+    const data = {
+        member_id,
+        grade_code,
+        role_code,
+        blacklist_reason_code, // 블랙리스트 등록 시 이유를 함께 전달
+    }
 
-// 역할 업데이트
-export const updateRole = ({ member_id, role_code }) => {
-    return api.put(`${baseUrl}/updateRole`, { member_id, role_code })
+    return api.put(`${baseUrl}/updateMemberStatus`, data) // 서버에서 이 API를 통해 업데이트
 }
 
 // 블랙리스트 사유 가져오기
 export const getAllBlacklistReasons = () => {
     return api.get(`${baseUrl}/blacklistreason`)
-}
-
-// 블랙리스트 등록
-export const addBlacklist = ({ member_id, blacklist_reason_code }) => {
-    return api.post(`${baseUrl}/addBlacklist`, {
-        member_id,
-        blacklist_reason_code,
-    })
 }
 
 // 블랙리스트 조회

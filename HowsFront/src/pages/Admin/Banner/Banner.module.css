@@ -44,8 +44,8 @@
 .rows {
     flex: 1;
     border-bottom: 1px solid #ddd;
-    max-height: 125px;
-    min-height: 125px;
+    max-height: 200px;
+    min-height: 200px;
     display: flex;
 }
 
@@ -78,7 +78,7 @@
 }
 
 .cols:nth-child(3) img {
-    width: 60%;
+    width: 45%;
 }
 
 .cols:last-child {
@@ -90,10 +90,10 @@
 }
 
 .imgLabel {
-    height: 100px;
+    height: 240px;
     border: 1px solid black;
     margin: 10px 0;
-    width: 507px;
+    width: 510px;
 }
 
 .imgLabel label {

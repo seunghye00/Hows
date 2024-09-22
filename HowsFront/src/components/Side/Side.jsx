@@ -1,13 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styles from './Side.module.css'
 import logo from '../../assets/images/logo_how.png'
 import { useNavigate, Link } from 'react-router-dom' // useNavigate 임포트
+import { Button } from '../Button/Button'
+import { SwalComp } from '../../commons/commons'
+import { useAuthStore } from '../../store/store'
 
 export const Side = () => {
     const navigate = useNavigate() // useNavigate 사용
 
     // 각 3뎁스 메뉴의 열림/닫힘 상태를 관리
     const [openMenus, setOpenMenus] = useState({})
+    const { logout, setIsAuth, isAuth } = useAuthStore()
 
     // 토글 버튼을 클릭하면 해당 메뉴의 열림/닫힘 상태를 변경
     const handleToggle = index => {
@@ -73,6 +77,7 @@ export const Side = () => {
                     icon: 'bx bx-error-circle', // 아이콘 추가
                     subMenu: [
                         { title: '공지사항 관리', path: 'notice' },
+                        { title: '이벤트 관리', path: '/admin/notice/event' },
                         { title: 'FAQ 관리', path: '/admin/notice/faq' },
                     ],
                 },
@@ -104,6 +109,31 @@ export const Side = () => {
             ],
         },
     ]
+
+    const handleLogout = () => {
+        SwalComp({
+            type: 'question',
+            text: '정말 로그아웃을 하시겠습니까?',
+        }).then(result => {
+            if (result.isConfirmed) {
+                // 로그아웃 처리
+                logout()
+                sessionStorage.removeItem('token')
+                sessionStorage.removeItem('member_id')
+                sessionStorage.removeItem('member_avatar')
+                sessionStorage.removeItem('nickname')
+                // 인증 상태를 false로 설정
+                setIsAuth(false)
+            }
+        })
+    }
+
+    // 로그아웃 후 인증 상태가 변경되면 사용자 페이지로 리다이렉트
+    useEffect(() => {
+        if (!isAuth) {
+            navigate('/signIn')
+        }
+    }, [isAuth, navigate])
 
     return (
         <div className="side">
@@ -244,6 +274,13 @@ export const Side = () => {
                             </ul>
                         </div>
                     ))}
+                    <div className={styles.btn}>
+                        <Button
+                            title="로그아웃"
+                            size={'s'}
+                            onClick={handleLogout}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

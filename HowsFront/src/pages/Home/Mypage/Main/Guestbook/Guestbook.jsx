@@ -1,10 +1,9 @@
 import styles from "./Guestbook.module.css";
-import profile from "../../../../../assets/images/마이페이지_프로필사진.jpg";
+import profile from "../../../../../assets/images/기본사진.jpg";
 import { useMemberStore } from "../../../../../store/store";
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { api } from "../../../../../config/config";
 import { format } from "date-fns";
 import {
   deleteGuestbook,
@@ -15,6 +14,8 @@ import {
 import Swal from "sweetalert2";
 
 export const Guestbook = () => {
+  const navi = useNavigate();
+
   const { memberSeq, setMemberSeq, currentUser, memberId, setMemberId } =
     useMemberStore();
   const [contents, setContents] = useState("");
@@ -34,14 +35,14 @@ export const Guestbook = () => {
 
   // "등록" 버튼
   const handleWriteBtn = () => {
-    const content = inputRef.current.innerText;
+    const content = inputRef.current.innerHTML;
     const MAX_CONTENT_LENGTH = 300;
 
     // 글자 수 확인 후 제출
     if (content.length > MAX_CONTENT_LENGTH) {
       Swal.fire({
         icon: "warning",
-        title: '글자 수 제한',
+        title: "글자 수 제한",
         text: `방명록 내용은 ${MAX_CONTENT_LENGTH}자를 초과할 수 없습니다.`,
         showConfirmButton: true,
       });
@@ -60,7 +61,7 @@ export const Guestbook = () => {
           setOutputs(resp.data);
         });
         setContents("");
-        inputRef.current.innerText = "";
+        inputRef.current.innerHTML = "";
       }
     });
   };
@@ -86,6 +87,13 @@ export const Guestbook = () => {
       });
   };
 
+  // 마이페이지로 이동
+  const goToUserPage = member_id => {
+    console.log('Navigating to user page:', member_id) // member_id 확인 로그
+    navi(`/mypage/main/${member_id}/post`) // member_id를 기반으로 마이페이지 경로 설정
+  }
+
+
   return (
     <div className={styles.container}>
       <div className={styles.countContents}>
@@ -101,7 +109,16 @@ export const Guestbook = () => {
             className={styles.inputText}
             contentEditable="true"
             suppressContentEditableWarning={true}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (!e.shiftKey) {
+                  e.preventDefault(); // 기본 Enter 동작(줄바꿈)을 막기
+                  handleWriteBtn(); // 글 작성 함수 호출
+                }
+              }
+            }}
           />
+
           <button onClick={handleWriteBtn}>등록</button>
         </div>
 
@@ -119,14 +136,18 @@ export const Guestbook = () => {
               />
               <div>
                 <div className={styles.writer_writeDate}>
-                  <span>{output.nickname}</span>
+                  <span onClick={() => goToUserPage(output.member_id)}>
+                    {output.nickname}
+                  </span>
                   <span> {write_currentDate}</span>
                 </div>
-                <div className={styles.content}>
-                  {output.guestbook_contents}
-                </div>
+                <div
+                  className={styles.content}
+                  dangerouslySetInnerHTML={{
+                    __html: output.guestbook_contents,
+                  }} // 줄바꿈 포함하여 렌더링
+                />
               </div>
-              {/* 로그인된 사용자와 댓글 작성자가 같은 경우에만 X 버튼 표시 */}
               {output.member_id === memberId && (
                 <button onClick={() => handleDelBtn(output.guestbook_seq)}>
                   X

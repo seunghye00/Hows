@@ -8,10 +8,8 @@ import Swal from 'sweetalert2'
 import {
     selectAll,
     detailMember,
-    updateGrade,
-    updateRole,
+    updateMemberStatus,
     getAllBlacklistReasons,
-    addBlacklist,
     getAllGrades,
     getAllRoles,
 } from '../../../api/member'
@@ -39,50 +37,36 @@ export const Member = () => {
     const endRow = page * itemsPerPage
 
     // 회원 목록과 전체 회원 수를 서버에서 가져오는 함수
-    useEffect(() => {
-        const fetchMembers = async () => {
-            try {
-                // selectAll 함수에 필요한 파라미터 전달 (startRow, endRow, chosung, searchTerm)
-                const response = await selectAll(
-                    startRow,
-                    endRow,
-                    chosung,
-                    searchTerm
-                )
-                setMembers(response.data.members) // 멤버 리스트 저장
-                setTotalMembers(response.data.totalCount) // 전체 회원 수 저장
-                console.log('Total Members: ', totalMembers)
-                console.log('Fetched Members: ', response.data.members)
-                console.log('Total Count: ', response.data.totalCount)
-                console.log(
-                    'Start Row:',
-                    startRow,
-                    'End Row:',
-                    endRow,
-                    'Page:',
-                    page
-                )
-            } catch (error) {
-                console.error('전체 회원 조회 실패:', error)
-            }
+    const fetchMembers = async () => {
+        try {
+            const response = await selectAll(
+                startRow,
+                endRow,
+                chosung,
+                searchTerm
+            )
+            setMembers(response.data.members)
+            setTotalMembers(response.data.totalCount)
+        } catch (error) {
+            console.error('전체 회원 조회 실패:', error)
         }
+    }
 
+    useEffect(() => {
         fetchMembers()
     }, [page, chosung, searchTerm]) // page, chosung, searchTerm 변경 시마다 호출
 
-    // 서버에서 등급 정보 가져오기
+    // 서버에서 등급 및 역할 정보 가져오기
     useEffect(() => {
         getAllGrades()
             .then(resp => setGrades(resp.data))
             .catch(error => console.error('등급 조회 실패:', error))
 
-        // 서버에서 역할 정보 가져오기
         getAllRoles()
             .then(resp => setRoles(resp.data))
             .catch(error => console.error('역할 조회 실패:', error))
     }, [])
 
-    // 모달 열기 및 회원 상세 조회 API 호출
     const Modalopen = member_id => {
         detailMember(member_id)
             .then(resp => {
@@ -104,7 +88,6 @@ export const Member = () => {
         setEditMode(!editMode)
     }
 
-    // 등급을 코드로 변환하는 함수
     const getGradeCode = grade => {
         switch (grade) {
             case '골드':
@@ -118,7 +101,6 @@ export const Member = () => {
         }
     }
 
-    // 역할을 코드로 변환하는 함수
     const getRoleCode = role => {
         switch (role) {
             case '관리자':
@@ -158,22 +140,14 @@ export const Member = () => {
                 // 블랙리스트로 선택되었을 경우, 블랙리스트 사유 모달을 열기
                 if (Role === '블랙리스트') {
                     openBlacklistModal()
-                    return // 블랙리스트 모달을 연 뒤 더 이상 진행하지 않음
+                    return
                 }
 
-                const gradeUpdate = gradeCode
-                    ? updateGrade({
-                          member_id: memberId,
-                          grade_code: gradeCode,
-                      })
-                    : Promise.resolve()
-
-                const roleUpdate = roleCode
-                    ? updateRole({ member_id: memberId, role_code: roleCode })
-                    : Promise.resolve()
-
-                // 등급과 역할 각각 업데이트
-                Promise.all([gradeUpdate, roleUpdate])
+                updateMemberStatus({
+                    member_id: memberId,
+                    grade_code: gradeCode,
+                    role_code: roleCode,
+                })
                     .then(() => {
                         Swal.fire(
                             '성공',
@@ -215,13 +189,13 @@ export const Member = () => {
         }).then(result => {
             if (result.isConfirmed) {
                 const memberId = selectedMember.member_id
-                addBlacklist({
+
+                updateMemberStatus({
                     member_id: memberId,
-                    blacklist_reason_code: blacklistReason,
+                    grade_code: getGradeCode(Grade),
+                    role_code: 'R3',
+                    blacklist_reason_code: blacklistReason, // 블랙리스트 사유 추가
                 })
-                    .then(() =>
-                        updateRole({ member_id: memberId, role_code: 'R3' })
-                    )
                     .then(() => {
                         Swal.fire(
                             '성공',
@@ -230,6 +204,7 @@ export const Member = () => {
                         )
                         closeBlacklistModal()
                         setModal(false)
+                        fetchMembers()
                     })
                     .catch(error =>
                         Swal.fire('오류', '블랙리스트 등록 실패', 'error')
@@ -238,9 +213,14 @@ export const Member = () => {
         })
     }
 
-    // 페이지 변경 처리 함수
     const handlePageChange = pageNumber => {
         setPage(pageNumber)
+    }
+
+    // 검색 실행 시 자동으로 chosung을 '전체'로 변경하고 검색 수행
+    const handleSearch = searchQuery => {
+        setSearchTerm(searchQuery)
+        setChosung('전체') // 검색 실행 시 필터를 전체로 설정
     }
 
     return (
@@ -270,7 +250,7 @@ export const Member = () => {
                             className={`${styles.filterItem} ${
                                 chosung === filter ? styles.selected : ''
                             }`}
-                            onClick={() => setChosung(filter)} // 초성 필터 변경
+                            onClick={() => setChosung(filter)}
                         >
                             {filter}
                         </span>
@@ -279,7 +259,7 @@ export const Member = () => {
                 <div className={styles.searchSection}>
                     <Search
                         placeholder="아이디 또는 이름 검색"
-                        onSearch={setSearchTerm} // 검색어 업데이트
+                        onSearch={handleSearch}
                     />
                 </div>
             </div>

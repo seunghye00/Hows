@@ -122,6 +122,17 @@
 		)
 	</insert>
 
+	<select id="getTotalPrice" resultType="java.lang.Integer">
+		SELECT
+			sum(order_price)
+		FROM
+			orders
+		WHERE
+			member_seq = #{member_seq}
+		AND
+			order_code = 'O6'
+	</select>
+
 	<!-- 주문 상태 업데이트 -->
 	<update id="updateOrder">
 		UPDATE
@@ -139,4 +150,9 @@
 	<delete id="delete">
 		delete from orders where order_seq = #{orderSeq}
 	</delete>
+	
+	<!-- 주문 상태 조회 -->
+	<select id="getOrderCode">
+		select order_code from orders where order_seq = #{orderSeq}
+	</select>
 </mapper>

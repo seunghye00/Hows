@@ -89,8 +89,13 @@ public class FileService {
 		return result;
 	}
 	
-	// parent_seq에 포함된 파일 목록의 sysname 조회
-	public List<String> getSysNames(int parentSeq) {
-		return fileDAO.getSysNames(parentSeq);
+	// fileCode와 parent_seq로 파일의 sysname 조회
+	public List<String> getSysNames(int parentSeq, String fileCode) {
+		return fileDAO.getSysNames(parentSeq, fileCode);
+	}
+
+	// parent_seq 업데이트
+	public boolean updateParentSeq(int parentSeq, int fileSeq) {
+		return fileDAO.updateParentSeq(parentSeq, fileSeq);
 	}
 }

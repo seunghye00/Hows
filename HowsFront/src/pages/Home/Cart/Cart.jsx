@@ -88,7 +88,12 @@ export const Cart = () => {
     if(Array.isArray(seq)) {
       data = seq;
     } else {
-      if(total.count === 0) return alert("선택된 상품 없음");
+      if(total.count === 0) {
+        return SwalComp({
+          type:"warning",
+          text:"선택한 상품이 없습니다."
+        });
+      }
       checkCart.forEach(item => {
         if (item.checked) data.push(item.cart_seq);
       });
@@ -101,6 +106,7 @@ export const Cart = () => {
     let order = [];
     let orderPrice = 0;
     dataArr.forEach(item => {
+      console.log(item);
       const dataSet = {
         product_seq: item.product_seq,
         product_title: item.product_title,
@@ -108,9 +114,17 @@ export const Cart = () => {
         product_quantity: item.cart_quantity,
         product_total_price: item.cart_price,
       };
+      if(item.cart_quantity > item.quantity){
+        SwalComp({
+          type: "warning",
+          text: item.product_title + "의 재고가 부족합니다"
+        });
+        return false;
+      }
       orderPrice += item.cart_price;
       order.push(dataSet);
     });
+
     setOrderPrice(orderPrice);
     setOrderProducts(order);
     sessionStorage.setItem("howsOrder", JSON.stringify(order));
@@ -167,6 +181,7 @@ export const Cart = () => {
 
     cartList().then(res => {
       if(res.data !== "") {
+        console.log(res.data);
         const arr = res.data.map(item => ({ ...item, checked: true }));
         setCarts(arr);
         setCheckCart(arr);

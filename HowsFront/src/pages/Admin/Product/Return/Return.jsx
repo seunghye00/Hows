@@ -60,11 +60,6 @@ export const Return = () => {
     useEffect(() => {
         // searchQuery가 비어있지 않은 경우 검색어에 맞는 주문을 필터링
         let filtered = orders
-        if (searchQuery !== '') {
-            filtered = filtered.filter(order =>
-                order.order_name.includes(searchQuery)
-            )
-        }
         // 상태별로 주문 목록 필터링
         filtered = filtered.filter(
             order => status === 'return' || order.return_code === status
@@ -72,7 +67,18 @@ export const Return = () => {
         // 최종 필터링된 목록 설정 및 체크박스 상태 초기화
         setFilteredOrders(filtered.map(order => ({ ...order, checked: false })))
         setSelectAll(false)
-    }, [searchQuery, status]) // searchQuery, status가 변경될 때마다 실행
+    }, [status]) // status가 변경될 때마다 실행
+
+    useEffect(() => {
+        // 검색어에 맞는 주문을 필터링
+        let filtered = orders
+        filtered = filtered.filter(order =>
+            order.order_name.includes(searchQuery)
+        )
+        // 최종 필터링된 목록 설정 및 체크박스 상태 초기화
+        setFilteredOrders(filtered.map(order => ({ ...order, checked: false })))
+        setSelectAll(false)
+    }, [searchQuery]) // searchQuery가 변경될 때마다 실행
 
     // 주문 목록의 상태 선택 핸들러
     const handleSelectStatus = e => {
@@ -85,7 +91,7 @@ export const Return = () => {
         const return_code = e.target.value
         updateReturn(return_seq, return_code)
             .then(resp => {
-                console.log(resp)
+                // console.log(resp)
                 // 상태 변경 후 orders 배열 업데이트
                 const updatedOrders = orders.map(order =>
                     order.return_seq === return_seq
@@ -129,11 +135,17 @@ export const Return = () => {
         }).then(result => {
             if (result.isConfirmed) {
                 // 환불 완료 요청
-                doneReturn(selectedOrders.map(order => order.return_seq))
+                doneReturn(
+                    selectedOrders.map(order => ({
+                        return_seq: order.return_seq,
+                        payment_id: order.payment_id,
+                        payment_text: order.payment_text,
+                    }))
+                )
                     .then(resp => {
                         console.log(resp)
                         const currentTimestamp = new Date().toISOString()
-                        // 구매 확정 후 주문 목록 업데이트
+                        // 환불 완료 후 주문 목록 업데이트
                         const updatedOrders = orders.map(order =>
                             selectedOrders.some(
                                 selected =>
@@ -143,7 +155,7 @@ export const Return = () => {
                                       ...order,
                                       return_code: 'R6',
                                       done_return_date: currentTimestamp,
-                                  } // 구매 확정 상태로 변경
+                                  } // 환불 완료 상태로 변경
                                 : order
                         )
                         setOrders(
@@ -173,7 +185,7 @@ export const Return = () => {
     // 주문 삭제 핸들러
     const handleDeleteOrder = () => {
         const selectedOrders = filteredOrders.filter(order => order.checked)
-        console.log(selectedOrders)
+        // console.log(selectedOrders)
         if (selectedOrders.length === 0) {
             SwalComp({
                 type: 'warning',
@@ -189,7 +201,7 @@ export const Return = () => {
             if (result.isConfirmed) {
                 deleteOrder(selectedOrders.map(order => order.order_seq))
                     .then(resp => {
-                        console.log(resp)
+                        // console.log(resp)
                         setOrders(orders.filter(order => !order.checked))
                         console.log('삭제 직후', orders)
                         SwalComp({
@@ -436,6 +448,57 @@ export const Return = () => {
                     </div>
                 </div>
             </div>
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal}>
+                <h2 className={styles.modalTitle}>주문 상세 정보</h2>
+                <div className={styles.dateInfo}>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>주문일</div>
+                        <div>{formatDate(viewOrder.order_date)}</div>
+                    </div>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>결재일</div>
+                        <div>{formatDate(viewOrder.payment_date)}</div>
+                    </div>
+                </div>
+                <div className={styles.dateInfo}>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>환불 요청일</div>
+                        <div>{formatDate(viewOrder.return_date)}</div>
+                    </div>
+                    <div className={styles.date}>
+                        <div className={styles.subTitle}>환불 완료일</div>
+                        <div>{formatDate(viewOrder.done_return_date)}</div>
+                    </div>
+                </div>
+                <div className={styles.orderInfo}>
+                    <div className={styles.name}>
+                        <div className={styles.subTitle}>주문명</div>
+                        <div>{viewOrder.order_name}</div>
+                    </div>
+                    <div className={styles.price}>
+                        <div className={styles.subTitle}>주문 금액</div>
+                        <div>{addCommas(viewOrder.order_price)}원</div>
+                    </div>
+                    <div className={styles.price}>
+                        <div className={styles.subTitle}>결재 금액</div>
+                        <div>{addCommas(viewOrder.payment_price)}원</div>
+                    </div>
+                </div>
+                <div className={styles.memberInfo}>
+                    <div className={styles.member}>
+                        <div className={styles.subTitle}>회원 등급</div>
+                        <div>{viewOrder.grade_title}</div>
+                    </div>
+                    <div className={styles.member}>
+                        <div className={styles.subTitle}>회원명</div>
+                        <div>{viewOrder.name}</div>
+                    </div>
+                    <div className={styles.member}>
+                        <div className={styles.subTitle}>전화 번호</div>
+                        <div>{viewOrder.orderer_phone}</div>
+                    </div>
+                </div>
+            </Modal>
         </>
     )
 }

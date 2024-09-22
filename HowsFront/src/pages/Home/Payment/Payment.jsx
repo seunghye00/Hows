@@ -179,8 +179,10 @@ export const Payment = () => {
     } else {
       // 실패 시 결제 취소
       paymentCancel(paymentId).then(res => {
-        console.log("res.data ==== ", res.data);
-        alert("결제 실패");
+        SwalComp({
+          type:"error",
+          text:"결제에 실패하였습니다"
+        });
       });
     }
   }
@@ -218,8 +220,11 @@ export const Payment = () => {
     const price = sessionStorage.getItem("howsPrice");
 
     if(item === null || price === null) {
-      alert("선택한 상품이 없습니다.")
-      return navi("/cart");
+      SwalComp({
+        type:"error",
+        text:"선택한 상품이 없습니다."
+      });
+      return navi("/");
     }
 
     if(orderProducts.length <= 0){

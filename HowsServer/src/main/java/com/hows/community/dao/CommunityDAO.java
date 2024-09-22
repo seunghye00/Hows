@@ -264,4 +264,9 @@ public class CommunityDAO {
 		return mybatis.selectList("Community.getPostCountByColor");
 	}
 
+	// 오늘 작성된 게시글 수 조회
+	public int todayBoardNum() {
+		return mybatis.selectOne("Community.todayBoardNum");
+	}
+
 }

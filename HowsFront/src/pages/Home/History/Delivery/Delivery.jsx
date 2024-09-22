@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react'
 import {myPayments, myPaymentsDetail, requestPayment} from "../../../../api/history";
 import {TextBox} from "../TextBox/TextBox";
 import {Modal} from "../../../../components/Modal/Modal";
-import {addCommas, formatDate} from "../../../../commons/commons";
+import {addCommas, formatDate, SwalComp} from "../../../../commons/commons";
 import {useNavigate} from "react-router-dom";
 
 export const Delivery = () => {
@@ -40,7 +40,10 @@ export const Delivery = () => {
   /** 결제취소 & 환불 요청 **/
   const handleSaleCancel = (seq) => {
     if(reason === "") {
-      alert("사유를 입력하세요.");
+      SwalComp({
+        type:"warning",
+        text:"사유를 입력하세요."
+      });
       return false;
     }
     const params = {
@@ -50,7 +53,10 @@ export const Delivery = () => {
     requestPayment(params).then(res => {
       if(res.data === "ok"){
         // 취소 요청 완료
-        alert("취소 요청 되었습니다.");
+        SwalComp({
+          type:"success",
+          text:"취소 요청 되었습니다."
+        });
         setIsModalOpen(false);
       }
     })
@@ -128,7 +134,7 @@ export const Delivery = () => {
               }
             </div>
             {
-              selectPayment.paymentCode === "P1" || selectPayment.paymentCode === "P2" ?
+              selectPayment.paymentCode === "P1" || selectPayment.paymentCode === "P2" || orderDetail.orderDetail.order_code !== "O4" ?
                   <button className={styles.cancelBtn} onClick={() => handleReasonWrite(selectPayment.paymentSeq)}>구매 취소 & 환불
                     요청</button>
                   :

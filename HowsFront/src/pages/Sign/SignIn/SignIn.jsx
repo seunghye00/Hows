@@ -1,13 +1,10 @@
 import styles from "./SignIn.module.css";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import logo from "../../../assets/images/logo_how.png";
-import axios from "axios";
+import { useState, useEffect } from "react";
+import logo from "../../../assets/images/로그인_로고.png";
 import { jwtDecode } from "jwt-decode";
 import { useAuthStore, useMemberStore } from "./../../../store/store";
-import { host } from "./../../../config/config";
 import { FindId } from "./FindId/FindId";
-import { FindPw } from "./FindPw/FindPw";
 import { loginUser } from "../../../api/member";
 import Swal from "sweetalert2";
 
@@ -16,7 +13,19 @@ export const SignIn = () => {
   const [user, setUser] = useState({ member_id: "", pw: "" });
   const { login } = useAuthStore();
   const { setCurrentUser } = useMemberStore();
-  const [page, setPage] = useState("login"); // main으로 해야하나
+  const [page, setPage] = useState("login");
+  const [rememberId, setRememberId] = useState(false); // 아이디 기억하기 상태
+  const [showPassword, setShowPassword] = useState(false); // 비밀번호 표시 상태
+
+  // 페이지 로드 시 localStorage에서 member_id 가져오기
+  useEffect(() => {
+    const savedMemberId = localStorage.getItem("member_id");
+    if (savedMemberId) {
+      setUser((prev) => ({ ...prev, member_id: savedMemberId }));
+      setRememberId(true); // 아이디 저장 체크
+    }
+  }, []);
+
 
   const handleInputLogin = (e) => {
     const { name, value } = e.target;
@@ -37,9 +46,15 @@ export const SignIn = () => {
         sessionStorage.setItem("nickname", decoded.nickname); // 사용자 닉네임 저장
         sessionStorage.setItem("member_avatar", decoded.member_avatar); // 사용자 프로필사진 저장
 
+        // 체크박스 상태에 따라 localStorage에 member_id 저장
+        if (rememberId) {
+          localStorage.setItem("member_id", decoded.sub);
+        } else {
+          localStorage.removeItem("member_id"); // 체크박스가 해제된 경우 삭제
+        }
         setCurrentUser({
-          "nickname": decoded.nickname,
-          "member_avatar": decoded.member_avatar
+          nickname: decoded.nickname,
+          member_avatar: decoded.member_avatar,
         });
 
         login(token);
@@ -76,9 +91,10 @@ export const SignIn = () => {
   return (
     <div className={styles.container}>
       <div className={styles.loginBox}>
-        <div className={styles.logo}>
-          <img src={logo}></img>
-          <h1 className={styles.title}>How's</h1>
+        <div className={styles.logo} onClick={() => navi("/")}>
+          <div className={styles.logoBox}>
+            <img src={logo} />
+          </div>
         </div>
         <input
           type="text"
@@ -86,18 +102,31 @@ export const SignIn = () => {
           onChange={handleInputLogin}
           placeholder="아이디"
           className={styles.input}
+          value={user.member_id}
         />
         <input
-          type="password"
+          type={showPassword ? "text" : "password"}
           name="pw"
           onChange={handleInputLogin}
+          onKeyDown={(e) => e.key === "Enter" && handleLoginBtn()}
           placeholder="비밀번호"
           className={styles.input}
+          value={user.pw}
         />
+        <div className={styles.loginTool}>
+          <div className={styles.tool}>
+            <input type="checkbox" checked={rememberId} onChange={() => setRememberId((prev) => !prev)} />
+            <span>아이디 저장</span>
+          </div>
+          <div className={styles.tool}>
+            <input type="checkbox" checked={showPassword} onChange={() => setShowPassword((prev) => !prev)} />
+            <span>비밀번호 표시</span>
+          </div>
+
+        </div>
         <button className={styles.loginBtn} onClick={handleLoginBtn}>
           로그인
         </button>
-        {/* <button className={styles.kakaoLoginBtn}>카카오톡으로 로그인</button> */}
         <div className={styles.links}>
           <button
             onClick={() => handlePageChange("findId")}

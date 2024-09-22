@@ -126,160 +126,156 @@ public class CommunityController {
 	// 게시글 업데이트 로그인 필요
 	@PutMapping("/update-with-images/{board_seq}")
 	@Transactional
-	public ResponseEntity<Void> updateWriteWithImages(
-	        @PathVariable int board_seq,
-	        @RequestParam("housing_type_code") String housingTypeCode,
-	        @RequestParam("space_type_code") String spaceTypeCode,
-	        @RequestParam("area_size_code") String areaSizeCode,
-	        @RequestParam("board_contents") String boardContents,
+	public ResponseEntity<Void> updateWriteWithImages(@PathVariable int board_seq,
+			@RequestParam("housing_type_code") String housingTypeCode,
+			@RequestParam("space_type_code") String spaceTypeCode, @RequestParam("area_size_code") String areaSizeCode,
+			@RequestParam("board_contents") String boardContents,
 			@RequestParam(value = "color_code", required = false) String colorCode, // 단일 color_code로 수정
-	        @RequestParam("member_id") String memberId,
-	        @RequestParam("existing_image_urls") List<String> existingImageUrls,
-	        @RequestPart(value = "new_files", required = false) MultipartFile[] newFiles,
-	        @RequestParam(value = "new_image_orders", required = false) int[] newImageOrders,
-	        @RequestParam(value = "existing_image_orders", required = false) int[] existingImageOrders,
-	        @RequestParam Map<String, String> tagsMap // 각 이미지에 대한 태그를 Map으로 받음
+			@RequestParam("member_id") String memberId,
+			@RequestParam("existing_image_urls") List<String> existingImageUrls,
+			@RequestPart(value = "new_files", required = false) MultipartFile[] newFiles,
+			@RequestParam(value = "new_image_orders", required = false) int[] newImageOrders,
+			@RequestParam(value = "existing_image_orders", required = false) int[] existingImageOrders,
+			@RequestParam Map<String, String> tagsMap // 각 이미지에 대한 태그를 Map으로 받음
 	) {
-	    try {
-	        // 태그 JSON이 제대로 넘어오는지 확인
-	        System.out.println("Received tags JSON: " + tagsMap);
+		try {
+			// 태그 JSON이 제대로 넘어오는지 확인
+			System.out.println("Received tags JSON: " + tagsMap);
 
-	        // 1. 기존 이미지 URL 정보 조회
-	        List<String> currentImageURLs = communityServ.selectImagesUrls(board_seq);
-	        System.out.println("Current Images from DB: " + currentImageURLs);
+			// 1. 기존 이미지 URL 정보 조회
+			List<String> currentImageURLs = communityServ.selectImagesUrls(board_seq);
+			System.out.println("Current Images from DB: " + currentImageURLs);
 
-	        // 2. 클라이언트에서 넘어온 기존 이미지 목록 평탄화 작업
-	        List<String> flattenedExistingImageUrls = existingImageUrls.stream()
-	                .flatMap(url -> Arrays.stream(url.replaceAll("\\[|\\]|\"", "").split(", ")))  // 이중 배열 평탄화
-	                .collect(Collectors.toList());
+			// 2. 클라이언트에서 넘어온 기존 이미지 목록 평탄화 작업
+			List<String> flattenedExistingImageUrls = existingImageUrls.stream()
+					.flatMap(url -> Arrays.stream(url.replaceAll("\\[|\\]|\"", "").split(", "))) // 이중 배열 평탄화
+					.collect(Collectors.toList());
 
-	        System.out.println("Flattened Existing Image URLs: " + flattenedExistingImageUrls);
+			System.out.println("Flattened Existing Image URLs: " + flattenedExistingImageUrls);
 
-	        // 3. 기존 이미지와 평탄화된 이미지 목록을 비교하여 삭제된 이미지 찾기
-	        List<String> deletedImages = new ArrayList<>();
-	        for (String currentImage : currentImageURLs) {
-	            if (!flattenedExistingImageUrls.contains(currentImage)) {
-	                deletedImages.add(currentImage);  // 삭제된 이미지
-	            }
-	        }
-	        System.out.println("Images to delete: " + deletedImages);
+			// 3. 기존 이미지와 평탄화된 이미지 목록을 비교하여 삭제된 이미지 찾기
+			List<String> deletedImages = new ArrayList<>();
+			for (String currentImage : currentImageURLs) {
+				if (!flattenedExistingImageUrls.contains(currentImage)) {
+					deletedImages.add(currentImage); // 삭제된 이미지
+				}
+			}
+			System.out.println("Images to delete: " + deletedImages);
 
-	        // 4. 삭제된 이미지가 있으면 GCS와 DB에서 삭제 처리 (GCS는 권한 이슈로 제외)
-	        for (String deletedImage : deletedImages) {
-	            String fileName = extractFileNameFromURL(deletedImage);  // 파일명 추출 메서드 사용
-	            if (fileName != null) {
-	                // GCS 삭제는 남겨두되, 실제 삭제는 실행되지 않도록 함
-	                // DB에서 이미지 삭제 처리
-	                communityServ.deleteImage(deletedImage);  // DB에서 이미지 삭제
-	                System.out.println("Deleted image from DB: " + deletedImage);
-	            }
-	        }
+			// 4. 삭제된 이미지가 있으면 GCS와 DB에서 삭제 처리 (GCS는 권한 이슈로 제외)
+			for (String deletedImage : deletedImages) {
+				String fileName = extractFileNameFromURL(deletedImage); // 파일명 추출 메서드 사용
+				if (fileName != null) {
+					// GCS 삭제는 남겨두되, 실제 삭제는 실행되지 않도록 함
+					// DB에서 이미지 삭제 처리
+					communityServ.deleteImage(deletedImage); // DB에서 이미지 삭제
+					System.out.println("Deleted image from DB: " + deletedImage);
+				}
+			}
 
-	        // 5. 기존 이미지 순서 및 태그 업데이트 (중복 방지 및 삭제/추가/업데이트 로직 추가)
-	        if (existingImageOrders != null) {
-	            for (int i = 0; i < flattenedExistingImageUrls.size(); i++) {
-	                String existingImageUrl = flattenedExistingImageUrls.get(i);
-	                int imageOrder = existingImageOrders[i];
+			// 5. 기존 이미지 순서 및 태그 업데이트 (중복 방지 및 삭제/추가/업데이트 로직 추가)
+			if (existingImageOrders != null) {
+				for (int i = 0; i < flattenedExistingImageUrls.size(); i++) {
+					String existingImageUrl = flattenedExistingImageUrls.get(i);
+					int imageOrder = existingImageOrders[i];
 
-	                // DB에서 이미지 URL로 board_image_seq 조회
-	                int boardImageSeq = communityServ.selectBoardImageSeqByUrl(existingImageUrl);
-	                communityServ.updateImageOrder(existingImageUrl, imageOrder);
+					// DB에서 이미지 URL로 board_image_seq 조회
+					int boardImageSeq = communityServ.selectBoardImageSeqByUrl(existingImageUrl);
+					communityServ.updateImageOrder(existingImageUrl, imageOrder);
 
-	                // 기존 이미지에 대한 태그 처리
-	                String tagsJson = tagsMap.get("tags_json_" + i);
-	                System.out.println("Received tags JSON for existing image " + i + ": " + tagsJson);
+					// 기존 이미지에 대한 태그 처리
+					String tagsJson = tagsMap.get("tags_json_" + i);
+					System.out.println("Received tags JSON for existing image " + i + ": " + tagsJson);
 
-	                if (tagsJson != null) {
-	                    List<TagDTO> newTagsList = parseTagsFromJson(tagsJson, boardImageSeq);  // 새로운 태그 파싱
-	                    System.out.println("Parsed tags for existing image " + i + ": " + newTagsList);
+					if (tagsJson != null) {
+						List<TagDTO> newTagsList = parseTagsFromJson(tagsJson, boardImageSeq); // 새로운 태그 파싱
+						System.out.println("Parsed tags for existing image " + i + ": " + newTagsList);
 
-	                    // 1) 기존 태그 조회
-	                    List<TagDTO> existingTags = communityServ.selectTagsByImageSeq(boardImageSeq);
+						// 1) 기존 태그 조회
+						List<TagDTO> existingTags = communityServ.selectTagsByImageSeq(boardImageSeq);
 
-	                    // 2) 삭제할 태그 찾기
-	                    for (TagDTO existingTag : existingTags) {
-	                        boolean isDeleted = newTagsList.stream()
-	                                .noneMatch(newTag -> newTag.getProduct_seq() == existingTag.getProduct_seq()
-	                                        && newTag.getLeft_position() == existingTag.getLeft_position()
-	                                        && newTag.getTop_position() == existingTag.getTop_position());
-	                        if (isDeleted) {
-	                            communityServ.deleteTag(existingTag.getBoard_tag_seq());  // 태그 삭제
-	                            System.out.println("Deleted tag: " + existingTag);
-	                        }
-	                    }
+						// 2) 삭제할 태그 찾기
+						for (TagDTO existingTag : existingTags) {
+							boolean isDeleted = newTagsList.stream()
+									.noneMatch(newTag -> newTag.getProduct_seq() == existingTag.getProduct_seq()
+											&& newTag.getLeft_position() == existingTag.getLeft_position()
+											&& newTag.getTop_position() == existingTag.getTop_position());
+							if (isDeleted) {
+								communityServ.deleteTag(existingTag.getBoard_tag_seq()); // 태그 삭제
+								System.out.println("Deleted tag: " + existingTag);
+							}
+						}
 
-	                    // 3) 새로운 태그 추가
-	                    for (TagDTO newTag : newTagsList) {
-	                        boolean isDuplicate = existingTags.stream()
-	                                .anyMatch(existingTag -> existingTag.getProduct_seq() == newTag.getProduct_seq()
-	                                        && existingTag.getLeft_position() == newTag.getLeft_position()
-	                                        && existingTag.getTop_position() == newTag.getTop_position());
+						// 3) 새로운 태그 추가
+						for (TagDTO newTag : newTagsList) {
+							boolean isDuplicate = existingTags.stream()
+									.anyMatch(existingTag -> existingTag.getProduct_seq() == newTag.getProduct_seq()
+											&& existingTag.getLeft_position() == newTag.getLeft_position()
+											&& existingTag.getTop_position() == newTag.getTop_position());
 
-	                        if (!isDuplicate) {
-	                            newTag.setBoard_image_seq(boardImageSeq);  // 기존 이미지의 시퀀스 설정
-	                            communityServ.insertTag(newTag);  // 중복이 아니면 태그 저장
-	                            System.out.println("Added new tag: " + newTag);
-	                        }
-	                    }
-	                }
-	            }
-	        }
+							if (!isDuplicate) {
+								newTag.setBoard_image_seq(boardImageSeq); // 기존 이미지의 시퀀스 설정
+								communityServ.insertTag(newTag); // 중복이 아니면 태그 저장
+								System.out.println("Added new tag: " + newTag);
+							}
+						}
+					}
+				}
+			}
 
-	        // 6. 새로 추가된 이미지 처리
-	        if (newFiles != null && newFiles.length > 0) {
-	            for (int i = 0; i < newFiles.length; i++) {
-	                MultipartFile file = newFiles[i];
-	                int imageOrder = newImageOrders[i];
+			// 6. 새로 추가된 이미지 처리
+			if (newFiles != null && newFiles.length > 0) {
+				for (int i = 0; i < newFiles.length; i++) {
+					MultipartFile file = newFiles[i];
+					int imageOrder = newImageOrders[i];
 
-	                // 이미지 업로드
-	                String uploadResult = fileServ.upload(file, board_seq, "F2");
-	                if (!uploadResult.equals("fail")) {
-	                    // 새 이미지 DB 저장
-	                    ImageDTO imageDTO = new ImageDTO();
-	                    imageDTO.setBoard_seq(board_seq);
-	                    imageDTO.setImage_url(uploadResult);
-	                    imageDTO.setImage_order(imageOrder);
-	                    int boardImageSeq = communityServ.insertImage(imageDTO);
+					// 이미지 업로드
+					String uploadResult = fileServ.upload(file, board_seq, "F2");
+					if (!uploadResult.equals("fail")) {
+						// 새 이미지 DB 저장
+						ImageDTO imageDTO = new ImageDTO();
+						imageDTO.setBoard_seq(board_seq);
+						imageDTO.setImage_url(uploadResult);
+						imageDTO.setImage_order(imageOrder);
+						int boardImageSeq = communityServ.insertImage(imageDTO);
 
-	                    // 태그 데이터 처리 (중복 방지 적용)
-	                    String tagsJson = tagsMap.get("tags_json_" + i);
-	                    System.out.println("Received tags JSON for new image " + i + ": " + tagsJson);
+						// 태그 데이터 처리 (중복 방지 적용)
+						String tagsJson = tagsMap.get("tags_json_" + i);
+						System.out.println("Received tags JSON for new image " + i + ": " + tagsJson);
 
-	                    if (tagsJson != null && !tagsJson.isEmpty()) {
-	                        List<TagDTO> tagsList = parseTagsFromJson(tagsJson, boardImageSeq);  // 태그 파싱
-	                        System.out.println("Parsed tags for new image " + i + ": " + tagsList);
+						if (tagsJson != null && !tagsJson.isEmpty()) {
+							List<TagDTO> tagsList = parseTagsFromJson(tagsJson, boardImageSeq); // 태그 파싱
+							System.out.println("Parsed tags for new image " + i + ": " + tagsList);
 
-	                        if (tagsList != null && !tagsList.isEmpty()) {
-	                            for (TagDTO tag : tagsList) {
-	                                tag.setBoard_image_seq(boardImageSeq);
-	                                communityServ.insertTag(tag);  // 태그 저장
-	                            }
-	                        }
-	                    }
-	                }
-	            }
-	        }
-	        System.out.println(colorCode + " 컬러코드 갑 확인");
-	        // 7. 게시글 내용 업데이트
-	        CommunityDTO dto = new CommunityDTO();
-	        dto.setHousing_type_code(housingTypeCode);
-	        dto.setSpace_type_code(spaceTypeCode);
-	        dto.setArea_size_code(areaSizeCode);
-	        dto.setBoard_contents(boardContents);
-	        dto.setColor_code(colorCode);
-	        dto.setMember_id(memberId);
-	        dto.setBoard_seq(board_seq);
-	        communityServ.updateWrite(dto);  // 게시글 업데이트
+							if (tagsList != null && !tagsList.isEmpty()) {
+								for (TagDTO tag : tagsList) {
+									tag.setBoard_image_seq(boardImageSeq);
+									communityServ.insertTag(tag); // 태그 저장
+								}
+							}
+						}
+					}
+				}
+			}
+			System.out.println(colorCode + " 컬러코드 갑 확인");
+			// 7. 게시글 내용 업데이트
+			CommunityDTO dto = new CommunityDTO();
+			dto.setHousing_type_code(housingTypeCode);
+			dto.setSpace_type_code(spaceTypeCode);
+			dto.setArea_size_code(areaSizeCode);
+			dto.setBoard_contents(boardContents);
+			dto.setColor_code(colorCode);
+			dto.setMember_id(memberId);
+			dto.setBoard_seq(board_seq);
+			communityServ.updateWrite(dto); // 게시글 업데이트
 
-	        return ResponseEntity.ok().build();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        throw new RuntimeException("게시글 업데이트 또는 이미지 처리 실패", e);
-	    }
+			return ResponseEntity.ok().build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("게시글 업데이트 또는 이미지 처리 실패", e);
+		}
 	}
 
-
-	
 	// 태그 데이터를 JSON에서 List<TagDTO>로 파싱하는 메서드
 	private List<TagDTO> parseTagsFromJson(String tagsJson, int boardImageSeq) throws IOException {
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -314,66 +310,66 @@ public class CommunityController {
 	// 커뮤니티 게시글 불러오는 메서드 로그인 없어도 됌
 	@GetMapping
 	public ResponseEntity<List<Map<String, Object>>> selectAll(
-	        @RequestParam(value = "member_id", required = false) String memberId,
-	        @RequestParam(value = "keyword", required = false) String keyword,
-	        @RequestParam(value = "sort", required = false) String sort,
-	        @RequestParam(value = "housingType", required = false) String housingType,
-	        @RequestParam(value = "spaceType", required = false) String spaceType,
-	        @RequestParam(value = "areaSize", required = false) String areaSize,
-	        @RequestParam(value = "color", required = false) String color,
-	        @RequestParam(value = "page", required = false, defaultValue = "1") int page,
-	        @RequestParam(value = "limit", required = false, defaultValue = "20") int limit
-	) {
+			@RequestParam(value = "member_id", required = false) String memberId,
+			@RequestParam(value = "keyword", required = false) String keyword,
+			@RequestParam(value = "sort", required = false) String sort,
+			@RequestParam(value = "housingType", required = false) String housingType,
+			@RequestParam(value = "spaceType", required = false) String spaceType,
+			@RequestParam(value = "areaSize", required = false) String areaSize,
+			@RequestParam(value = "color", required = false) String color,
+			@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(value = "limit", required = false, defaultValue = "20") int limit) {
 
-	    // 게시글 리스트 가져오기
-	    List<Map<String, Object>> list = communityServ.selectCommunityPosts(page, limit, keyword, sort, housingType, spaceType, areaSize, color);
+		// 게시글 리스트 가져오기
+		List<Map<String, Object>> list = communityServ.selectCommunityPosts(page, limit, keyword, sort, housingType,
+				spaceType, areaSize, color);
 
-	    // 이미지 가져오기 및 맵핑
-	    List<Map<String, Object>> listImg = communityServ.selectAllImg();
-	    Map<Integer, List<String>> imageMap = new HashMap<>();
-	    for (Map<String, Object> imgData : listImg) {
-	        BigDecimal boardSeqDecimal = (BigDecimal) imgData.get("BOARD_SEQ");
-	        Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-	        String imageUrl = (String) imgData.get("IMAGE_URL");
+		// 이미지 가져오기 및 맵핑
+		List<Map<String, Object>> listImg = communityServ.selectAllImg();
+		Map<Integer, List<String>> imageMap = new HashMap<>();
+		for (Map<String, Object> imgData : listImg) {
+			BigDecimal boardSeqDecimal = (BigDecimal) imgData.get("BOARD_SEQ");
+			Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+			String imageUrl = (String) imgData.get("IMAGE_URL");
 
-	        if (imageUrl != null) {
-	            imageMap.putIfAbsent(boardSeq, new ArrayList<>());
-	            imageMap.get(boardSeq).add(imageUrl);
-	        }
-	    }
+			if (imageUrl != null) {
+				imageMap.putIfAbsent(boardSeq, new ArrayList<>());
+				imageMap.get(boardSeq).add(imageUrl);
+			}
+		}
 
-	    // 게시글에 이미지 및 좋아요/북마크 상태 추가
-	    for (Map<String, Object> boardData : list) {
-	        BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
-	        Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
-	        List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
-	        boardData.put("images", images);
+		// 게시글에 이미지 및 좋아요/북마크 상태 추가
+		for (Map<String, Object> boardData : list) {
+			BigDecimal boardSeqDecimal = (BigDecimal) boardData.get("BOARD_SEQ");
+			Integer boardSeq = boardSeqDecimal != null ? boardSeqDecimal.intValue() : null;
+			List<String> images = imageMap.getOrDefault(boardSeq, new ArrayList<>());
+			boardData.put("images", images);
 
-	        if (memberId != null) {
-	            // 로그인한 사용자의 SEQ 가져오기
-	            MemberDTO fromMemberInfo = memServ.selectInfo(memberId);
-	            int fromMemberSeq = fromMemberInfo.getMember_seq(); // 로그인한 사용자의 member_seq
+			if (memberId != null) {
+				// 로그인한 사용자의 SEQ 가져오기
+				MemberDTO fromMemberInfo = memServ.selectInfo(memberId);
+				int fromMemberSeq = fromMemberInfo.getMember_seq(); // 로그인한 사용자의 member_seq
 
-	            // 게시글 작성자의 MEMBER_SEQ 가져오기
-	            BigDecimal toMemberSeqDecimal = (BigDecimal) boardData.get("MEMBER_SEQ");
-	            Integer toMemberSeq = toMemberSeqDecimal != null ? toMemberSeqDecimal.intValue() : null;
+				// 게시글 작성자의 MEMBER_SEQ 가져오기
+				BigDecimal toMemberSeqDecimal = (BigDecimal) boardData.get("MEMBER_SEQ");
+				Integer toMemberSeq = toMemberSeqDecimal != null ? toMemberSeqDecimal.intValue() : null;
 
-	            // 회원일 경우 좋아요 및 북마크 상태 추가
-	            boolean isFollowing = memServ.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
-	            boolean isLiked = communityServ.checkIfUserLikedBoard(memberId, boardSeq);
-	            boolean isBookmarked = communityServ.checkIfUserBookmarkedBoard(memberId, boardSeq);
-	            boardData.put("isLiked", isLiked);
-	            boardData.put("isFollowing", isFollowing);
-	            boardData.put("isBookmarked", isBookmarked);
-	        } else {
-	            // 비회원일 경우 기본 값 설정
-	            boardData.put("isLiked", false);
-	            boardData.put("isFollowing", false);
-	            boardData.put("isBookmarked", false);
-	        }
-	    }
+				// 회원일 경우 좋아요 및 북마크 상태 추가
+				boolean isFollowing = memServ.checkIfUserFollowing(fromMemberSeq, toMemberSeq);
+				boolean isLiked = communityServ.checkIfUserLikedBoard(memberId, boardSeq);
+				boolean isBookmarked = communityServ.checkIfUserBookmarkedBoard(memberId, boardSeq);
+				boardData.put("isLiked", isLiked);
+				boardData.put("isFollowing", isFollowing);
+				boardData.put("isBookmarked", isBookmarked);
+			} else {
+				// 비회원일 경우 기본 값 설정
+				boardData.put("isLiked", false);
+				boardData.put("isFollowing", false);
+				boardData.put("isBookmarked", false);
+			}
+		}
 
-	    return ResponseEntity.ok(list);
+		return ResponseEntity.ok(list);
 	}
 
 	// 커뮤니티 좋아요 로그인 필요
@@ -448,7 +444,7 @@ public class CommunityController {
 		}
 	}
 
-	// 커뮤니티 디테일 로그인 필요없음 
+	// 커뮤니티 디테일 로그인 필요없음
 	@GetMapping("/{board_seq}")
 	public ResponseEntity<Map<String, Object>> selectAllSeq(@PathVariable int board_seq,
 			@RequestParam(value = "member_id", required = false) String memberId) {
@@ -471,8 +467,8 @@ public class CommunityController {
 
 		return ResponseEntity.ok(boardDetail);
 	}
-	
-	// 이미지 태그정보 
+
+	// 이미지 태그정보
 	@GetMapping("/images/{board_seq}")
 	public ResponseEntity<Map<String, Object>> selectImagesAndTags(@PathVariable int board_seq) {
 		List<Map<String, Object>> images = communityServ.selectImages(board_seq);
@@ -492,7 +488,7 @@ public class CommunityController {
 		List<Map<String, Object>> list = communityServ.selectTagsAndProductInfo(board_seq);
 		return ResponseEntity.ok(list);
 	}
-	
+
 	// 조회수 증가 메서드
 	@PostMapping("/{board_seq}/increment-view")
 	public ResponseEntity<Integer> incrementViewCount(@PathVariable int board_seq) {
@@ -522,14 +518,15 @@ public class CommunityController {
 		return ResponseEntity.ok().build();
 	}
 
-	// 사용자 구매내역 
+	// 사용자 구매내역
 	@GetMapping("/purchaseHistory")
-	public ResponseEntity<List<Map<String, Object>>> purchaseHistory(@AuthenticationPrincipal CustomUserDetails user) throws Exception {
+	public ResponseEntity<List<Map<String, Object>>> purchaseHistory(@AuthenticationPrincipal CustomUserDetails user)
+			throws Exception {
 		int member_seq = user.getMemberSeq();
 		List<Map<String, Object>> list = communityServ.purchaseHistory(member_seq);
 		return ResponseEntity.ok(list);
 	}
-	
+
 	// 관리자
 	// 게시물 신고 조회 (관리자)
 	@GetMapping("/reportedCommunity")
@@ -565,55 +562,62 @@ public class CommunityController {
 	// 신고 게시물 삭제 (관리자)
 	@DeleteMapping("/deleteCommunity/{board_seq}")
 	public ResponseEntity<Integer> deleteCommunity(@PathVariable int board_seq) throws Exception {
-		 try {
-		        // 1. 게시글과 연관된 이미지 파일들 가져오기
-		        List<String> fileURLs = communityServ.getFileURLsForBoard(board_seq);
-		        
-		        // 2. GCS에서 파일 삭제
-		        for (String fileURL  : fileURLs) {
-		            String fileName = extractFileNameFromURL(fileURL);
-		            System.out.println(fileName);
-		            String deleteResult = fileServ.deleteFile(fileName, "F2"); // 적절한 code 전달
-		            
-		            if ("success".equals(deleteResult)) {
-		                System.out.println("GCS 파일 삭제 성공: " + fileName);
-		            } else {
-		                System.out.println("GCS 파일 삭제 실패: " + fileName);
-		            }
-		        }
+		try {
+			// 1. 게시글과 연관된 이미지 파일들 가져오기
+			List<String> fileURLs = communityServ.getFileURLsForBoard(board_seq);
 
-		        // 3. 게시글 삭제
-		        int result = communityServ.deleteCommunity(board_seq);
+			// 2. GCS에서 파일 삭제
+			for (String fileURL : fileURLs) {
+				String fileName = extractFileNameFromURL(fileURL);
+				System.out.println(fileName);
+				String deleteResult = fileServ.deleteFile(fileName, "F2"); // 적절한 code 전달
 
-		        if (result > 0) {
-		            return ResponseEntity.ok(result); // 성공 시 200 OK와 삭제된 행 수 반환
-		        } else {
-		            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 삭제 실패 시 404 NOT FOUND
-		        }
+				if ("success".equals(deleteResult)) {
+					System.out.println("GCS 파일 삭제 성공: " + fileName);
+				} else {
+					System.out.println("GCS 파일 삭제 실패: " + fileName);
+				}
+			}
 
-		    } catch (Exception e) {
-		        e.printStackTrace();
-		        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(0); // 에러 발생 시 500 에러 반환
-		    }
+			// 3. 게시글 삭제
+			int result = communityServ.deleteCommunity(board_seq);
+
+			if (result > 0) {
+				return ResponseEntity.ok(result); // 성공 시 200 OK와 삭제된 행 수 반환
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(0); // 삭제 실패 시 404 NOT FOUND
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(0); // 에러 발생 시 500 에러 반환
+		}
 	}
-	
-	// 이미지 제거를 위한 sysname뽑아오는 로직 
+
+	// 이미지 제거를 위한 sysname뽑아오는 로직
 	public String extractFileNameFromURL(String fileURL) {
-	    if (fileURL == null || fileURL.isEmpty()) {
-	        System.out.println("파일 URL이 null이거나 비어있습니다.");
-	        return null;
-	    }
-	    // 마지막 슬래시 뒤에 있는 파일명만 추출
-	    return fileURL.substring(fileURL.lastIndexOf("/") + 1);
+		if (fileURL == null || fileURL.isEmpty()) {
+			System.out.println("파일 URL이 null이거나 비어있습니다.");
+			return null;
+		}
+		// 마지막 슬래시 뒤에 있는 파일명만 추출
+		return fileURL.substring(fileURL.lastIndexOf("/") + 1);
 	}
-	
+
 	// 카테고리 별 게시글 수 조회
 	@GetMapping("/getBoardNumByCategory")
 	public ResponseEntity<Map<String, Object>> getBoardNumByCategory() throws Exception {
 		Map<String, Object> result = communityServ.getBoardNumByCategory();
 		return ResponseEntity.ok(result);
 	}
-	
+
+	// 오늘 작성된 게시글 수 조회
+	@GetMapping("/todayBoardNum")
+	public ResponseEntity<Integer> todayBoardNum() throws Exception {
+		int result = communityServ.todayBoardNum();
+		return ResponseEntity.ok(result);
+	}
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

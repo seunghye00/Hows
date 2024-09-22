@@ -21,5 +21,9 @@ public class ReturnService {
         return result > 0 ? "ok" : "fail";
 	}
 
-
+	// 반품 내역 생성
+	public String insert(ReturnDTO dto) {
+		int result = returnDAO.insert(dto);
+        return result > 0 ? "ok" : "fail";
+	}
 }

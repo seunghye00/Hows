@@ -227,22 +227,33 @@ export const Review = () => {
             {/* 리뷰 모달창 */}
             {isReviewModalOpen && (
                 <div className={styles.reviewModal}>
-                    <div className={styles.modalContent}>
+                    <div className={styles.reviewmodalContent}>
                         <h3>신고당한 리뷰</h3>
                         <div className={styles.reviewDetail}>
-                            <img
-                                src={
-                                    selectedReview.IMAGE_URL || test
-                                } /* 리뷰 이미지 URL 사용 */
-                                alt="리뷰 이미지"
-                            />
-                            <div>{selectedReview.REVIEW_CONTENTS}</div>
+                            {selectedReview.IMAGE_URLS ? (
+                                selectedReview.IMAGE_URLS.split(',').map(
+                                    (url, index) => (
+                                        <img
+                                            key={index}
+                                            src={url}
+                                            alt={`리뷰 이미지 ${index + 1}`}
+                                        />
+                                    )
+                                )
+                            ) : (
+                                <img src={test} alt="기본 이미지" />
+                            )}
                         </div>
-                        <Button
-                            size="s"
-                            title="닫기"
-                            onClick={closeReviewModal}
-                        />
+                        <div className={styles.reviewCtn}>
+                            {selectedReview.REVIEW_CONTENTS}
+                        </div>
+                        <div className={styles.closebtn}>
+                            <Button
+                                size="s"
+                                title="닫기"
+                                onClick={closeReviewModal}
+                            />
+                        </div>
                     </div>
                 </div>
             )}

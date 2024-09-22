@@ -35,11 +35,29 @@
     object-fit: cover;
     /* 이미지 비율을 유지하며 크기 조정 */
     margin-bottom: 5px;
-
-    border: 2px solid var(--hows-gray-500);
 }
 
 .categoryItem p {
     font-size: 14px;
     color: #333;
+}
+
+/* 1100px 이하일 때 3개 */
+@media screen and (max-width: 1100px) {
+    .contentCon {
+        width: calc((100% / 3) - 20px);
+    }
+}
+
+/* 태블릿 크기(768px) 이하일 때 2개 */
+@media screen and (max-width: 768px) {
+    .contentCon {
+        width: calc((100% / 2) - 15px);
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .container {
+        padding: 40px 20px;
+    }
 }

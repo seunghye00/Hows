@@ -61,7 +61,7 @@
 
 .visitPost .output {
   display: flex;
-  padding: 25px 8px 20px 20px;
+  padding: 25px 8px 35px 20px;
   border-bottom: 1px solid var(--hows-point-color-light);
 }
 
@@ -85,6 +85,7 @@
 .visitPost .output > div .writer_writeDate > span:nth-child(1) {
   font-size: 24px;
   font-weight: 600;
+  cursor: pointer;
 }
 .visitPost .output > div .writer_writeDate > span:nth-child(2) {
   margin-left: 10px;

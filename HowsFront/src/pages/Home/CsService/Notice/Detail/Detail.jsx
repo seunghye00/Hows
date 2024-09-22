@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { detailNtc } from '../../../../../api/notice'
 import styles from './Detail.module.css'
 import { Button } from '../../../../../components/Button/Button' // 버튼 컴포넌트 임포트
+import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop' // 버튼 컴포넌트 임포트
 
 export const Detail = () => {
     const { notice_seq } = useParams() // URL 파라미터로 notice_seq를 가져옴
@@ -26,6 +27,15 @@ export const Detail = () => {
         fetchNoticeDetail() // 컴포넌트가 마운트될 때 공지사항 데이터 가져오기
     }, [notice_seq])
 
+    // 이미지 URL과 텍스트를 분리하는 함수
+    const formatNoticeContents = contents => {
+        const imageUrlRegex =
+            /(https:\/\/storage\.cloud\.google\.com\/hows-attachment\/[^\s]+)/
+        const imageUrl = contents.match(imageUrlRegex) // 이미지 URL 추출
+        const text = contents.replace(imageUrlRegex, '').trim() // URL 제외한 나머지 텍스트 추출
+        return { imageUrl: imageUrl ? imageUrl[0] : '', text }
+    }
+
     // 날짜 포맷을 yyyy.mm.dd로 변환하는 함수
     const formatDate = dateString => {
         const date = new Date(dateString)
@@ -36,7 +46,7 @@ export const Detail = () => {
     }
 
     return (
-        <div className={styles.detailCont}>
+        <>
             {notice ? (
                 <div className={styles.detailBox}>
                     <div>
@@ -44,12 +54,32 @@ export const Detail = () => {
                             <h2 className={styles.noticeTitle}>
                                 {notice.notice_title}
                             </h2>
-                            <p className={styles.noticeDate}>
-                                {formatDate(notice.notice_date)}
-                            </p>
+                            <div className={styles.subTxt}>
+                                <div className={styles.noticeDate}>
+                                    {formatDate(notice.notice_date)}
+                                </div>
+                                <div className={styles.viewCount}>
+                                    <i className="bx bx-show"></i>
+                                    {notice.view_count}
+                                </div>
+                            </div>
                         </div>
                         <div className={styles.noticeContents}>
-                            {notice.notice_contents}
+                            {/* 이미지가 있으면 출력 */}
+                            {formatNoticeContents(notice.notice_contents)
+                                .imageUrl && (
+                                <img
+                                    src={
+                                        formatNoticeContents(
+                                            notice.notice_contents
+                                        ).imageUrl
+                                    }
+                                    alt="공지사항 이미지"
+                                    className={styles.noticeImage}
+                                />
+                            )}
+                            {/* 텍스트 출력 */}
+                            {formatNoticeContents(notice.notice_contents).text}
                         </div>
                     </div>
                     {/* 버튼 컴포넌트를 사용한 리턴 버튼 */}
@@ -64,6 +94,7 @@ export const Detail = () => {
             ) : (
                 <p>로딩 중...</p>
             )}
-        </div>
+            <ScrollTop />
+        </>
     )
 }

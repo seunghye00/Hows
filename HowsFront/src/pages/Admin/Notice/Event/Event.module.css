@@ -1,0 +1,199 @@
+.eventContainer {
+    flex: 9 1;
+}
+
+/* 검색창! */
+.searchSection {
+    display: flex;
+    justify-content: space-between;
+}
+
+.searchSection select,
+.searchSection input {
+    padding: 5px;
+    margin-right: 5px;
+}
+
+.searchSection button {
+    padding: 5px 10px;
+}
+
+/* 조회 하는 영역 */
+.eventlist {
+    font-size: 17px;
+    height: 625px;
+    /* border: 1px solid var(--hows-point-color); */
+}
+
+.eventHeader {
+    display: flex;
+    background-color: #555;
+    padding: 10px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    color: var(--hows-white);
+    height: 35px;
+    justify-content: center;
+    align-items: center;
+}
+
+.headerItem {
+    flex: 1;
+    text-align: center;
+}
+
+.eventRow {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #ddd;
+    /* cursor: pointer; */
+    height: 35px;
+}
+
+.eventItem {
+    flex: 1;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.deletebtn {
+    padding: 10px 20px;
+    background-color: #555;
+    color: var(--hows-white);
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 70px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.span{
+    cursor: pointer;
+}
+
+.viewcount {
+    cursor: pointer;
+    color: var(--hows-black);
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+/* 공지사항 상세모달 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modalContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: left;
+    width: 500px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.headerSection {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.titleView, .writerDate {
+    display: flex;
+    justify-content: space-between;
+}
+
+.titleView span, .writerDate span {
+    font-size: 16px;
+}
+
+.modalBody {
+    margin-top: 15px;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.contentContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.evtimg{
+    width: 100%;
+    height: 100%;
+    display: flex;
+}
+
+.img {
+    max-width: 100%; 
+    height: auto;
+}
+
+.btn {
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+    right: 38%;
+    margin-top: 10px;
+    gap: 10px;
+}
+
+/* 페이지네비 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 88%;
+    left: 52%;
+}
+
+.pagination button {
+    padding: 5px 10px;
+    margin: 0 5px;
+    cursor: pointer;
+}
+
+.pagination i {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.img {
+    max-width: 500px;
+    display: block;
+    margin-bottom: 20px;
+}
+
+.empty{
+    display: flex;
+    font-size: 20px;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    top: 40%;
+}

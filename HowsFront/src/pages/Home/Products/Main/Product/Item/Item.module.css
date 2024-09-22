@@ -1,9 +1,6 @@
 .container{
-    /* width: 100%; */
-    /* border: 1px solid #000; */
-
     max-width: 1300px;
-    padding: 20px 0;
+    padding: 50px 0;
     width: 100%;
     margin: 0 auto;
 }
@@ -11,23 +8,29 @@
     /* width: 325px;
     height: 500px; */
     display: flex; flex-wrap: wrap;
-    padding: 20px 0px;
+    padding: 10px 0px;
+    justify-content: space-between;
     /* gap: 20px; */
 }
-/* 오늘의 추천 상품 */
+
+/* 상품 */
 .titleItem {
+    font-size: 20px;
     font-weight: bold;
-    padding: 10px 10px 0;
+    padding: 20px 10px;
 }
 .item {
-    width: 305px;
+    width: calc(25% - 20px); /* 4개씩 배치되도록 각각의 너비를 25%로 설정하고 여백을 고려해 20px을 뺍니다 */
+    /* width: 305px; */
     height: 500px;
     margin: 10px;
     cursor: pointer;
+    transition: transform 0.3s ease;
 }
 
 .item:hover .img > img {
-    transform: scale(1.5);
+    transform: scale(1.1);
+    opacity: 0.8;
 }
 
 /* 상품 이미지 */
@@ -35,9 +38,12 @@
     height: 400px;
     overflow: hidden;
     border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
 }
 .img > img {
-    object-fit: cover; width: 100%;height: 100%; transition: all ease 0.1s;
+    object-fit: cover; 
+    width: 100%;height: 100%; 
+    transition: all 0.3s ease;
 }
 
 /* 상품 설명 */
@@ -63,4 +69,24 @@
 
 
 /* 무한 스크롤 이미지 배치 */
-.itemBox {display: flex;}
+/* .itemBox {display: flex;} */
+
+
+/* 반응형 레이아웃 */
+@media (max-width: 1200px) {
+    .item {
+        width: calc(33.33% - 20px); /* 중간 화면에서는 3개씩 배치 */
+    }
+}
+
+@media (max-width: 900px) {
+    .item {
+        width: calc(50% - 20px); /* 작은 화면에서는 2개씩 배치 */
+    }
+}
+
+@media (max-width: 600px) {
+    .item {
+        width: calc(100% - 20px); /* 매우 작은 화면에서는 1개씩 배치 */
+    }
+}

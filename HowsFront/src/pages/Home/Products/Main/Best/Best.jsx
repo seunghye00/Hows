@@ -25,6 +25,7 @@ export const Best = () => {
 
   return (
     <div className={styles.container}>
+      <div style={{height:"70px"}}></div>
       <div className={styles.bestTitlt}>베스트 상품</div>
       <div className={styles.contents}>
 

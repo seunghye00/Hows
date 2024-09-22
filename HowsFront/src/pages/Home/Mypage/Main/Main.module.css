@@ -129,32 +129,32 @@
   transition-duration: 0.3s;
   margin: 10px 0 0 5px;
 }
-.container .mainBox .header .userInfo .bottom .addFollowBtn {
-  background-color: var(--hows-point-color);
-  color: var(--hows-white);
-}
-.container .mainBox .header .userInfo .bottom .addFollowBtn:hover {
-  background-color: var(--hows-point-color-dark);
-}
 
-.container .mainBox .header .userInfo .bottom .delFollowBtn {
+.container .mainBox .header .userInfo .bottom .addFollowBtn {
   border: 2px solid var(--hows-point-color);
   background-color: var(--hows-white);
   color: var(--hows-point-color-darker);
 }
-.container .mainBox .header .userInfo .bottom .delFollowBtn:hover {
+.container .mainBox .header .userInfo .bottom .addFollowBtn:hover {
   background-color: var(--hows-point-color);
   color: var(--hows-white);
 }
 
+.container .mainBox .header .userInfo .bottom .delFollowBtn {
+  background-color: var(--hows-point-color);
+  color: var(--hows-white);
+}
+.container .mainBox .header .userInfo .bottom .delFollowBtn:hover {
+  background-color: var(--hows-point-color-dark);
+}
+
 /* 하단 게시물 부분 */
 .container .mainBox .menus {
-  /* flex: 1; */
   height: 70px;
   display: flex;
   padding: 10px 120px;
   border-top: 1px solid var(--hows-gray-200);
-  /* background-color: burlywood; */
+  min-width: 360px;
 }
 .container .mainBox .menus .menu {
   flex: 1;
@@ -279,20 +279,21 @@
   cursor: pointer;
   transition-duration: 0.4s;
 }
-.followListBox .followList .followerBtn {
-  background-color: var(--hows-point-color-dark);
-  color: var(--hows-white);
-}
-.followListBox .followList .followerBtn:hover {
-  background-color: var(--hows-point-color-darker);
-}
 
-.followListBox .followList .followingBtn {
+.followListBox .followList .followerBtn {
   border: 1px solid var(--hows-point-color-dark);
   background-color: var(--hows-white);
   color: var(--hows-point-color-darker);
 }
-.followListBox .followList .followingBtn:hover {
+.followListBox .followList .followerBtn:hover {
   background-color: var(--hows-point-color-dark);
   color: var(--hows-white);
+}
+
+.followListBox .followList .followingBtn {
+  background-color: var(--hows-point-color-dark);
+  color: var(--hows-white);
+}
+.followListBox .followList .followingBtn:hover {
+  background-color: var(--hows-point-color-darker);
 }

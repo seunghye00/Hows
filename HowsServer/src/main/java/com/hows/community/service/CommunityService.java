@@ -211,4 +211,9 @@ public class CommunityService {
 		result.put("postCountByColor", communityDAO.getPostCountByColor());
 		return result;
 	}
+
+	// 오늘 작성된 게시글 수 조회
+	public int todayBoardNum() {
+		return communityDAO.todayBoardNum();
+	}
 }

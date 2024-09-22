@@ -1,7 +1,10 @@
 import styles from './Category.module.css'
-import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
-import img1 from '../../../../../../assets/images/꼬래.png'
-import img2 from '../../../../../../assets/images/cry.jpg'
+import allComunity from '../../../../../../assets/images/comuni01.png'
+import comuni02 from '../../../../../../assets/images/comuni02.png'
+import comuni03 from '../../../../../../assets/images/comuni03.png'
+import comuni04 from '../../../../../../assets/images/comuni04.png'
+import comuni05 from '../../../../../../assets/images/comuni05.png'
+import comuni06 from '../../../../../../assets/images/comuni06.png'
 import { useNavigate } from 'react-router-dom'
 
 export const Category = () => {
@@ -9,16 +12,21 @@ export const Category = () => {
 
     // 카테고리 데이터 (이미지와 텍스트)
     const categories = [
-        { id: 0, imageUrl: img, name: '전체 커뮤니티', path: '/communities' }, // 기본 커뮤니티로 돌아가는 버튼
-        { id: 1, imageUrl: img, name: '자취생 필수탬', keyword: '자취' },
-        { id: 2, imageUrl: img1, name: '급상승 인기글', sort: 'likes' }, // 좋아요 순 정렬
-        { id: 3, imageUrl: img2, name: '원룸 스타일', keyword: '원룸' },
-        { id: 4, imageUrl: img, name: '캠핑 용품 자랑', keyword: '캠핑' },
+        {
+            id: 0,
+            imageUrl: allComunity,
+            name: '전체 커뮤니티',
+            path: '/communities',
+        }, // 기본 커뮤니티로 돌아가는 버튼
+        { id: 1, imageUrl: comuni02, name: '급상승 인기글', sort: 'likes' },
+        { id: 2, imageUrl: comuni03, name: '방꾸', keyword: '방꾸' }, // 좋아요 순 정렬
+        { id: 3, imageUrl: comuni04, name: '자취생 필수탬', keyword: '자취' },
+        { id: 4, imageUrl: comuni05, name: '캠핑 용품 자랑', keyword: '캠핑' },
         {
             id: 5,
-            imageUrl: img2,
-            name: 'ROTD 오늘의 룸 스타일',
-            keyword: 'ROTD',
+            imageUrl: comuni06,
+            name: '주방 디자인',
+            keyword: '주방',
         },
     ]
 

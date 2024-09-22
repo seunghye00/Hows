@@ -54,6 +54,12 @@ public class OrderDAO {
         return mybatis.update("Order.updateOrder", orderDTO);
     }
 
+    /** 총 주문 금액 조회 **/
+    public int getTotalPrice(int memberSeq) {
+        Integer totalPrice = mybatis.selectOne("Order.getTotalPrice", memberSeq);
+        return totalPrice != null ? totalPrice : 0;
+    }
+
     // 주문 상태 별 주문 목록 조회
 	public List<OrderInfoListDTO> getOrdersByStatus(String status) {
 		return mybatis.selectList("Order.orderListByStatus", status);
@@ -67,5 +73,10 @@ public class OrderDAO {
 	// 주문 내역 삭제
 	public boolean deleteOrder(int orderSeq) {
 		return mybatis.delete("Order.delete", orderSeq) > 0;
+	}
+
+	// 주문 상태 조회
+	public String getOrderCode(int orderSeq) {
+		return mybatis.selectOne("Order.getOrderCode", orderSeq);
 	}
 }

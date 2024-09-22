@@ -25,7 +25,7 @@ public class BannerService {
 	}
 
 	// 배너 추가
-	public boolean addBanner(BannerDTO dto) {
+	public int addBanner(BannerDTO dto) {
 		return bannDAO.addBanner(dto);
 	}
 

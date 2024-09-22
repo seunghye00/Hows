@@ -22,7 +22,29 @@ export const Header = () => {
     const { currentUser } = useMemberStore()
     const [isMenuOpen, setIsMenuOpen] = useState(false) // 메뉴 열림/닫힘 상태
 
-    const { subHeader, setSubHeader } = useProductStore();
+    const [subHeader, setSubHeader] = useState(false); //서브헤더 관리 상태 
+    let hideTimeout;
+
+    const handleMouseEnter = () => {
+        if (hideTimeout) {
+            clearTimeout(hideTimeout); // 지연 시간을 초기화하여 서브헤더가 사라지지 않도록
+        }
+        setSubHeader(true); // 서브헤더 표시
+    };
+
+    const handleMouseLeave = () => {
+        hideTimeout = setTimeout(() => {
+            setSubHeader(false); // 서브헤더 숨김
+        }, 100); // 200ms의 지연 시간
+    };
+
+    useEffect(() => {
+        return () => {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+            }
+        };
+    }, []);
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
@@ -87,14 +109,6 @@ export const Header = () => {
         })
     }
 
-    const handleMouseEnter = () => {
-        setSubHeader(true);
-    };
-
-    const handleMouseLeave = () => {
-        setSubHeader(false);
-    };
-
     useEffect(() => {
         const token = sessionStorage.getItem('token')
         if (token) {
@@ -139,7 +153,11 @@ export const Header = () => {
     }
 
     return (
-        <div className="header">
+        <div 
+            className="header"         
+            onMouseEnter={handleMouseEnter} // 마우스가 들어오면 서브헤더 표시
+            onMouseLeave={handleMouseLeave} // 마우스가 나가면 서브헤더 숨김
+        >
             <div className={styles.headerWrap}>
                 {isFixed && <div className={styles.headerSpacer}></div>}
                 <div
@@ -173,8 +191,6 @@ export const Header = () => {
                                           : ''
                                       }`}
                                       onClick={() => handleMenuClick('Shop')}
-                                      onMouseEnter={handleMouseEnter}
-                                      onMouseLeave={handleMouseLeave}
                                     >
                                         <a>Shop</a>
                                     </div>
@@ -325,6 +341,7 @@ export const Header = () => {
                     </div>
                 </div>
             )}
+            {subHeader && <SubHeader />}
         </div>
     )
 }

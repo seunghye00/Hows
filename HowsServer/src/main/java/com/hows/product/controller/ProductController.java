@@ -52,11 +52,19 @@ public class ProductController {
         return ResponseEntity.ok(bestProducts);
     }
 
-	// 상품 '전체' 목록 출력
+	// 상품 랜덤으로 '전체' 목록 출력
 	@GetMapping
 	public ResponseEntity<List<ProductDTO>> getProducts() 
 	throws Exception {
 		List<ProductDTO> products = productServ.getProducts();
+		return ResponseEntity.ok(products);
+	}
+	
+	// 상품 리뷰 많은순 목록 출력 
+	@GetMapping("/getProductBytReview")
+	public ResponseEntity<List<ProductDTO>> getProductBytReview() 
+	throws Exception {
+		List<ProductDTO> products = productServ.getProductBytReview();
 		return ResponseEntity.ok(products);
 	}
 
@@ -123,10 +131,24 @@ public class ProductController {
 
 	        // 기존 이미지 갱신	        	
         	List<Map<String, String>> imgList = reviewServ.getReviewImgList(review_seq);
-        	for (Map<String, String> img : imgList) {
-        		if (existImages == null || !existImages.contains(img.get("IMAGE_URL"))) {
+        	for (Map<String, String> image : imgList) {
+        		if (existImages == null || !existImages.contains(image.get("IMAGE_URL"))) {
         			// DB에 있는 이미지가 목록에 포함이 안되어 있으면 제거
-        			reviewServ.delReviewImage(img.get("IMAGE_URL"));
+        			if (image == null) continue;
+    	        	
+    	            String imageURL = image.get("IMAGE_URL");
+    	            System.out.println("i url : " + image);
+    	            
+    	            String fileName = imageURL.substring(imageURL.lastIndexOf('/') + 1); // URL에서 파일 이름 추출
+    	            String deleteResult = fileServ.deleteFile(fileName, "F4"); // 적절한 코드 사용
+
+    	            if ("ok".equals(deleteResult)) {
+    	                System.out.println("GCS 이미지 삭제 성공: " + fileName);
+    	            } else {
+    	                System.out.println("GCS 이미지 삭제 실패: " + fileName);
+    	            }
+    	            
+        			reviewServ.delReviewImage(image.get("IMAGE_URL"));
         		}
         	}
 	        

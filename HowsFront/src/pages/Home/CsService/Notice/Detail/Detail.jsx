@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { detailNtc } from '../../../../../api/notice'
 import styles from './Detail.module.css'
 import { Button } from '../../../../../components/Button/Button' // 버튼 컴포넌트 임포트
+import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop' // 버튼 컴포넌트 임포트
 
 export const Detail = () => {
     const { notice_seq } = useParams() // URL 파라미터로 notice_seq를 가져옴
@@ -87,6 +88,7 @@ export const Detail = () => {
             ) : (
                 <p>로딩 중...</p>
             )}
+            <ScrollTop />
         </>
     )
 }

@@ -3,20 +3,29 @@ import { useNavigate, useParams } from 'react-router-dom'
 import styles from './Detail.module.css'
 import { Button } from '../../../../../components/Button/Button'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
-import img from '../../../../../assets/images/Group16.png'
+import { detailEvt } from '../../../../../api/event' // 이벤트 API 불러오기
 
 export const Detail = () => {
-    const { event_seq } = useParams()
+    const { event_seq } = useParams() // URL 파라미터에서 event_seq 가져오기
     const [event, setEvent] = useState(null)
     const navigate = useNavigate()
 
-    // 이벤트 상세 데이터를 가져오는 함수 (임의의 값으로 설정)
+    // 이벤트 상세 데이터를 가져오는 함수
     useEffect(() => {
-        setEvent({
-            event_title: '이벤트 타이틀',
-            event_date: '2024-09-22',
-            event_contents: `이벤트 내용입니다. ${img}`,
-        })
+        const fetchEventDetail = async () => {
+            try {
+                const response = await detailEvt(event_seq) // API 호출
+                setEvent(response.data) // API에서 받아온 데이터를 상태에 저장
+                console.log(response.data)
+            } catch (error) {
+                console.error(
+                    '이벤트 상세 데이터를 가져오는 중 오류 발생:',
+                    error
+                )
+            }
+        }
+
+        fetchEventDetail() // 이벤트 상세 데이터 가져오기 호출
     }, [event_seq])
 
     // 이미지 URL과 텍스트를 분리하는 함수
@@ -46,9 +55,15 @@ export const Detail = () => {
                             <h2 className={styles.eventTitle}>
                                 {event.event_title}
                             </h2>
-                            <p className={styles.eventDate}>
-                                {formatDate(event.event_date)}
-                            </p>
+                            <div className={styles.subTxt}>
+                                <div className={styles.eventDate}>
+                                    {formatDate(event.event_date)}
+                                </div>
+                                <div className={styles.viewCount}>
+                                    <i className="bx bx-show"></i>
+                                    {event.view_count}
+                                </div>
+                            </div>
                         </div>
                         <div className={styles.eventContents}>
                             {/* 이미지가 있으면 출력 */}
@@ -68,13 +83,6 @@ export const Detail = () => {
                             <p>
                                 {formatEventContents(event.event_contents).text}
                             </p>
-
-                            {/* 직접 넣은 이미지 출력 */}
-                            <img
-                                src={img}
-                                alt="추가된 이미지"
-                                className={styles.additionalImage}
-                            />
                         </div>
                     </div>
                     {/* 버튼 컴포넌트를 사용한 리턴 버튼 */}

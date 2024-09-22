@@ -54,9 +54,15 @@ export const Detail = () => {
                             <h2 className={styles.noticeTitle}>
                                 {notice.notice_title}
                             </h2>
-                            <p className={styles.noticeDate}>
-                                {formatDate(notice.notice_date)}
-                            </p>
+                            <div className={styles.subTxt}>
+                                <div className={styles.noticeDate}>
+                                    {formatDate(notice.notice_date)}
+                                </div>
+                                <div className={styles.viewCount}>
+                                    <i className="bx bx-show"></i>
+                                    {notice.view_count}
+                                </div>
+                            </div>
                         </div>
                         <div className={styles.noticeContents}>
                             {/* 이미지가 있으면 출력 */}

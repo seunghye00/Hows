@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-// import { selectEvents } from '../../../../../api/event' // 이벤트 API
+import { selectEvt } from '../../../../../api/event' // 이벤트 API
 import styles from './EventList.module.css'
 import { Paging } from '../../../../../components/Pagination/Paging' // 페이지네이션 컴포넌트
 
@@ -15,30 +15,18 @@ export const EventList = () => {
     const endRow = page * perPage
 
     useEffect(() => {
-        // API 대신 임의의 데이터를 설정
         const fetchEvents = async () => {
             try {
-                // 임의 데이터 설정
-                const mockEvents = [
-                    {
-                        event_seq: 1,
-                        event_title: '가을 할인 이벤트',
-                        event_date: '2024-09-22',
-                    },
-                    {
-                        event_seq: 2,
-                        event_title: '여름 맞이 대박 세일',
-                        event_date: '2024-08-15',
-                    },
-                    {
-                        event_seq: 3,
-                        event_title: '겨울 시즌 사전 예약 이벤트',
-                        event_date: '2024-10-01',
-                    },
-                ]
-
-                setEvents(mockEvents)
-                setTotalEvents(mockEvents.length)
+                // selectEvt API 호출로 실제 이벤트 데이터를 가져옴
+                const response = await selectEvt(startRow, endRow)
+                // 응답 데이터가 undefined가 아닌지 체크
+                if (response && response.data && response.data.eventList) {
+                    setEvents(response.data.eventList) // 이벤트 데이터 설정
+                    setTotalEvents(response.data.totalEvents) // 총 이벤트 개수 설정
+                } else {
+                    setEvents([]) // 응답이 없을 경우 빈 배열 설정
+                    setTotalEvents(0) // 총 이벤트 개수를 0으로 설정
+                }
             } catch (error) {
                 console.error(
                     '이벤트 데이터를 불러오는 중 오류가 발생했습니다.',
@@ -65,7 +53,7 @@ export const EventList = () => {
     return (
         <>
             <h2 className={styles.title}>이벤트</h2>
-            {events.length > 0 ? (
+            {events && events.length > 0 ? (
                 events.map((event, index) => (
                     <div
                         key={index}

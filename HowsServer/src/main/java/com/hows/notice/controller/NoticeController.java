@@ -113,7 +113,7 @@ public class NoticeController {
 	public ResponseEntity<String> deleteNtc(@PathVariable int notice_seq) {
 	    try {
 	        // GCS에 있는 파일 삭제 (이미지 정보가 있을 경우에만)
-	        List<String> sysNames = Fservice.getSysNames(notice_seq); // 해당 공지사항의 이미지 sysName 목록 조회
+	        List<String> sysNames = Fservice.getSysNames(notice_seq, "F6"); // 해당 공지사항의 이미지 sysName 목록 조회
 	        if (sysNames != null && !sysNames.isEmpty()) {
 	            for (String sysName : sysNames) {
 	                Fservice.deleteFile(sysName, "F6"); // GCS 파일 삭제

@@ -41,8 +41,6 @@ export const requestPaymentEvent = async (payment, orderInfo) => {
             customer, // 구매자 정보
         })
 
-        console.log('결제 요청 응답 ======= ', response)
-
         // 결제 실패
         if (response.code != null) {
             if (response.code.toString() === 'FAILURE_TYPE_PG')

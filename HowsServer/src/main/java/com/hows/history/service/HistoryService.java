@@ -1,5 +1,8 @@
 package com.hows.history.service;
 
+import com.hows.history.dao.HistoryDAO;
+import com.hows.member.dao.MemberDAO;
+import com.hows.member.dto.MemberDTO;
 import com.hows.order.dao.OrderDAO;
 import com.hows.order.dto.OrderDTO;
 import com.hows.order.dto.OrderListDTO;
@@ -26,6 +29,22 @@ public class HistoryService {
 
     @Autowired
     private PaymentDAO paymentDAO;
+
+    @Autowired
+    private HistoryDAO historyDAO;
+
+    /** My History info **/
+    public Map<String, Object> myInfo(int memberSeq) {
+        // 회원 등급 및 포인트
+        Map<String, Object> map = historyDAO.myInfo(memberSeq);
+        System.out.println("map ==== " + map);
+        // 결제 총 금액
+        int totalPrice = orderDAO.getTotalPrice(memberSeq);
+        System.out.println("totalPrice ==== " + totalPrice);
+        map.put("totalPrice", totalPrice);
+
+        return map;
+    }
 
     /** My 주문 목록 **/
     public List<?> myOrder (int memberSeq) {

@@ -45,6 +45,7 @@
     width: 200px;
     height: 40px;
     background-color: var(--hows-point-color);
+    border-radius: 5px;
     color: var(--hows-white);
     font-size: 16px;
     font-weight: 900;
@@ -98,6 +99,7 @@
     height: 30px;
     padding: 4px;
     background-color: var(--hows-point-color);
+    border-radius: 5px;
     border: none;
     color: var(--hows-white);
     font-weight: 700;
@@ -190,6 +192,7 @@
     width: 90%;
     height: 35px;
     background-color: var(--hows-point-color);
+    border-radius: 5px;
     color: var(--hows-white);
     border: none;
     font-size: 16px;

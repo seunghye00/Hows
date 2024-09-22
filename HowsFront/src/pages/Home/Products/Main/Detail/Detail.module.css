@@ -58,6 +58,7 @@
 .product_title > div:first-child {
     font-weight: bold; 
     font-size: 24px;
+    padding-right: 10px;
 }
 
 /* 장바구니/바로구매/하트 버튼 */
@@ -125,17 +126,18 @@
     flex: 3;
     display: flex;justify-content: center;align-items: center;
     border-radius: 8px;
-    /* background-color: #0d1732; */
+    background-color: #f5f5f5; 
 }
 .buy > div:last-child > div {
     flex: 1; display: flex; justify-content: center; align-items: center;
     height: 100%;
-    background-color: var(--hows-point-color);
-    color: white; 
+    /* background-color: var(--hows-point-color); */
+    /* color: white;  */
     letter-spacing: 1px; font-weight: bold;
     cursor: pointer;
-    transition: all ease 0.2s;
-    border: 1px solid white;
+    transition: all ease 0.1s;
+    border: 1px solid #9999997b;
+    box-sizing: border-box;
 }
 
 .buy > div:last-child > div:first-child {border-radius: 8px 0 0 8px;}

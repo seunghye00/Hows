@@ -52,11 +52,19 @@ public class ProductController {
         return ResponseEntity.ok(bestProducts);
     }
 
-	// 상품 '전체' 목록 출력
+	// 상품 랜덤으로 '전체' 목록 출력
 	@GetMapping
 	public ResponseEntity<List<ProductDTO>> getProducts() 
 	throws Exception {
 		List<ProductDTO> products = productServ.getProducts();
+		return ResponseEntity.ok(products);
+	}
+	
+	// 상품 리뷰 많은순 목록 출력 
+	@GetMapping("/getProductBytReview")
+	public ResponseEntity<List<ProductDTO>> getProductBytReview() 
+	throws Exception {
+		List<ProductDTO> products = productServ.getProductBytReview();
 		return ResponseEntity.ok(products);
 	}
 
@@ -76,7 +84,29 @@ public class ProductController {
 		return ResponseEntity.ok(detaile);
 	}
 
-	
+	// 사용자 구매 확정 여부 확인, 로그인 필요함
+    @GetMapping("/review/checkPurchaseStatus")
+    public ResponseEntity<Boolean> checkPurchaseStatus(
+            @RequestParam String memberId, 
+            @RequestParam int productSeq) 
+    throws Exception{
+    	
+        boolean isPurchased = reviewServ.checkPurchaseStatus(memberId, productSeq);
+        return ResponseEntity.ok(isPurchased);
+    }
+    
+    // 구매 여부 및 이미 리뷰를 작성했는지 확인, 로그인 필요함
+    @GetMapping("/review/canWriteReview")
+    public ResponseEntity<Boolean> canWriteReview(
+            @RequestParam String memberId, 
+            @RequestParam int productSeq) 
+    throws Exception {
+    	
+        boolean canWriteReview = reviewServ.canWriteReview(memberId, productSeq);
+        return ResponseEntity.ok(canWriteReview);
+    }
+
+    
 	// 리뷰 수정, 로그인 필요함
 	@PostMapping("/reviewMod")
 	@Transactional
@@ -101,10 +131,24 @@ public class ProductController {
 
 	        // 기존 이미지 갱신	        	
         	List<Map<String, String>> imgList = reviewServ.getReviewImgList(review_seq);
-        	for (Map<String, String> img : imgList) {
-        		if (existImages == null || !existImages.contains(img.get("IMAGE_URL"))) {
+        	for (Map<String, String> image : imgList) {
+        		if (existImages == null || !existImages.contains(image.get("IMAGE_URL"))) {
         			// DB에 있는 이미지가 목록에 포함이 안되어 있으면 제거
-        			reviewServ.delReviewImage(img.get("IMAGE_URL"));
+        			if (image == null) continue;
+    	        	
+    	            String imageURL = image.get("IMAGE_URL");
+    	            System.out.println("i url : " + image);
+    	            
+    	            String fileName = imageURL.substring(imageURL.lastIndexOf('/') + 1); // URL에서 파일 이름 추출
+    	            String deleteResult = fileServ.deleteFile(fileName, "F4"); // 적절한 코드 사용
+
+    	            if ("ok".equals(deleteResult)) {
+    	                System.out.println("GCS 이미지 삭제 성공: " + fileName);
+    	            } else {
+    	                System.out.println("GCS 이미지 삭제 실패: " + fileName);
+    	            }
+    	            
+        			reviewServ.delReviewImage(image.get("IMAGE_URL"));
         		}
         	}
 	        
@@ -113,11 +157,10 @@ public class ProductController {
 	        	for (int i = 0; i < newImages.length; i++) {
 	        		String imageUrl = fileServ.upload(newImages[i], productSeq, "F4");
 	        		
-	        		System.out.println(imageUrl + " : " + review_seq);
+	        		//System.out.println(imageUrl + " : " + review_seq);
 	        		// imageUrl : GCS에 등록된 이미지 URL
 	        		// review_image 테이블에 등록
 	        		if (!imageUrl.equals("fail")) {
-//	        			System.out.println("test !!!");
 	        			ImageDTO imageDTO = new ImageDTO(0, review_seq, imageUrl, imageOrders[i]);
 	        			reviewServ.insertReviewImage(imageDTO);
 	        		}
@@ -164,7 +207,7 @@ public class ProductController {
 				for (int i = 0; i < images.length; i++) {
 					String imageUrl = fileServ.upload(images[i], productSeq, "F4");
 
-					System.out.println(imageUrl + " 결과");
+					//System.out.println(imageUrl + " 결과");
 					// imageUrl : GCS에 등록된 이미지 URL
 					// review_image 테이블에 등록
 					if (!imageUrl.equals("fail")) {
@@ -244,8 +287,42 @@ public class ProductController {
 	@DeleteMapping("/delReview/{review_seq}")
 	public ResponseEntity<String> delReview(@PathVariable int review_seq) 
 	throws Exception {
-	    reviewServ.deleteReview(review_seq);
-	    return ResponseEntity.ok().build();
+//	    reviewServ.deleteReview(review_seq);
+//	    return ResponseEntity.ok().build();
+	    
+	    try {
+	        // 1. 리뷰와 연관된 이미지 파일 URL들 가져오기
+	    	List<Map<String, String>> imageList = reviewServ.getReviewImgList(review_seq);
+
+	    	// 2. GCS에서 이미지 파일 삭제
+	        for (Map<String, String> image : imageList) {
+	        	if (image == null) continue;
+	        	
+	            String imageURL = image.get("IMAGE_URL");
+	            System.out.println("i url : " + image);
+	            
+	            String fileName = imageURL.substring(imageURL.lastIndexOf('/') + 1); // URL에서 파일 이름 추출
+	            String deleteResult = fileServ.deleteFile(fileName, "F4"); // 적절한 코드 사용
+
+	            if ("ok".equals(deleteResult)) {
+	                System.out.println("GCS 이미지 삭제 성공: " + fileName);
+	            } else {
+	                System.out.println("GCS 이미지 삭제 실패: " + fileName);
+	            }
+	            
+	            // 3. DB에서 이미지 정보 삭제
+	            reviewServ.delReviewImage(imageURL);
+	        }
+
+	        // 3. 리뷰 삭제
+	        reviewServ.deleteReview(review_seq);
+
+	        return ResponseEntity.ok("리뷰 및 이미지 삭제 완료"); // 성공 시 응답
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("리뷰 삭제 중 오류 발생"); // 에러 시 응답
+	    }
 	}
 	
 	// 리뷰 신고, 로그인 필요함

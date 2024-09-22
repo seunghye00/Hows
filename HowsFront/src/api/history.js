@@ -1,5 +1,11 @@
 import {api} from '../config/config'
 
+
+/** History 회원 정보 **/
+export const myInfo = () => {
+  return api.get(`history`);
+}
+
 /** 구매내역 **/
 export const myOrders = () => {
   return api.get(`/history/order`);

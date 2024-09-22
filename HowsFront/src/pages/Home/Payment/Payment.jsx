@@ -179,7 +179,6 @@ export const Payment = () => {
     } else {
       // 실패 시 결제 취소
       paymentCancel(paymentId).then(res => {
-        console.log("res.data ==== ", res.data);
         alert("결제 실패");
       });
     }

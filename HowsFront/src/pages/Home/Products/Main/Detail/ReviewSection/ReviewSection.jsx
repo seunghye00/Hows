@@ -2,14 +2,14 @@ import { useEffect, useRef, useState } from 'react';
 import styles from './ReviewSection.module.css'
 import axios from 'axios';
 import Swal from "sweetalert2";
-import img from '../../../../../../assets/images/마이페이지_프로필사진.jpg'
+import img from '../../../../../../assets/images/기본사진.jpg'
 import StarRating from '../../../../../../components/StarRating/StarRating';
 import { Modal } from '../../../../../../components/Modal/Modal';
 import { api, host } from '../../../../../../config/config';
 import { formatDate } from '../../../../../../commons/commons'
 import { Paging } from '../../../../../../components/Pagination/Paging';
 import { userInfo } from '../../../../../../api/member' 
-import { getReviewList , getReviewImgList , reviewLike, reviewUnlike , getReviewLikeCount , checkReviewLikeStatus , getRatings} from '../../../../../../api/product';
+import { checkPurchaseStatus, checkCanWriteReview, getReviewList , getReviewImgList , reviewLike, reviewUnlike , getReviewLikeCount , checkReviewLikeStatus , getRatings} from '../../../../../../api/product';
 import ReportModal from '../ReportModal/ReportModal';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,16 +19,43 @@ import { Navigation, Pagination } from 'swiper/modules'
 
 
 export const ReviewSection = ({ product_seq, isAuth }) => {
-    const memberId = sessionStorage.getItem("member_id"); // 세션에서 member_id 가져오기
-    const navi = useNavigate(); //페이지 전환을 위한 훅
+
+    const memberId = sessionStorage.getItem("member_id");
+    const navi = useNavigate();
     
     // =============== 모달창 ===============
     const [ isReviewModalOpen, setIsReviewModalOpen ] = useState(false); // 리뷰
     const [ isReportModalOpen, setIsReportModalOpen ] = useState(false); // 신고 
     const [ selectedReviewSeq, setSelectedReviewSeq ] = useState(null); // 신고 모달에서 사용할 리뷰 seq
 
+
     // 리뷰 작성 모달 열기
-    const handleOpenReviewModal = () => {
+    const handleOpenReviewModal = async () => {
+        // 로그인한 사용자의 ID와 현재 상품의 product_seq를 이용하여 구매 상태 확인
+        const isPurchased = await checkPurchaseStatus(memberId, product_seq);
+
+        // 구매하지 않은 경우 경고 메시지 표시
+        if (!isPurchased) {
+            Swal.fire({
+                icon: 'warning',
+                title: '상품을 구매한 후에만 리뷰를 작성할 수 있습니다.',
+                showConfirmButton: true,
+            });
+            return; 
+        }
+
+        // 이미 리뷰를 작성한 경우 경고 메시지 표시
+        const canWriteReview = await checkCanWriteReview(memberId, product_seq);
+        if (!canWriteReview) {
+            Swal.fire({
+                icon: 'warning',
+                title: '이미 이 상품에 대한 리뷰를 작성하셨습니다.',
+                showConfirmButton: true,
+            });
+            return;
+        }
+
+        // 리뷰 작성 가능
         setReviewMod({
             'state': false,
             'review_seq': 0
@@ -284,9 +311,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
         data.images.forEach((_, index) =>
             formData.append('imageOrders', index + 1)
-        )
-
-        console.log("newImages : " + newImages);        
+        )    
 
         api.post(`/product/reviewMod`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
@@ -410,8 +435,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                 const ratingResp = await getRatings(product_seq);
                 const reviewsData = resp.data.reviews;
                 const ratingsData = ratingResp.data;
-                // console.log("테스트중1"+JSON.stringify(reviewsData));
-                // console.log("테스트중2"+JSON.stringify(ratingsData));
                 
     
                 if (reviewsData.length > 0) {
@@ -426,18 +449,14 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     
                     // 리뷰 작성자 프로필 이미지를 불러오는 부분
                     const avatarPromises = reviewsData.map(async (review) => {
-                        // member_id가 null 또는 "null"이 아닌 경우에만 호출
-                        if (memberId && review.MEMBER_ID && review.MEMBER_ID !== "null") { 
+                        if (review.MEMBER_ID) {
                             try {
-                                // 프로필 이미지 API 호출
                                 const profileResp = await userInfo(review.MEMBER_ID);
                                 return { memberId: review.MEMBER_ID, avatar: profileResp.data.member_avatar };
                             } catch (error) {
-                                console.error(`프로필 이미지를 불러오는 중 오류 발생: ${review.MEMBER_ID}`, error);
-                                return { memberId: review.MEMBER_ID, avatar: img }; // 오류 발생 시 기본 이미지
+                                console.error(`프로필 이미지 불러오기 오류: ${review.MEMBER_ID}`, error);
+                                return { memberId: review.MEMBER_ID, avatar: img };  // 기본 이미지
                             }
-                        } else {
-                            return { memberId: review.MEMBER_ID, avatar: img };  // member_id가 없으면 기본 이미지 반환
                         }
                     });
                     const avatarData = await Promise.all(avatarPromises);
@@ -455,7 +474,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     // 리뷰 상태 및 총 리뷰 수 설정
                     setReviews(reviewsWithImages);
                     setTotalReviews(reviewsData[0].TOTAL_COUNT);
-                    // console.log(reviewsData);
                     
     
                     // 평균 별점 계산
@@ -467,9 +485,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     const newRatingsCount = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
                     ratingsData.forEach(review => newRatingsCount[review.rating]++);
                     setRatingsCount(newRatingsCount);
-                    // console.log("1: " + JSON.stringify(newRatingsCount));
-                    console.log("2: " + JSON.stringify(ratingsCount));
-                    console.log("2: " + JSON.stringify(ratingsData));
 
                     
                     
@@ -490,7 +505,6 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                         }
                     });
                     const likeData = await Promise.all(likePromises);
-                    // console.log("각 리뷰의 좋아요 데이터 확인중"+likeData);
 
                     const newLikeCount = {};
                     const newLikedStatus = {};
@@ -626,7 +640,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     const handleChangeSortType = (sortType) => {
         setSortType(sortType);
     }
-
+    
     return (
         <div className={styles.container}>
             {/* 상품 리뷰 내용 */}
@@ -634,20 +648,12 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
             <div className={styles.reviewsBox}>
                 <div className={styles.reviewsHeader}>
                     <div>리뷰 {reviews.length} </div>
-                    
-                    {isAuth ? (
-                        // 로그인 상태일 때
-                        <div onClick={handleOpenReviewModal} style={{ cursor: 'pointer'}}>리뷰쓰기</div>
-                    ) : (
-                        // 로그인이 되어 있지 않을 때
-                        <div>로그인 후 리뷰를 작성할 수 있습니다.</div>
-                    )}
+                    <div onClick={handleOpenReviewModal} style={{ cursor: 'pointer'}}>리뷰쓰기</div>
 
                     {/* 리뷰 모달 */}
                     {isReviewModalOpen && (
                         <Modal isOpen={isReviewModalOpen} onClose={handleCloseReviewModal}>
                             <div className={styles.modalBox}>
-                                {/* {console.log("reviewMod : " + reviewMod)} */}
                                 {
                                 reviewMod.state === false ? 
                                 ( <h2>리뷰 쓰기</h2> )
@@ -730,8 +736,12 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                     <div>
                                         <div>
                                             <div>
-                                                {/* 리뷰 작성자의 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시 */}
-                                                <img src={reviewAvatars[review.MEMBER_ID] || img} alt="profile"/>
+                                            {/* 리뷰 작성자의 MEMBER_ID와 연결된 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시 */}
+                                            {reviewAvatars[review.MEMBER_ID] ? (
+                                                <img src={reviewAvatars[review.MEMBER_ID]} alt="profile" />
+                                            ) : (
+                                                <img src={img} alt="default profile" />
+                                            )}
                                             </div>
                                             <div>
                                                 <div>{review.MEMBER_ID} </div>
@@ -791,12 +801,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                                     </SwiperSlide>
                                                 ))}
                                             </Swiper>
-
-                                            // review.images.map((img, imgIndex) => (
-                                            //     <div key={imgIndex}><img src={img.IMAGE_URL} alt='img'/></div>
-                                            // ))
                                         ) : (
-                                            <div>이미지가 없습니다.</div> 
+                                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', color: '#666'}}>이미지가 없습니다.</div> 
                                         )}
                                         </div>
                                         <div>

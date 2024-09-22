@@ -38,6 +38,12 @@ public class HistoryController {
 	@Autowired
 	private OrderService orderServ;
 
+	@GetMapping
+	public ResponseEntity<Map<String, Object>> myInfo(@AuthenticationPrincipal CustomUserDetails user) {
+		Map<String, Object> map = historyServ.myInfo(user.getMemberSeq());
+		return ResponseEntity.ok(map);
+	}
+
 	@GetMapping("/order")
 	public ResponseEntity<List<?>> orderList(@AuthenticationPrincipal CustomUserDetails user) {
 		List<?> list = historyServ.myOrder(user.getMemberSeq());

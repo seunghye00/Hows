@@ -9,7 +9,7 @@ import StarRating from '../../../../../components/StarRating/StarRating';
 import { useAuthStore } from '../../../../../store/store';
 import Swal from "sweetalert2";
 import { useOrderStore } from '../../../../../store/orderStore';
-import { getReviewList , getProductDetail, getLikeCount, getRatings} from '../../../../../api/product';
+import { checkLikeStatus, getReviewList , getProductDetail, getLikeCount, getRatings} from '../../../../../api/product';
 
 
 
@@ -38,77 +38,28 @@ export const Detail = () => {
 
 
     useEffect(()=>{
-        // 페이지가 로드될 때 스크롤을 맨 위로 이동
-        window.scrollTo(0, 0);
+        window.scrollTo(0, 0); 
 
         // 상품 상세 정보
-        getProductDetail(product_seq)
-        .then(resp=>{
+        getProductDetail(product_seq).then(resp=>{
             setList(resp.data);
             setTotalPrice(resp.data.price); // 초기 가격 설정
-        }).catch((error) => {
-            console.error('상품 상세 정보 불러오기 오류', error);
         });
 
         // 좋아요 개수
-        getLikeCount(product_seq)
-        .then(resp => {
-            setLikeCount(resp.data); // 서버에서 받은 좋아요 개수 상태로 설정
-        })
-        .catch((error) => {
-            console.error('좋아요 개수 불러오기 실패', error);
+        getLikeCount(product_seq).then(resp => {setLikeCount(resp.data);});
+
+        // 좋아요 상태
+        checkLikeStatus(product_seq, memberId).then(resp => setLiked(resp.data));
+
+        // 별점 데이터 받아서 평균 계산
+        getRatings(product_seq).then(resp => {
+            const ratings = resp.data;
+            // 모든 리뷰의 별점을 더하고, 리뷰 수로 나누어 평균 별점 계산
+            const avgRating = ratings.reduce((acc, review) => acc + review.rating, 0) / ratings.length;
+            setAverageRating(avgRating); // 평균 별점 상태 업데이트
         });
-        // 리뷰 목록과 별점 정보 가져오기
-        const fetchRatingsAndReviews = async () => {
-            try {
-                const ratingResp = await getRatings(product_seq); // 별점 정보 가져오기
-                const reviewResp = await getReviewList(product_seq); // 리뷰 목록 가져오기
-                // const reviewList = reviewResp.data.reviews;
-                const ratingsData = ratingResp.data; // 별점 정보
-
-                // 평균 별점 계산
-                const totalRating = ratingsData.reduce((acc, review) => acc + review.rating, 0);
-                const average = totalRating / ratingsData.length;
-                setAverageRating(average); // 평균 별점 상태 업데이트
-
-                // 별점 카운트 업데이트
-                const newRatingsCount = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
-                ratingsData.forEach(review => newRatingsCount[review.rating]++);
-                setRatingsCount(newRatingsCount);
-            } catch (error) {
-                console.error("리뷰 및 별점 정보 불러오기 오류", error);
-            }
-        };
-        fetchRatingsAndReviews();
-
-        // 리뷰 목록을 가져와 평균 별점 계산
-        getReviewList(product_seq)
-        .then(resp => {
-            const reviewList = resp.data.reviews;
-
-            if (reviewList && reviewList.length > 0) {
-                const totalRating = reviewList.reduce((acc, review) => acc + review.RATING, 0);
-                const average = totalRating / reviewList.length;
-
-                // 평균 별점 상태 업데이트
-                setAverageRating(average); 
-            }
-        }).catch((error) => {
-            console.error('리뷰 목록 오류', error);
-        });
-
-        // 사용자가 이미 좋아요를 눌렀는지 확인 (로그인 상태일 경우만)
-        if (memberId) {
-            axios.get(`${host}/likes/check`, { params: { product_seq, member_id: memberId } })
-                .then((resp) => {
-                    setLiked(resp.data); // 서버에서 받은 좋아요 상태
-                })
-                .catch((error) => {
-                    console.error('좋아요 상태 확인 실패:', error);
-                });
-        } else {
-            console.log('사용자가 로그인하지 않았습니다.');
-        }
+        
     },[])
 
 
@@ -217,7 +168,6 @@ export const Detail = () => {
             product_quantity: quantity, 
             product_total_price: totalPrice, 
         }
-        console.log(data)
 
         // 주문 가격 계산
         orderPrice += totalPrice;

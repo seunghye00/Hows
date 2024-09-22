@@ -101,6 +101,7 @@ export const Cart = () => {
     let order = [];
     let orderPrice = 0;
     dataArr.forEach(item => {
+      console.log(item);
       const dataSet = {
         product_seq: item.product_seq,
         product_title: item.product_title,
@@ -108,9 +109,14 @@ export const Cart = () => {
         product_quantity: item.cart_quantity,
         product_total_price: item.cart_price,
       };
+      if(item.cart_quantity > item.quantity){
+        alert(item.product_title, "의 재고가 부족합니다");
+        return false;
+      }
       orderPrice += item.cart_price;
       order.push(dataSet);
     });
+
     setOrderPrice(orderPrice);
     setOrderProducts(order);
     sessionStorage.setItem("howsOrder", JSON.stringify(order));
@@ -167,6 +173,7 @@ export const Cart = () => {
 
     cartList().then(res => {
       if(res.data !== "") {
+        console.log(res.data);
         const arr = res.data.map(item => ({ ...item, checked: true }));
         setCarts(arr);
         setCheckCart(arr);

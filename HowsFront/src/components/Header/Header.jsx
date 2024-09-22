@@ -8,6 +8,8 @@ import profile from '../../assets/images/기본사진.jpg'
 import { throttle } from 'lodash'
 import { api } from './../../config/config' // API 요청을 위한 경로
 import Swal from 'sweetalert2'
+import {useProductStore} from "../../store/productStore";
+import {SubHeader} from "../../pages/Home/Products/SubHeader/SubHeader";
 
 export const Header = () => {
     const navigate = useNavigate()
@@ -19,6 +21,30 @@ export const Header = () => {
     const [setProfileImage] = useState('') // 프로필 사진 상태
     const { currentUser } = useMemberStore()
     const [isMenuOpen, setIsMenuOpen] = useState(false) // 메뉴 열림/닫힘 상태
+
+    const [subHeader, setSubHeader] = useState(false); //서브헤더 관리 상태 
+    let hideTimeout;
+
+    const handleMouseEnter = () => {
+        if (hideTimeout) {
+            clearTimeout(hideTimeout); // 지연 시간을 초기화하여 서브헤더가 사라지지 않도록
+        }
+        setSubHeader(true); // 서브헤더 표시
+    };
+
+    const handleMouseLeave = () => {
+        hideTimeout = setTimeout(() => {
+            setSubHeader(false); // 서브헤더 숨김
+        }, 100); // 200ms의 지연 시간
+    };
+
+    useEffect(() => {
+        return () => {
+            if (hideTimeout) {
+                clearTimeout(hideTimeout);
+            }
+        };
+    }, []);
 
     const handleMenuClick = menuName => {
         setActiveMenu(menuName)
@@ -127,7 +153,11 @@ export const Header = () => {
     }
 
     return (
-        <div className="header">
+        <div 
+            className="header"         
+            onMouseEnter={handleMouseEnter} // 마우스가 들어오면 서브헤더 표시
+            onMouseLeave={handleMouseLeave} // 마우스가 나가면 서브헤더 숨김
+        >
             <div className={styles.headerWrap}>
                 {isFixed && <div className={styles.headerSpacer}></div>}
                 <div
@@ -153,32 +183,35 @@ export const Header = () => {
                                 </a>
                             </div>
                             <div className={styles.naviMenuList}>
-                                <div
-                                    className={`${styles.naviMenu} ${
+                                <>
+                                    <div
+                                      className={`${styles.naviMenu} ${
                                         activeMenu === 'Shop'
-                                            ? styles.active
-                                            : ''
-                                    }`}
-                                    onClick={() => handleMenuClick('Shop')}
-                                >
-                                    <a>Shop</a>
-                                </div>
+                                          ? styles.active
+                                          : ''
+                                      }`}
+                                      onClick={() => handleMenuClick('Shop')}
+                                    >
+                                        <a>Shop</a>
+                                    </div>
+                                </>
+
 
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'Story'
-                                            ? styles.active
-                                            : ''
-                                    }`}
-                                    onClick={() => handleMenuClick('Story')}
+                                  className={`${styles.naviMenu} ${
+                                    activeMenu === 'Story'
+                                      ? styles.active
+                                      : ''
+                                  }`}
+                                  onClick={() => handleMenuClick('Story')}
                                 >
                                     <a>Story</a>
                                 </div>
                                 <div
-                                    className={`${styles.naviMenu} ${
-                                        activeMenu === 'Service'
-                                            ? styles.active
-                                            : ''
+                                  className={`${styles.naviMenu} ${
+                                    activeMenu === 'Service'
+                                      ? styles.active
+                                      : ''
                                     }`}
                                     onClick={() => handleMenuClick('Service')}
                                 >
@@ -308,6 +341,7 @@ export const Header = () => {
                     </div>
                 </div>
             )}
+            {subHeader && <SubHeader />}
         </div>
     )
 }

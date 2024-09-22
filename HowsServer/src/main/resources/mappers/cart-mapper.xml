@@ -15,6 +15,7 @@
         <result property="product_title" column="product_title"/>
         <result property="product_contents" column="product_contents"/>
         <result property="price" column="price"/>
+        <result property="quantity" column="quantity"/>
         <result property="product_category_code" column="product_category_code"/>
     </resultMap>
 
@@ -29,6 +30,7 @@
             p.product_title,
             p.product_contents,
             p.price,
+            p.quantity,
             p.product_category_code
         FROM
             cart c

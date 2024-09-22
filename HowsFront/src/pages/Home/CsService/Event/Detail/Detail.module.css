@@ -10,7 +10,7 @@
     border-bottom: 1px solid var(--hows-gray-200);
 }
 
-.noticeTitle {
+.eventTitle {
     font-size: 28px;
     font-weight: bold;
     margin-bottom: 10px;
@@ -19,20 +19,20 @@
     word-wrap: break-word;
 }
 
-.noticeDate {
+.event_date {
     font-size: 16px;
     color: var(--hows-gray-300);
     margin-bottom: 20px;
 }
 
-.noticeContents {
+.eventContents {
     font-size: 18px;
     margin-bottom: 40px;
     word-break: keep-all;
     word-wrap: break-word;
 }
 
-.noticeImage {
+.eventImage {
     display: block;
     margin-bottom: 20px;
     max-width: 100%;

@@ -35,6 +35,7 @@ const ReportModal = ({ reviewSeq, memberId, isOpen, onClose }) => {
 
 
         try {
+            
             await sendReviewReport(reviewSeq, selectedReason, memberId);
 
             Swal.fire({

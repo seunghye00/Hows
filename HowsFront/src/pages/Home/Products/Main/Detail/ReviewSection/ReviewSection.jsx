@@ -211,7 +211,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
             <>
             {
                 existImages.map((src, index) => (
-                    <div key={index} className={styles.previewImageContainer}>
+                    <div key={`exist-${index}`} className={styles.previewImageContainer}>
                         {/* 이미지 미리보기 */}
                         <img src={src} alt={`preview ${index}`} className={styles.previewImage} />
 
@@ -228,7 +228,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
             {
                 newImages.map((src, index) => (
-                    <div key={index} className={styles.previewImageContainer}>
+                    <div key={`new-${index}`} className={styles.previewImageContainer}>
                         {/* 이미지 미리보기 */}
                         <img src={src} alt={`preview ${index}`} className={styles.previewImage} />
 
@@ -550,7 +550,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     const handleReviewDel = (review_seq) => {
         axios.delete(`${host}/product/delReview/${review_seq}`)
             .then(response => {
-                console.log('리뷰 삭제 성공:', response.data);
+                // console.log('리뷰 삭제 성공:', response.data);
                 // 삭제된 리뷰를 제외하고 나머지 리뷰로 상태 업데이트
                 setReviews(prevReviews => prevReviews.filter(review => review.REVIEW_SEQ !== review_seq));
                 Swal.fire({
@@ -731,8 +731,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     </div>
                     <div className={styles.reviewBox}>
                         {reviews.length > 0 ? (
-                            (reviews || []).map((review, index) => (
-                                <div key={index}>
+                            (reviews || []).map((review) => (
+                                <div key={review.REVIEW_SEQ}>
                                     <div>
                                         <div>
                                             <div>
@@ -772,7 +772,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                                     {isReportModalOpen && selectedReviewSeq === review.REVIEW_SEQ && (
                                                         <ReportModal
                                                             reviewSeq={selectedReviewSeq}
-                                                            memberId={review.MEMBER_ID} 
+                                                            memberId={memberId} 
                                                             isOpen={isReportModalOpen}
                                                             onClose={handleCloseReportModal}
                                                         />
@@ -794,8 +794,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                             >
                                                 {
                                                 review.images.map((img, imgIndex) => (
-                                                    <SwiperSlide key={index}>
-                                                        <div key={imgIndex}>
+                                                    <SwiperSlide key={imgIndex}>
+                                                        <div>
                                                             <img src={img.IMAGE_URL} alt='img'/>
                                                         </div>
                                                     </SwiperSlide>

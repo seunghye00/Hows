@@ -11,32 +11,32 @@ import com.hows.product.dto.ProductDTO;
 
 @Service
 public class ProductService {
-	
+
 	@Autowired
 	private ProductDAO productDAO;
-	
+
 	// 상품 '베스트' 목록 출력
-    public List<ProductDTO> getBestProducts() {
-        return productDAO.getBestProducts();
-    }
-	
-    // 상품 '전체' 목록 출력
-	public List<ProductDTO> getProducts () {
+	public List<ProductDTO> getBestProducts() {
+		return productDAO.getBestProducts();
+	}
+
+	// 상품 '전체' 목록 출력
+	public List<ProductDTO> getProducts() {
 		return productDAO.getProducts();
 	}
-	
-	// 상품 리뷰 많은순 목록 출력 
-	public List<ProductDTO> getProductBytReview () {
+
+	// 상품 리뷰 많은순 목록 출력
+	public List<ProductDTO> getProductBytReview() {
 		return productDAO.getProductBytReview();
 	}
-	
+
 	// 상품 '카테고리'별 목록 출력
-	public List<Map<String, Object>> getProductByCategory (String product_category_code) {
+	public List<Map<String, Object>> getProductByCategory(String product_category_code) {
 		return productDAO.getProductByCategory(product_category_code);
 	}
-	
+
 	// 상품 '디테일' 출력
-	public ProductDTO getProductByDetail (String product_seq) {
+	public ProductDTO getProductByDetail(String product_seq) {
 		return productDAO.getProductDetaile(product_seq);
 	}
 
@@ -63,5 +63,17 @@ public class ProductService {
 	// 카테고리별 상품 수 조회
 	public List<Map<String, Object>> getProductNumByCategory() {
 		return productDAO.getProductNumByCategory();
+	}
+
+	// 조건별 베스트 상품 조회
+	public List<ProductDTO> getBestProductByCondition(String condition) {
+		switch(condition) {
+		case "selling":
+			return productDAO.getBestProductBySelling();
+		case "review":
+			return productDAO.getBestProductByReview();
+		default:
+			return null;
+		}
 	}
 }

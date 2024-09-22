@@ -51,7 +51,6 @@
 		GROUP BY p.product_seq, p.product_thumbnail, p.product_title, p.product_contents, p.price, p.product_category_code
 		ORDER BY review_count DESC
 	</select>
-
 	
 	<select id="getProductByCategory" parameterType="String" resultType="map">
 		  SELECT 
@@ -91,7 +90,6 @@
 	    WHERE member_id = #{memberId}
 	    AND product_seq = #{productSeq}
 	</select>
-
     
 	<!-- 리뷰등록 -->
 	<insert id="insertReview" parameterType="com.hows.product.dto.ReviewDTO">
@@ -335,7 +333,7 @@
     	group by c.product_category_title
 	</select>
 
-	<!-- 수문 완료 시 재고 차감 -->
+	<!-- 주문 완료 시 재고 차감 -->
 	<update id="updateQuantity">
 		UPDATE
 			product
@@ -344,4 +342,42 @@
 		WHERE
 			product_seq = #{product_seq}
 	</update>
+	
+	<!-- 판매량 순으로 5개까지만 조회 -->
+	<select id="getBestProductBySelling" resultType="com.hows.product.dto.ProductDTO">
+		select *
+		from (
+    		select p.product_seq, 
+           		p.product_title, 
+           		p.product_thumbnail,
+           		p.price,
+           		p.quantity,
+           		sum(ol.order_list_count) as total_sales
+    		from product p
+    		join order_list ol on p.product_seq = ol.product_seq
+    		join orders o on ol.order_seq = o.order_seq
+    		where o.order_code = 'O6'  -- 구매확정된 주문
+    		group by p.product_seq, p.product_title, p.product_thumbnail, p.price, p.quantity
+    		order by total_sales desc
+		) 
+		where rownum &lt;= 5
+	</select>
+	
+	<!-- 리뷰순으로 5개까지만 조회 -->
+	<select id="getBestProductByReview" resultType="com.hows.product.dto.ProductDTO">
+		select *
+		from (
+    		select p.product_seq, 
+           		p.product_title, 
+           		p.product_thumbnail,
+           		p.price,
+           		p.quantity, 
+           		count(r.review_seq) as review_count
+    		from product p
+    		left join review r on p.product_seq = r.product_seq
+    		group by p.product_seq, p.product_title, p.product_thumbnail, p.price, p.quantity
+    		order by review_count desc
+		)
+		where rownum &lt;= 5
+	</select>
 </mapper>

@@ -482,6 +482,13 @@ public class ProductController {
 		return ResponseEntity.ok(result);
 	}
 	
+    // 조건별 베스트 상품 조회
+    @GetMapping("/getBestProduct/{condition}")
+    public ResponseEntity<List<ProductDTO>> getBestProductByCondition (@PathVariable String condition) throws Exception{
+    	List<ProductDTO> result = productServ.getBestProductByCondition(condition);
+    	return ResponseEntity.ok(result);
+    }
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

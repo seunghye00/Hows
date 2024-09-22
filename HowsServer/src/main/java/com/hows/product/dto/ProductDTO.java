@@ -8,6 +8,8 @@ public class ProductDTO {
 	private int price;
 	private int quantity;
 	private String product_category_code;
+	private int review_count;
+	private int total_sales;
 	
 	public ProductDTO() {
 		super();
@@ -65,5 +67,16 @@ public class ProductDTO {
 	public void setProduct_category_code(String product_category_code) {
 		this.product_category_code = product_category_code;
 	}
-	
+	public int getReview_count() {
+		return review_count;
+	}
+	public void setReview_count(int review_count) {
+		this.review_count = review_count;
+	}
+	public int getTotal_sales() {
+		return total_sales;
+	}
+	public void setTotal_sales(int total_sales) {
+		this.total_sales = total_sales;
+	}
 }

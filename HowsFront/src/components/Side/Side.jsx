@@ -77,8 +77,8 @@ export const Side = () => {
                     icon: 'bx bx-error-circle', // 아이콘 추가
                     subMenu: [
                         { title: '공지사항 관리', path: 'notice' },
-                        { title: 'FAQ 관리', path: '/admin/notice/faq' },
                         { title: '이벤트 관리', path: '/admin/notice/event' },
+                        { title: 'FAQ 관리', path: '/admin/notice/faq' },
                     ],
                 },
             ],

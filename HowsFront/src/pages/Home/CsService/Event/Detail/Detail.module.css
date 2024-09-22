@@ -8,6 +8,13 @@
 .titleCont {
     margin-bottom: 20px;
     border-bottom: 1px solid var(--hows-gray-200);
+    padding-bottom: 20px;
+}
+
+.subTxt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 .eventTitle {
@@ -19,9 +26,15 @@
     word-wrap: break-word;
 }
 
-.event_date {
+.eventDate {
     font-size: 16px;
-    color: var(--hows-gray-300);
+    color: var(--hows-gray-500);
+    margin-bottom: 20px;
+}
+
+.viewCount {
+    font-size: 16px;
+    color: var(--hows-gray-500);
     margin-bottom: 20px;
 }
 

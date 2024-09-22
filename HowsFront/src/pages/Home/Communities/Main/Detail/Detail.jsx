@@ -290,6 +290,11 @@ export const Detail = () => {
             } else {
                 await sendReport(board_seq, selectedReports, member_id) // 게시글 신고
             }
+            // 신고 후 상태 초기화
+            setSelectedCommentSeq(null)
+            setSelectedReplySeq(null)
+            setSelectedReports(null)
+
             Swal.fire({
                 icon: 'success',
                 title: '신고가 접수되었습니다.',

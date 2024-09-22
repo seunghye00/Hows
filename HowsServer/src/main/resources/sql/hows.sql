@@ -24,7 +24,7 @@ withdrawal_date timestamp default null,
 withdrawal_yn char(1) default 'N',
 member_banner varchar2(500) default null, 
 point number default 0,
-member_avatar varchar2(200) default null
+member_avatar varchar2(200) default 'https://storage.cloud.google.com/hows-attachment/F1/3adc3060-ce44-4d0a-ac27-f05d75023f76'
 );
 
 create sequence member_seq

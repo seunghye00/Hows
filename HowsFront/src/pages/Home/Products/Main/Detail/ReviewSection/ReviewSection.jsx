@@ -610,9 +610,11 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
                     // 좋아요 취소 요청 보내기
                     reviewUnlike(reviewSeq, memberId)
-                        .then((resp) => {console.log('리뷰 좋아요 취소 성공:', resp);})
+                        .then((resp) => {
+                            // console.log('리뷰 좋아요 취소 성공:', resp);
+                        })
                         .catch((error) => {
-                            console.error('리뷰 좋아요 취소 실패:', error);
+                            // console.error('리뷰 좋아요 취소 실패:', error);
                             // 실패 시 좋아요 상태 복구
                             setLiked((prev) => ({ ...prev, [reviewSeq]: true }));
                             setLikeCount((prev) => ({ ...prev, [reviewSeq]: (prev[reviewSeq] || 0) + 1 }));
@@ -626,7 +628,9 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
             // 좋아요 요청 보내기
             reviewLike(reviewSeq, memberId)
-                .then((resp) => {console.log('리뷰 좋아요 성공:', resp);})
+                .then((resp) => {
+                    // console.log('리뷰 좋아요 성공:', resp);
+                })
                 .catch((error) => {
                     console.error('리뷰 좋아요 추가 실패:', error);
                     // 좋아요 추가 실패 시 원상복구
@@ -639,6 +643,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     // 리뷰 정렬 타입 변경
     const handleChangeSortType = (sortType) => {
         setSortType(sortType);
+        setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
+
     }
     
     return (
@@ -671,8 +677,9 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                 <h2>리뷰 작성</h2>
                                 <div className={styles.reviewModal}>
                                     <input type='text' 
+                                        maxLength={30}
                                         name='review_contents' 
-                                        placeholder='리뷰 내용을 입력하세요.' 
+                                        placeholder='리뷰 내용을 입력하세요. (최대 30자)' 
                                         value={data.review_contents} 
                                         onChange={handleInputChange}
                                         className={styles.reviewContent}>

@@ -101,7 +101,7 @@ export const Event = () => {
     const formatEventContents = contents => {
         const imageUrlRegex =
             /(https:\/\/storage\.cloud\.google\.com\/hows-attachment\/[^\s]+)/g
-        const imageUrls = contents.match(imageUrlRegex) || [] // 이미지 URL 추출
+        const imageUrls = contents.match(imageUrlRegex) || [] // 모든 이미지 URL 추출
         const text = contents.replace(imageUrlRegex, '').trim() // URL 제외한 나머지 텍스트 추출
         return { imageUrls, text }
     }
@@ -245,7 +245,7 @@ export const Event = () => {
                                     />
                                 ))}
 
-                                {/* 이미지 아래에 텍스트 출력 */}
+                                {/* 텍스트 출력 */}
                                 {formatEventContents(
                                     selectedEvent.event_contents
                                 ).text && (

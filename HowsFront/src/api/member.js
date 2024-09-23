@@ -22,7 +22,6 @@ export const checkEmailForSignUp = (email) => {
 
 /** 유저 정보  **/
 export const userInfo = member_id => {
-    console.log(member_id)
     if (member_id) {
         return api.get(`/member/selectInfo`, { params: { member_id } })
     } else {

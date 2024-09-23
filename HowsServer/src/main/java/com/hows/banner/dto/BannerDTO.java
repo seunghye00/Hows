@@ -9,6 +9,8 @@ public class BannerDTO {
 	private Date start_date;
 	private Date end_date;
 	private int banner_order;
+	private String is_visible;
+	private int connect_seq;
 	public int getBanner_seq() {
 		return banner_seq;
 	}
@@ -45,6 +47,18 @@ public class BannerDTO {
 	public void setBanner_order(int banner_order) {
 		this.banner_order = banner_order;
 	}
+	public String getIs_visible() {
+		return is_visible;
+	}
+	public void setIs_visible(String is_visible) {
+		this.is_visible = is_visible;
+	}
+	public int getConnect_seq() {
+		return connect_seq;
+	}
+	public void setConnect_seq(int connect_seq) {
+		this.connect_seq = connect_seq;
+	}
 	public BannerDTO(int banner_seq, int file_seq, String banner_url, Date start_date, Date end_date,
 			int banner_order) {
 		super();
@@ -54,6 +68,18 @@ public class BannerDTO {
 		this.start_date = start_date;
 		this.end_date = end_date;
 		this.banner_order = banner_order;
+	}
+	public BannerDTO(int banner_seq, int file_seq, String banner_url, Date start_date, Date end_date, int banner_order,
+			String is_visible, int connect_seq) {
+		super();
+		this.banner_seq = banner_seq;
+		this.file_seq = file_seq;
+		this.banner_url = banner_url;
+		this.start_date = start_date;
+		this.end_date = end_date;
+		this.banner_order = banner_order;
+		this.is_visible = is_visible;
+		this.connect_seq = connect_seq;
 	}
 	public BannerDTO() {
 		super();

@@ -1,7 +1,5 @@
 import styles from "./Category.module.css";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { host } from "../../../../../config/config";
 
 import { useNavigate, useParams } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -249,7 +247,7 @@ export const Category = () => {
                 )}
               </div>
             </div>
-            <div className={styles.length}>{productsList.length}개</div>
+            <div className={styles.length}>{productsList.length}개의 상품이 있습니다.</div>
           </div>
 
           <div>
@@ -257,7 +255,7 @@ export const Category = () => {
               dataLength={productsList.length || 0}
               next={loadMoreData}
               hasMore={hasMore}
-              loader={<h4>Loading...</h4>}
+              // loader={<h4>Loading...</h4>}
             >
               {chunkedContentList.length > 0 ? (
                 chunkedContentList.map((chunk, index) => (

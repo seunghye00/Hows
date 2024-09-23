@@ -275,6 +275,7 @@
             r.review_seq, p.product_title, m.nickname, r.review_contents, r.review_date
     	)
     	WHERE row_num BETWEEN #{startRow} AND #{endRow}  <!-- 페이징 처리 -->
+    	AND report_count > 0 -- 신고 횟수가 1 이상인 경우만 조회
 	</select>
 
 	

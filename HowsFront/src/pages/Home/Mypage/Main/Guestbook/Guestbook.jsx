@@ -88,11 +88,10 @@ export const Guestbook = () => {
   };
 
   // 마이페이지로 이동
-  const goToUserPage = member_id => {
-    console.log('Navigating to user page:', member_id) // member_id 확인 로그
-    navi(`/mypage/main/${member_id}/post`) // member_id를 기반으로 마이페이지 경로 설정
-  }
-
+  const goToUserPage = (member_id) => {
+    console.log("Navigating to user page:", member_id); // member_id 확인 로그
+    navi(`/mypage/main/${member_id}/post`); // member_id를 기반으로 마이페이지 경로 설정
+  };
 
   return (
     <div className={styles.container}>
@@ -103,7 +102,7 @@ export const Guestbook = () => {
       {/* =================== */}
       <div className={styles.visitPost}>
         <div className={styles.input}>
-          <img src={currentUser.member_avatar} alt="" />
+          <img src={currentUser.member_avatar || profile} alt="" />
           <div
             ref={inputRef} // ref 설정
             className={styles.inputText}

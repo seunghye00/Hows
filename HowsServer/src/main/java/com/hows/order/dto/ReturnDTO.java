@@ -127,10 +127,10 @@ public class ReturnDTO {
 		this.return_seq = return_seq;
 		this.return_code = return_code;
 	}
-	public ReturnDTO(int order_seq, int return_seq, int payment_seq, String return_code) {
+	public ReturnDTO(int return_seq, int order_seq, int payment_seq, String return_code) {
 		super();
-		this.order_seq = order_seq;
 		this.return_seq = return_seq;
+		this.order_seq = order_seq;
 		this.payment_seq = payment_seq;
 		this.return_code = return_code;
 	}

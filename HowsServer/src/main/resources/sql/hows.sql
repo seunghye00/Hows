@@ -690,7 +690,8 @@ banner_url varchar2(300) not null,
 start_date Date,
 end_date Date,
 banner_order number not null,
-is_visible char(1) default 'N' not null
+is_visible char(1) default 'N' not null,
+connect_seq number default 0
 );
 
 create sequence banner_seq

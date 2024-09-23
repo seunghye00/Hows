@@ -1,10 +1,21 @@
 import styles from './Banner.module.css'
 import { Button } from '../../../components/Button/Button'
-import { bannerList, addBanner, deleteBanners } from '../../../api/banner'
+import {
+    bannerList,
+    addBanner,
+    deleteBanners,
+    updateBanner,
+} from '../../../api/banner'
 import { useEffect, useState } from 'react'
-import { formatDateForInput, SwalComp } from '../../../commons/commons'
+import {
+    formatDate,
+    formatDateForInput,
+    SwalComp,
+} from '../../../commons/commons'
 import { Modal } from '../../../components/Modal/Modal'
 import { BiCamera } from 'react-icons/bi'
+import { selectEvt } from '../../../api/event'
+import { Paging } from '../../../components/Pagination/Paging'
 
 export const Banner = () => {
     const [banners, setBanners] = useState([])
@@ -14,9 +25,15 @@ export const Banner = () => {
         banner_order: 0,
     })
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isSubModalOpen, setIsSubModalOpen] = useState(false)
     const [selectedFile, setSelectedFile] = useState(null)
     const [preview, setPreview] = useState('')
     const [selectAll, setSelectAll] = useState(false)
+    const [events, setEvents] = useState([]) // 이벤트 목록 저장
+    const [totalEvts, setTotalEvts] = useState(0) // 전체 이벤트 수
+    const [page, setPage] = useState(1) // 현재 페이지 상태
+    const [itemsPerPage] = useState(10) // 페이지당 항목 수
+    const [selectedEvent, setSelectedEvent] = useState(null) // 선택한 이벤트
 
     // 오늘 날짜 가져오기
     const today = new Date()
@@ -24,6 +41,10 @@ export const Banner = () => {
     // 내일 날짜 설정
     const tomorrow = new Date(today)
     tomorrow.setDate(today.getDate() + 1)
+
+    // 페이징에 따른 startRow와 endRow 계산
+    const startRow = (page - 1) * itemsPerPage + 1
+    const endRow = page * itemsPerPage
 
     useEffect(() => {
         bannerList()
@@ -39,6 +60,46 @@ export const Banner = () => {
                 console.log('데이터 가져오기 실패: ' + error) // 오류 처리
             })
     }, [])
+
+    // 이벤트 목록 가져오기 (useEffect 사용)
+    useEffect(() => {
+        loadEvents()
+    }, [page])
+
+    const loadEvents = async () => {
+        try {
+            console.log(
+                `현재 페이지: ${page}, 시작 행: ${startRow}, 끝 행: ${endRow}, 페이지당 항목 수: ${itemsPerPage}`
+            )
+
+            // 서버에 startRow와 endRow를 넘겨서 데이터를 받아옴
+            const response = await selectEvt(startRow, endRow)
+
+            // 서버 응답 데이터 확인
+            console.log('서버에서 받은 데이터:', response.data)
+
+            // 서버에서 받은 이벤트 목록과 전체 이벤트 수를 상태에 저장
+            const { eventList, totalEvents } = response.data
+            console.log(
+                '이벤트 목록:',
+                eventList,
+                '전체 이벤트 수:',
+                totalEvents
+            )
+
+            // 서버에서 받은 이벤트 목록을 상태에 저장
+            setEvents(eventList)
+            // 전체 이벤트 수 저장 (페이징을 위한 값)
+            setTotalEvts(totalEvents)
+        } catch (error) {
+            console.error('이벤트 목록을 불러오는데 실패했습니다.', error)
+        }
+    }
+
+    // 페이지 변경 처리
+    const handlePageChange = pageNumber => {
+        setPage(pageNumber) // 페이지 상태 업데이트
+    }
 
     // 배너 등록 버튼 클릭
     const handleOpenModal = () => {
@@ -186,6 +247,69 @@ export const Banner = () => {
         })
     }
 
+    // 배너 연결 버튼 클릭
+    const handleOpenSubModal = () => {
+        // 체크된 배너가 존재하는 지 확인
+        const selectedBanners = banners.filter(banner => banner.checked)
+
+        if (selectedBanners.length !== 1) {
+            SwalComp({
+                type: 'warning',
+                text: '배너를 한 개만 선택해주세요',
+            })
+            return
+        }
+
+        setIsSubModalOpen(true) // 모달 열기
+    }
+
+    // 모달창 닫기 버튼 클릭
+    const handleCloseSubModal = () => {
+        setIsSubModalOpen(false) // 모달 닫기
+    }
+
+    // 체크된 배너와 체크된 이벤트 연결 핸들러
+    const handleConnectEvent = () => {
+        // 선택 확인
+        SwalComp({
+            type: 'question',
+            text: '해당 이벤트를 연결하시겠습니까 ?',
+        }).then(result => {
+            if (result.isConfirmed) {
+                // 체크된 배너 정보 저장
+                const selectedBanner = banners.filter(banner => banner.checked)
+                updateBanner(selectedBanner[0].banner_seq, selectedEvent)
+                    .then(resp => {
+                        if (resp.data) {
+                            SwalComp({
+                                type: 'success',
+                                text: '성공적으로 연결했습니다.',
+                            })
+                        } else {
+                            SwalComp({
+                                type: 'error',
+                                text: '연결에 실패했습니다.',
+                            })
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        SwalComp({
+                            type: 'error',
+                            text: '연결에 실패했습니다.',
+                        })
+                    })
+            }
+        })
+        setSelectedEvent(null)
+        setIsSubModalOpen(false)
+        setBanners(banners.map(banner => ({ ...banner, checked: false })))
+    }
+
+    const handleCheckEvent = event_seq => {
+        setSelectedEvent(event_seq)
+    }
+
     return (
         <>
             <div className={styles.btns}>
@@ -194,6 +318,11 @@ export const Banner = () => {
                     size={'s'}
                     onClick={handleDeleteBanner}
                     title={'삭제'}
+                />
+                <Button
+                    size={'s'}
+                    onClick={handleOpenSubModal}
+                    title={'연결'}
                 />
             </div>
             <div className={styles.container}>
@@ -316,6 +445,62 @@ export const Banner = () => {
                     <Button
                         size={'s'}
                         onClick={handleCloseModal}
+                        title={'취소'}
+                    />
+                </div>
+            </Modal>
+            <Modal isOpen={isSubModalOpen} onClose={handleCloseSubModal}>
+                <h2 className={styles.modalTitle}>등록된 이벤트 목록</h2>
+                <div className={styles.eventList}>
+                    {events.length > 0 ? (
+                        events.map((event, index) => (
+                            <div
+                                className={styles.events}
+                                key={event.event_seq}
+                                onClick={() =>
+                                    handleCheckEvent(event.event_seq)
+                                }
+                            >
+                                <input
+                                    type="checkbox"
+                                    checked={selectedEvent === event.event_seq}
+                                    onChange={() =>
+                                        handleCheckEvent(event.event_seq)
+                                    }
+                                />
+                                <div className={styles.eventItem}>
+                                    {startRow + index}
+                                </div>
+                                <div className={styles.eventTitle}>
+                                    <span>{event.event_title}</span>
+                                </div>
+                                <div className={styles.eventItem}>
+                                    {formatDate(event.event_date)}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className={styles.empty}>이벤트가 없습니다</div>
+                    )}
+                </div>
+                {/* 페이징 컴포넌트 */}
+                <div className={styles.pagination}>
+                    <Paging
+                        page={page}
+                        count={totalEvts} // 전체 이벤트 개수
+                        perpage={itemsPerPage} // 페이지당 항목 수
+                        setPage={handlePageChange} // 페이지 변경 함수
+                    />
+                </div>
+                <div className={styles.subModalBtns}>
+                    <Button
+                        size={'s'}
+                        onClick={handleConnectEvent}
+                        title={'선택'}
+                    />
+                    <Button
+                        size={'s'}
+                        onClick={handleCloseSubModal}
                         title={'취소'}
                     />
                 </div>

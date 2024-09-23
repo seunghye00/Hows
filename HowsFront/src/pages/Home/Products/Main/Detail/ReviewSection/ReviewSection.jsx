@@ -610,9 +610,11 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
                     // 좋아요 취소 요청 보내기
                     reviewUnlike(reviewSeq, memberId)
-                        .then((resp) => {console.log('리뷰 좋아요 취소 성공:', resp);})
+                        .then((resp) => {
+                            // console.log('리뷰 좋아요 취소 성공:', resp);
+                        })
                         .catch((error) => {
-                            console.error('리뷰 좋아요 취소 실패:', error);
+                            // console.error('리뷰 좋아요 취소 실패:', error);
                             // 실패 시 좋아요 상태 복구
                             setLiked((prev) => ({ ...prev, [reviewSeq]: true }));
                             setLikeCount((prev) => ({ ...prev, [reviewSeq]: (prev[reviewSeq] || 0) + 1 }));
@@ -626,7 +628,9 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
             // 좋아요 요청 보내기
             reviewLike(reviewSeq, memberId)
-                .then((resp) => {console.log('리뷰 좋아요 성공:', resp);})
+                .then((resp) => {
+                    // console.log('리뷰 좋아요 성공:', resp);
+                })
                 .catch((error) => {
                     console.error('리뷰 좋아요 추가 실패:', error);
                     // 좋아요 추가 실패 시 원상복구

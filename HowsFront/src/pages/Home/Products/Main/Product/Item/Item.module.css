@@ -5,12 +5,9 @@
     margin: 0 auto;
 }
 .contents {
-    /* width: 325px;
-    height: 500px; */
     display: flex; flex-wrap: wrap;
     padding: 10px 0px;
     justify-content: space-between;
-    /* gap: 20px; */
 }
 
 /* 상품 */
@@ -21,7 +18,6 @@
 }
 .item {
     width: calc(25% - 20px); /* 4개씩 배치되도록 각각의 너비를 25%로 설정하고 여백을 고려해 20px을 뺍니다 */
-    /* width: 305px; */
     height: 500px;
     margin: 10px;
     cursor: pointer;
@@ -43,6 +39,7 @@
 .img > img {
     object-fit: cover; 
     width: 100%;height: 100%; 
+    border-radius: 8px 8px 0 0;
     transition: all 0.3s ease;
 }
 
@@ -65,12 +62,8 @@
 /* 상품 설명 - 상품 가격 */
 .title > div:last-child{
     /* border:1px solid #000; */
+    font-weight: bold;
 }
-
-
-/* 무한 스크롤 이미지 배치 */
-/* .itemBox {display: flex;} */
-
 
 /* 반응형 레이아웃 */
 @media (max-width: 1200px) {

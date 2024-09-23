@@ -16,7 +16,7 @@ import { Scrap } from "./Scrap/Scrap";
 import { Guestbook } from "./Guestbook/Guestbook";
 import { Modal } from "../../../../components/Modal/Modal"
 import { useAuthStore, useMemberStore } from "../../../../store/store";
-import { countBookmark, countGuestbook, countPost, deleteImage, deleteProfileImage, eachFollow, findMemberSeq, getCountFollow, getFollower, getFollowing, selectInfo, toggleFollow, uploadImage, uploadProfileImage, userInfo } from "../../../../api/member";
+import { countBookmark, countGuestbook, countPost, deleteImage, eachFollow, findMemberSeq, getCountFollow, getFollower, getFollowing, selectInfo, toggleFollow, uploadImage, uploadProfileImage, userInfo } from "../../../../api/member";
 import { TextBox } from './TextBox/TextBox';
 import Swal from "sweetalert2";
 import { jwtDecode } from 'jwt-decode';
@@ -45,9 +45,11 @@ export const Main = () => {
     const [followingData, setFollowingData] = useState([]); // 팔로잉 데이터
 
     const { currentUser, setCurrentUser } = useMemberStore();
-    const session_member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
-    const session_member_seq = jwtDecode(sessionStorage.getItem("token")).member_seq // token에서 member_seq 가져오기
+    const token = sessionStorage.getItem("token");
+    const session_member_id = sessionStorage.getItem('member_id') || ''; // 세션에서 member_id 가져오기, 없으면 빈 문자열
+    const session_member_seq = token ? jwtDecode(token).member_seq : ''; // token이 있으면 member_seq 가져오기, 없으면 빈 문자열
     const [isEachFollow, setIsEachFollow] = useState(false);
+    const { isAuth } = useAuthStore() // 로그인 여부 확인
 
     useEffect(() => {
         // url에서 가져온 member_id로 해당 페이지 member_id의 데이터 가져오기
@@ -155,16 +157,16 @@ export const Main = () => {
 
     // 팔로우, 팔로잉 상태 변경 
     const handleIsFollowing = (targetMemberSeq) => {
-        // if (!isAuth || !session_member_seq) {
-        //     Swal.fire({
-        //         icon: 'warning',
-        //         title: '로그인 후 이용할 수 있습니다.',
-        //         showConfirmButton: true,
-        //     }).then(() => {
-        //         navi('/signIn') // 로그인 페이지로 이동
-        //     })
-        //     return
-        // }
+        if (!isAuth || !session_member_seq) {
+            Swal.fire({
+                icon: 'warning',
+                text: '로그인 후 이용할 수 있습니다.',
+                showConfirmButton: true,
+            }).then(() => {
+                navi('/signIn') // 로그인 페이지로 이동
+            })
+            return
+        }
 
         toggleFollow({
             from_member_seq: session_member_seq, // 로그인한 사용자의 member_seq

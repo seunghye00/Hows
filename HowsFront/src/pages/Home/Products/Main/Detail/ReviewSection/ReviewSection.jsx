@@ -138,6 +138,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     
     // 각 리뷰 작성자의 프로필 이미지를 저장
     const [reviewAvatars, setReviewAvatars] = useState({});
+    const [nicknames, setNicknames] = useState({});
 
     // 좋아요 상태 관리
     const [liked, setLiked] = useState({});
@@ -452,14 +453,26 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                         if (review.MEMBER_ID) {
                             try {
                                 const profileResp = await userInfo(review.MEMBER_ID);
-                                return { memberId: review.MEMBER_ID, avatar: profileResp.data.member_avatar };
+                                // console.log(JSON.stringify(profileResp.data.nickname));
+                                
+                                return { 
+                                    memberId: review.MEMBER_ID, 
+                                    avatar: profileResp.data.member_avatar,
+                                    nickname: profileResp.data.nickname
+                                };
                             } catch (error) {
                                 console.error(`프로필 이미지 불러오기 오류: ${review.MEMBER_ID}`, error);
-                                return { memberId: review.MEMBER_ID, avatar: img };  // 기본 이미지
+                                return { memberId: review.MEMBER_ID, avatar: img , nickname: '알 수 없음'};  // 기본 
                             }
                         }
                     });
                     const avatarData = await Promise.all(avatarPromises);
+
+                    // 닉네임을 상태로 저장
+                    const nicknamesMap = avatarData.reduce((acc, { memberId, nickname }) => {
+                        acc[memberId] = nickname; // memberId를 키로, nickname을 값으로 저장
+                        return acc;
+                    }, {});
 
                     // 프로필 이미지를 상태로 저장
                     const avatarsMap = avatarData.reduce((acc, { memberId, avatar }) => {
@@ -469,7 +482,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     }, {});
     
                     // 프로필 이미지를 상태로 저장
-                    setReviewAvatars(avatarsMap); 
+                    setReviewAvatars(avatarsMap);
+                    setNicknames(nicknamesMap); // 닉네임 상태 업데이트
 
                     // 리뷰 상태 및 총 리뷰 수 설정
                     setReviews(reviewsWithImages);
@@ -646,6 +660,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
         setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
 
     }
+    // console.log(nicknames);
     
     return (
         <div className={styles.container}>
@@ -751,7 +766,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                             )}
                                             </div>
                                             <div>
-                                                <div>{review.MEMBER_ID} </div>
+                                                {/* <div>{review.MEMBER_ID} </div> */}
+                                                <div>{nicknames[review.MEMBER_ID]}</div>
                                                 <div>
                                                     <StarRating rating={review.RATING}/>
                                                 </div>

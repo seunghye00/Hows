@@ -166,25 +166,26 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
         const files = event.target.files;
         if (files) {
             // 파일 수가 4개를 초과하면 경고 메시지 표시
-            if (files.length > 4 || (data.images && data.images.length + files.length > 4)) {
+            if (files.length > 4 || (data.images && (data.images.length + files.length) > 4)) {
                 Swal.fire({
                     icon: "warning",
                     title: "최대 4개의 파일만 선택할 수 있습니다.",
                     showConfirmButton: true,
                 });
+
                 return;
             }
-    
+            
             // 새로 선택한 파일들을 URL로 변환하여 미리보기 배열에 추가
             const newPreviewImages = Array.from(files).map(file => URL.createObjectURL(file));
-
+            
             // 기존 이미지들과 새로 선택한 이미지를 병합하여 상태 업데이트
             setNewImages((prevImages) => [...prevImages, ...newPreviewImages]);
-
+            
             // 기존 이미지들과 새로 선택한 이미지를 병합하여 상태에 저장
             setData((prevData) => ({
                 ...prevData, // 기존 데이터는 유지하고
-                images: [...Array.from(files)] // 이미지 배열 업데이트
+                images: [...prevData.images, ...Array.from(files)] // 이미지 배열 업데이트
             }));
         }
     };
@@ -193,6 +194,11 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     const handleRemoveExistImage = (index) => {
         // 이미지 URL을 미리보기 배열에서 제거
         setExistImages((prevImages) => prevImages.filter((_, i) => i !== index));
+
+        setData((prevData) => ({
+            ...prevData, // 기존의 데이터는 유지하고
+            images: prevData.images.filter((_, i) => i !== index) // 선택된 이미지만 삭제
+        }));
     };
 
     const handleRemoveNewImage = (index) => {

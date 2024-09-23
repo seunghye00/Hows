@@ -129,15 +129,20 @@
 }
 
 .modalBody {
-    margin-top: 15px;
-    font-size: 16px;
-    line-height: 1.5;
+    max-height: 500px; /* 모달 내용 최대 높이 */
+    overflow-y: auto; /* 스크롤 추가 */
 }
 
 .contentContainer {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 10px; /* 이미지 간의 간격 */
+}
+
+.img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
 }
 
 .evtimg{
@@ -176,12 +181,6 @@
     align-items: center;
     font-size: 20px;
     cursor: pointer;
-}
-
-.img {
-    width: 500px;
-    height: 700px;
-    margin-bottom: 20px;
 }
 
 .empty{

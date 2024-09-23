@@ -24,7 +24,7 @@
 		<selectKey keyProperty="banner_seq" resultType="int" order="AFTER">
 			select banner_seq.currval from dual
 		</selectKey>
-		insert into banner values (banner_seq.nextval, #{file_seq}, #{banner_url}, #{start_date}, #{end_date}, #{banner_order}, default)
+		insert into banner values (banner_seq.nextval, #{file_seq}, #{banner_url}, #{start_date}, #{end_date}, #{banner_order}, default, default)
 	</insert>
 	
 	<!-- 배너 순서 변경 -->
@@ -34,5 +34,10 @@
 			, is_visible = 'N'
 		</if>
 		 where banner_seq = #{bannerSeq}
+	</update>
+	
+	<!-- 배너와 이벤트 연결 -->
+	<update id="connect">
+		update banner set connect_seq = #{eventSeq} where banner_seq = #{bannerSeq}
 	</update>
 </mapper>

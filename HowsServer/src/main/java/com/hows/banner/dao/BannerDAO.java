@@ -43,4 +43,12 @@ public class BannerDAO {
 		params.put("bannerOrder", bannerOrder);
 		mybatis.update("Banner.updateOrder", params);
 	}
+
+	// 배너와 이벤트 연결
+	public boolean connectEvent(int bannerSeq, int eventSeq) {
+		Map<String, Integer> params = new HashMap<>();
+		params.put("bannerSeq", bannerSeq);
+		params.put("eventSeq", eventSeq);
+		return mybatis.update("Banner.connect", params) > 0;
+	}
 }

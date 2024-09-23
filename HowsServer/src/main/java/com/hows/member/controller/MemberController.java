@@ -225,8 +225,6 @@ public class MemberController {
 	public ResponseEntity<Map<String, Object>> toggleFollow(
 	        @RequestBody Map<String, Object> requestBody
 	) {
-		System.out.println(requestBody.get("from_member_seq"));
-		System.out.println(requestBody.get("to_member_seq"));
 	    try {
 	        int fromMemberSeq = (int) requestBody.get("from_member_seq");
 	        int toMemberSeq = (int) requestBody.get("to_member_seq");

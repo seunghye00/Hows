@@ -88,7 +88,12 @@ export const Cart = () => {
     if(Array.isArray(seq)) {
       data = seq;
     } else {
-      if(total.count === 0) return alert("선택된 상품 없음");
+      if(total.count === 0) {
+        return SwalComp({
+          type:"warning",
+          text:"선택한 상품이 없습니다."
+        });
+      }
       checkCart.forEach(item => {
         if (item.checked) data.push(item.cart_seq);
       });
@@ -110,7 +115,10 @@ export const Cart = () => {
         product_total_price: item.cart_price,
       };
       if(item.cart_quantity > item.quantity){
-        alert(item.product_title, "의 재고가 부족합니다");
+        SwalComp({
+          type: "warning",
+          text: item.product_title + "의 재고가 부족합니다"
+        });
         return false;
       }
       orderPrice += item.cart_price;

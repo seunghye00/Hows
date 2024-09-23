@@ -193,6 +193,7 @@
 		(reply_report_seq.nextval, #{report_code}, default, #{member_id},
 		#{reply_seq})
 	</insert>
+	
 	<!-- 관리자 -->
 	<!-- 댓글 신고조회 (관리자) -->
 	<select id="getReportedComments" resultType="map">

@@ -24,7 +24,7 @@ withdrawal_date timestamp default null,
 withdrawal_yn char(1) default 'N',
 member_banner varchar2(500) default null, 
 point number default 0,
-member_avatar varchar2(200) default null
+member_avatar varchar2(200) default 'https://storage.cloud.google.com/hows-attachment/F1/3adc3060-ce44-4d0a-ac27-f05d75023f76'
 );
 
 create sequence member_seq
@@ -642,20 +642,6 @@ increment by 1
 nomaxvalue
 nocache;
 
--- FAQ
-create table faq (
-faq_seq number primary key,
-faq_title varchar2(100) not null,
-faq_contents varchar2(4000) not null,
-notice_code char(2) default 'N2' not null
-);
-
-create sequence faq_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
 -- 이벤트
 create table event (
 event_seq number primary key,
@@ -663,10 +649,24 @@ event_title varchar2(100) not null,
 event_contents varchar2(4000) not null,
 event_date timestamp default sysdate,
 view_count number default 0 not null,
-notice_code char(2) default 'N3' not null
+notice_code char(2) default 'N2' not null
 );
 
 create sequence event_seq
+start with 1
+increment by 1
+nomaxvalue
+nocache;
+
+-- FAQ
+create table faq (
+faq_seq number primary key,
+faq_title varchar2(100) not null,
+faq_contents varchar2(4000) not null,
+notice_code char(2) default 'N3' not null
+);
+
+create sequence faq_seq
 start with 1
 increment by 1
 nomaxvalue
@@ -679,8 +679,8 @@ create table notice_code (
 );
 
 insert into notice_code (notice_code, notice_title) values ('N1', '공지사항');
-insert into notice_code (notice_code, notice_title) values ('N2', 'FAQ');
-insert into notice_code (notice_code, notice_title) values ('N3', '이벤트');
+insert into notice_code (notice_code, notice_title) values ('N2', '이벤트');
+insert into notice_code (notice_code, notice_title) values ('N3', 'FAQ');
 
 -- 배너
 create table banner (

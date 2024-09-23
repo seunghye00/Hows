@@ -65,19 +65,25 @@ export const Order = () => {
     useEffect(() => {
         // searchQuery가 비어있지 않은 경우 검색어에 맞는 주문을 필터링
         let filtered = orders
-        if (searchQuery !== '') {
-            filtered = filtered.filter(order =>
-                order.order_name.includes(searchQuery)
-            )
-        }
         // 상태별로 주문 목록 필터링
         filtered = filtered.filter(
-            order => status === 'delivery' || order.order_code === status
+            order => status === 'product' || order.order_code === status
         )
         // 최종 필터링된 목록 설정 및 체크박스 상태 초기화
         setFilteredOrders(filtered.map(order => ({ ...order, checked: false })))
         setSelectAll(false)
-    }, [searchQuery, status]) // searchQuery, status가 변경될 때마다 실행
+    }, [status]) // status가 변경될 때마다 실행
+
+    useEffect(() => {
+        // 검색어에 맞는 주문을 필터링
+        let filtered = orders
+        filtered = filtered.filter(order =>
+            order.order_name.includes(searchQuery)
+        )
+        // 최종 필터링된 목록 설정 및 체크박스 상태 초기화
+        setFilteredOrders(filtered.map(order => ({ ...order, checked: false })))
+        setSelectAll(false)
+    }, [searchQuery]) // searchQuery가 변경될 때마다 실행
 
     // 주문 목록의 상태 선택 핸들러
     const handleSelectStatus = e => {

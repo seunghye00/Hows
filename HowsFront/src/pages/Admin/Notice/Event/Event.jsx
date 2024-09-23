@@ -122,6 +122,7 @@ export const Event = () => {
     const closeModal = () => {
         setIsModalOpen(false)
         setSelectedEvent(null)
+        loadEvents()
     }
 
     // 검색 기능 구현

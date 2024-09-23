@@ -146,16 +146,11 @@
     display: flex;
 }
 
-.img {
-    max-width: 100%; 
-    height: auto;
-}
-
 .btn {
     display: flex;
     justify-content: flex-end;
     position: relative;
-    right: 38%;
+    right: 37%;
     margin-top: 10px;
     gap: 10px;
 }
@@ -184,8 +179,8 @@
 }
 
 .img {
-    max-width: 500px;
-    display: block;
+    width: 500px;
+    height: 700px;
     margin-bottom: 20px;
 }
 

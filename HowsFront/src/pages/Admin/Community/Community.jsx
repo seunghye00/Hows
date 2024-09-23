@@ -216,32 +216,32 @@ export const Community = () => {
             {boardDetailModalOpen && (
                 <div className={styles.reportModal}>
                     <div className={styles.detailmodalContent}>
-                        <div className={styles.boardDetails}>
-                            {/* 작성자 정보 */}
-                            <div className={styles.authorInfo}>
-                                <img
-                                    src={selectedBoard.MEMBER_AVATAR || test}
-                                    alt="회원 아바타"
-                                    className={styles.avatar}
-                                />
-                                <span className={styles.nickname}>
-                                    {selectedBoard.MEMBER_ID}
-                                </span>
-                            </div>
-                            {/* 첨부된 이미지 스와이프 */}
-                            <div className={styles.imageSection}>
-                                {selectedBoard.IMAGE_URLS &&
-                                selectedBoard.IMAGE_URLS.length > 0 ? (
-                                    <Swiper
-                                        modules={[Navigation, Pagination]}
-                                        navigation
-                                        pagination={{ clickable: true }}
-                                        spaceBetween={30}
-                                        slidesPerView={1}
-                                    >
-                                        {selectedBoard.IMAGE_URLS.split(',')
-                                            .filter(Boolean)
-                                            .map((url, index) => (
+                        {/* 작성자 정보 */}
+                        <div className={styles.authorInfo}>
+                            <img
+                                src={selectedBoard.MEMBER_AVATAR || test}
+                                alt="회원 아바타"
+                                className={styles.avatar}
+                            />
+                            <span className={styles.nickname}>
+                                {selectedBoard.MEMBER_ID}
+                            </span>
+                        </div>
+                        {/* 첨부된 이미지 스와이프 */}
+                        <div className={styles.imageSection}>
+                            {selectedBoard.IMAGE_URLS &&
+                            selectedBoard.IMAGE_URLS.length > 0 ? (
+                                <Swiper
+                                    modules={[Navigation, Pagination]}
+                                    navigation
+                                    pagination={{ clickable: true }}
+                                    spaceBetween={30}
+                                    slidesPerView={1}
+                                >
+                                    {selectedBoard.IMAGE_URLS.split(',')
+                                        .filter(Boolean)
+                                        .map((url, index) => (
+                                            <div className={styles.detailimg}>
                                                 <SwiperSlide key={index}>
                                                     <img
                                                         src={url}
@@ -253,26 +253,26 @@ export const Community = () => {
                                                         }
                                                     />
                                                 </SwiperSlide>
-                                            ))}
-                                    </Swiper>
-                                ) : (
-                                    <img
-                                        src={test}
-                                        alt="기본 이미지"
-                                        className={styles.boardImage}
-                                    />
-                                )}
-                            </div>
-                            <div className={styles.boardContent}>
-                                <div>{selectedBoard.BOARD_CONTENTS}</div>
-                            </div>
-                            <div className={styles.close}>
-                                <Button
-                                    size="s"
-                                    title="닫기"
-                                    onClick={closeBoardDetailModal}
+                                            </div>
+                                        ))}
+                                </Swiper>
+                            ) : (
+                                <img
+                                    src={test}
+                                    alt="기본 이미지"
+                                    className={styles.boardImage}
                                 />
-                            </div>
+                            )}
+                        </div>
+                        <div className={styles.boardContent}>
+                            <div>{selectedBoard.BOARD_CONTENTS}</div>
+                        </div>
+                        <div className={styles.close}>
+                            <Button
+                                size="s"
+                                title="닫기"
+                                onClick={closeBoardDetailModal}
+                            />
                         </div>
                     </div>
                 </div>

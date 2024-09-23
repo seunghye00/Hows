@@ -78,7 +78,7 @@
 }
 
 .cols:nth-child(3) img {
-    width: 45%;
+    width: 35%;
 }
 
 .cols:last-child {
@@ -154,6 +154,42 @@
 }
 
 .modalBtns {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.eventList {
+    padding: 15px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.events {
+    display: flex;
+    gap: 10px;
+    font-size: 18px;
+}
+
+.events:hover {
+    cursor: pointer;
+}
+
+.events .eventTitle span {
+    display: inline-block;
+    width: 200px;
+    min-width: 200px;
+    white-space: nowrap;
+    /* 텍스트를 한 줄로 처리 */
+    overflow: hidden;
+    /* 넘치는 부분을 숨김 */
+    text-overflow: ellipsis;
+    /* 넘치는 텍스트를 '...'으로 표시 */
+}
+
+.subModalBtns {
+    padding-top: 15px;
     display: flex;
     gap: 10px;
     justify-content: center;

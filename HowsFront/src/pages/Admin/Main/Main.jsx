@@ -68,12 +68,12 @@ export const Main = () => {
                             <span className={styles.subTitle}>
                                 오늘 작성된 게시글 수
                             </span>
-                            <span className={styles.result}>{boardNum}</span>
+                            <span className={styles.result}>{boardNum}개</span>
                         </div>
                         <div className={styles.contBox}>
                             <span className={styles.subTitle}>오늘 매출</span>
                             <span className={styles.result}>
-                                {paymentPrice}
+                                {addCommas(paymentPrice)}원
                             </span>
                         </div>
                     </div>

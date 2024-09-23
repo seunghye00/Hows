@@ -18,3 +18,10 @@ export const deleteBanners = bannerSeqs => {
     const seqs = bannerSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
     return axios.delete(`${baseUrl}`, { params: { seqs } })
 }
+
+// 배너 정보 업데이트 함수
+export const updateBanner = (banner_seq, event_seq) => {
+    return axios.put(`${baseUrl}`, null, {
+        params: { banner_seq, event_seq },
+    })
+}

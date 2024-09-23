@@ -221,15 +221,21 @@ export const Reply = ({
                         </>
                     ) : null}
                     {/* 신고하기 버튼 */}
-                    <div
-                        className={styles.reportComment}
-                        onClick={() =>
-                            handleOpenReportModalForReply(replyData.REPLY_SEQ)
-                        }
-                    >
-                        <PiSiren />
-                        신고하기
-                    </div>
+                    {!isOwner ? (
+                        <div
+                            className={styles.reportComment}
+                            onClick={() =>
+                                handleOpenReportModalForReply(
+                                    replyData.REPLY_SEQ
+                                )
+                            }
+                        >
+                            <PiSiren />
+                            신고하기
+                        </div>
+                    ) : (
+                        <></>
+                    )}
                 </div>
             </div>
         </div>

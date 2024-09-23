@@ -22,8 +22,9 @@ export const Main = () => {
     const [paymentPrice, setPaymentPrice] = useState(0)
     const [choice, setChoice] = useState('selling')
     const [bestProducts, setBestProducts] = useState([])
+    const [lastSyncTime, setLastSyncTime] = useState('') // 마지막 동기화 시간
 
-    useEffect(() => {
+    const fetchData = () => {
         todayBoardNum()
             .then(resp => {
                 // console.log('resp.data === ', resp.data)
@@ -46,6 +47,11 @@ export const Main = () => {
             // console.log(resp)
             setBestProducts(resp.data)
         })
+    }
+
+    useEffect(() => {
+        fetchData()
+        setLastSyncTime(new Date().toLocaleString()) // 동기화 시간 설정
     }, [])
 
     useEffect(() => {
@@ -58,22 +64,38 @@ export const Main = () => {
         setChoice(e.target.getAttribute('data-label'))
     }
 
+    const handleRefresh = () => {
+        fetchData()
+        setLastSyncTime(new Date().toLocaleString()) // 새로고침 시 동기화 시간 갱신
+    }
+
     return (
         <div className={styles.container}>
             <div className={styles.row}>
                 <div className={styles.leftBox}>
-                    <h1>How's DashBoard</h1>
+                    <div className={styles.title}>
+                        <h1>How's DashBoard</h1>
+                        <span className={styles.syncTime}>
+                            마지막 동기화: {lastSyncTime}
+                            <span
+                                onClick={handleRefresh}
+                                className={styles.refreshBtn}
+                            >
+                                <i className="bx bx-sync" />
+                            </span>
+                        </span>
+                    </div>
                     <div className={styles.subBox}>
                         <div className={styles.contBox}>
                             <span className={styles.subTitle}>
                                 오늘 작성된 게시글 수
                             </span>
-                            <span className={styles.result}>{boardNum}</span>
+                            <span className={styles.result}>{boardNum}개</span>
                         </div>
                         <div className={styles.contBox}>
                             <span className={styles.subTitle}>오늘 매출</span>
                             <span className={styles.result}>
-                                {paymentPrice}
+                                {addCommas(paymentPrice)}원
                             </span>
                         </div>
                     </div>
@@ -122,13 +144,14 @@ export const Main = () => {
                                         </div>
                                         <div>\ {addCommas(product.price)}</div>
                                         <div className={styles.num}>
-                                            {product.quantity === 0 ? (
-                                                <span>품절</span>
-                                            ) : (
-                                                ''
-                                            )}
-                                            남은 수량 :{' '}
-                                            {addCommas(product.quantity)}개
+                                            <span>
+                                                판매량 :{' '}
+                                                {addCommas(product.total_sales)}
+                                            </span>
+                                            <span>
+                                                남은 수량 :{' '}
+                                                {addCommas(product.quantity)}
+                                            </span>
                                         </div>
                                     </div>
                                 </div>

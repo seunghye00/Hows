@@ -57,6 +57,8 @@ export const Detail = () => {
     const [itemsPerPage] = useState(5) // 페이지당 항목 수 (5개)
     const [totalCommentsCount, setTotalCommentsCount] = useState(0) // 전체 댓글 수
     const [userProfile, setUserProfile] = useState('') // 유저 프로필 정보 상태
+    const isOwner = isAuth && member_id === postData?.MEMBER_ID // 댓글 작성자가 현재 로그인된 유저인지 확인
+
     // 게시글 정보 및 이미지, 태그 정보 받아오기
     useEffect(() => {
         const fetchData = async () => {
@@ -473,6 +475,7 @@ export const Detail = () => {
                         viewCount={viewCount}
                         copyLinkToClipboard={copyLinkToClipboard}
                         handleOpenReportModal={handleOpenReportModal}
+                        isOwner={isOwner}
                     />
                     <div className={styles.mainContent}>
                         {postData.BOARD_CONTENTS}

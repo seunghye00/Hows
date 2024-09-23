@@ -38,4 +38,9 @@ public class BannerService {
 	public void updateOrder(int bannerSeq, int bannerOrder) {
 		bannDAO.updateOrder(bannerSeq, bannerOrder);
 	}
+
+	// 배너와 이벤트 연결
+	public boolean connectEvent(int bannerSeq, int eventSeq) {
+		return bannDAO.connectEvent(bannerSeq, eventSeq);
+	}
 }

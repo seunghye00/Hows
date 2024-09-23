@@ -55,7 +55,6 @@ function AppContent({ session }) {
     const location = useLocation()
 
     // 특정 경로에서 Header와 Footer 숨기기
-    // const hideHeaderFooter = location.pathname === '/signIn' || location.pathname === '/signUp' || location.pathname === '/findPw';
     const hideHeaderFooter = location.pathname.startsWith('/signIn') || location.pathname === '/signUp';
     return (
         <div className={session ? 'App' : 'Admin'}>

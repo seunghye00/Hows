@@ -258,21 +258,21 @@ public class MemberController {
 	    }
 	}
 	
-	 // 팔로워 목록 가져오기 - 로그인 필요
+	 // 팔로워 목록 가져오기
     @GetMapping("/getFollower")
     public ResponseEntity<List<Map<String, Object>>> getFollower(@RequestParam("member_seq") int member_seq) {
     	List<Map<String, Object>> follower = memServ.getFollower(member_seq);
         return ResponseEntity.ok(follower);
     }
 
-    // 팔로잉 목록 가져오기 - 로그인 필요
+    // 팔로잉 목록 가져오기
     @GetMapping("/getFollowing")
     public ResponseEntity<List<Map<String, Object>>> getFollowing(@RequestParam("member_seq") int member_seq) {
     	List<Map<String, Object>> following = memServ.getFollowing(member_seq);
         return ResponseEntity.ok(following);
     }
     
-    // 팔로워, 팔로잉 수 가져오기 - 로그인 필요
+    // 팔로워, 팔로잉 수 가져오기
     @GetMapping("/countFollow")
     public ResponseEntity<Map<String, BigDecimal>> countFollow(@RequestParam("member_seq") int member_seq){
     	Map<String, BigDecimal> result = memServ.countFollow(member_seq);
@@ -287,28 +287,32 @@ public class MemberController {
     }
     
   
-	// 마이페이지 게시글(이미지) 출력 - 로그인 필요
+	// 마이페이지 게시글(이미지) 출력
 	@GetMapping("/selectPost")
 	public ResponseEntity<List<Map<String, Object>> > selectPost(@RequestParam String member_id){
+		
+		System.out.println("누구냐 : "+ member_id);
+		
+		
 		List<Map<String, Object>> result = memServ.selectPostByMemberId(member_id);
 		return ResponseEntity.ok(result);
 	}
 
-	// 마이페이지 게시글 갯수 - 로그인 필요
+	// 마이페이지 게시글 갯수
 	@GetMapping("/countPost")
 	public ResponseEntity<Integer> countPost(@RequestParam String member_id){
 		int result = memServ.countPost(member_id);
 		return ResponseEntity.ok(result);
 	}
 	
-	// 마이페이지 북마크(이미지) 출력 - 로그인 필요
+	// 마이페이지 북마크(이미지) 출력
 	@GetMapping("/selectBookmark")
 	public ResponseEntity<List<Map<String, Object>> > selectBookmark(@RequestParam String member_id){
 		List<Map<String, Object>> result = memServ.selectBookmarkByMemberId(member_id);
 		return ResponseEntity.ok(result);
 	}
 	
-	// 마이페이지 북마크 갯수 - 로그인 필요
+	// 마이페이지 북마크 갯수
 	@GetMapping("/countBookmark")
 	public ResponseEntity<Integer> countBookmark(@RequestParam String member_id){
 		int result = memServ.countBookmark(member_id);

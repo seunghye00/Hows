@@ -28,6 +28,7 @@
   height: 50px;
   border-radius: 50%;
   margin: 0 5px 0 10px;
+  border: 1px solid var(--hows-point-color-dark);
 }
 .visitPost .input .inputText {
   width: 88%;

@@ -137,6 +137,7 @@ export const Return = () => {
                 // 환불 완료 요청
                 doneReturn(
                     selectedOrders.map(order => ({
+                        order_seq: order.order_seq,
                         return_seq: order.return_seq,
                         payment_id: order.payment_id,
                         payment_text: order.payment_text,
@@ -407,12 +408,7 @@ export const Return = () => {
                                     >
                                         \ {addCommas(order.order_price)}
                                     </div>
-                                    <div
-                                        className={styles.cols}
-                                        onClick={() =>
-                                            handleViewInfo(order.order_seq)
-                                        }
-                                    >
+                                    <div className={styles.cols}>
                                         {order.return_code === 'R1' ? (
                                             '결재 취소 요청'
                                         ) : order.return_code === 'R6' ? (

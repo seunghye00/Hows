@@ -81,7 +81,7 @@
 		left join grade g on m.grade_code = g.grade_code
 		left join payment p on o.order_seq = p.order_seq
 		left join return r on o.order_seq = r.order_seq
-		where o.order_code = 'O7'
+		where p.payment_text is not null
 	</select>
 
 	<insert id="addOrder" parameterType="com.hows.order.dto.OrderDTO">
@@ -152,7 +152,7 @@
 	</delete>
 	
 	<!-- 주문 상태 조회 -->
-	<select id="getOrderCode">
+	<select id="getOrderCode" resultType="String">
 		select order_code from orders where order_seq = #{orderSeq}
 	</select>
 </mapper>

@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hows.order.dto.OrderDTO;
 import com.hows.order.dto.ReturnDTO;
+import com.hows.order.service.OrderService;
 import com.hows.order.service.ReturnService;
 import com.hows.payment.service.PaymentService;
 
@@ -25,6 +27,9 @@ public class ReturnController {
 	
 	@Autowired
 	private PaymentService payServ;
+	
+	@Autowired
+	private OrderService orderServ;
 	
 	// 반품 상태 변경
 	@PutMapping("/updateReturnCode")
@@ -46,7 +51,11 @@ public class ReturnController {
                 }
                 String result2 = returnServ.updateReturn(new ReturnDTO((int)item.get("return_seq"), "R6"));
                 if(result2.equals("fail")) {
-                	throw new RuntimeException("환불 실패 : DB 업데이트 오류");
+                	throw new RuntimeException("환불 실패 : return DB 업데이트 오류");
+                }
+                String result3 = orderServ.updateOrder(new OrderDTO((int)item.get("order_seq"), "O7"));
+                if(result3.equals("fail")) {
+                	throw new RuntimeException("환불 실패 : order DB 업데이트 오류");
                 }
             }
         } catch (Exception e) {

@@ -416,25 +416,24 @@
 
 	<!-- [마이페이지] 게시글(이미지) 출력 -->
 	<select id="selectPostByMemberId" resultType="map">
-		select
-		b.board_seq,
-		b.board_contents,
-		to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS')
-		as board_write_date,
-		b.view_count,
-		b.member_id,
-		m.name as member_name,
-		bi.image_url
-		from
-		board b
-		inner join
-		member m on b.member_id = m.member_id
-		left join
-		board_image bi on b.board_seq = bi.board_seq
-		where
-		b.member_id
-		= #{member_id} order by b.board_seq desc
+	    select 
+		    b.board_seq, 
+		    b.board_contents, 
+		    to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date, 
+		    b.view_count, 
+		    b.member_id, 
+		    m.name as member_name, 
+		    (select bi.image_url from board_image bi where bi.board_seq = b.board_seq and ROWNUM = 1) as image_url 
+		from 
+		    board b 
+		inner join 
+		    member m on b.member_id = m.member_id 
+		where 
+		    b.member_id = #{member_id}
+		order by 
+		    b.board_seq desc
 	</select>
+
 
 	<!-- [마이페이지] 게시글 갯수 -->
 	<select id="countPost" resultType="int">
@@ -444,30 +443,26 @@
 
 	<!-- [마이페이지] 북마크(이미지) 출력 -->
 	<select id="selectBookmarkByMemberId" resultType="map">
-		select
-		b.board_seq,
-		b.board_contents,
-		to_char(b.board_write_date, 'YYYY-MM-DD
-		HH24:MI:SS') as board_write_date,
-		b.view_count,
-		b.member_id,
-		m.name as
-		member_name,
-		bi.image_url
-		from
-		board_book_mark bbm
-		inner join
-		board b on
-		bbm.board_seq = b.board_seq
-		inner join
-		member m on b.member_id =
-		m.member_id
-		left join
-		board_image bi on b.board_seq = bi.board_seq
-		where
-		bbm.member_id = #{member_id}
-		order by board_book_mark_seq desc
+	    select
+	        b.board_seq,
+	        b.board_contents,
+	        to_char(b.board_write_date, 'YYYY-MM-DD HH24:MI:SS') as board_write_date,
+	        b.view_count,
+	        b.member_id,
+	        m.name as member_name,
+	        (select bi.image_url from board_image bi where bi.board_seq = b.board_seq and ROWNUM = 1) as image_url
+	    from
+	        board_book_mark bbm
+	    inner join
+	        board b on bbm.board_seq = b.board_seq
+	    inner join
+	        member m on b.member_id = m.member_id
+	    where
+	        bbm.member_id = #{member_id}
+	    order by
+	        bbm.board_book_mark_seq desc
 	</select>
+
 
 	<!-- [마이페이지] 사용자의 게시글 북마크 갯수 -->
 	<select id="countBookmark" resultType="int">

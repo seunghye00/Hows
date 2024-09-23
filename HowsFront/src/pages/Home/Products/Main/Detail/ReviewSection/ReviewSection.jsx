@@ -660,8 +660,12 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
         setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
 
     }
-    // console.log(nicknames);
-    
+
+    // 마이페이지로 이동
+    const userPage = member_id => {
+        navi(`/mypage/main/${member_id}/post`) 
+    }
+
     return (
         <div className={styles.container}>
             {/* 상품 리뷰 내용 */}
@@ -757,7 +761,12 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                 <div key={review.REVIEW_SEQ}>
                                     <div>
                                         <div>
-                                            <div>
+                                            <div
+                                                onClick={e => {
+                                                    e.stopPropagation() 
+                                                    userPage(review.MEMBER_ID) // 마이페이지로 이동
+                                                }}
+                                            >
                                             {/* 리뷰 작성자의 MEMBER_ID와 연결된 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시 */}
                                             {reviewAvatars[review.MEMBER_ID] ? (
                                                 <img src={reviewAvatars[review.MEMBER_ID]} alt="profile" />

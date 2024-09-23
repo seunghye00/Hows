@@ -380,11 +380,18 @@ export const Post = () => {
     const handleSubmitPost = async () => {
         const member_id = sessionStorage.getItem('member_id') // 세션에서 member_id 가져오기
 
-        if (!postContent || images.length === 0) {
+        // 글 내용과 이미지, 주거 형태, 공간, 평수 선택 여부 확인
+        if (
+            !postContent ||
+            images.length === 0 ||
+            !selectedHousingType ||
+            !selectedSpaceType ||
+            !selectedAreaSize
+        ) {
             Swal.fire({
                 icon: 'warning',
                 title: '작성 실패',
-                text: '글 내용과 이미지를 모두 입력해주세요.',
+                text: '글 내용, 이미지, 주거 형태, 공간, 평수를 모두 선택해주세요.',
             })
             return
         }

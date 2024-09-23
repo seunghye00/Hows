@@ -47,7 +47,7 @@ export const Best = () => {
                 <div>
                   {product.product_title.length > 20 ? `${product.product_title.slice(0, 20)}...` : product.product_title}
                 </div>
-                <div>{product.price.toLocaleString()}원</div>
+                <div>{product.price.toLocaleString()}</div>
               </div>
             </div>
           ))

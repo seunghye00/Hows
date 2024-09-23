@@ -22,6 +22,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     const memberId = sessionStorage.getItem("member_id");
     const navi = useNavigate();
+    const [loading, setLoading] = useState(false);
     
     // =============== 모달창 ===============
     const [ isReviewModalOpen, setIsReviewModalOpen ] = useState(false); // 리뷰
@@ -138,6 +139,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     
     // 각 리뷰 작성자의 프로필 이미지를 저장
     const [reviewAvatars, setReviewAvatars] = useState({});
+    const [nicknames, setNicknames] = useState({});
 
     // 좋아요 상태 관리
     const [liked, setLiked] = useState({});
@@ -165,25 +167,26 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
         const files = event.target.files;
         if (files) {
             // 파일 수가 4개를 초과하면 경고 메시지 표시
-            if (files.length > 4 || (data.images && data.images.length + files.length > 4)) {
+            if (files.length > 4 || (data.images && (data.images.length + files.length) > 4)) {
                 Swal.fire({
                     icon: "warning",
                     title: "최대 4개의 파일만 선택할 수 있습니다.",
                     showConfirmButton: true,
                 });
+
                 return;
             }
-    
+            
             // 새로 선택한 파일들을 URL로 변환하여 미리보기 배열에 추가
             const newPreviewImages = Array.from(files).map(file => URL.createObjectURL(file));
-
+            
             // 기존 이미지들과 새로 선택한 이미지를 병합하여 상태 업데이트
             setNewImages((prevImages) => [...prevImages, ...newPreviewImages]);
-
+            
             // 기존 이미지들과 새로 선택한 이미지를 병합하여 상태에 저장
             setData((prevData) => ({
                 ...prevData, // 기존 데이터는 유지하고
-                images: [...Array.from(files)] // 이미지 배열 업데이트
+                images: [...prevData.images, ...Array.from(files)] // 이미지 배열 업데이트
             }));
         }
     };
@@ -192,6 +195,11 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     const handleRemoveExistImage = (index) => {
         // 이미지 URL을 미리보기 배열에서 제거
         setExistImages((prevImages) => prevImages.filter((_, i) => i !== index));
+
+        setData((prevData) => ({
+            ...prevData, // 기존의 데이터는 유지하고
+            images: prevData.images.filter((_, i) => i !== index) // 선택된 이미지만 삭제
+        }));
     };
 
     const handleRemoveNewImage = (index) => {
@@ -430,6 +438,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     useEffect(() => {
         const fetchReviews = async () => {
+            setLoading(true);  // 로딩 상태 시작
             try {
                 const resp = await getReviewList(product_seq, page, itemsPerPage, sortType);
                 const ratingResp = await getRatings(product_seq);
@@ -452,14 +461,26 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                         if (review.MEMBER_ID) {
                             try {
                                 const profileResp = await userInfo(review.MEMBER_ID);
-                                return { memberId: review.MEMBER_ID, avatar: profileResp.data.member_avatar };
+                                // console.log(JSON.stringify(profileResp.data.nickname));
+                                
+                                return { 
+                                    memberId: review.MEMBER_ID, 
+                                    avatar: profileResp.data.member_avatar,
+                                    nickname: profileResp.data.nickname
+                                };
                             } catch (error) {
                                 console.error(`프로필 이미지 불러오기 오류: ${review.MEMBER_ID}`, error);
-                                return { memberId: review.MEMBER_ID, avatar: img };  // 기본 이미지
+                                return { memberId: review.MEMBER_ID, avatar: img , nickname: '알 수 없음'};  // 기본 
                             }
                         }
                     });
                     const avatarData = await Promise.all(avatarPromises);
+
+                    // 닉네임을 상태로 저장
+                    const nicknamesMap = avatarData.reduce((acc, { memberId, nickname }) => {
+                        acc[memberId] = nickname; // memberId를 키로, nickname을 값으로 저장
+                        return acc;
+                    }, {});
 
                     // 프로필 이미지를 상태로 저장
                     const avatarsMap = avatarData.reduce((acc, { memberId, avatar }) => {
@@ -469,7 +490,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                     }, {});
     
                     // 프로필 이미지를 상태로 저장
-                    setReviewAvatars(avatarsMap); 
+                    setReviewAvatars(avatarsMap);
+                    setNicknames(nicknamesMap); // 닉네임 상태 업데이트
 
                     // 리뷰 상태 및 총 리뷰 수 설정
                     setReviews(reviewsWithImages);
@@ -523,7 +545,10 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                 }
             } catch (error) {
                 console.error('리뷰 목록 불러오기 오류', error);
+            } finally {
+                setLoading(false);  // 로딩 상태 종료
             }
+            
         };
     
         fetchReviews();
@@ -532,6 +557,9 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     
     // 페이지네이션
     const handlePageChange = (newPage) => {
+        // 현재 페이지와 같은 페이지를 클릭했을 때는 아무 작업도 하지 않음
+        if (newPage === page) return;
+
         const startRow = (newPage - 1) * itemsPerPage + 1;
         const endRow = newPage * itemsPerPage;
         getReviewList(product_seq, startRow, endRow)
@@ -610,9 +638,11 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
                     // 좋아요 취소 요청 보내기
                     reviewUnlike(reviewSeq, memberId)
-                        .then((resp) => {console.log('리뷰 좋아요 취소 성공:', resp);})
+                        .then((resp) => {
+                            // console.log('리뷰 좋아요 취소 성공:', resp);
+                        })
                         .catch((error) => {
-                            console.error('리뷰 좋아요 취소 실패:', error);
+                            // console.error('리뷰 좋아요 취소 실패:', error);
                             // 실패 시 좋아요 상태 복구
                             setLiked((prev) => ({ ...prev, [reviewSeq]: true }));
                             setLikeCount((prev) => ({ ...prev, [reviewSeq]: (prev[reviewSeq] || 0) + 1 }));
@@ -626,7 +656,9 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
             // 좋아요 요청 보내기
             reviewLike(reviewSeq, memberId)
-                .then((resp) => {console.log('리뷰 좋아요 성공:', resp);})
+                .then((resp) => {
+                    // console.log('리뷰 좋아요 성공:', resp);
+                })
                 .catch((error) => {
                     console.error('리뷰 좋아요 추가 실패:', error);
                     // 좋아요 추가 실패 시 원상복구
@@ -639,8 +671,15 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     // 리뷰 정렬 타입 변경
     const handleChangeSortType = (sortType) => {
         setSortType(sortType);
+        setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
+
     }
-    
+
+    // 마이페이지로 이동
+    const userPage = member_id => {
+        navi(`/mypage/main/${member_id}/post`) 
+    }
+
     return (
         <div className={styles.container}>
             {/* 상품 리뷰 내용 */}
@@ -671,8 +710,9 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                 <h2>리뷰 작성</h2>
                                 <div className={styles.reviewModal}>
                                     <input type='text' 
+                                        maxLength={30}
                                         name='review_contents' 
-                                        placeholder='리뷰 내용을 입력하세요.' 
+                                        placeholder='리뷰 내용을 입력하세요. (최대 30자)' 
                                         value={data.review_contents} 
                                         onChange={handleInputChange}
                                         className={styles.reviewContent}>
@@ -730,12 +770,20 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                         <div onClick={() => handleChangeSortType('latest')}>최신순</div>
                     </div>
                     <div className={styles.reviewBox}>
-                        {reviews.length > 0 ? (
+                    {loading ? (  // 로딩 중일 때
+                        <div className={styles.loading}>로딩 중...</div>
+                    ):(
+                        reviews.length > 0 ? (
                             (reviews || []).map((review) => (
                                 <div key={review.REVIEW_SEQ}>
                                     <div>
                                         <div>
-                                            <div>
+                                            <div
+                                                onClick={e => {
+                                                    e.stopPropagation() 
+                                                    userPage(review.MEMBER_ID) // 마이페이지로 이동
+                                                }}
+                                            >
                                             {/* 리뷰 작성자의 MEMBER_ID와 연결된 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시 */}
                                             {reviewAvatars[review.MEMBER_ID] ? (
                                                 <img src={reviewAvatars[review.MEMBER_ID]} alt="profile" />
@@ -744,7 +792,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                             )}
                                             </div>
                                             <div>
-                                                <div>{review.MEMBER_ID} </div>
+                                                {/* <div>{review.MEMBER_ID} </div> */}
+                                                <div>{nicknames[review.MEMBER_ID]}</div>
                                                 <div>
                                                     <StarRating rating={review.RATING}/>
                                                 </div>
@@ -814,7 +863,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                             ))
                         ) : (
                             <div>리뷰가 없습니다.</div> 
-                        )}
+                        )
+                    )}
                     </div>
                     <div>
                         <Paging page={page} count={totalReviews} perpage={itemsPerPage} setPage={handlePageChange} />

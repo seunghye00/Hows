@@ -180,8 +180,7 @@ export const Payment = () => {
       // 실패 시 결제 취소
       paymentCancel(paymentId).then(res => {
         SwalComp({
-          type:"error",
-          text:"결제에 실패하였습니다"
+          text:"결제가 취소되었습니다."
         });
       });
     }

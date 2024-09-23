@@ -31,10 +31,10 @@ export const Detail = () => {
     // 이미지 URL과 텍스트를 분리하는 함수
     const formatEventContents = contents => {
         const imageUrlRegex =
-            /(https:\/\/storage\.cloud\.google\.com\/hows-attachment\/[^\s]+)/
-        const imageUrl = contents.match(imageUrlRegex) // 이미지 URL 추출
+            /(https:\/\/storage\.cloud\.google\.com\/hows-attachment\/[^\s]+)/g
+        const imageUrls = contents.match(imageUrlRegex) || [] // 모든 이미지 URL 추출
         const text = contents.replace(imageUrlRegex, '').trim() // URL 제외한 나머지 텍스트 추출
-        return { imageUrl: imageUrl ? imageUrl[0] : '', text }
+        return { imageUrls, text }
     }
 
     // 날짜 포맷을 yyyy.mm.dd로 변환하는 함수
@@ -67,17 +67,20 @@ export const Detail = () => {
                         </div>
                         <div className={styles.eventContents}>
                             {/* 이미지가 있으면 출력 */}
-                            {formatEventContents(event.event_contents)
-                                .imageUrl && (
-                                <img
-                                    src={
-                                        formatEventContents(
-                                            event.event_contents
-                                        ).imageUrl
-                                    }
-                                    alt="이벤트 이미지"
-                                    className={styles.eventImage}
-                                />
+                            {formatEventContents(event.event_contents).imageUrls
+                                .length > 0 && (
+                                <div className={styles.imageContainer}>
+                                    {formatEventContents(
+                                        event.event_contents
+                                    ).imageUrls.map((url, index) => (
+                                        <img
+                                            key={index}
+                                            src={url}
+                                            alt={`이벤트 이미지 ${index + 1}`}
+                                            className={styles.eventImage}
+                                        />
+                                    ))}
+                                </div>
                             )}
                             {/* 텍스트 출력 */}
                             <p>

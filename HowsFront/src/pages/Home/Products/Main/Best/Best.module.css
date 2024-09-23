@@ -1,6 +1,4 @@
 .container {
-    /* width: 100%;  */
-
     max-width: 1300px;
     padding: 20px 0;
     width: 100%;
@@ -29,7 +27,8 @@
 }
 
 .item:hover .img > img {
-    transform: scale(1.5);
+    transform: scale(1.1);
+    opacity: 0.8;
 }
 
 /* 북마크 */
@@ -37,7 +36,7 @@
     position: absolute; 
     z-index: 50;
     width: 50px; 
-    background-color:black;
+    background-color: var(--hows-point-color-dark);
     color: white; 
     height: 50px; 
     border-radius: 10px 0 10px 10px; 
@@ -52,11 +51,14 @@
 .img {
     height: 400px;
     overflow: hidden;
-    border-radius: 10px 10px 0px 0px; 
+    border-radius: 8px 8px 0px 0px; 
+    transition: all 0.3s ease;
 }
 .img > img {
-    object-fit: cover; width: 100%;height: 100%; transition: all ease 0.1s;
+    object-fit: cover; 
+    width: 100%;height: 100%; 
     border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
 }
 
 /* 상품 설명 */
@@ -67,11 +69,15 @@
 }
 
 /* 상품 설명 - 상품명 */
-.title > div{
+.title > div {
     text-align: center;
     height: 50px; 
     display: flex;
     justify-content: center;
     align-items: center;
     overflow: hidden; 
+}
+/* 상품 설명 - 가격 */
+.title > div:last-child{
+    font-weight: bold;
 }

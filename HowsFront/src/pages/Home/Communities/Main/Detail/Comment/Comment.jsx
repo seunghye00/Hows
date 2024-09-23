@@ -140,11 +140,6 @@ export const Comment = ({
         setActiveReplySeq(prevSeq =>
             prevSeq === commentData.COMMENT_SEQ ? null : commentData.COMMENT_SEQ
         )
-
-        // 자동 태그 추가
-        if (!replyContent.includes(`@${commentData.NICKNAME}`)) {
-            setReplyContent(`@${commentData.NICKNAME} `) // 답글 작성 시 태그된 내용 추가
-        }
     }
 
     // 답글 작성 함수
@@ -264,7 +259,9 @@ export const Comment = ({
                 <div className={styles.commentName}>
                     <a
                         onClick={() =>
-                            navigate(`/profile/${commentData.MEMBER_ID}`)
+                            navigate(
+                                `/mypage/main/${commentData.MEMBER_ID}/post`
+                            )
                         }
                     >
                         {commentData.NICKNAME} {/* 댓글 작성자의 닉네임 */}
@@ -350,17 +347,21 @@ export const Comment = ({
                                     )}
                                 </>
                             )}
-                            <div
-                                className={styles.reportComment}
-                                onClick={() =>
-                                    handleOpenReportModalForComment(
-                                        commentData.COMMENT_SEQ
-                                    )
-                                } // 댓글 신고 처리
-                            >
-                                <PiSiren />
-                                신고하기
-                            </div>
+                            {!isOwner ? (
+                                <div
+                                    className={styles.reportComment}
+                                    onClick={() =>
+                                        handleOpenReportModalForComment(
+                                            commentData.COMMENT_SEQ
+                                        )
+                                    } // 댓글 신고 처리
+                                >
+                                    <PiSiren />
+                                    신고하기
+                                </div>
+                            ) : (
+                                <></>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -135,9 +135,21 @@
 }
 
 .contentContainer {
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.imageContainer {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.imageContainer img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
 }
 
 .ntcimg{

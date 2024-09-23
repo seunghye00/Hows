@@ -98,10 +98,17 @@ export const ProfileSection = ({
             alert('팔로우 처리 중 오류가 발생했습니다.')
         }
     }
+    //마이페이지로 이동
+    const goToUserPage = member_id => {
+        navigate(`/mypage/main/${member_id}/post`) // member_id를 기반으로 마이페이지 경로 설정
+    }
 
     return (
         <div className={styles.profileSection}>
-            <div className={styles.profileInfo}>
+            <div
+                className={styles.profileInfo}
+                onClick={() => goToUserPage(profileData?.MEMBER_ID)} // 클릭 시 마이페이지로 이동
+            >
                 <img
                     src={profileData?.MEMBER_AVATAR || memberAvatar}
                     alt="Profile"

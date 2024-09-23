@@ -259,7 +259,9 @@ export const Comment = ({
                 <div className={styles.commentName}>
                     <a
                         onClick={() =>
-                            navigate(`/profile/${commentData.MEMBER_ID}`)
+                            navigate(
+                                `/mypage/main/${commentData.MEMBER_ID}/post`
+                            )
                         }
                     >
                         {commentData.NICKNAME} {/* 댓글 작성자의 닉네임 */}

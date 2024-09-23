@@ -132,7 +132,12 @@ export const Reply = ({
 
     return (
         <div className={styles.replyItem}>
-            <div className={styles.replyHeader}>
+            <div
+                className={styles.replyHeader}
+                onClick={() =>
+                    navigate(`/mypage/main/${replyData.MEMBER_ID}/post`)
+                }
+            >
                 <div className={styles.imgBox}>
                     <img src={replyData.MEMBER_AVATAR} alt="profile" />
                 </div>

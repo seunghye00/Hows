@@ -97,13 +97,22 @@ export const Notice = () => {
         })
     }
 
-    // 이미지와 텍스트 분리하는 함수
+    // // 이미지와 텍스트 분리하는 함수
+    // const formatNoticeContents = contents => {
+    //     const imageUrlRegex =
+    //         /(https:\/\/storage\.cloud\.google\.com\/hows-attachment\/[^\s]+)/
+    //     const imageUrl = contents.match(imageUrlRegex) // 이미지 URL 추출
+    //     const text = contents.replace(imageUrlRegex, '').trim() // URL 제외한 나머지 텍스트 추출
+    //     return { imageUrl: imageUrl ? imageUrl[0] : '', text }
+    // }
+
+    // 이미지와 텍스트 분리하는 함수 (여러 이미지 처리)
     const formatNoticeContents = contents => {
         const imageUrlRegex =
-            /(https:\/\/storage\.cloud\.google\.com\/hows-attachment\/[^\s]+)/
-        const imageUrl = contents.match(imageUrlRegex) // 이미지 URL 추출
+            /(https:\/\/storage\.cloud\.google\.com\/hows-attachment\/[^\s]+)/g
+        const imageUrls = contents.match(imageUrlRegex) // 모든 이미지 URL 추출
         const text = contents.replace(imageUrlRegex, '').trim() // URL 제외한 나머지 텍스트 추출
-        return { imageUrl: imageUrl ? imageUrl[0] : '', text }
+        return { imageUrls: imageUrls || [], text }
     }
 
     // 공지사항 제목 클릭 시 모달 열기
@@ -236,19 +245,24 @@ export const Notice = () => {
                         <hr />
                         <div className={styles.modalBody}>
                             <div className={styles.contentContainer}>
-                                {/* 이미지가 있으면 출력 */}
+                                {/* 이미지가 있으면 모두 출력 */}
                                 {formatNoticeContents(
                                     selectedNotice.notice_contents
-                                ).imageUrl && (
-                                    <img
-                                        src={
-                                            formatNoticeContents(
-                                                selectedNotice.notice_contents
-                                            ).imageUrl
-                                        }
-                                        alt="공지사항 이미지"
-                                        className={styles.img}
-                                    />
+                                ).imageUrls.length > 0 && (
+                                    <div className={styles.imageContainer}>
+                                        {formatNoticeContents(
+                                            selectedNotice.notice_contents
+                                        ).imageUrls.map((url, index) => (
+                                            <img
+                                                key={index}
+                                                src={url}
+                                                alt={`공지사항 이미지 ${
+                                                    index + 1
+                                                }`}
+                                                className={styles.img}
+                                            />
+                                        ))}
+                                    </div>
                                 )}
 
                                 {/* 이미지 아래에 텍스트 출력 */}

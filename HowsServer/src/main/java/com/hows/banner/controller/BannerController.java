@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ import com.hows.File.service.FileService;
 import com.hows.banner.dto.BannerDTO;
 import com.hows.banner.service.BannerService;
 import com.hows.common.DateFormat;
+import com.hows.order.dto.OrderDTO;
 
 @RestController
 @RequestMapping("/banner")
@@ -85,6 +87,15 @@ public class BannerController {
 		return ResponseEntity.ok("success");
 	}
 
+	// 배너와 이벤트 글 연결
+	@PutMapping()
+	public ResponseEntity<Boolean> updateBanner(@RequestParam int banner_seq, @RequestParam int event_seq) throws Exception {
+	    // 배너와 이벤트 연결 서비스 호출
+	    boolean result = bannServ.connectEvent(banner_seq, event_seq);
+	    // 성공적으로 업데이트 되었는지 여부 반환
+	    return ResponseEntity.ok(result);
+	}
+	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

@@ -240,3 +240,27 @@
     overflow-y: auto; 
     padding: 20px;
 }
+
+
+
+/* 로딩중 */
+.loading {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--hows-point-color);
+    text-align: center;
+    padding: 20px;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        opacity: 1;
+    }
+}

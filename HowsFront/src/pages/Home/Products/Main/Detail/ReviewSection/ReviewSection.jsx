@@ -22,6 +22,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     const memberId = sessionStorage.getItem("member_id");
     const navi = useNavigate();
+    const [loading, setLoading] = useState(false);
     
     // =============== 모달창 ===============
     const [ isReviewModalOpen, setIsReviewModalOpen ] = useState(false); // 리뷰
@@ -437,6 +438,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     useEffect(() => {
         const fetchReviews = async () => {
+            setLoading(true);  // 로딩 상태 시작
             try {
                 const resp = await getReviewList(product_seq, page, itemsPerPage, sortType);
                 const ratingResp = await getRatings(product_seq);
@@ -543,7 +545,10 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                 }
             } catch (error) {
                 console.error('리뷰 목록 불러오기 오류', error);
+            } finally {
+                setLoading(false);  // 로딩 상태 종료
             }
+            
         };
     
         fetchReviews();
@@ -552,6 +557,9 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
     
     // 페이지네이션
     const handlePageChange = (newPage) => {
+        // 현재 페이지와 같은 페이지를 클릭했을 때는 아무 작업도 하지 않음
+        if (newPage === page) return;
+
         const startRow = (newPage - 1) * itemsPerPage + 1;
         const endRow = newPage * itemsPerPage;
         getReviewList(product_seq, startRow, endRow)
@@ -762,7 +770,10 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                         <div onClick={() => handleChangeSortType('latest')}>최신순</div>
                     </div>
                     <div className={styles.reviewBox}>
-                        {reviews.length > 0 ? (
+                    {loading ? (  // 로딩 중일 때
+                        <div className={styles.loading}>로딩 중...</div>
+                    ):(
+                        reviews.length > 0 ? (
                             (reviews || []).map((review) => (
                                 <div key={review.REVIEW_SEQ}>
                                     <div>
@@ -852,7 +863,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                             ))
                         ) : (
                             <div>리뷰가 없습니다.</div> 
-                        )}
+                        )
+                    )}
                     </div>
                     <div>
                         <Paging page={page} count={totalReviews} perpage={itemsPerPage} setPage={handlePageChange} />

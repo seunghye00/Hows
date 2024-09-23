@@ -14,6 +14,7 @@ export const PostActions = ({
     viewCount,
     copyLinkToClipboard,
     handleOpenReportModal,
+    isOwner,
 }) => {
     return (
         <div className={styles.postActions}>
@@ -39,10 +40,14 @@ export const PostActions = ({
                 <div className={styles.Link} onClick={copyLinkToClipboard}>
                     <i className="bx bx-link"></i>
                 </div>
-                <div onClick={handleOpenReportModal}>
-                    <PiSiren />
-                    신고하기
-                </div>
+                {!isOwner ? (
+                    <div onClick={handleOpenReportModal}>
+                        <PiSiren />
+                        신고하기
+                    </div>
+                ) : (
+                    <></>
+                )}
             </div>
         </div>
     )

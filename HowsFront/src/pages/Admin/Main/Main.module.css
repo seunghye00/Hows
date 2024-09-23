@@ -19,8 +19,23 @@
     gap: 5px;
 }
 
-.leftBox h1 {
+.leftBox .title {
     flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.syncTime {
+    width: 300px;
+    position: relative;
+}
+
+.refreshBtn {
+    position: absolute;
+    right: 0;
+    font-size: 17px;
+    cursor: pointer;
 }
 
 .leftBox .subBox {
@@ -108,14 +123,8 @@
 .productList .num {
     width: 100%;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     position: relative;
-}
-
-.productList .num span {
-    position: absolute;
-    left: 0;
-    color: var(--hows-red);
 }
 
 .rightBox {

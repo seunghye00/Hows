@@ -19,16 +19,16 @@ ChartJS.register(
     Title,
     Tooltip,
     Legend,
-    LineElement, // Line 차트의 선 요소 등록
-    PointElement // Line 차트의 점 요소 등록
+    LineElement,
+    PointElement
 )
 
-export const LineChart = ({ category }) => {
+export const LineChart = ({ category, lastSyncTime }) => {
     const [chartData, setChartData] = useState({
         labels: [], // X축 레이블
         datasets: [
             {
-                label: '데이터 라벨',
+                label: '게시글 수',
                 data: [], // Y축 데이터
                 borderColor: 'rgba(75, 192, 192, 1)', // 선 색상
                 backgroundColor: 'rgba(75, 192, 192, 0.2)', // 배경 색상
@@ -37,11 +37,13 @@ export const LineChart = ({ category }) => {
             },
         ],
     })
+    const [loading, setLoading] = useState(true) // 로딩 상태 추가
+    const [error, setError] = useState(null) // 에러 상태 추가
 
     useEffect(() => {
+        setLoading(true) // 데이터 로드 시작
         getBoardNumByCategory()
             .then(resp => {
-                // console.log(resp.data)
                 let data
                 let labels
 
@@ -62,6 +64,9 @@ export const LineChart = ({ category }) => {
                         data = resp.data.postCountByColor
                         labels = data.map(item => item.COLOR_TITLE)
                         break
+                    default:
+                        setError('Invalid category provided.') // 잘못된 카테고리 처리
+                        return
                 }
 
                 const dataValues = data ? data.map(item => item.POST_COUNT) : []
@@ -82,8 +87,12 @@ export const LineChart = ({ category }) => {
             })
             .catch(error => {
                 console.error('Error fetching chart data:', error)
+                setError('데이터를 가져오는 데 오류가 발생했습니다.') // 에러 메시지 설정
             })
-    }, [category])
+            .finally(() => {
+                setLoading(false) // 로딩 완료
+            })
+    }, [category, lastSyncTime])
 
     const options = {
         responsive: true,
@@ -99,8 +108,21 @@ export const LineChart = ({ category }) => {
         scales: {
             y: {
                 beginAtZero: true, // Y축 최솟값을 0으로 설정
+                ticks: {
+                    stepSize: 1, // Y축 간격을 1로 설정
+                },
             },
         },
+    }
+
+    // 로딩 상태일 때 표시
+    if (loading) {
+        return <div>Loading...</div>
+    }
+
+    // 에러 상태일 때 표시
+    if (error) {
+        return <div>{error}</div>
     }
 
     return <Line data={chartData} options={options} />

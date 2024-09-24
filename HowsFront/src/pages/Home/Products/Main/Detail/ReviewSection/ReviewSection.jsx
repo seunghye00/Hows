@@ -32,6 +32,19 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     // 리뷰 작성 모달 열기
     const handleOpenReviewModal = async () => {
+
+        // 로그인 하지 않은 경우 처리 
+        if (!isAuth){
+            Swal.fire({
+                icon:'warning',
+                title: '로그인을 먼저 해주세요.',
+                showConfirmButton: true,
+            }).then(() => {
+                navi('/signIn'); // 로그인 페이지로 이동
+            });
+            return;
+        }
+
         // 로그인한 사용자의 ID와 현재 상품의 product_seq를 이용하여 구매 상태 확인
         const isPurchased = await checkPurchaseStatus(memberId, product_seq);
 
@@ -469,8 +482,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                     nickname: profileResp.data.nickname
                                 };
                             } catch (error) {
-                                console.error(`프로필 이미지 불러오기 오류: ${review.MEMBER_ID}`, error);
-                                return { memberId: review.MEMBER_ID, avatar: img , nickname: '알 수 없음'};  // 기본 
+                                // console.error(`프로필 이미지 불러오기 오류: ${review.MEMBER_ID}`, error);
+                                // return { memberId: review.MEMBER_ID, avatar: img , nickname: '알 수 없음'};  // 기본 
                             }
                         }
                     });
@@ -670,8 +683,22 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     // 리뷰 정렬 타입 변경
     const handleChangeSortType = (sortType) => {
-        setSortType(sortType);
-        setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
+        // setSortType(sortType);
+        // setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
+
+        if (sortType === 'lowToHigh') {
+            // 별점 낮은 순으로 정렬
+            const sortedReviews = [...reviews].sort((a, b) => a.RATING - b.RATING);
+            setReviews(sortedReviews);
+        } else if (sortType === 'highToLow') {
+            // 별점 높은 순으로 정렬
+            const sortedReviews = [...reviews].sort((a, b) => b.RATING - a.RATING);
+            setReviews(sortedReviews);
+        } else {
+            // 최신순, 베스트순은 서버에서 데이터를 받아옴
+            setSortType(sortType);
+            setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
+        }
 
     }
 
@@ -766,8 +793,12 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                 </div>
                 <div className={styles.reviewsMain}>
                     <div className={styles.option}>
-                        <div onClick={() => handleChangeSortType('best')}>베스트순</div>
-                        <div onClick={() => handleChangeSortType('latest')}>최신순</div>
+                        <select onChange={(e) => handleChangeSortType(e.target.value)} className={styles.comboBox}>   
+                            <option value="latest">최신순</option>
+                            <option value="best">베스트순</option>
+                            <option value="lowToHigh">별점 낮은순</option>
+                            <option value="highToLow">별점 높은순</option>
+                        </select>
                     </div>
                     <div className={styles.reviewBox}>
                     {loading ? (  // 로딩 중일 때
@@ -785,11 +816,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                                 }}
                                             >
                                             {/* 리뷰 작성자의 MEMBER_ID와 연결된 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시 */}
-                                            {reviewAvatars[review.MEMBER_ID] ? (
-                                                <img src={reviewAvatars[review.MEMBER_ID]} alt="profile" />
-                                            ) : (
-                                                <img src={img} alt="default profile" />
-                                            )}
+                                            <img src={reviewAvatars[review.MEMBER_ID]} alt="profile" />
                                             </div>
                                             <div>
                                                 {/* <div>{review.MEMBER_ID} </div> */}

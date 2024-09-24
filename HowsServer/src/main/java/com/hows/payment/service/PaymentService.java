@@ -129,7 +129,8 @@ public class PaymentService {
 					// 결제 내역 취소로 변경
 					if (!paymentDAO.doneCancel(paymentId)) {
 						throw new RuntimeException("DB 업데이트 오류");
-					}
+					} 
+					return "ok";
 				} else {
 					// 결제 오류로 발생 시 자동 결제 취소
 					int cancel = paymentDAO.cancelPayment(paymentId);

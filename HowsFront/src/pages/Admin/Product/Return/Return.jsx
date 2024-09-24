@@ -345,7 +345,7 @@ export const Return = () => {
                             />
                         </div>
                         <div className={styles.cols}>환불 요청일</div>
-                        <div className={styles.cols}>상품명</div>
+                        <div className={styles.cols}>주문명</div>
                         <div className={styles.cols}>주문자</div>
                         <div className={styles.cols}>주문 금액</div>
                         <div className={styles.cols}>반품 현황</div>

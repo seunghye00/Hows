@@ -1,9 +1,6 @@
-import axios from 'axios'
-import { host } from '../config/config'
-
-const baseUrl = `${host}/file`
+import { api } from '../config/config'
 
 // 파일 업로드 요청 함수
 export const uploadFile = formData => {
-    return axios.post(`${baseUrl}`, formData)
+    return api.post(`/file`, formData)
 }

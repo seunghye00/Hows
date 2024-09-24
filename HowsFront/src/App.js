@@ -1,14 +1,19 @@
-import './App.css';
-import { Home } from './pages/Home/Home';
-import { Admin } from './pages/Admin/Admin';
-import { Side } from './components/Side/Side';
-import { Header } from './components/Header/Header';
-import { Footer } from './components/Footer/Footer';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { useAuthStore, useMemberStore } from './store/store';
-import { jwtDecode } from 'jwt-decode'; // import 수정
-import { getRoleCode } from './api/member';
+import './App.css'
+import { Home } from './pages/Home/Home'
+import { Admin } from './pages/Admin/Admin'
+import { Side } from './components/Side/Side'
+import { Header } from './components/Header/Header'
+import { Footer } from './components/Footer/Footer'
+import {
+    BrowserRouter as Router,
+    Routes,
+    Route,
+    useLocation,
+} from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useAuthStore, useMemberStore } from './store/store'
+import { jwtDecode } from 'jwt-decode' // import 수정
+import { getRoleCode } from './api/member'
 
 function App() {
     const [session, setSession] = useState(true)
@@ -53,9 +58,11 @@ function App() {
 
 function AppContent({ session }) {
     const location = useLocation()
-
     // 특정 경로에서 Header와 Footer 숨기기
-    const hideHeaderFooter = location.pathname.startsWith('/signIn') || location.pathname === '/signUp';
+    const hideHeaderFooter =
+        location.pathname.startsWith('/signIn') ||
+        location.pathname === '/signUp'
+
     return (
         <div className={session ? 'App' : 'Admin'}>
             {session ? (
@@ -63,14 +70,22 @@ function AppContent({ session }) {
                     {!hideHeaderFooter && <Header />}
                     <Routes>
                         <Route path="/*" element={<Home />} />
-                        {/* 추가 라우트들 */}
                     </Routes>
                     {!hideHeaderFooter && <Footer />}
                 </>
             ) : (
                 <>
-                    <Side />
-                    <Admin />
+                    <Routes>
+                        <Route
+                            path="/admin/*"
+                            element={
+                                <>
+                                    <Side />
+                                    <Admin />
+                                </>
+                            }
+                        />
+                    </Routes>
                 </>
             )}
         </div>

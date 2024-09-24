@@ -24,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	
 	@Autowired
 	private JwtUtil jwt;
+	
 	@Autowired
 	@Lazy
 	private MemberService memServ;
@@ -49,7 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		
 		Authentication auth = new UsernamePasswordAuthenticationToken(member, null, member.getAuthorities());
 		SecurityContextHolder.getContext().setAuthentication(auth);
-		
+
 		}
 		filterChain.doFilter(request, response);
 	}

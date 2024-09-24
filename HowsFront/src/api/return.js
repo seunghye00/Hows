@@ -1,16 +1,13 @@
-import axios from 'axios'
-import { host } from '../config/config'
-
-const baseUrl = `${host}/return`
+import { api } from '../config/config'
 
 // 반품 상태 업데이트
 export const updateReturn = (return_seq, return_code) => {
-    return axios.put(`${baseUrl}/updateReturnCode`, null, {
+    return api.put('return/updateReturnCode', null, {
         params: { return_seq, return_code },
     })
 }
 
 // 환불 완료 요청
 export const doneReturn = datas => {
-    return axios.put(`${baseUrl}/doneReturn`, datas) // 데이터는 본문으로 전송
+    return api.put('/return/doneReturn', datas) // 데이터는 본문으로 전송
 }

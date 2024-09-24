@@ -40,15 +40,10 @@ export const Side = () => {
                     title: '회원 관리',
                     icon: 'bx bx-group', // 아이콘 추가
                     subMenu: [
-                        { title: '회원 목록', path: '/member' },
-                        { title: '블랙리스트 목록', path: '/blacklist' },
+                        { title: '회원 목록', path: '/admin/member' },
+                        { title: '블랙리스트 목록', path: '/admin/blacklist' },
                     ],
                 },
-                // {
-                //     title: '블랙리스트 관리',
-                //     icon: 'bx bx-block', // 아이콘 추가
-                //     subMenu: [{ title: '블랙리스트 조회', path: '/' }],
-                // },
             ],
         },
         {
@@ -57,28 +52,32 @@ export const Side = () => {
                 {
                     title: '게시글 관리',
                     icon: 'bx bx-file', // 아이콘 추가
-                    subMenu: [{ title: '신고 게시물 목록', path: 'community' }],
+                    subMenu: [
+                        { title: '신고 게시물 목록', path: '/admin/community' },
+                    ],
                 },
                 {
                     title: '댓글 관리',
                     icon: 'bx bx-message-rounded-dots', // 아이콘 추가
                     subMenu: [
-                        { title: '신고 댓글 목록', path: 'comment' },
-                        { title: '신고 대댓글 목록', path: 'reply' },
+                        { title: '신고 댓글 목록', path: '/admin/comment' },
+                        { title: '신고 대댓글 목록', path: '/admin/reply' },
                     ],
                 },
                 {
                     title: '리뷰 관리',
                     icon: 'bx bx-comment-edit', // 아이콘 추가
-                    subMenu: [{ title: '신고 리뷰 목록', path: 'review' }],
+                    subMenu: [
+                        { title: '신고 리뷰 목록', path: '/admin/review' },
+                    ],
                 },
                 {
                     title: '공지사항 관리',
                     icon: 'bx bx-error-circle', // 아이콘 추가
                     subMenu: [
-                        { title: '공지사항 관리', path: 'notice' },
-                        { title: '이벤트 관리', path: '/admin/notice/event' },
-                        { title: 'FAQ 관리', path: '/admin/notice/faq' },
+                        { title: '공지사항 목록', path: 'notice' },
+                        { title: '이벤트 목록', path: '/admin/notice/event' },
+                        { title: 'FAQ 목록', path: '/admin/notice/faq' },
                     ],
                 },
             ],

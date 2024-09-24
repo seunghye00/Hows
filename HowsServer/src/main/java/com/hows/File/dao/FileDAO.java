@@ -44,9 +44,14 @@ public class FileDAO {
 
 	// parent_seq 업데이트
 	public boolean updateParentSeq(int parentSeq, int fileSeq) {
-		Map<String, Object> params = new HashMap<>();
+		Map<String, Integer> params = new HashMap<>();
 		params.put("parentSeq", parentSeq);
 		params.put("fileSeq", fileSeq);
 		return mybatis.update("File.update", params) > 0;
+	}
+
+	// parent_seq가 0인 파일 목록 조회
+	public List<FileDTO> getFilesByNotFound() {
+		return mybatis.selectList("File.getFilesByNotFound");
 	}
 }

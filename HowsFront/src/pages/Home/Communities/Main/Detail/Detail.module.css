@@ -27,6 +27,7 @@
     margin-bottom: 20px;
     word-break: keep-all;
     word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .commentInput {

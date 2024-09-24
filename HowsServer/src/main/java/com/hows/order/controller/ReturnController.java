@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,7 @@ public class ReturnController {
 	@Autowired
 	private OrderService orderServ;
 	
+	// 관리자 기능
 	// 반품 상태 변경
 	@PutMapping("/updateReturnCode")
 	public ResponseEntity<String> updateOrderCode(@RequestParam int return_seq, @RequestParam String return_code) throws Exception {
@@ -38,10 +40,11 @@ public class ReturnController {
 		return ResponseEntity.ok(result);
 	}
 	
+	// 관리자 기능
 	// 환불 완료
 	@Transactional
     @PutMapping("/doneReturn")
-    public ResponseEntity<String> doneOrder(@RequestBody List<Map<String, Object>> data) throws Exception {
+    public ResponseEntity<String> doneReturn(@RequestBody List<Map<String, Object>> data) throws Exception {
         try {
             for (Map<String, Object> item : data) {
             	item.put("type", "cancel");
@@ -63,4 +66,10 @@ public class ReturnController {
         }
         return ResponseEntity.ok("success");
     }
+	
+	@ExceptionHandler(Exception.class)
+	public ResponseEntity<String> exceptionHandler(Exception e) {
+		e.printStackTrace();
+		return ResponseEntity.badRequest().body("fail");
+	}
 }

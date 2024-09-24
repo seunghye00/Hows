@@ -32,7 +32,7 @@ public class JwtUtil {
 				.withClaim("nickname", nickname)
 				.withClaim("member_avatar", memberAvatar)
 				.withIssuedAt(new Date()) // issue : 발급되다 => 현재 시간으로 발급
-				.withExpiresAt(new Date(System.currentTimeMillis() + (expiration * 10000 ))) // 24시간 
+				.withExpiresAt(new Date(System.currentTimeMillis() + (expiration * 1000))) // 24시간 
 				.sign(this.algo); // 최종적으로 알고리즘(HMAC256)을 사용하여 토큰에 서명
 		}
 		
@@ -41,6 +41,8 @@ public class JwtUtil {
 				this.verifier.verify(token);
 				return true;
 			} catch(Exception e) {
+				// 예외에 대한 로그 출력
+		        System.out.println("토큰 검증 실패: " + e.getMessage());
 				return false;
 			}
 		}

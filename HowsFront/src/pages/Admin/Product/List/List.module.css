@@ -72,7 +72,7 @@
 
 .name {
     height: 25px;
-    max-width: 197px;
+    max-width: 170px;
     white-space: nowrap;
     /* 텍스트를 한 줄로 처리 */
     overflow: hidden;

@@ -46,6 +46,7 @@ public class PaymentController {
 		return ResponseEntity.ok(result);
 	}
 
+	// 관리자 기능
 	// 오늘 매출 조회
 	@GetMapping("/todayPaymentPrice")
 	public ResponseEntity<Integer> todayPaymentPrice() throws Exception {

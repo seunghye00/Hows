@@ -9,9 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -84,7 +81,8 @@ public class SecurityConfig {
 			        "/product/detail/{product_seq}", 
 			        "/product/getReviewList/{product_seq}", 
 			        "/product/getReviewListByBest/{product_seq}", 
-			        "/product/review/getRatings/{product_seq}"
+			        "/product/review/getRatings/{product_seq}",
+			        "/product/getReviewImgList/{review_seq}"
 			    ).permitAll()
 
 			    // 로그인 필요

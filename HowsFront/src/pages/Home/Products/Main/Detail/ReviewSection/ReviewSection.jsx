@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './ReviewSection.module.css'
-import axios from 'axios';
 import Swal from "sweetalert2";
-import img from '../../../../../../assets/images/기본사진.jpg'
 import StarRating from '../../../../../../components/StarRating/StarRating';
 import { Modal } from '../../../../../../components/Modal/Modal';
-import { api, host } from '../../../../../../config/config';
 import { formatDate } from '../../../../../../commons/commons'
 import { Paging } from '../../../../../../components/Pagination/Paging';
 import { userInfo } from '../../../../../../api/member' 
-import { checkPurchaseStatus, checkCanWriteReview, getReviewList , getReviewImgList , reviewLike, reviewUnlike , getReviewLikeCount , checkReviewLikeStatus , getRatings} from '../../../../../../api/product';
+import { checkPurchaseStatus, checkCanWriteReview, getReviewList , getReviewImgList , reviewLike, reviewUnlike , getReviewLikeCount , checkReviewLikeStatus , getRatings, delReview, modifyReview, addReview} from '../../../../../../api/product';
 import ReportModal from '../ReportModal/ReportModal';
 import { useNavigate } from 'react-router-dom';
 
@@ -334,42 +331,41 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
             formData.append('imageOrders', index + 1)
         )    
 
-        api.post(`/product/reviewMod`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        }).then((response) => {
-            Swal.fire({
-                icon: "success",
-                title: "리뷰 수정에 성공했습니다.",
-                showConfirmButton: true,
-            });
-            
-            // 리뷰 등록 성공 시, 새 리뷰를 추가하여 리뷰 목록을 업데이트
-            const modReview = {
-                RATING: data.rating,
-                REVIEW_CONTENTS: data.review_contents,
-                MEMBER_ID: memberId,
-                REVIEW_DATE: new Date(), // 현재 시간을 등록 시간으로 사용
-                images: [...existImages, ...newImages.map((src, index) => ({ IMAGE_URL: src }))], // 이미지 미리보기 배열을 사용하여 새 리뷰 이미지로 추가
-            };
-            
-            // 수정된 리뷰 반영
-            let modifiedReviews = reviews.map((review) => {
-                if (review.REVIEW_SEQ === reviewMod.review_seq){
-                    review.RATING = data.rating;
-                    review.REVIEW_CONTENTS = data.review_contents;
-                    review.REVIEW_DATE = new Date();
-                    review.images = newImages.map((src, index) => ({ IMAGE_URL : src }));
-                }
+        modifyReview(formData)
+            .then((response) => {
+                Swal.fire({
+                    icon: "success",
+                    title: "리뷰 수정에 성공했습니다.",
+                    showConfirmButton: true,
+                });
                 
-                return review;
-            });
+                // // 리뷰 등록 성공 시, 새 리뷰를 추가하여 리뷰 목록을 업데이트
+                // const modReview = {
+                //     RATING: data.rating,
+                //     REVIEW_CONTENTS: data.review_contents,
+                //     MEMBER_ID: memberId,
+                //     REVIEW_DATE: new Date(), // 현재 시간을 등록 시간으로 사용
+                //     images: [...existImages, ...newImages.map((src, index) => ({ IMAGE_URL: src }))], // 이미지 미리보기 배열을 사용하여 새 리뷰 이미지로 추가
+                // };
+                
+                // 수정된 리뷰 반영
+                let modifiedReviews = reviews.map((review) => {
+                    if (review.REVIEW_SEQ === reviewMod.review_seq){
+                        review.RATING = data.rating;
+                        review.REVIEW_CONTENTS = data.review_contents;
+                        review.REVIEW_DATE = new Date();
+                        review.images = newImages.map((src, index) => ({ IMAGE_URL : src }));
+                    }
+                    
+                    return review;
+                });
 
-            setReviews(modifiedReviews);
-            setIsReviewModalOpen(false); // 모달 닫기
-        }).catch((error) => {
-            alert('리뷰 수정에 실패했습니다');
-            setIsReviewModalOpen(false);
-        });
+                setReviews(modifiedReviews);
+                setIsReviewModalOpen(false); // 모달 닫기
+            }).catch((error) => {
+                alert('리뷰 수정에 실패했습니다');
+                setIsReviewModalOpen(false);
+            });
 
         setIsSubmitting(false);
     }
@@ -407,33 +403,32 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
             formData.append('image_orders', index + 1)
         )
     
-        api.post(`/product/reviewAdd`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-        }).then((response) => {
-            Swal.fire({
-                icon: "success",
-                title: "리뷰 제출에 성공했습니다.",
-                showConfirmButton: true,
+        addReview(formData)
+            .then((response) => {
+                Swal.fire({
+                    icon: "success",
+                    title: "리뷰 제출에 성공했습니다.",
+                    showConfirmButton: true,
+                });
+        
+                // 리뷰 등록 성공 시, 새 리뷰를 추가하여 리뷰 목록을 업데이트
+                const newReview = {
+                    RATING: data.rating,
+                    REVIEW_CONTENTS: data.review_contents,
+                    MEMBER_ID: memberId,
+                    REVIEW_DATE: new Date(), // 현재 시간을 등록 시간으로 사용
+                    images: newImages.map((src, index) => ({ IMAGE_URL: src })), // 이미지 미리보기 배열을 사용하여 새 리뷰 이미지로 추가
+                };
+                
+                setReviews((prevReviews) => [newReview, ...prevReviews]); // 새 리뷰를 목록에 추가
+                setTotalReviews(prevCount => prevCount + 1); // 전체 리뷰 수 업데이트
+                setIsReviewModalOpen(false); // 모달 닫기
+                setIsSubmitting(false); // 제출 상태 해제
+            }).catch((error) => {
+                alert('리뷰 제출에 실패했습니다');
+                setIsReviewModalOpen(false);
+                setIsSubmitting(false);
             });
-    
-            // 리뷰 등록 성공 시, 새 리뷰를 추가하여 리뷰 목록을 업데이트
-            const newReview = {
-                RATING: data.rating,
-                REVIEW_CONTENTS: data.review_contents,
-                MEMBER_ID: memberId,
-                REVIEW_DATE: new Date(), // 현재 시간을 등록 시간으로 사용
-                images: newImages.map((src, index) => ({ IMAGE_URL: src })), // 이미지 미리보기 배열을 사용하여 새 리뷰 이미지로 추가
-            };
-            
-            setReviews((prevReviews) => [newReview, ...prevReviews]); // 새 리뷰를 목록에 추가
-            setTotalReviews(prevCount => prevCount + 1); // 전체 리뷰 수 업데이트
-            setIsReviewModalOpen(false); // 모달 닫기
-            setIsSubmitting(false); // 제출 상태 해제
-        }).catch((error) => {
-            alert('리뷰 제출에 실패했습니다');
-            setIsReviewModalOpen(false);
-            setIsSubmitting(false);
-        });
     };
     
     // 리뷰 이미지 로딩 함수
@@ -589,10 +584,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     // 리뷰 삭제
     const handleReviewDel = (review_seq) => {
-        axios.delete(`${host}/product/delReview/${review_seq}`)
+        delReview(review_seq)
             .then(response => {
-                // console.log('리뷰 삭제 성공:', response.data);
-                // 삭제된 리뷰를 제외하고 나머지 리뷰로 상태 업데이트
                 setReviews(prevReviews => prevReviews.filter(review => review.REVIEW_SEQ !== review_seq));
                 Swal.fire({
                     icon: "success",
@@ -747,10 +740,10 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
                                     {/* 이미지 업로드 */}
                                     <div className={styles.filesBox}>
-                                        <label className={styles.fileBtn} for="files">
+                                        <label className={styles.fileBtn} htmlFor="files">
                                             <div>
                                                 <span> 사진 첨부하기 </span>
-                                                <i class='bx bxs-file-image'/>
+                                                <i className='bx bxs-file-image'/>
                                             </div>
                                         </label>
                                         <input type="file" accept="image/*" id='files' className={styles.files} onChange={handleImageChange} multiple/>

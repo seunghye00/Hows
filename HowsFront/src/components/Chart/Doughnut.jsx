@@ -12,7 +12,7 @@ import { getProductNumByCategory } from '../../api/product'
 // Doughnut 차트를 위해 ArcElement 등록
 ChartJS.register(Title, Tooltip, Legend, ArcElement)
 
-export const DoughnutChart = () => {
+export const DoughnutChart = ({ lastSyncTime }) => {
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [
@@ -91,7 +91,7 @@ export const DoughnutChart = () => {
             .finally(() => {
                 setLoading(false) // 로딩 완료
             })
-    }, [])
+    }, [lastSyncTime])
 
     const options = {
         responsive: true,

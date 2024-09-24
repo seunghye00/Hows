@@ -89,7 +89,6 @@ public class SecurityConfig {
 
 			    // 로그인 필요
 			    .requestMatchers(
-
 			    	"/cart/**", 
 			        "/coupon/**", 
 			        "/event/**", 
@@ -102,14 +101,12 @@ public class SecurityConfig {
 			        "/payment/**",
 			        "/comment/**", 
 			        "/community/**", 
-			        "/banner", 
 			        "/member/**",
 			        "/guestbook/**", 
 			        "/notice/**", 
 			        "/likes/**",
 			        "/product/**"
 			    ).authenticated()
-
 
 		        // 관리자 전용 기능 - R1 접근 가능
 		        .requestMatchers(HttpMethod.POST, 

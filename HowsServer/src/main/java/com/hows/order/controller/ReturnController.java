@@ -44,7 +44,7 @@ public class ReturnController {
 	// 환불 완료
 	@Transactional
     @PutMapping("/doneReturn")
-    public ResponseEntity<String> doneOrder(@RequestBody List<Map<String, Object>> data) throws Exception {
+    public ResponseEntity<String> doneReturn(@RequestBody List<Map<String, Object>> data) throws Exception {
         try {
             for (Map<String, Object> item : data) {
             	item.put("type", "cancel");

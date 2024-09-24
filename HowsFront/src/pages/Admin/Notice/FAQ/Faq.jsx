@@ -233,12 +233,16 @@ const Faq = () => {
                             expandedFaqIndex === index ? styles.active : ''
                         }`}
                     >
-                        <div className={styles.faqTitleContainer}>
+                        <div
+                            className={styles.faqTitleContainer}
+                            onClick={() => toggleFaq(index)}
+                        >
                             {editIndex === index ? (
                                 <>
                                     <textarea
                                         className={styles.faqTitle}
                                         value={faq.faq_title}
+                                        onClick={e => e.stopPropagation()}
                                         onChange={e =>
                                             handleInputChange(
                                                 e,
@@ -256,7 +260,10 @@ const Faq = () => {
                             )}
                             <button
                                 className={styles.faqToggle}
-                                onClick={() => toggleFaq(index)}
+                                onClick={e => {
+                                    e.stopPropagation() // 버튼 클릭 시 이벤트가 상위로 전파되지 않도록 함
+                                    toggleFaq(index)
+                                }}
                             >
                                 {expandedFaqIndex === index ? (
                                     <FaTimes />
@@ -265,6 +272,7 @@ const Faq = () => {
                                 )}
                             </button>
                         </div>
+
                         {expandedFaqIndex === index && (
                             <div className={styles.faqText}>
                                 {editIndex === index ? (

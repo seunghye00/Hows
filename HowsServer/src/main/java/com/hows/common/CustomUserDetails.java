@@ -9,6 +9,7 @@ public class CustomUserDetails extends User {
     private int memberSeq;
     private String nickname;
     private String memberAvatar;
+    private String memberRoleCode;
 
     public CustomUserDetails(
     		String username, 
@@ -16,12 +17,13 @@ public class CustomUserDetails extends User {
     		Collection<? extends GrantedAuthority> authorities, 
     		int memberSeq, 
     		String nickname, 
-    		String memberAvatar) {
+    		String memberAvatar,
+    		String memberRoleCode) {
         super(username, password, authorities);
         this.memberSeq = memberSeq;
         this.nickname = nickname;
         this.memberAvatar = memberAvatar;
-        
+        this.memberRoleCode = memberRoleCode;
     }
 
     public int getMemberSeq() {
@@ -36,6 +38,8 @@ public class CustomUserDetails extends User {
 		return memberAvatar;
 	}
 
-    
+	public String getMemberRoleCode() {
+		return memberRoleCode;
+	}
     
 }

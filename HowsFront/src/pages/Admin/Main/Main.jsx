@@ -44,8 +44,10 @@ export const Main = () => {
             })
 
         getBestProduct('selling').then(resp => {
-            // console.log(resp)
-            setBestProducts(resp.data)
+            if (resp !== '' && resp !== undefined && resp !== null) {
+                // console.log(resp)
+                setBestProducts(resp.data)
+            }
         })
     }
 
@@ -56,7 +58,9 @@ export const Main = () => {
 
     useEffect(() => {
         getBestProduct(choice).then(resp => {
-            setBestProducts(resp.data)
+            if (resp !== '' && resp !== undefined && resp !== null) {
+                setBestProducts(resp.data)
+            }
         })
     }, [choice])
 

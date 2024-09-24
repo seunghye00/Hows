@@ -165,6 +165,11 @@ input[type="text"]:disabled {
   flex: 4;
 }
 
+/* 이메일 */
+.container .updateInfo .emailBox .inputEmail {
+  flex: 4;
+}
+
 /* 주소 */
 .container .updateInfo .addressBox input {
   margin-bottom: 3px;

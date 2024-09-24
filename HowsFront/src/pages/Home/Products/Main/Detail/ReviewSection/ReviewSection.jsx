@@ -482,8 +482,8 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                     nickname: profileResp.data.nickname
                                 };
                             } catch (error) {
-                                console.error(`프로필 이미지 불러오기 오류: ${review.MEMBER_ID}`, error);
-                                return { memberId: review.MEMBER_ID, avatar: img , nickname: '알 수 없음'};  // 기본 
+                                // console.error(`프로필 이미지 불러오기 오류: ${review.MEMBER_ID}`, error);
+                                // return { memberId: review.MEMBER_ID, avatar: img , nickname: '알 수 없음'};  // 기본 
                             }
                         }
                     });
@@ -798,11 +798,7 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                                                 }}
                                             >
                                             {/* 리뷰 작성자의 MEMBER_ID와 연결된 프로필 이미지가 있으면 표시, 없으면 기본 이미지 표시 */}
-                                            {reviewAvatars[review.MEMBER_ID] ? (
-                                                <img src={reviewAvatars[review.MEMBER_ID]} alt="profile" />
-                                            ) : (
-                                                <img src={img} alt="default profile" />
-                                            )}
+                                            <img src={reviewAvatars[review.MEMBER_ID]} alt="profile" />
                                             </div>
                                             <div>
                                                 {/* <div>{review.MEMBER_ID} </div> */}

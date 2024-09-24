@@ -131,7 +131,7 @@ export const ModifyEvent = () => {
                 <Button
                     size={'s'}
                     title={'취소'}
-                    onClick={() => navigate('/event')}
+                    onClick={() => navigate('/admin/notice/event')}
                 />
             </div>
         </div>

@@ -242,5 +242,5 @@
     line-clamp: 1;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
-    margin-right: 60px;
+    width: calc(100% - 60px)
 }

@@ -334,10 +334,17 @@ public class ProductController {
 	@GetMapping("/getProductNumByCategory")
 	public ResponseEntity<List<Map<String, Object>>> getProductNumByCategory() throws Exception {
 
-	    List<Map<String, Object>> result = productServ.getProductNumByCategory();
-	    return ResponseEntity.ok(result);
+		List<Map<String, Object>> result = productServ.getProductNumByCategory();
+		return ResponseEntity.ok(result);
 	}
 
+	// 관리자
+	// 상품 전체 목록 조회
+	@GetMapping("/getProductsByAdmin")
+	public ResponseEntity<List<ProductDTO>> getProductsByAdmin() throws Exception {
+		List<ProductDTO> products = productServ.getProductsByAdmin();
+		return ResponseEntity.ok(products);
+	}
 
 	// 관리자
 	// 조건별 베스트 상품 조회

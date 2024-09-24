@@ -76,4 +76,9 @@ public class ProductService {
 			return null;
 		}
 	}
+
+	// 상품 전체 목록 조회 (관리자)
+	public List<ProductDTO> getProductsByAdmin() {
+		return productDAO.getProductsByAdmin();
+	}
 }

@@ -38,6 +38,9 @@ export const SignIn = () => {
   const handleLoginBtn = () => {
     loginUser(user)
       .then((resp) => {
+
+        console.log("로그인 : ", resp.data);
+
         const { token } = resp.data; // 서버 응답에서 token과 memberId 분해 할당
         const decoded = jwtDecode(token);
 

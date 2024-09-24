@@ -55,6 +55,11 @@ export const checkNickname = nickname => {
     return api.post(`/member/checkNickname`, { nickname })
 }
 
+// [마이페이지 회원정보 수정] 이메일 중복 확인
+export const checkEmail = email => {
+    return api.post(`/member/checkEmail`, { email })
+}
+
 // [마이페이지 비밀번호 변경] 현재 비밀번호 확인
 export const checkCurrentPw = currentPw => {
     return api.post(`/member/checkPw`, { pw: currentPw })

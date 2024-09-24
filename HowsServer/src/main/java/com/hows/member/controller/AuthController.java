@@ -54,12 +54,17 @@ public class AuthController {
 	    // 사용자 role_code 확인 (블랙리스트 여부 확인)
 	    String role_code = memServ.getRoleCode(member_id); // member_seq를 사용하여 role_code 가져오기
 
+//	    if ("R3".equals(role_code)) {
+//	        // role_code가 R3인 경우, 블랙리스트로 처리하여 로그인 차단
+//	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//	                .body(new SignInResponseDTO("계정이 블랙리스트로 처리되어 로그인이 불가능합니다.", null, 0, null, null));
+//	    }
+
 	    if ("R3".equals(role_code)) {
 	        // role_code가 R3인 경우, 블랙리스트로 처리하여 로그인 차단
-	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-	                .body(new SignInResponseDTO("계정이 블랙리스트로 처리되어 로그인이 불가능합니다.", null, 0, null, null));
+	        return ResponseEntity.ok(new SignInResponseDTO("계정이 블랙리스트로 처리되어 로그인이 불가능합니다.", null, 0, null, null));
 	    }
-
+	    
 	    // 로그인 성공 시 토큰 생성
 	    String token = jwt.createToken(member_id, member_seq, nickname, member_avatar);
 

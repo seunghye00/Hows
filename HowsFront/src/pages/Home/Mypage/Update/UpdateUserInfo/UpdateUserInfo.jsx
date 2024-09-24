@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { api } from "../../../../../config/config";
 import { format } from "date-fns";
 import { useAuthStore } from "../../../../../store/store";
-import { checkEmailForSignUp, checkNickname, deleteUser, userInfo } from "../../../../../api/member";
+import { checkEmail, checkNickname, deleteUser, userInfo } from "../../../../../api/member";
 import Swal from "sweetalert2";
 import DaumPostcode from "react-daum-postcode";
 import { SwalComp } from "../../../../../commons/commons";
@@ -152,7 +152,7 @@ export const UpdateUserInfo = () => {
     }
 
     // 중복확인 요청
-    checkEmailForSignUp(formData.email).then((resp) => {
+    checkEmail(formData.email).then((resp) => {
       setEmailAvailable(resp.data);
       setEmailChecked(!resp.data);
       setCheckEmailStatus(

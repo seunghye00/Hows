@@ -230,4 +230,17 @@
     align-items: center;
     display: flex;
     justify-content: space-between;
+    margin-right: 10px;
+}
+
+.productInfo span {
+    word-wrap: break-word;
+    overflow: hidden;
+    word-break: break-word;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    width: calc(100% - 60px)
 }

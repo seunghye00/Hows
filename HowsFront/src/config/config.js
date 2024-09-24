@@ -1,75 +1,53 @@
-import axios from "axios";
-import { useAuthStore } from "../store/store";
-import { useLocation } from "react-router-dom";
-import Swal from "sweetalert2";
+import axios from 'axios'
+import { useAuthStore } from '../store/store'
+import { SwalComp } from '../commons/commons'
 
-/** 설정 변수 또는 함수 만들어서 보관 **/
+// 설정 변수
 const { REACT_APP_BASE_URL } = process.env
+export const host = REACT_APP_BASE_URL
 
-// API base url
-export const host = REACT_APP_BASE_URL;
-
-
+// API base url 설정
 export const api = axios.create({
-  baseURL: `${host}`
-});
+    baseURL: `${host}`,
+})
 
-api.interceptors.request.use(
-  (config) => {
-    const token = sessionStorage.getItem("token");
+// 요청 인터셉터 설정
+api.interceptors.request.use(config => {
+    const token = sessionStorage.getItem('token')
     if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+        config.headers['Authorization'] = `Bearer ${token}`
     }
-    return config;
-  }
-);
+    return config
+})
 
-api.interceptors.response.use(
-  (response) => response, // axios 응답이 정상응답일 때는 then으로 가게 방치
-  (error) => {
-    switch (error.response.status) {
-      case 401:
-        sessionStorage.removeItem("token");
-        useAuthStore.getState().logout(); // useAuthStore에 있는 state값을 가져와서 logout 시키겠다.
-        break;
-
-      case 403:
-        sessionStorage.removeItem("token");
-        useAuthStore.getState().logout(); // useAuthStore에 있는 state값을 가져와서 logout 시키겠다.
-
-        Swal.fire({
-          icon: 'warning',
-          text: '로그인 후 이용할 수 있습니다.!!!!!!!!!!!',
-          showConfirmButton: true,
-        }).then(() => {
-          window.location.href = "/signIn";
-        })
-        break;
+// 에러 처리 함수
+const handleError = error => {
+    if (error.response) {
+        switch (error.response.status) {
+            case 401:
+                sessionStorage.removeItem('token')
+                useAuthStore.getState().logout()
+                break
+            case 403:
+                sessionStorage.removeItem('token')
+                useAuthStore.getState().logout()
+                SwalComp({
+                    type: 'warning',
+                    text: '로그인 후 이용할 수 있습니다.',
+                }).then(() => {
+                    window.location.href = '/signIn'
+                })
+                break
+            // 다른 에러 코드 추가 가능
+            default:
+                SwalComp({
+                    type: 'error',
+                    text: '알 수 없는 오류가 발생했습니다.',
+                })
+        }
     }
-  }
-);
+    return Promise.reject(error)
+}
 
-axios.interceptors.response.use(
-  (response) => response, // axios 응답이 정상응답일 때는 then으로 가게 방치
-  (error) => {
-    switch (error.response.status) {
-      case 401:
-        sessionStorage.removeItem("token");
-        useAuthStore.getState().logout(); // useAuthStore에 있는 state값을 가져와서 logout 시키겠다.
-        break;
-
-      case 403:
-        sessionStorage.removeItem("token");
-        useAuthStore.getState().logout(); // useAuthStore에 있는 state값을 가져와서 logout 시키겠다.
-
-        Swal.fire({
-          icon: 'warning',
-          text: '로그인 후 이용할 수 있습니다.!!!!!!!!!!!',
-          showConfirmButton: true,
-        }).then(() => {
-          window.location.href = "/signIn";
-        })
-        break;
-    }
-  }
-);
+// 응답 인터셉터 설정
+api.interceptors.response.use(response => response, handleError)

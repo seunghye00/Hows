@@ -329,13 +329,17 @@ public class ProductController {
 		return ResponseEntity.ok(result);
 	}
 
+	// 관리자
 	// 카테고리별 상품 수 조회
 	@GetMapping("/getProductNumByCategory")
 	public ResponseEntity<List<Map<String, Object>>> getProductNumByCategory() throws Exception {
-		List<Map<String, Object>> result = productServ.getProductNumByCategory();
-		return ResponseEntity.ok(result);
+
+	    List<Map<String, Object>> result = productServ.getProductNumByCategory();
+	    return ResponseEntity.ok(result);
 	}
 
+
+	// 관리자
 	// 조건별 베스트 상품 조회
 	@GetMapping("/getBestProduct/{condition}")
 	public ResponseEntity<List<ProductDTO>> getBestProductByCondition(@PathVariable String condition) throws Exception {

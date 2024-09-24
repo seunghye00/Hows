@@ -46,6 +46,7 @@ public class AuthController {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	    }
 
+	    String member_roleCode = existingUser.getMemberRoleCode();
 	    String member_id = existingUser.getUsername();
 	    int member_seq = existingUser.getMemberSeq();
 	    String nickname = existingUser.getNickname();
@@ -57,13 +58,12 @@ public class AuthController {
 	    if ("R3".equals(role_code)) {
 	        // role_code가 R3인 경우, 블랙리스트로 처리하여 로그인 차단
 	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-	                .body(new SignInResponseDTO("계정이 블랙리스트로 처리되어 로그인이 불가능합니다.", null, 0, null, null));
+	                .body(new SignInResponseDTO("계정이 블랙리스트로 처리되어 로그인이 불가능합니다.", null, 0, null, null, null));
 	    }
 
 	    // 로그인 성공 시 토큰 생성
 	    String token = jwt.createToken(member_id, member_seq, nickname, member_avatar);
-
-	    return ResponseEntity.ok(new SignInResponseDTO(token, member_id, member_seq, nickname, member_avatar));
+	    return ResponseEntity.ok(new SignInResponseDTO(token, member_id, member_seq, nickname, member_avatar, member_roleCode));
 	}
 
 

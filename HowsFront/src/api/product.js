@@ -2,7 +2,6 @@ import axios from 'axios'
 import { host, api } from '../config/config'
 
 const baseUrl = `${host}/product`
-const categoryUrl = `${host}/category`
 const likeUrl = `${host}/likes`
 
 /************************************ [사용자 기능] ************************************/
@@ -91,17 +90,17 @@ export const checkCanWriteReview = async (memberId, productSeq) => {
 export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
     return sortType === 'latest'
         ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
-            params: {
-                page: page, // 페이지 번호 전달
-                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-            },
-        })
+              params: {
+                  page: page, // 페이지 번호 전달
+                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+              },
+          })
         : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
-            params: {
-                page: page, // 페이지 번호 전달
-                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-            },
-        })
+              params: {
+                  page: page, // 페이지 번호 전달
+                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+              },
+          })
 }
 
 // 별점
@@ -214,23 +213,6 @@ export const sendReviewReport = (reviewSeq, selectedReason, memberId) => {
     })
 }
 
-/************************************ / [사용자 기능] ************************************/
-
-// 상품 카테고리 목록 요청 함수
-export const categoryList = () => {
-    return axios.get(`${categoryUrl}`)
-}
-
-// 상품 목록 요청 함수
-export const productList = () => {
-    return axios.get(`${baseUrl}`)
-}
-
-// 상품 추가 요청 함수
-export const addProduct = formData => {
-    return axios.post(`${baseUrl}`, formData)
-}
-
 /************************************  [ 관리자 기능 ] /************************************/
 
 // 신고 리뷰 조회 (관리자)
@@ -253,29 +235,44 @@ export const deleteReview = review_seq => {
     return axios.delete(`${baseUrl}/deleteReview/${review_seq}`)
 }
 
+// 상품 카테고리 목록 요청 함수
+export const categoryList = () => {
+    return api.get('/category')
+}
+
+// 상품 목록 요청 함수
+export const productList = () => {
+    return api.get('product')
+}
+
+// 상품 추가 요청 함수
+export const addProduct = formData => {
+    return api.post('/product', formData)
+}
+
 // 상품 삭제 요청 함수
 export const deleteProducts = productSeqs => {
     const seqs = productSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
-    return axios.delete(`${baseUrl}`, { params: { seqs } })
+    return api.delete('/product', { params: { seqs } })
 }
 
 // 상품 정보 조회 함수
 export const getProductInfo = product_seq => {
-    return axios.get(`${baseUrl}/detail/${product_seq}`)
+    return api.get(`/product/detail/${product_seq}`)
 }
 
 // 상품 수량 변경 요청 함수
 export const updateProductByQuantity = (productSeqs, quantity) => {
     const seqs = productSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
-    return axios.put(`${baseUrl}`, null, { params: { seqs, quantity } })
+    return api.put('/product', null, { params: { seqs, quantity } })
 }
 
 // 카테고리별 상품 수 조회 함수
 export const getProductNumByCategory = () => {
-    return axios.get(`${baseUrl}/getProductNumByCategory`)
+    return api.get('/product/getProductNumByCategory')
 }
 
 // 조건별 베스트 상품 조회 함수
 export const getBestProduct = condition => {
-    return axios.get(`${baseUrl}/getBestProduct/${condition}`)
+    return api.get(`/product/getBestProduct/${condition}`)
 }

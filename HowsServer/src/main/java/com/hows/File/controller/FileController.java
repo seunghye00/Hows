@@ -18,11 +18,9 @@ public class FileController {
 	@Autowired
 	private FileService fileServ;
 	
+	// 관리자 기능
 	@PostMapping
 	public ResponseEntity<String> getUrl(@RequestParam("file") MultipartFile file) throws Exception {
-		
-		System.out.println("여긴 서버");
-		
 		// 파일을 서버와 DB에 저장하고 반환받은 파일 경로 저장
 		String result = fileServ.upload(file, 0, "F6");
 		return ResponseEntity.ok(result);

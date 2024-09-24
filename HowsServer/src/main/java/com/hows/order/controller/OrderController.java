@@ -22,18 +22,7 @@ public class OrderController {
 	@Autowired
 	private OrderService orderServ;
 
-	@GetMapping
-	public ResponseEntity<List<OrderDTO>> orderList() {
-		try {
-			List<OrderDTO> list = orderServ.orderList();
-			return ResponseEntity.ok(list);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
-
+	// 관리자 기능
 	// 필터링된 주문 목록 조회
 	@GetMapping("/listByStatus")
 	public ResponseEntity<List<OrderInfoListDTO>> getOrdersByStatus(@RequestParam String status) throws Exception {
@@ -41,6 +30,7 @@ public class OrderController {
 		return ResponseEntity.ok(list);
 	}
 	
+	// 관리자 기능
 	// 반품 목록 조회
 	@GetMapping("/getReturnList")
 	public ResponseEntity<List<ReturnDTO>> getReturnList() throws Exception {
@@ -61,6 +51,7 @@ public class OrderController {
 		return ResponseEntity.ok(result);
 	}
 	
+	// 관리자 기능
 	// 주문 상태 변경
 	@PutMapping("/updateOrderCode")
 	public ResponseEntity<String> updateOrderCode(@RequestParam int order_seq, @RequestParam String order_code) throws Exception {
@@ -68,6 +59,7 @@ public class OrderController {
 		return ResponseEntity.ok(result);
 	}
 	
+	// 관리자 기능
 	// 배송 시작
 	@Transactional
 	@PutMapping("/startDelivery")
@@ -88,6 +80,7 @@ public class OrderController {
 		return ResponseEntity.ok("success");
 	}
 	
+	// 관리자 기능
 	// 구매 확정
 	@Transactional
 	@PutMapping("/doneOrder")
@@ -108,6 +101,7 @@ public class OrderController {
 		return ResponseEntity.ok("success");
 	}
 
+	// 관리자 기능
 	// 주문 내역 삭제
 	@Transactional
 	@DeleteMapping

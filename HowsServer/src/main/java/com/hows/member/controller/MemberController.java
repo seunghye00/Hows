@@ -416,7 +416,7 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
-	// 블랙리스트 수정 (관리자)
+	// 블랙리스트 수정(해제) (관리자)
 	@PutMapping("/modifyBlacklist")
 	public ResponseEntity<Integer> modifyBlacklist(@RequestBody Map<String, String> request) {
 		String memberId = request.get("member_id");
@@ -424,7 +424,7 @@ public class MemberController {
 		return ResponseEntity.ok(result);
 	}
 
-	// 연령대별 남녀 회원 수 조회
+	// 연령대별 남녀 회원 수 조회 (관리자)
 	@GetMapping("/getAgeGenderDistribution")
 	public ResponseEntity<List<Map<String, Object>>> getAgeGenderDistribution() throws Exception {
 		List<Map<String, Object>> result = memServ.getAgeGenderDistribution();

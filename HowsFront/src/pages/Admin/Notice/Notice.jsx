@@ -7,6 +7,7 @@ import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 import { selectNtc, detailNtc, deleteNtc } from '../../../api/notice'
 import { formatDate } from '../../../commons/commons'
+import ReactMarkdown from 'react-markdown'
 
 export const Notice = () => {
     const [searchResults, setSearchResults] = useState([]) // 검색 결과 저장
@@ -264,17 +265,18 @@ export const Notice = () => {
                                         ))}
                                     </div>
                                 )}
-
                                 {/* 이미지 아래에 텍스트 출력 */}
                                 {formatNoticeContents(
                                     selectedNotice.notice_contents
                                 ).text && (
                                     <div>
-                                        {
-                                            formatNoticeContents(
-                                                selectedNotice.notice_contents
-                                            ).text
-                                        }
+                                        <ReactMarkdown>
+                                            {
+                                                formatNoticeContents(
+                                                    selectedNotice.notice_contents
+                                                ).text
+                                            }
+                                        </ReactMarkdown>
                                     </div>
                                 )}
                             </div>

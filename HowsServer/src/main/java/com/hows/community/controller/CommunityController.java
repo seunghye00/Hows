@@ -552,7 +552,7 @@ public class CommunityController {
 		return ResponseEntity.ok(response);
 	}
 
-	// 게시물 내역 조회 (관리자)
+	// 게시물 신고내역 조회 (관리자)
 	@GetMapping("/communityReport/{board_seq}")
 	public ResponseEntity<List<BoardReportDTO>> CommunityReport(@PathVariable int board_seq) throws Exception {
 		List<BoardReportDTO> boardReports = communityServ.CommunityReport(board_seq);
@@ -604,14 +604,14 @@ public class CommunityController {
 		return fileURL.substring(fileURL.lastIndexOf("/") + 1);
 	}
 
-	// 카테고리 별 게시글 수 조회
+	// 카테고리 별 게시글 수 조회 (관리자)
 	@GetMapping("/getBoardNumByCategory")
 	public ResponseEntity<Map<String, Object>> getBoardNumByCategory() throws Exception {
 		Map<String, Object> result = communityServ.getBoardNumByCategory();
 		return ResponseEntity.ok(result);
 	}
 
-	// 오늘 작성된 게시글 수 조회
+	// 오늘 작성된 게시글 수 조회 (관리자)
 	@GetMapping("/todayBoardNum")
 	public ResponseEntity<Integer> todayBoardNum() throws Exception {
 		int result = communityServ.todayBoardNum();

@@ -7,6 +7,7 @@ import Swal from 'sweetalert2'
 import { useNavigate } from 'react-router-dom'
 import { selectEvt, detailEvt, deleteEvt } from '../../../../api/event'
 import { formatDate } from '../../../../commons/commons'
+import ReactMarkdown from 'react-markdown'
 
 export const Event = () => {
     const [searchResults, setSearchResults] = useState([]) // 검색 결과 저장
@@ -250,11 +251,13 @@ export const Event = () => {
                                     selectedEvent.event_contents
                                 ).text && (
                                     <div>
-                                        {
-                                            formatEventContents(
-                                                selectedEvent.event_contents
-                                            ).text
-                                        }
+                                        <ReactMarkdown>
+                                            {
+                                                formatEventContents(
+                                                    selectedEvent.event_contents
+                                                ).text
+                                            }
+                                        </ReactMarkdown>
                                     </div>
                                 )}
                             </div>

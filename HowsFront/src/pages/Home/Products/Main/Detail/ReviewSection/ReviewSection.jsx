@@ -32,6 +32,19 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     // 리뷰 작성 모달 열기
     const handleOpenReviewModal = async () => {
+
+        // 로그인 하지 않은 경우 처리 
+        if (!isAuth){
+            Swal.fire({
+                icon:'warning',
+                title: '로그인을 먼저 해주세요.',
+                showConfirmButton: true,
+            }).then(() => {
+                navi('/signIn'); // 로그인 페이지로 이동
+            });
+            return;
+        }
+
         // 로그인한 사용자의 ID와 현재 상품의 product_seq를 이용하여 구매 상태 확인
         const isPurchased = await checkPurchaseStatus(memberId, product_seq);
 

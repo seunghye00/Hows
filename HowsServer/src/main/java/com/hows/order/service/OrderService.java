@@ -25,13 +25,9 @@ public class OrderService {
 
     @Autowired
     private CouponDAO couponDAO;
+    
     @Autowired
     private ProductDAO productDAO;
-
-    /** 주문 목록 **/
-    public List<OrderDTO> orderList() throws Exception {
-        return orderDAO.orderList();
-    }
 
     /** 주문 등록 **/
     @Transactional

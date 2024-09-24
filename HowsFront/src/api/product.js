@@ -217,7 +217,7 @@ export const sendReviewReport = (reviewSeq, selectedReason, memberId) => {
 
 // 신고 리뷰 조회 (관리자)
 export const reportedReviews = (startRow, endRow) => {
-    return axios.get(`${baseUrl}/reportedReviews`, {
+    return api.get(`/product/reportedReviews`, {
         params: {
             startRow: startRow,
             endRow: endRow,
@@ -227,12 +227,12 @@ export const reportedReviews = (startRow, endRow) => {
 
 // 신고 내역 조회 (관리자)
 export const reviewReport = review_seq => {
-    return axios.get(`${baseUrl}/reviewReport/${review_seq}`)
+    return api.get(`/product/reviewReport/${review_seq}`)
 }
 
 // 신고 리뷰 삭제 (관리자)
 export const deleteReview = review_seq => {
-    return axios.delete(`${baseUrl}/deleteReview/${review_seq}`)
+    return api.delete(`/product/deleteReview/${review_seq}`)
 }
 
 // 상품 카테고리 목록 요청 함수

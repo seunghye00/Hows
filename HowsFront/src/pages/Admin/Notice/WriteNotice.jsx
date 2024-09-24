@@ -51,20 +51,23 @@ export const WriteNotice = () => {
 
         const markdownContent = notice.notice_contents
 
-        // 마크다운에서 이미지 URL 추출 (예시: 첫 번째 이미지만 추출)
-        const imageRegex = /!\[.*?\]\((.*?)\)/
-        const imageUrlMatch = markdownContent.match(imageRegex)
-        const imageUrl = imageUrlMatch ? imageUrlMatch[1] : null
+        // 마크다운에서 모든 이미지 URL 추출
+        const imageRegex = /!\[.*?\]\((.*?)\)/g
+        const imageUrlMatches = Array.from(markdownContent.matchAll(imageRegex))
 
-        // 공지사항 내용을 URL로 교체
-        const contentWithoutMarkdown = markdownContent.replace(
+        // 모든 이미지 URL을 추출하여 배열로 저장
+        const imageUrls = imageUrlMatches.map(match => match[1])
+
+        // 공지사항 내용을 마크다운 이미지 문법을 제거하고 URL로 대체
+        let contentWithoutMarkdown = markdownContent.replace(
             imageRegex,
-            imageUrl
+            (_, url) => url
         )
 
+        // 최종적으로 DB에 저장될 내용
         const formData = new FormData()
         formData.append('notice_title', notice.notice_title)
-        formData.append('notice_contents', contentWithoutMarkdown) // URL로 대체된 내용을 DB에 저장
+        formData.append('notice_contents', contentWithoutMarkdown) // 마크다운 이미지 문법이 제거되고 URL만 저장
 
         insertNtc(formData)
             .then(resp => {

@@ -102,7 +102,7 @@ export const ModifyNotice = () => {
             SwalComp({
                 type: 'success',
                 text: '공지사항이 수정되었습니다.',
-            }).then(() => navigate('/notice')) // 수정 후 목록으로 이동
+            }).then(() => navigate('/admin/notice')) // 수정 후 목록으로 이동
         } catch (error) {
             console.error('공지사항 수정 실패:', error)
             SwalComp({ type: 'error', text: '공지사항 수정에 실패했습니다.' })

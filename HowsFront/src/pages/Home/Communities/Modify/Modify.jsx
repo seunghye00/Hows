@@ -219,6 +219,14 @@ export const Modify = () => {
                 setThumbnail(updatedImages[hoverIndex]?.src)
                 setSelectedImageIndex(hoverIndex)
             }
+            // 이미지 순서 콘솔 출력
+            console.log(
+                'Updated Image Order:',
+                updatedImages.map((img, idx) => ({
+                    index: idx + 1,
+                    src: img.src,
+                }))
+            )
 
             return updatedImages
         })
@@ -504,9 +512,10 @@ export const Modify = () => {
             existingImageOrders.forEach(order =>
                 formData.append('existing_image_orders', order)
             )
-
+            // 콘솔에 이미지 순서 출력
+            console.log('New Image Orders:', newImageOrders)
+            console.log('Existing Image Orders:', existingImageOrders)
             console.log('전송되는 formData:', [...formData.entries()]) // 전송되는 데이터 확인
-
             const response = await updatePostData(board_seq, formData) // 서버로 전송
 
             if (response.status === 200) {

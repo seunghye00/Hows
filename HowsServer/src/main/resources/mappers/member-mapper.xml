@@ -7,7 +7,8 @@
 
 	<!-- 로그인 시 role_code 가져오기 -->
 	<select id="getRoleCode" resultType="String">
-		select role_code from member where member_id = #{member_id}
+		select role_code from member
+		where member_id = #{member_id}
 	</select>
 
 	<!-- 회원가입 -->
@@ -73,12 +74,12 @@
 		select count(*) from member
 		where member_id = #{member_id} and email = #{email}
 	</select>
-	
+
 	<!-- [로그인] 비밀번호 찾기 - 임시 비밀번호 업데이트 -->
 	<update id="updateTempPassword">
-        update member set pw = #{pw} where member_id = #{member_id}
-    </update>
-	
+		update member set pw = #{pw} where member_id = #{member_id}
+	</update>
+
 	<!-- 마이페이지 회원정보 출력 -->
 	<select id="selectInfo"
 		resultType="com.hows.member.dto.MemberDTO">
@@ -87,43 +88,45 @@
 
 	<!-- 회원정보 수정 -->
 	<update id="updateInfo">
-		update member 
-		set	nickname = #{nickname},
-			email = #{email},
-			phone = #{phone},
-			zip_code = #{zip_code},
-			address = #{address},
-			detail_address = #{detail_address}
+		update member
+		set nickname = #{nickname},
+		email = #{email},
+		phone = #{phone},
+		zip_code = #{zip_code},
+		address = #{address},
+		detail_address = #{detail_address}
 		where member_id = #{member_id}
 	</update>
-	
+
 	<!-- 프로필 이미지 업데이트 -->
-    <update id="updateProfileImage">
-        update member set member_avatar = #{member_avatar} where member_seq = ${member_seq}
-    </update>
+	<update id="updateProfileImage">
+		update member set member_avatar = #{member_avatar} where member_seq =
+		${member_seq}
+	</update>
 	<!-- 배너 이미지 업데이트 -->
-    <update id="updateBannerImage">
-        update member set member_banner = #{member_banner} where member_seq = ${member_seq}
-    </update>
-    
-    <!--  현재 프로필 사진 URL 가져오기 -->
+	<update id="updateBannerImage">
+		update member set member_banner = #{member_banner} where member_seq =
+		${member_seq}
+	</update>
+
+	<!-- 현재 프로필 사진 URL 가져오기 -->
 	<select id="getProfileImageUrl" resultType="String">
-	    select member_avatar from member where member_seq = ${member_seq}
+		select member_avatar from member where member_seq = ${member_seq}
 	</select>
-    <!--  현재 배너 사진 URL 가져오기 -->
+	<!-- 현재 배너 사진 URL 가져오기 -->
 	<select id="getBannerImageUrl" resultType="String">
-	    select member_banner from member where member_seq = ${member_seq}
+		select member_banner from member where member_seq = ${member_seq}
 	</select>
-	
-	<!-- 프로필 삭제 시 member_avatar => null  -->
+
+	<!-- 프로필 삭제 시 member_avatar => null -->
 	<update id="updateProfileImageToNull">
-	    update member set member_avatar = null where member_seq = ${member_seq}
+		update member set member_avatar = null where member_seq = ${member_seq}
 	</update>
-	<!-- 프로필 삭제 시 member_avatar => null  -->
+	<!-- 프로필 삭제 시 member_avatar => null -->
 	<update id="updateBannerImageToNull">
-	    update member set member_banner = null where member_seq = ${member_seq}
+		update member set member_banner = null where member_seq = ${member_seq}
 	</update>
-	
+
 	<!-- 비밀번호 변경 시 기존 비밀번호 확인 -->
 	<select id="getPasswordById" resultType="string">
 		select pw from member
@@ -147,87 +150,89 @@
 		member where member_id = #{member_id}
 	</select>
 
-    <!-- 팔로우 상태 확인 -->
-    <select id="checkIfUserFollowing" resultType="boolean">
-        select count(*) 
-        from follow
-        where from_member_seq = #{from_member_seq}
-        and to_member_seq = #{to_member_seq}
-    </select>
+	<!-- 팔로우 상태 확인 -->
+	<select id="checkIfUserFollowing" resultType="boolean">
+		select count(*)
+		from follow
+		where from_member_seq = #{from_member_seq}
+		and to_member_seq = #{to_member_seq}
+	</select>
 
-    <!-- 팔로우 추가 -->
-    <insert id="addFollow">
-        insert into follow (follow_seq, from_member_seq, to_member_seq)
-        values (follow_seq.nextval, #{from_member_seq}, #{to_member_seq})
-    </insert>
+	<!-- 팔로우 추가 -->
+	<insert id="addFollow">
+		insert into follow (follow_seq, from_member_seq, to_member_seq)
+		values (follow_seq.nextval, #{from_member_seq}, #{to_member_seq})
+	</insert>
 
-    <!-- 팔로우 취소 -->
-    <delete id="removeFollow">
-        delete from follow
-        where from_member_seq = #{from_member_seq}
-        and to_member_seq = #{to_member_seq}
-    </delete>
-    
-     <!-- 팔로워 목록 가져오기 -->
-    <select id="getFollower" resultType="map">
+	<!-- 팔로우 취소 -->
+	<delete id="removeFollow">
+		delete from follow
+		where from_member_seq = #{from_member_seq}
+		and to_member_seq = #{to_member_seq}
+	</delete>
+
+	<!-- 팔로워 목록 가져오기 -->
+	<select id="getFollower" resultType="map">
 		SELECT
-		    CASE 
-		        WHEN EXISTS (
-		            SELECT 1
-		            FROM follow f2
-		            WHERE f2.from_member_seq = ${member_seq}
-		            AND f2.to_member_seq = f.from_member_seq
-		        ) THEN 'Y'
-		        ELSE 'N'
-		    END AS is_following,
-		    m.member_seq,
-		    m.member_id,
-		    m.nickname,
-		    m.member_avatar
-		FROM 
-		    follow f
-		    JOIN member m ON f.from_member_seq = m.member_seq
-		WHERE 
-		    f.to_member_seq = ${member_seq}
-    </select>
+		CASE
+		WHEN EXISTS (
+		SELECT 1
+		FROM follow f2
+		WHERE f2.from_member_seq = ${member_seq}
+		AND f2.to_member_seq = f.from_member_seq
+		) THEN 'Y'
+		ELSE 'N'
+		END AS is_following,
+		m.member_seq,
+		m.member_id,
+		m.nickname,
+		m.member_avatar
+		FROM
+		follow f
+		JOIN member m ON f.from_member_seq = m.member_seq
+		WHERE
+		f.to_member_seq = ${member_seq}
+	</select>
 
 	<!-- 팔로잉 목록 가져오기 -->
 	<select id="getFollowing" resultType="map">
-	    SELECT
-	        CASE 
-	            WHEN EXISTS (
-	                SELECT 1
-	                FROM follow f2
-	                WHERE f2.from_member_seq = ${member_seq}
-	                AND f2.to_member_seq = f.to_member_seq
-	            ) THEN 'Y'
-	            ELSE 'N'
-	        END AS is_following,
-	        m.member_seq,
-	        m.member_id,
-	        m.nickname,
-	        m.member_avatar
-	    FROM 
-	        follow f
-	        JOIN member m ON f.to_member_seq = m.member_seq
-	    WHERE 
-	        f.from_member_seq = ${member_seq}
+		SELECT
+		CASE
+		WHEN EXISTS (
+		SELECT 1
+		FROM follow f2
+		WHERE f2.from_member_seq = ${member_seq}
+		AND f2.to_member_seq = f.to_member_seq
+		) THEN 'Y'
+		ELSE 'N'
+		END AS is_following,
+		m.member_seq,
+		m.member_id,
+		m.nickname,
+		m.member_avatar
+		FROM
+		follow f
+		JOIN member m ON f.to_member_seq = m.member_seq
+		WHERE
+		f.from_member_seq = ${member_seq}
 	</select>
-    
-    <!-- 팔로워, 팔로잉 수 가져오기 -->
-    <select id="countFollow" resultType="map">
-    	select
-			(select count(*) from follow where from_member_seq = ${member_seq}) as following,
-			(select count(*) from follow where to_member_seq = ${member_seq}) as follower
+
+	<!-- 팔로워, 팔로잉 수 가져오기 -->
+	<select id="countFollow" resultType="map">
+		select
+		(select count(*) from follow where from_member_seq = ${member_seq}) as
+		following,
+		(select count(*) from follow where to_member_seq = ${member_seq}) as follower
 		from dual
-    </select>
-    
-    <!-- 맞팔 되어있는지 -->
-    <select id="eachFollow" resultType="int">
-    	select count(*) from follow where from_member_seq = ${from_member_seq} and to_member_seq = ${to_member_seq}
-    </select>
-    
-    
+	</select>
+
+	<!-- 맞팔 되어있는지 -->
+	<select id="eachFollow" resultType="int">
+		select count(*) from follow where from_member_seq = ${from_member_seq} and
+		to_member_seq = ${to_member_seq}
+	</select>
+
+
 	<!-- ===========================================[ 관리자 ] -->
 	<!-- 전체 회원조회 (관리자) -->
 	<select id="selectAll" parameterType="map"
@@ -329,34 +334,21 @@
 		m.member_id,
 		m.name,
 		m.nickname,
-		CONCAT(CONCAT(SUBSTR(m.phone, 1, 3), '-'), CONCAT(SUBSTR(m.phone, 4,
-		4), CONCAT('-', SUBSTR(m.phone, 8, 4)))) AS phone,
+		SUBSTR(m.phone, 1, 3) || '-' || SUBSTR(m.phone, 4, 4) || '-' || SUBSTR(m.phone, 8, 4)
+		AS phone,
 		m.email,
 		m.address,
 		m.detail_address,
-		CASE
-		WHEN SUBSTR(m.birth, 1, 1) = '0' THEN
-		'20' ||
-		SUBSTR(m.birth, 1, 2) || '년 ' || SUBSTR(m.birth, 3, 2) || '월 ' ||
-		SUBSTR(m.birth, 5, 2) || '일'
-		ELSE
-		'19' || SUBSTR(m.birth, 1, 2) || '년 '
-		|| SUBSTR(m.birth, 3, 2) || '월 ' ||
-		SUBSTR(m.birth, 5, 2) || '일'
-		END AS
-		birth,
+		SUBSTR(m.birth, 1, 4) || '년 ' || SUBSTR(m.birth, 5, 2) || '월 ' || SUBSTR(m.birth, 7,
+		2) || '일' AS birth,
 		m.signup_date,
 		m.withdrawal_date,
 		m.member_avatar,
-		g.grade_title AS
-		grade_code,
+		g.grade_title AS grade_code,
 		r.role_title AS role_code
 		FROM member m
-		JOIN grade g ON
-		m.grade_code = g.grade_code
-		JOIN role r ON
-		m.role_code =
-		r.role_code
+		JOIN grade g ON m.grade_code = g.grade_code
+		JOIN role r ON m.role_code = r.role_code
 		WHERE m.member_id = #{member_id}
 	</select>
 
@@ -457,9 +449,11 @@
 		resultType="int">
 		SELECT COUNT(*)
 		FROM member m
-		JOIN blacklist_reason br ON m.blacklist_reason_code =
+		JOIN blacklist_reason br ON
+		m.blacklist_reason_code =
 		br.blacklist_reason_code
-		WHERE m.role_code = 'R3'
+		WHERE m.role_code =
+		'R3'
 		<if test="chosung != null and chosung != ''">
         <![CDATA[
             AND (
@@ -499,40 +493,49 @@
 
 	<!-- 연령대별 남녀 회원 수 조회 -->
 	<select id="getAgeGenderDistribution" resultType="map">
-		with age_ranges as (
-    		select '10대' as age_range from dual
-    		union all select '20대' from dual
-    		union all select '30대' from dual
-    		union all select '40대' from dual
-    		union all select '50대' from dual
-    		union all select '60대 이상' from dual
-		), 
+		with age_ranges
+		as (
+		select '10대' as age_range from dual
+		union all select '20대' from dual
+		union all select '30대' from dual
+		union all select '40대' from dual
+		union all select '50대' from dual
+		union all select '60대 이상' from dual
+		),
 		genders as (
-    		select 'M' as gender from dual
-    		union all select 'F' from dual
+		select 'M' as gender from dual
+		union all select 'F' from dual
 		),
 		age_gender_counts as (
-    		select
-        	case
-           	 	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 10 and 19 then '10대'
-            	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 20 and 29 then '20대'
-            	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 30 and 39 then '30대'
-            	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 40 and 49 then '40대'
-            	when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12) between 50 and 59 then '50대'
-            	else '60대 이상'
-        	end as age_range, gender
-    		from member
+		select
+		case
+		when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12)
+		between 10 and 19 then '10대'
+		when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12)
+		between 20 and 29 then '20대'
+		when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12)
+		between 30 and 39 then '30대'
+		when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12)
+		between 40 and 49 then '40대'
+		when floor(months_between(sysdate, to_date(birth, 'YYYYMMDD')) / 12)
+		between 50 and 59 then '50대'
+		else '60대 이상'
+		end as age_range, gender
+		from member
 		),
 		all_combinations as (
-    		select a.age_range, g.gender
-    		from age_ranges a
-    		cross join genders g
+		select a.age_range, g.gender
+		from age_ranges a
+		cross join genders g
 		)
-		select ac.age_range, ac.gender, coalesce(count(agc.age_range), 0) as count
+		select ac.age_range, ac.gender,
+		coalesce(count(agc.age_range), 0) as count
 		from all_combinations ac
-		left join age_gender_counts agc on ac.age_range = agc.age_range and ac.gender = agc.gender
+		left join age_gender_counts agc on ac.age_range = agc.age_range and
+		ac.gender = agc.gender
 		group by ac.age_range, ac.gender
-		order by ac.age_range, ac.gender
+		order by
+		ac.age_range, ac.gender
 	</select>
 
 </mapper>

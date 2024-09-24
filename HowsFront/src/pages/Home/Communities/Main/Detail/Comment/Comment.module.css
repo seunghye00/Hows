@@ -42,6 +42,22 @@
     word-break: keep-all;
     word-wrap: break-word;
     font-size: 16px;
+    white-space: pre-wrap;
+}
+
+.commentTxt textarea {
+    resize: none;
+    width: 100%;
+    padding: 5px 10px;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    overflow-y: auto;
+    letter-spacing: .7px;
+    color: var(--hows-gray-700);
+    border: 1px solid var(--hows-gray-600);
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .btnBox {

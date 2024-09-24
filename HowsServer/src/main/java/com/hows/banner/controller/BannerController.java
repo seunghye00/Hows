@@ -53,14 +53,13 @@ public class BannerController {
 
 		// 파일을 서버와 DB에 저장하고 반환받은 파일 정보에 대한 JSON 문자열
 		String bannerInfo = fileServ.upload(file, 0, "F5");
-
+		
 		// 문자열을 Map으로 변환
-		Map<String, Object> map = new ObjectMapper().readValue(bannerInfo, new TypeReference<Map<String, Object>>() {
-		});
+		Map<String, Object> map = new ObjectMapper().readValue(bannerInfo, new TypeReference<Map<String, Object>>() {});
 		int file_seq = (int) map.get("file_seq");
 		String sysName = (String) map.get("sysName");
 		String banner_url = (String) map.get("banner_url");
-
+		
 		BannerDTO dto = new BannerDTO(0, file_seq, banner_url, DateFormat.convertToDate(startDate),
 				DateFormat.convertToDate(endDate), banner_order);
 		if (bannServ.addBanner(dto) > 0) {

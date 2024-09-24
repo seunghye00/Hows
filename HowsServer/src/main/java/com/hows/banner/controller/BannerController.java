@@ -40,8 +40,9 @@ public class BannerController {
 	}
 
 	// 관리자 기능
-	@GetMapping("/getAllBannersByAdmin")
+	@GetMapping("/getAllBanners")
 	public ResponseEntity<List<BannerDTO>> getAllBannersByAdmin() throws Exception {
+	
 		List<BannerDTO> list = bannServ.getAllBannersByAdmin();
 		return ResponseEntity.ok(list);
 	}
@@ -103,6 +104,7 @@ public class BannerController {
 	@PutMapping
 	public ResponseEntity<Boolean> updateBanner(@RequestParam int banner_seq, @RequestParam int event_seq)
 			throws Exception {
+	    
 		// 배너와 이벤트 연결 서비스 호출
 		boolean result = bannServ.connectEvent(banner_seq, event_seq);
 		// 성공적으로 업데이트 되었는지 여부 반환

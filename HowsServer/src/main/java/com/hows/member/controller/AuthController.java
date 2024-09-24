@@ -34,29 +34,44 @@ public class AuthController {
 	
 	// 로그인
 	@PostMapping
-	public ResponseEntity<SignInResponseDTO> login(@RequestBody MemberDTO dto){
+	public ResponseEntity<SignInResponseDTO> login(@RequestBody MemberDTO dto) {
 	    // 사용자 존재 여부 확인
-		CustomUserDetails existingUser = memServ.loadUserByUsername(dto.getMember_id());
+	    CustomUserDetails existingUser = memServ.loadUserByUsername(dto.getMember_id());
 	    if (existingUser == null) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	    }
-	    
+
 	    // 비밀번호 검증
 	    if (!pwEncoder.matches(dto.getPw(), existingUser.getPassword())) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	    }
 
+	    String member_roleCode = existingUser.getMemberRoleCode();
 	    String member_id = existingUser.getUsername();
 	    int member_seq = existingUser.getMemberSeq();
 	    String nickname = existingUser.getNickname();
 	    String member_avatar = existingUser.getMemberAvatar();
 
+	    // 사용자 role_code 확인 (블랙리스트 여부 확인)
+	    String role_code = memServ.getRoleCode(member_id); // member_seq를 사용하여 role_code 가져오기
+
+//	    if ("R3".equals(role_code)) {
+//	        // role_code가 R3인 경우, 블랙리스트로 처리하여 로그인 차단
+//	        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//	                .body(new SignInResponseDTO("계정이 블랙리스트로 처리되어 로그인이 불가능합니다.", null, 0, null, null));
+//	    }
+
+	    if ("R3".equals(role_code)) {
+	        // role_code가 R3인 경우, 블랙리스트로 처리하여 로그인 차단
+	        return ResponseEntity.ok(new SignInResponseDTO("계정이 블랙리스트로 처리되어 로그인이 불가능합니다.", null, 0, null, null, null));
+	    }
+	    
 	    // 로그인 성공 시 토큰 생성
-	    String token = jwt.createToken(member_id,member_seq,nickname,member_avatar);
-        
-		return ResponseEntity.ok(new SignInResponseDTO(token, member_id,member_seq, nickname, member_avatar));
+	    String token = jwt.createToken(member_id, member_seq, nickname, member_avatar);
+	    return ResponseEntity.ok(new SignInResponseDTO(token, member_id, member_seq, nickname, member_avatar, member_roleCode));
 	}
-	
+
+
 	// 아이디 찾기
 	@PostMapping("/findId")
 	public ResponseEntity<String> findId(@RequestBody Map<String, String> request){

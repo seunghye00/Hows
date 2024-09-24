@@ -59,10 +59,10 @@ export const ModifyProduct = product_seq => {
     const handleFileChange = e => {
         const files = Array.from(e.target.files)
 
-        if (files.length + selectedFiles.length > 10) {
+        if (files.length + selectedFiles.length > 11) {
             SwalComp({
                 type: 'warning',
-                text: '최대 10개의 파일만 업로드할 수 있습니다.',
+                text: '최대 1개의 파일만 업로드할 수 있습니다.',
             })
             return
         }
@@ -192,7 +192,7 @@ export const ModifyProduct = product_seq => {
                             <BiCamera size={40} />
                         </label>
                         <div className={styles.imgNum}>
-                            <span>{selectedFiles.length}</span> / 10
+                            <span>{selectedFiles.length}</span> / 1
                         </div>
                     </span>
                     {previews.map((preview, index) => (

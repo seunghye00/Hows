@@ -1,7 +1,4 @@
-import axios from 'axios'
-import { api, host } from '../config/config'
-
-const baseUrl = `${host}/order`
+import { api } from '../config/config'
 
 // 주문 목록 요청 함수
 export const orderList = status => {
@@ -22,7 +19,7 @@ export const addOrder = async order => {
 
 // 주문 상태 업데이트
 export const updateOrder = (order_seq, order_code) => {
-    return axios.put(`${baseUrl}/updateOrderCode`, null, {
+    return api.put('/order/updateOrderCode', null, {
         params: { order_seq, order_code },
     })
 }
@@ -48,5 +45,5 @@ export const deleteOrder = orderSeqs => {
 // 환불 처리 완료
 export const doneReturn = orderSeqs => {
     const seqs = orderSeqs.join(',') // 배열을 쉼표로 구분된 문자열로 변환
-    return axios.put('/return/doneReturn', null, { params: { seqs } })
+    return api.put('/return/doneReturn', null, { params: { seqs } })
 }

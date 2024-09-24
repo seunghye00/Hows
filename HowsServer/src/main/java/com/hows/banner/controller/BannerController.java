@@ -40,7 +40,7 @@ public class BannerController {
 	}
 
 	// 관리자 기능
-	@GetMapping("/getAllBannersByAdmin")
+	@GetMapping("/getAllBanners")
 	public ResponseEntity<List<BannerDTO>> getAllBannersByAdmin() throws Exception {
 	
 		List<BannerDTO> list = bannServ.getAllBannersByAdmin();

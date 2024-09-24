@@ -93,7 +93,7 @@ public class SecurityConfig {
 //				    ).permitAll()
 			    // 로그인 필요
 			    .requestMatchers(
-			    	"/banner/**",
+//			    	"/banner/**",
 			    	"/cart/**", 
 			        "/coupon/**", 
 			        "/event/**", 
@@ -116,19 +116,18 @@ public class SecurityConfig {
 
 
 		        // 관리자 전용 기능 - R1 접근 가능
-//			    .requestMatchers("/event/**").hasRole("R1")
-			    
 		        .requestMatchers(HttpMethod.POST, 
-		        		"/banner/**",
+		        		"/banner",
 		        		"/coupon/**",
 		        		"/faq/**",
 		        		"/file/**",
 		        		"/notice/insert",
-		        		"/event/insert"
-		        		
+		        		"/event/insert",
+		        		"/order"
 		        		).hasAuthority("R1")
 		        
 		        .requestMatchers(HttpMethod.GET, 
+		        		"/banner/getAllBanners",
 		        		"/member/all",
 		        		"/member/detail",
 		        		"/member/grades",
@@ -144,40 +143,49 @@ public class SecurityConfig {
 		        		"/comment/commentReport/{comment_seq}", 
 		        		"/comment/reportedReplys", 
 		        		"/comment/replyReport/{reply_seq}", 
+		        		"/community/reportedCommunity",
+		        		"/community/communityReport/{board_seq}",
+		        		"/community/getBoardNumByCategory",
+		        		"/community/todayBoardNum",
+		        		"/order/listByStatus",
+		        		"/order/getReturnList",
+		        		"/payment/todayPaymentPrice",
 		        		"/product/reportedReviews", 
 		        		"/product/reviewReport/{review_seq}",
 		        		"/product/getProductNumByCategory",
 		        		"/product/getBestProduct/{condition}"
-		        		
 		        		).hasAuthority("R1")
 		        
 		        .requestMatchers(HttpMethod.DELETE, 
-		        		"/banner/**",
+		        		"/banner",
 		        		"/coupon/**",
 		        		"/faq/**",
 		        		"/notice/delete/{notice_seq}",
 		        		"/community/deleteCommunity/{board_seq}",
 		        		"/comment/deleteCmt/{comment_seq}", 
 		        		"/comment/deleteReply/{reply_seq}", 
+		        		"/community/deleteCommunity/{board_seq}",
 		        		"/event/delete/{event_seq}",
 		        		"/product/deleteReview/{review_seq}",
-		        		"/product"
-		        		
-		        		
-		        		
+		        		"/product",
+		        		"/order"
 		        		).hasAuthority("R1")
 		        
 		        .requestMatchers(HttpMethod.PUT, 
-		        		"/banner/**",
+		        		"/banner",
 		        		"/coupon/**",
 		        		"/faq/**",
-		        		"member/updateMemberStatus",
-		        		"member/modifyBlacklist",
+		        		"/member/updateMemberStatus",
+		        		"/member/modifyBlacklist",
 		        		"/notice/modify/{notice_seq}",
 		        		"/event/modify/{event_seq}",
-		        		"/product"
-		        		
-		        		
+		        		"/product",
+		        		"/order",
+		        		"/order/updateOrderCode",
+		        		"/order/startDelivery",
+		        		"/order/doneOrder",
+		        		"/return/updateReturnCode",
+		        		"/return/doneReturn"
 		        		).hasAuthority("R1")
 	        
 		        // 기타 모든 요청은 인증된 사용자만 접근 가능

@@ -420,7 +420,7 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
-	// 블랙리스트 수정 (관리자)
+	// 블랙리스트 수정(해제) (관리자)
 	@PutMapping("/modifyBlacklist")
 	public ResponseEntity<Integer> modifyBlacklist(@RequestBody Map<String, String> request) {
 		String memberId = request.get("member_id");

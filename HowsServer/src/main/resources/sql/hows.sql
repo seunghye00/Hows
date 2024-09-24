@@ -1,37 +1,28 @@
--- 테이블 생성 쿼리문
--- 유나 (멤버)
-
--- 멤버
+-- 회원
 create table member (
-member_seq number primary key,
-member_id varchar2(20) not null,
-pw varchar2(128) not null,
-name varchar2(30) not null,
-nickname varchar2(50) not null,
-birth varchar2(8) not null,
-gender char(1) not null,
-phone varchar2(11) not null,
-email varchar2(50) not null,
-zip_code varchar2(10) not null,
-address varchar2(255) not null,
-detail_address varchar2(255) not null,
-grade_code char(2) default 'G3' not null,
-role_code char(2) default 'R2' not null,
-blacklist_reason_code char(2) default null,
-blacklist_date timestamp default null,
-signup_date timestamp default sysdate,
-withdrawal_date timestamp default null,
-withdrawal_yn char(1) default 'N',
-member_banner varchar2(500) default null, 
-point number default 0,
-member_avatar varchar2(200) default 'https://storage.cloud.google.com/hows-attachment/F1/3adc3060-ce44-4d0a-ac27-f05d75023f76'
+    member_seq number primary key,
+    member_id varchar2(20) not null,
+    pw varchar2(128) not null,
+    name varchar2(30) not null,
+    nickname varchar2(50) not null,
+    birth varchar2(8) not null,
+    gender char(1) not null,
+    phone varchar2(11) not null,
+    email varchar2(50) not null,
+    zip_code varchar2(10) not null,
+    address varchar2(255) not null,
+    detail_address varchar2(255) not null,
+    grade_code char(2) default 'G3' not null,
+    role_code char(2) default 'R2' not null,
+    blacklist_reason_code char(2) default null,
+    blacklist_date timestamp default null,
+    signup_date timestamp default sysdate,
+    withdrawal_date timestamp default null,
+    withdrawal_yn char(1) default 'N',
+    member_banner varchar2(500) default null,
+    point number default 0,
+    member_avatar varchar2(200) default 'https://storage.cloud.google.com/hows-attachment/F1/90855e98-54c0-47af-8935-b1b0b5bff526'
 );
-
-create sequence member_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 방명록
 create table guestbook (
@@ -42,31 +33,17 @@ create table guestbook (
     member_id varchar2(20) not null
 );
 
-create sequence guestbook_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
 -- 등급
 create table grade (
-grade_code char(2) primary key,
-grade_title varchar2(20)
+    grade_code char(2) primary key,
+    grade_title varchar2(20)
 );
-
-insert into grade (grade_code, grade_title) values ('G1', '골드');
-insert into grade (grade_code, grade_title) values ('G2', '실버');
-insert into grade (grade_code, grade_title) values ('G3', '브론즈');
 
 -- 역할
 create table role (
     role_code char(2) primary key,
     role_title varchar2(20)
 );
-
-insert into role (role_code, role_title) values ('R1', '관리자');
-insert into role (role_code, role_title) values ('R2', '회원');
-insert into role (role_code, role_title) values ('R3', '블랙리스트');
 
 -- 팔로우
 create table follow (
@@ -75,40 +52,23 @@ create table follow (
     to_member_seq number not null
 );
 
-create sequence follow_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
 -- 블랙리스트 사유
 create table blacklist_reason(
     blacklist_reason_code char(2) primary key,
     blacklist_reason_description varchar2(50)
 );
 
-insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B1', '과도한 욕설');
-insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B2', '음란물 배포');
-insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B3', '스팸 또는 과도한 광고');
-insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B4', '사기 행위');
-insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B5', '부적절한 콘텐츠 게시');
-insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B6', '개인정보 유출');
-insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B7', '정치적 성향 강제');
-
-------------------------------------------------------------------------------------
--- 경원 (게시판)
-
 -- 게시판
 create table board (
-board_seq number primary key,
-board_contents varchar2(4000) not null,
-board_write_date  timestamp default sysdate,
-view_count number default 0,
-housing_type_code char(2) not null,
-space_type_code char(2) not null,
-area_size_code char(2) not null,
-color_code char(2) not null,
-member_id varchar2(20) not null
+    board_seq number primary key,
+    board_contents varchar2(4000) not null,
+    board_write_date  timestamp default sysdate,
+    view_count number default 0,
+    housing_type_code char(2) not null,
+    space_type_code char(2) not null,
+    area_size_code char(2) not null,
+    color_code char(2) not null,
+    member_id varchar2(20) not null
 );
 
 -- 게시판 이미지
@@ -119,12 +79,6 @@ create table board_image (
     image_order number not null          
 );
 
-create sequence board_image_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
 -- 게시판 이미지 상품 태그
 create table board_tag (
     board_tag_seq number primary key,       
@@ -134,204 +88,103 @@ create table board_tag (
     top_position NUMBER not null
 );
 
-create sequence board_tag_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
-create sequence board_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
-
 -- 주거 형태
 create table housing_type (
-housing_type_code char(2) primary key,
-housing_type_title varchar2(30)
+    housing_type_code char(2) primary key,
+    housing_type_title varchar2(30)
 );
-
-insert into housing_type (housing_type_code, housing_type_title) values ('H1', '원룸 및 오피스텔');
-insert into housing_type (housing_type_code, housing_type_title) values ('H2', '아파트');
-insert into housing_type (housing_type_code, housing_type_title) values ('H3', '빌라');
 
 -- 공간
 create table space_type (
-space_type_code char(2) primary key,
-space_type_title varchar2(30)
+    space_type_code char(2) primary key,
+    space_type_title varchar2(30)
 );
-
-insert into space_type (space_type_code, space_type_title) values ('S1', '원룸');
-insert into space_type (space_type_code, space_type_title) values ('S2', '거실');
-insert into space_type (space_type_code, space_type_title) values ('S3', '침실');
-insert into space_type (space_type_code, space_type_title) values ('S4', '주방');
-insert into space_type (space_type_code, space_type_title) values ('S5', '욕실');
-insert into space_type (space_type_code, space_type_title) values ('S6', '베란다');
-insert into space_type (space_type_code, space_type_title) values ('S7', '드레스룸');
-insert into space_type (space_type_code, space_type_title) values ('S8', '서재');
-insert into space_type (space_type_code, space_type_title) values ('S9', '기타');
 
 -- 평수
 create table area_size (
-area_size_code char(2) primary key,
-area_size_title varchar2(20)
+    area_size_code char(2) primary key,
+    area_size_title varchar2(20)
 );
-
-insert into area_size (area_size_code, area_size_title) values ('A1', '10평 미만');
-insert into area_size (area_size_code, area_size_title) values ('A2', '10평대');
-insert into area_size (area_size_code, area_size_title) values ('A3', '20평대');
-insert into area_size (area_size_code, area_size_title) values ('A4', '30평대');
-insert into area_size (area_size_code, area_size_title) values ('A5', '40평대');
-insert into area_size (area_size_code, area_size_title) values ('A6', '50평 이상');
 
 --컬러
 create table color (
-color_code char(2) primary key,
-color_title varchar2(20)
+    color_code char(2) primary key,
+    color_title varchar2(20)
 );
-
-insert into color (color_code, color_title) values ('C1', '화이트');
-insert into color (color_code, color_title) values ('C2', '블랙');
-insert into color (color_code, color_title) values ('C3', '그레이');
-insert into color (color_code, color_title) values ('C4', '옐로우');
-insert into color (color_code, color_title) values ('C5', '블루');
-insert into color (color_code, color_title) values ('C6', '핑크');
-insert into color (color_code, color_title) values ('C7', '레드');
-insert into color (color_code, color_title) values ('C8', '브라운');
 
 -- 북마크
 create table board_book_mark (
-board_book_mark_seq number primary key,
-member_id varchar2(20) not null,
-board_seq number not null
+    board_book_mark_seq number primary key,
+    member_id varchar2(20) not null,
+    board_seq number not null
 );
-
-create sequence board_book_mark_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 게시판 좋아요
 create table board_like(
-board_like_seq number primary key,
-member_id varchar2(20) not null,
-board_seq number not null
+    board_like_seq number primary key,
+    member_id varchar2(20) not null,
+    board_seq number not null
 );
-
-create sequence board_like_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 게시판 신고
 create table board_report(
-board_report_seq number primary key,
-report_code char(2) not null,
-board_report_date timestamp default sysdate,
-member_id varchar2(20) not null,
-board_seq number not null
+    board_report_seq number primary key,
+    report_code char(2) not null,
+    board_report_date timestamp default sysdate,
+    member_id varchar2(20) not null,
+    board_seq number not null
 );
-
-create sequence board_report_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 댓글
 create table comments (
-comment_seq number primary key,
-comment_contents varchar2(900) not null,
-comment_write_date timestamp default sysdate,
-board_seq number not null,
-member_id varchar2(20) not null
+    comment_seq number primary key,
+    comment_contents varchar2(900) not null,
+    comment_write_date timestamp default sysdate,
+    board_seq number not null,
+    member_id varchar2(20) not null
 );
-
-create sequence comment_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 댓글 좋아요
 create table comment_like (
-comment_like_seq number primary key,
-member_id varchar2(20) not null,
-comment_seq number not null
+    comment_like_seq number primary key,
+    member_id varchar2(20) not null,
+    comment_seq number not null
 );
-
-create sequence comment_like_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 댓글 신고
 create table comment_report (
-comment_report_seq number primary key,
-report_code char(2) not null,
-comment_report_date timestamp default sysdate,
-member_id varchar2(20) not null,
-comment_seq number not null
+    comment_report_seq number primary key,
+    report_code char(2) not null,
+    comment_report_date timestamp default sysdate,
+    member_id varchar2(20) not null,
+    comment_seq number not null
 );
-
-create sequence comment_report_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 대댓글
 create table  reply (
-reply_seq number primary key,
-reply_contents varchar2(900) not null,
-reply_date timestamp default sysdate,
-comment_seq number not null,
-member_id varchar2(20) not null
+    reply_seq number primary key,
+    reply_contents varchar2(900) not null,
+    reply_date timestamp default sysdate,
+    comment_seq number not null,
+    member_id varchar2(20) not null
 );
-
-create sequence reply_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 대댓글 좋아요
 create table reply_like (
-reply_like_seq number primary key,
-member_id varchar2(20) not null,
-reply_seq number not null
+    reply_like_seq number primary key,
+    member_id varchar2(20) not null,
+    reply_seq number not null
 );
-
-create sequence reply_like_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 대댓글 신고
 create table reply_report (
-reply_report_seq number primary key,
-report_code char(2) not null,
-reply_report_date timestamp default sysdate,
-member_id varchar2(20) not null,
-reply_seq number not null
+    reply_report_seq number primary key,
+    report_code char(2) not null,
+    reply_report_date timestamp default sysdate,
+    member_id varchar2(20) not null,
+    reply_seq number not null
 );
 
-create sequence reply_report_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
-------------------------------------------------------------------------------------------
--- 은미 & 시온 ( 개인적인 생각으론 같이 테이블 을 짜야 할 거 같단 생각이 듭니다! )
-
--- 은미 (상품)
 -- 상품
 create table product (
     product_seq number primary key,
@@ -343,11 +196,6 @@ create table product (
     product_category_code char(2) not null
 );
 
-create sequence product_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 상품 카테고리
 create table product_category (
@@ -355,12 +203,7 @@ create table product_category (
     product_category_title varchar2(50)
 );
 
-insert into product_category (product_category_code, product_category_title) values ('P1', '가구');
-insert into product_category (product_category_code, product_category_title) values ('P2', '조명');
-insert into product_category (product_category_code, product_category_title) values ('P3', '패브릭');
-insert into product_category (product_category_code, product_category_title) values ('P4', '수납정리');
-insert into product_category (product_category_code, product_category_title) values ('P5', '가전 및 디지털');
-insert into product_category (product_category_code, product_category_title) values ('P6', '주방용품');
+
 
 -- 상품 좋아요
 create table product_like (
@@ -368,12 +211,6 @@ create table product_like (
     product_seq number not null,
     member_id varchar2(20) not null
 );
-
-create sequence product_like_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 리뷰
 create table review (
@@ -384,13 +221,7 @@ create table review (
     product_seq number not null,
     member_id varchar2(20) not null
 );
-
-create sequence review_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
+    
 -- 리뷰 좋아요
 create table review_like (
     review_like_seq number primary key,
@@ -398,11 +229,6 @@ create table review_like (
     member_id varchar2(20) not null
 );
 
-create sequence review_like_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 리뷰 신고
 create table review_report (
@@ -413,11 +239,6 @@ create table review_report (
     member_id varchar2(20) not null
 );
 
-create sequence review_report_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 리뷰 이미지 관리
 create table review_image (
@@ -426,16 +247,6 @@ create table review_image (
     image_url varchar2(500) not null,    
     image_order number not null          
 );
-
-create sequence review_image_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
------------------------------------------------------------------------------------------
-
--- 시온 (결제)
 
 -- 장바구니
 create table cart (
@@ -446,12 +257,6 @@ create table cart (
     cart_price number not null,
     cart_date timestamp default sysdate not null
 );
-
-create sequence cart_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 주문
 create table orders (
@@ -469,40 +274,20 @@ create table orders (
     done_delivery_date timestamp default null
 );
 
-create sequence order_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
 -- 주문상태
 create table order_status (
-order_code char(2) primary key,
-order_title varchar2(50)
+    order_code char(2) primary key,
+    order_title varchar2(50)
 );
-
-insert into order_status (order_code, order_title) values ('O1', '입금 대기');
-insert into order_status (order_code, order_title) values ('O2', '결재 완료');
-insert into order_status (order_code, order_title) values ('O3', '배송 준비');
-insert into order_status (order_code, order_title) values ('O4', '배송 중');
-insert into order_status (order_code, order_title) values ('O5', '배송 완료');
-insert into order_status (order_code, order_title) values ('O6', '구매확정');
-insert into order_status (order_code, order_title) values ('O7', '구매취소');
 
 -- 주문 리스트
 create table order_list (
- order_list_seq number primary key,
- order_seq number not null,
- product_seq number not null,
- order_list_count number not null,
- order_list_price number not null
+     order_list_seq number primary key,
+     order_seq number not null,
+     product_seq number not null,
+     order_list_count number not null,
+     order_list_price number not null
 );
-
-create sequence order_list_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 쿠폰
 create table coupon (
@@ -513,23 +298,6 @@ create table coupon (
     expired_date timestamp not null
 );
 
-create sequence coupon_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
--- coupon dummy data
-INSERT INTO coupon
-VALUES ( coupon_seq.nextval, '[ 5% 할인 ] 가을 맞이 특가 5% 쿠폰', 'percent', '*0.95', '2024-12-31');
-INSERT INTO coupon
-VALUES ( coupon_seq.nextval, '[ 10% 할인 ] 가을 맞이 특가 10% 쿠폰', 'percent', '*0.9', '2024-12-31');
-INSERT INTO coupon
-VALUES ( coupon_seq.nextval, '[ 5000 할인 ] 가을 맞이 특가 5000원 할인 쿠폰', 'price', '-5000', '2024-12-31');
-INSERT INTO coupon
-VALUES ( coupon_seq.nextval, '[ 2000 할인 ] 한가위 맞이 2000원 할인 쿠폰', 'price', '-2000', '2024-12-31');
-
-
 -- 쿠폰 소유 
 create table coupon_owner (
     coupon_owner_seq number primary key,
@@ -539,12 +307,6 @@ create table coupon_owner (
     get_date timestamp default sysdate not null,
     use_date timestamp default null
 );
-
-create sequence coupon_owner_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 결제
 create table payment (
@@ -558,23 +320,11 @@ create table payment (
     payment_text varchar2(500) default null
 );
 
-create sequence payment_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
 -- 결제 상태
 create table payment_status (
     payment_code char(2) primary key,
     payment_title varchar2(50)
 );
-
-insert into payment_status (payment_code, payment_title) values ('P1', '결제대기');
-insert into payment_status (payment_code, payment_title) values ('P2', '결제완료');
-insert into payment_status (payment_code, payment_title) values ('P3', '결제실패');
-insert into payment_status (payment_code, payment_title) values ('P4', '취소요청');
-insert into payment_status (payment_code, payment_title) values ('P5', '결제취소');
 
 -- 반품
 create table return (
@@ -586,24 +336,11 @@ create table return (
 	done_return_Date timestamp		-- 환불 완료일
 );
 
-create sequence return_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
 -- 반품 상태
 create table return_status (
     return_code char(2) primary key,
     return_title varchar2(50)
 );
-
-insert into return_status (return_code, return_title) values ('R1', '결재 취소 요청');
-insert into return_status (return_code, return_title) values ('R2', '반품 요청');
-insert into return_status (return_code, return_title) values ('R3', '상품 검수');
-insert into return_status (return_code, return_title) values ('R4', '반품 불가');
-insert into return_status (return_code, return_title) values ('R5', '반품 확정');
-insert into return_status (return_code, return_title) values ('R6', '환불 완료');
 
 -- 포인트 내역 테이블
 create table point_history (
@@ -616,61 +353,34 @@ create table point_history (
    point_date timestamp default sysdate not null
 );
 
-create sequence point_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
-
------------------------------------------------------------------------------------------
--- 승혜 & 민서 (관리자)
-
 -- 공지사항
 create table notice (
-notice_seq number primary key,
-notice_title varchar2(100) not null,
-notice_contents varchar2(4000) not null,
-notice_date timestamp default sysdate,
-view_count number default 0 not null,
-notice_code char(2) default 'N1' not null
+    notice_seq number primary key,
+    notice_title varchar2(100) not null,
+    notice_contents varchar2(4000) not null,
+    notice_date timestamp default sysdate,
+    view_count number default 0 not null,
+    notice_code char(2) default 'N1' not null
 );
 
-create sequence notice_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 이벤트
 create table event (
-event_seq number primary key,
-event_title varchar2(100) not null,
-event_contents varchar2(4000) not null,
-event_date timestamp default sysdate,
-view_count number default 0 not null,
-notice_code char(2) default 'N2' not null
+    event_seq number primary key,
+    event_title varchar2(100) not null,
+    event_contents varchar2(4000) not null,
+    event_date timestamp default sysdate,
+    view_count number default 0 not null,
+    notice_code char(2) default 'N2' not null
 );
-
-create sequence event_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- FAQ
 create table faq (
-faq_seq number primary key,
-faq_title varchar2(100) not null,
-faq_contents varchar2(4000) not null,
-notice_code char(2) default 'N3' not null
+    faq_seq number primary key,
+    faq_title varchar2(100) not null,
+    faq_contents varchar2(4000) not null,
+    notice_code char(2) default 'N3' not null
 );
-
-create sequence faq_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 공지 코드
 create table notice_code (
@@ -678,33 +388,194 @@ create table notice_code (
     notice_title varchar2(50)
 );
 
-insert into notice_code (notice_code, notice_title) values ('N1', '공지사항');
-insert into notice_code (notice_code, notice_title) values ('N2', '이벤트');
-insert into notice_code (notice_code, notice_title) values ('N3', 'FAQ');
-
 -- 배너
 create table banner (
-banner_seq number primary key,
-file_seq number not null,
-banner_url varchar2(300) not null,
-start_date Date,
-end_date Date,
-banner_order number not null,
-is_visible char(1) default 'N' not null,
-connect_seq number default 0
+    banner_seq number primary key,
+    file_seq number not null,
+    banner_url varchar2(300) not null,
+    start_date Date,
+    end_date Date,
+    banner_order number not null,
+    is_visible char(1) default 'N' not null,
+    connect_seq number default 0
 );
-
-create sequence banner_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
 
 -- 신고사유
 create table report (
     report_code char(2) primary key,
     report_description varchar2(50) 
 );
+
+-- 파일
+create table files (
+    file_seq number primary key,
+    file_oriname varchar2(200) not null,
+    file_sysname varchar2(200) not null,
+    parent_seq number not null,
+    file_code char(2) not null
+);
+
+--파일 코드
+create table file_code (
+    file_code char(2) primary key,
+    file_title varchar2(50)
+);
+
+
+-- Sequence
+create sequence member_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence guestbook_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence follow_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence board_image_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence board_tag_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence board_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence board_book_mark_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence board_like_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence board_report_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence comment_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence comment_like_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence comment_report_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence reply_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence reply_like_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence reply_report_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence product_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence product_like_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence review_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence review_like_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence review_report_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence review_image_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence cart_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence order_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence order_list_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence coupon_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence coupon_owner_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence payment_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence return_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence point_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence notice_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence event_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence faq_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence banner_seq start with 1 increment by 1 nomaxvalue nocache;
+
+create sequence file_seq start with 1 increment by 1 nomaxvalue nocache;
+
+
+-- dummy data
+insert into grade (grade_code, grade_title) values ('G1', '골드');
+insert into grade (grade_code, grade_title) values ('G2', '실버');
+insert into grade (grade_code, grade_title) values ('G3', '브론즈');
+
+insert into role (role_code, role_title) values ('R1', '관리자');
+insert into role (role_code, role_title) values ('R2', '회원');
+insert into role (role_code, role_title) values ('R3', '블랙리스트');
+
+insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B1', '과도한 욕설');
+insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B2', '음란물 배포');
+insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B3', '스팸 또는 과도한 광고');
+insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B4', '사기 행위');
+insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B5', '부적절한 콘텐츠 게시');
+insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B6', '개인정보 유출');
+insert into blacklist_reason (blacklist_reason_code, blacklist_reason_description) values ('B7', '정치적 성향 강제');
+
+insert into housing_type (housing_type_code, housing_type_title) values ('H1', '원룸 및 오피스텔');
+insert into housing_type (housing_type_code, housing_type_title) values ('H2', '아파트');
+insert into housing_type (housing_type_code, housing_type_title) values ('H3', '빌라');
+
+
+insert into space_type (space_type_code, space_type_title) values ('S1', '원룸');
+insert into space_type (space_type_code, space_type_title) values ('S2', '거실');
+insert into space_type (space_type_code, space_type_title) values ('S3', '침실');
+insert into space_type (space_type_code, space_type_title) values ('S4', '주방');
+insert into space_type (space_type_code, space_type_title) values ('S5', '욕실');
+insert into space_type (space_type_code, space_type_title) values ('S6', '베란다');
+insert into space_type (space_type_code, space_type_title) values ('S7', '드레스룸');
+insert into space_type (space_type_code, space_type_title) values ('S8', '서재');
+insert into space_type (space_type_code, space_type_title) values ('S9', '기타');
+
+insert into area_size (area_size_code, area_size_title) values ('A1', '10평 미만');
+insert into area_size (area_size_code, area_size_title) values ('A2', '10평대');
+insert into area_size (area_size_code, area_size_title) values ('A3', '20평대');
+insert into area_size (area_size_code, area_size_title) values ('A4', '30평대');
+insert into area_size (area_size_code, area_size_title) values ('A5', '40평대');
+insert into area_size (area_size_code, area_size_title) values ('A6', '50평 이상');
+
+insert into color (color_code, color_title) values ('C1', '화이트');
+insert into color (color_code, color_title) values ('C2', '블랙');
+insert into color (color_code, color_title) values ('C3', '그레이');
+insert into color (color_code, color_title) values ('C4', '옐로우');
+insert into color (color_code, color_title) values ('C5', '블루');
+insert into color (color_code, color_title) values ('C6', '핑크');
+insert into color (color_code, color_title) values ('C7', '레드');
+insert into color (color_code, color_title) values ('C8', '브라운');
+
+insert into product_category (product_category_code, product_category_title) values ('P1', '가구');
+insert into product_category (product_category_code, product_category_title) values ('P2', '조명');
+insert into product_category (product_category_code, product_category_title) values ('P3', '패브릭');
+insert into product_category (product_category_code, product_category_title) values ('P4', '수납정리');
+insert into product_category (product_category_code, product_category_title) values ('P5', '가전 및 디지털');
+insert into product_category (product_category_code, product_category_title) values ('P6', '주방용품');
+
+insert into order_status (order_code, order_title) values ('O1', '입금 대기');
+insert into order_status (order_code, order_title) values ('O2', '결재 완료');
+insert into order_status (order_code, order_title) values ('O3', '배송 준비');
+insert into order_status (order_code, order_title) values ('O4', '배송 중');
+insert into order_status (order_code, order_title) values ('O5', '배송 완료');
+insert into order_status (order_code, order_title) values ('O6', '구매확정');
+insert into order_status (order_code, order_title) values ('O7', '구매취소');
+
+insert into coupon values ( coupon_seq.nextval, '[ 5% 할인 ] 가을 맞이 특가 5% 쿠폰', 'percent', '*0.95', '2024-12-31');
+insert into coupon values ( coupon_seq.nextval, '[ 10% 할인 ] 가을 맞이 특가 10% 쿠폰', 'percent', '*0.9', '2024-12-31');
+insert into coupon values ( coupon_seq.nextval, '[ 5000 할인 ] 가을 맞이 특가 5000원 할인 쿠폰', 'price', '-5000', '2024-12-31');
+insert into coupon values ( coupon_seq.nextval, '[ 2000 할인 ] 한가위 맞이 2000원 할인 쿠폰', 'price', '-2000', '2024-12-31');
+
+insert into payment_status (payment_code, payment_title) values ('P1', '결제대기');
+insert into payment_status (payment_code, payment_title) values ('P2', '결제완료');
+insert into payment_status (payment_code, payment_title) values ('P3', '결제실패');
+insert into payment_status (payment_code, payment_title) values ('P4', '취소요청');
+insert into payment_status (payment_code, payment_title) values ('P5', '결제취소');
+
+insert into return_status (return_code, return_title) values ('R1', '결재 취소 요청');
+insert into return_status (return_code, return_title) values ('R2', '반품 요청');
+insert into return_status (return_code, return_title) values ('R3', '상품 검수');
+insert into return_status (return_code, return_title) values ('R4', '반품 불가');
+insert into return_status (return_code, return_title) values ('R5', '반품 확정');
+insert into return_status (return_code, return_title) values ('R6', '환불 완료');
+
+insert into notice_code (notice_code, notice_title) values ('N1', '공지사항');
+insert into notice_code (notice_code, notice_title) values ('N2', '이벤트');
+insert into notice_code (notice_code, notice_title) values ('N3', 'FAQ');
 
 insert into report (report_code, report_description) values ('R1', '과도한 욕설');
 insert into report (report_code, report_description) values ('R2', '음란물 배포');
@@ -713,27 +584,6 @@ insert into report (report_code, report_description) values ('R4', '사기 행�
 insert into report (report_code, report_description) values ('R5', '부적절한 콘텐츠 게시');
 insert into report (report_code, report_description) values ('R6', '개인정보 유출');
 insert into report (report_code, report_description) values ('R7', '정치적 성향 강제');
-
--- 파일
-create table files (
-file_seq number primary key,
-file_oriname varchar2(200) not null,
-file_sysname varchar2(200) not null,
-parent_seq number not null,
-file_code char(2) not null
-);
-
-create sequence file_seq
-start with 1
-increment by 1
-nomaxvalue
-nocache;
-
---파일 코드
-create table file_code (
-file_code char(2) primary key,
-file_title varchar2(50)
-);
 
 insert into file_code (file_code, file_title) values ('F1', '프로필');
 insert into file_code (file_code, file_title) values ('F2', '커뮤니티');

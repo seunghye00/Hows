@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -39,13 +40,141 @@ public class SecurityConfig {
 		})).csrf(csrf -> csrf.disable()) 
 		.formLogin(form -> form.disable()).httpBasic(basic->basic.disable())
 		.authorizeHttpRequests(request -> request
-				// 로그인 - 모든 사용자 접근 가능
-//		        .requestMatchers(HttpMethod.POST, "/auth").permitAll()
-		        .requestMatchers("/**").permitAll()
-		        // 관리자 전용 기능 - ADMIN 또는 MANAGER 접근 가능
-		        .requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
-		        // 운영자 전용 기능 - ADMIN 접근 가능
-		        .requestMatchers("/admin/**").hasRole("ADMIN")
+			    // 로그인 필요없음 - 모든 사용자 접근 가능
+//				 .requestMatchers("/**").permitAll()
+			    .requestMatchers(HttpMethod.POST, 
+			    		"/auth", 
+			    		"/member", 
+			    		"/community/{board_seq}/increment-view").permitAll()
+			    .requestMatchers(HttpMethod.GET, 
+			        "/comment/getComments", 
+			        "/comment/repliesList", 
+			        "/community", 
+			        "/community/{board_seq}",
+			        "/community/images/{board_seq}",
+			        "/community/{board_seq}",
+			        "/purchaseHistory", 
+			        "/option/**", 
+			        "/banner", 
+			        "/faq", 
+			        "/event/list", 
+			        "/event/detail/{event_seq}",
+			        "/member/checkId", 
+			        "/member/checkNickname", 
+			        "/member/checkEmail", 
+			        "/member/getFollower",
+			        "/member/getFollowing", 
+			        "/member/countFollow", 
+			        "/member/selectPost", 
+			        "/member/countPost", 
+			        "/member/selectBookmark", 
+			        "/member/countBookmark",
+			        "/notice/list", 
+			        "/notice/detail/{notice_seq}",
+			        "/category", 
+			        "/likes/count", 
+			        "/likes/check",
+			        "/likes/review/count", 
+			        "/product/getBestProducts", 
+			        "/product", 
+			        "/product/getProductBytReview", 
+			        "/product/category/{product_category_code}",
+			        "/product/detail/{product_seq}", 
+			        "/product/getReviewList/{product_seq}", 
+			        "/product/getReviewListByBest/{product_seq}", 
+			        "/product/review/getRatings/{product_seq}"
+			    ).permitAll()
+			    
+			    // 로그인 필요
+			    .requestMatchers(
+			    	"/banner/**",
+			    	"/cart/**", 
+			        "/coupon/**", 
+			        "/event/**", 
+			        "/faq/**", 
+			        "/file/**", 
+			        "/history/**", 
+			        "/notice/**", 
+			        "/order/**", 
+			        "/return/**", 
+			        "/payment/**",
+			        "/comment/**", 
+			        "/community/**", 
+			        "/banner", 
+			        "/member/**",
+			        "/guestbook/**", 
+			        "/notice/**", 
+			        "/likes/**",
+			        "/product/**"
+			    ).authenticated()
+			
+
+		        // 관리자 전용 기능 - R1 접근 가능
+//			    .requestMatchers("/event/**").hasRole("R1")
+			    
+		        .requestMatchers(HttpMethod.POST, 
+		        		"/banner/**",
+		        		"/coupon/**",
+		        		"/faq/**",
+		        		"/file/**",
+		        		"/notice/insert",
+		        		"/event/insert"
+		        		
+		        		).hasAuthority("R1")
+		        
+		        .requestMatchers(HttpMethod.GET, 
+		        		"/member/all",
+		        		"/member/detail",
+		        		"/member/grades",
+		        		"/member/roles",
+		        		"/member/blacklistreason",
+		        		"/member/blacklist",
+		        		"/member/getAgeGenderDistribution",
+		        		"/community/reportedCommunity", 
+		        		"/community/communityReport/{board_seq}", 
+		        		"/community/getBoardNumByCategory", 
+		        		"/community/todayBoardNum", 
+		        		"/comment/reportedComments", 
+		        		"/comment/commentReport/{comment_seq}", 
+		        		"/comment/reportedReplys", 
+		        		"/comment/replyReport/{reply_seq}", 
+		        		"/product/reportedReviews", 
+		        		"/product/reviewReport/{review_seq}",
+//		        		"/product/getProductNumByCategory",
+		        		"/product/getBestProduct/{condition}"
+		        		
+		        		).hasAuthority("R1")
+		        
+		        .requestMatchers(HttpMethod.DELETE, 
+		        		"/banner/**",
+		        		"/coupon/**",
+		        		"/faq/**",
+		        		"/notice/delete/{notice_seq}",
+		        		"/community/deleteCommunity/{board_seq}",
+		        		"/comment/deleteCmt/{comment_seq}", 
+		        		"/comment/deleteReply/{reply_seq}", 
+		        		"/event/delete/{event_seq}",
+		        		"/product/deleteReview/{review_seq}",
+		        		"/product"
+		        		
+		        		
+		        		
+		        		).hasAuthority("R1")
+		        
+		        .requestMatchers(HttpMethod.PUT, 
+		        		"/banner/**",
+		        		"/coupon/**",
+		        		"/faq/**",
+		        		"member/updateMemberStatus",
+		        		"member/modifyBlacklist",
+		        		"/notice/modify/{notice_seq}",
+		        		"/event/modify/{event_seq}",
+		        		"/product"
+		        		
+		        		
+		        		).hasAuthority("R1")
+	        
+		        
 		        // 기타 모든 요청은 인증된 사용자만 접근 가능
 		        .anyRequest().authenticated())
 			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // UsernamePasswordAuthenticationFilter 이전에 필터를 추가

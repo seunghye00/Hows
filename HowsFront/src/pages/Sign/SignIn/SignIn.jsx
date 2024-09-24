@@ -34,63 +34,6 @@ export const SignIn = () => {
         }))
     }
 
-    // const handleLoginBtn = () => {
-    //   loginUser(user)
-    //     .then((resp) => {
-
-    //       console.log("로그인 : ", resp.data);
-
-    //       const { token } = resp.data; // 서버 응답에서 token과 memberId 분해 할당
-    //       const decoded = jwtDecode(token);
-
-    //       sessionStorage.setItem("token", token);
-    //       sessionStorage.setItem("member_id", decoded.sub); // 사용자 ID도 저장
-    //       sessionStorage.setItem("nickname", decoded.nickname); // 사용자 닉네임 저장
-    //       sessionStorage.setItem("member_avatar", decoded.member_avatar); // 사용자 프로필사진 저장
-
-    //       // 체크박스 상태에 따라 localStorage에 member_id 저장
-    //       if (rememberId) {
-    //         localStorage.setItem("member_id", decoded.sub);
-    //       } else {
-    //         localStorage.removeItem("member_id"); // 체크박스가 해제된 경우 삭제
-    //       }
-    //       setCurrentUser({
-    //         nickname: decoded.nickname,
-    //         member_avatar: decoded.member_avatar,
-    //       });
-
-    //       login(token);
-
-    //       Swal.fire({
-    //         title: "로그인",
-    //         text: `${decoded.nickname} 님 환영합니다.`,
-    //         icon: "success",
-    //         confirmButtonText: "확인",
-    //       });
-    //       navi("/");
-    //     })
-    //     .catch((error) => {
-    //       if (error.response && error.response.status === 403) {
-    //         Swal.fire({
-    //           title: "경고!",
-    //           text: "계정이 블랙리스트로 처리되어 로그인이 불가능합니다.",
-    //           icon: "error",
-    //           confirmButtonText: "확인",
-    //         }).then(() => {
-    //           // input 값 초기화
-    //           setUser({ member_id: "", pw: "" });
-    //         });
-    //       } else {
-    //         Swal.fire({
-    //           title: "경고!",
-    //           text: "로그인에 실패하였습니다.",
-    //           icon: "error",
-    //           confirmButtonText: "확인",
-    //         });
-    //       }
-    //     });
-    // };
-
     const handleLoginBtn = () => {
         loginUser(user)
             .then(resp => {
@@ -141,7 +84,11 @@ export const SignIn = () => {
                     icon: 'success',
                     confirmButtonText: '확인',
                 })
-                navi('/') // 메인 페이지로 이동
+                if (resp.data.member_roleCode === 'R1') {
+                    navi('/admin/home')
+                } else {
+                    navi('/') // 메인 페이지로 이동
+                }
             })
             .catch(error => {
                 console.error(error)

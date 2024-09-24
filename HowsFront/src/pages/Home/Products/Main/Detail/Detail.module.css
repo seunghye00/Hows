@@ -136,7 +136,7 @@
     letter-spacing: 1px; font-weight: bold;
     cursor: pointer;
     transition: all ease 0.1s;
-    border: 1px solid #9999997b;
+    border: 1px solid white;
     box-sizing: border-box;
 }
 

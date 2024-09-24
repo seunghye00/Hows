@@ -106,7 +106,6 @@ export const Cart = () => {
     let order = [];
     let orderPrice = 0;
     dataArr.forEach(item => {
-      console.log(item);
       const dataSet = {
         product_seq: item.product_seq,
         product_title: item.product_title,
@@ -142,20 +141,39 @@ export const Cart = () => {
         if(item.checked) data.push(item.cart_seq);
       });
     }
-    if(window.confirm("상품을 장바구니에서 삭제하시겠습니까?")){
-      setCheckCart(prev => {
-        let arr = prev;
-        data.forEach(seq => {
-          arr = arr.filter(item => {
-            if(item.cart_seq === seq){
-              deleteCart(seq);
-            }
-            return item.cart_seq !== seq;
+    SwalComp({
+      type: "question",
+      text: "상품을 장바구니에서 삭제하시겠습니까?"
+    }).then(res => {
+      if(res.isConfirmed) {
+        setCheckCart(prev => {
+          let arr = prev;
+          data.forEach(seq => {
+            arr = arr.filter(item => {
+              if(item.cart_seq === seq){
+                deleteCart(seq);
+              }
+              return item.cart_seq !== seq;
+            });
           });
+          return arr;
         });
-        return arr;
-      });
-    }
+      }
+    })
+    // if(window.confirm("상품을 장바구니에서 삭제하시겠습니까?")){
+    //   setCheckCart(prev => {
+    //     let arr = prev;
+    //     data.forEach(seq => {
+    //       arr = arr.filter(item => {
+    //         if(item.cart_seq === seq){
+    //           deleteCart(seq);
+    //         }
+    //         return item.cart_seq !== seq;
+    //       });
+    //     });
+    //     return arr;
+    //   });
+    // }
   }
 
   useEffect(() => {
@@ -181,7 +199,6 @@ export const Cart = () => {
 
     cartList().then(res => {
       if(res.data !== "") {
-        console.log(res.data);
         const arr = res.data.map(item => ({ ...item, checked: true }));
         setCarts(arr);
         setCheckCart(arr);

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { api } from "../../../../../config/config";
 import { format } from "date-fns";
 import { useAuthStore } from "../../../../../store/store";
-import { checkNickname, deleteUser, userInfo } from "../../../../../api/member";
+import { checkEmailForSignUp, checkNickname, deleteUser, userInfo } from "../../../../../api/member";
 import Swal from "sweetalert2";
 import DaumPostcode from "react-daum-postcode";
 import { SwalComp } from "../../../../../commons/commons";
@@ -27,10 +27,24 @@ export const UpdateUserInfo = () => {
     detail_address: "",
   });
   const [user, setUser] = useState([]);
-  const [nicknameErrorMessage, setNicknameErrorMessage] = useState("");
+  const member_id = sessionStorage.getItem('member_id') || ''; // 세션에서 member_id 가져오기, 없으면 빈 문자열
+
+  /* 중복검사 (true일 경우 이미 사용 중) */
   const [nicknameAvailable, setNicknameAvailable] = useState(null); // 중복검사 후 사용가능한지 / false가 사용가능
+  const [emailAvailable, setEmailAvailable] = useState(null);
+
+  /* 중복검사 후 보여지는 span 상태 */
   const [checkNicknameStatus, setCheckNicknameStatus] = useState(""); // 중복확인 후 메세지 상태
+  const [checkEmailStatus, setCheckEmailStatus] = useState('');
+
+  /* 에러 메세지 */
+  const [nicknameErrorMessage, setNicknameErrorMessage] = useState("");
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+
+  /* 중복확인 버튼 눌렀는지 (false일 경우 누르지 않은) */
   const [nicknameChecked, setNicknameChecked] = useState(true); // 중복확인 버튼 누르면 true
+  const [emailChecked, setEmailChecked] = useState(false); // 중복확인 상태 검사
+
   const { setIsAuth } = useAuthStore();
 
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal state
@@ -111,6 +125,41 @@ export const UpdateUserInfo = () => {
       );
     });
   };
+
+  // 이메일 중복확인 핸들러
+  const handleCheckEmail = () => {
+    // 이메일 유효성 검사
+    const emailPattern = /^[^\s@]+@[^\s@]+\.(com|net|org)$/;
+    if (!emailPattern.test(formData.email)) {
+      Swal.fire({
+        title: "경고!",
+        text: "이메일은 .com / .net / .org 형식의 이메일만 가능합니다.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      setEmailErrorMessage("다시 입력해주세요");
+      setEmailChecked(false); // 중복확인 버튼 상태 초기화
+      return;
+    } else {
+      setEmailErrorMessage(""); // 오류 메시지 초기화
+    }
+
+    // 현재 사용 중인 닉네임과 입력된 닉네임 비교
+    if (formData.email === user.email) {
+      setEmailAvailable(false);
+      setEmailChecked(true); // 중복 확인 상태를 true로 설정
+      return;
+    }
+
+    // 중복확인 요청
+    checkEmailForSignUp(formData.email).then((resp) => {
+      setEmailAvailable(resp.data);
+      setEmailChecked(!resp.data);
+      setCheckEmailStatus(
+        resp.data ? "이미 사용 중인 이메일입니다." : "사용 가능한 이메일입니다."
+      );
+    });
+  }
 
   /** 주소 찾기 **/
   const handleAddress = () => {
@@ -232,6 +281,11 @@ export const UpdateUserInfo = () => {
       setNicknameChecked(true); // 중복 확인 상태를 true로 설정
     }
 
+    if (formData.email === user.email) {
+      setEmailAvailable(false);
+      setEmailChecked(true); // 중복 확인 상태를 true로 설정
+    }
+
     // 유효성 검사 실행
     if (!validateFormData(formData)) {
       return;
@@ -241,6 +295,15 @@ export const UpdateUserInfo = () => {
       Swal.fire({
         title: "경고!",
         text: "닉네임 중복 확인을 해주세요.",
+        icon: "warning",
+        confirmButtonText: "확인",
+      });
+      return;
+    }
+    if (!emailChecked) {
+      Swal.fire({
+        title: "경고!",
+        text: "이메일 중복 확인을 해주세요.",
         icon: "warning",
         confirmButtonText: "확인",
       });
@@ -258,7 +321,7 @@ export const UpdateUserInfo = () => {
             icon: "success",
             confirmButtonText: "확인",
           });
-          navi("/");
+          navi(`/mypage/main/${member_id}`);
         }
       })
       .catch((error) => {
@@ -406,13 +469,32 @@ export const UpdateUserInfo = () => {
         <div className={styles.emailBox}>
           <span className={styles.title}>이메일</span>
           <span>.com / .net / .org 형식의 이메일만 가능합니다.</span>
-          <input
-            type="text"
-            value={formData.email}
-            name="email"
-            onChange={handleChange}
-            className={styles.inputEmail}
-          ></input>
+          <div className={styles.formGrop}>
+            <input
+              type="text"
+              value={formData.email}
+              name="email"
+              onChange={handleChange}
+              className={styles.inputEmail}
+            ></input>
+            <button className={styles.chkBtn} onClick={handleCheckEmail}>중복확인</button>
+          </div>
+          {emailErrorMessage && (
+            <p style={{ color: "red" }} className={styles.error}>
+              {emailErrorMessage}
+            </p>
+          )}{" "}
+          {/* 정규표현식 오류 메시지 */}
+          {emailAvailable === false && (
+            <p style={{ color: "green" }} className={styles.valid}>
+              사용 가능한 이메일입니다.
+            </p>
+          )}
+          {emailAvailable === true && (
+            <p style={{ color: "red" }} className={styles.valid}>
+              이미 사용 중인 이메일입니다.
+            </p>
+          )}
         </div>
         <div className={styles.phoneBox}>
           <span className={styles.title}>전화번호</span>

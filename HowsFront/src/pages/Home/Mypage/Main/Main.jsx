@@ -124,6 +124,8 @@ export const Main = () => {
             }
             if (imageType === 'profile') {
                 setSelectedProfileImage(profile); // 프로필 기본 이미지로 변경
+                sessionStorage.setItem("member_avatar", profile); // 기본 이미지로 sessionStorage 업데이트
+                setCurrentUser({ ...currentUser, "member_avatar": profile }); // Zustand 상태 업데이트
             } else if (imageType === 'banner') {
                 setSelectedBannerImage(banner); // 배너 기본 이미지로 변경
             }
@@ -255,7 +257,7 @@ export const Main = () => {
                                                 수정
                                             </button>
                                             <button className={styles.mypage} onClick={() => navi('/history/delivery')} >
-                                                마이페이지
+                                                My History
                                             </button>
                                         </>
                                     )}

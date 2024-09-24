@@ -68,12 +68,24 @@ export const SignIn = () => {
         navi("/");
       })
       .catch((error) => {
-        Swal.fire({
-          title: "경고!",
-          text: "로그인에 실패하였습니다.",
-          icon: "error",
-          confirmButtonText: "확인",
-        });
+        if (error.response && error.response.status === 403) {
+          Swal.fire({
+            title: "경고!",
+            text: "계정이 블랙리스트로 처리되어 로그인이 불가능합니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          }).then(() => {
+            // input 값 초기화
+            setUser({ member_id: "", pw: "" });
+          });
+        } else {
+          Swal.fire({
+            title: "경고!",
+            text: "로그인에 실패하였습니다.",
+            icon: "error",
+            confirmButtonText: "확인",
+          });
+        }
       });
   };
 

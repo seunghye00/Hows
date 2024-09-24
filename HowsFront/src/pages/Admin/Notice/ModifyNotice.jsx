@@ -173,7 +173,7 @@ export const ModifyNotice = () => {
                 <Button
                     size={'s'}
                     title={'취소'}
-                    onClick={() => navigate('/notice')}
+                    onClick={() => navigate('/admin/notice')}
                 />
             </div>
         </div>

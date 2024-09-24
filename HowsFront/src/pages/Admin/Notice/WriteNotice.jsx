@@ -89,7 +89,7 @@ export const WriteNotice = () => {
         SwalComp({ type: 'confirm', text: '작성을 취소하시겠습니까 ?' }).then(
             result => {
                 if (result.isConfirmed) {
-                    navigate('/notice')
+                    navigate('/admin/notice')
                 }
             }
         )

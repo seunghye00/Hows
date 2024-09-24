@@ -63,14 +63,15 @@ function AppContent({ session }) {
                     {!hideHeaderFooter && <Header />}
                     <Routes>
                         <Route path="/*" element={<Home />} />
-                        {/* 추가 라우트들 */}
                     </Routes>
                     {!hideHeaderFooter && <Footer />}
                 </>
             ) : (
                 <>
-                    <Side />
-                    <Admin />
+                    <Routes>
+                        <Route path="/admin/*" element={<Side />} />
+                        <Route path="/admin/*" element={<Admin />} />
+                    </Routes>
                 </>
             )}
         </div>

@@ -170,6 +170,15 @@ export const Post = () => {
 
     const { getRootProps, getInputProps } = useDropzone({
         onDrop: acceptedFiles => {
+            if (images.length + acceptedFiles.length > 5) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '업로드 제한',
+                    text: '이미지는 최대 5장까지만 업로드할 수 있습니다.',
+                })
+                return
+            }
+
             const validFiles = acceptedFiles.filter(file => {
                 const fileExtension = file.name.split('.').pop().toLowerCase()
                 const isValidExtension = ['jpg', 'jpeg', 'png', 'gif'].includes(

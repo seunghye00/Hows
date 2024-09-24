@@ -19,6 +19,6 @@ public class ReturnDAO {
 
 	// 반품 내역 생성
 	public int insert(ReturnDTO dto) {
-		return mybatis.insert("insert", dto);
+		return mybatis.insert("Return.insert", dto);
 	}
 }

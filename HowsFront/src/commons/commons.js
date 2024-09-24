@@ -38,7 +38,8 @@ export const addCommas = price => {
 
 /** 배송비 **/
 export const shippingPrice = price => {
-    return price >= 50000 ? 0 : 3000
+    return price >= 50000 ? 0 : 3000;
+    // return price >= 1000 ? 0 : 3000;
 }
 
 /** sweet alert **/

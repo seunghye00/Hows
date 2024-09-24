@@ -8,6 +8,11 @@ export const bannerList = () => {
     return axios.get(`${baseUrl}`)
 }
 
+// 배너 목록 요청 함수 (관리자)
+export const bannerListByAdmin = () => {
+    return axios.get(`${baseUrl}/getAllBanners`)
+}
+
 // 배너 추가 요청 함수
 export const addBanner = formData => {
     return axios.post(`${baseUrl}`, formData)

@@ -15,12 +15,6 @@
 		<result property="product_title" column="product_title"/>
 	</resultMap>
 
-
-	<select id="orderList" resultType="com.hows.order.dto.OrderDTO">
-		SELECT *
-		FROM orders
-	</select>
-
 	<select id="myOrder" resultType="com.hows.order.dto.OrderDTO">
 		SELECT
 			*

@@ -22,7 +22,6 @@ import com.hows.File.service.FileService;
 import com.hows.banner.dto.BannerDTO;
 import com.hows.banner.service.BannerService;
 import com.hows.common.DateFormat;
-import com.hows.order.dto.OrderDTO;
 
 @RestController
 @RequestMapping("/banner")
@@ -36,23 +35,34 @@ public class BannerController {
 
 	@GetMapping
 	public ResponseEntity<List<BannerDTO>> getAllBanners() throws Exception {
+		List<BannerDTO> list = bannServ.getAllBanners();
+		return ResponseEntity.ok(list);
+	}
+
+	// 관리자 기능
+	@GetMapping("/getAllBannersByAdmin")
+	public ResponseEntity<List<BannerDTO>> getAllBannersByAdmin() throws Exception {
 		List<BannerDTO> list = bannServ.getAllBannersByAdmin();
 		return ResponseEntity.ok(list);
 	}
 
+	// 관리자 기능
 	@PostMapping
-	public ResponseEntity<String> addBanner(@RequestParam("file") MultipartFile file, String startDate, String endDate, int banner_order) throws Exception {
+	public ResponseEntity<String> addBanner(@RequestParam("file") MultipartFile file, String startDate, String endDate,
+			int banner_order) throws Exception {
 
 		// 파일을 서버와 DB에 저장하고 반환받은 파일 정보에 대한 JSON 문자열
 		String bannerInfo = fileServ.upload(file, 0, "F5");
 
 		// 문자열을 Map으로 변환
-		Map<String, Object> map = new ObjectMapper().readValue(bannerInfo, new TypeReference<Map<String, Object>>() {});
+		Map<String, Object> map = new ObjectMapper().readValue(bannerInfo, new TypeReference<Map<String, Object>>() {
+		});
 		int file_seq = (int) map.get("file_seq");
 		String sysName = (String) map.get("sysName");
 		String banner_url = (String) map.get("banner_url");
 
-		BannerDTO dto = new BannerDTO(0, file_seq, banner_url, DateFormat.convertToDate(startDate), DateFormat.convertToDate(endDate), banner_order);
+		BannerDTO dto = new BannerDTO(0, file_seq, banner_url, DateFormat.convertToDate(startDate),
+				DateFormat.convertToDate(endDate), banner_order);
 		if (bannServ.addBanner(dto) > 0) {
 			int bannerSeq = dto.getBanner_seq();
 			if (fileServ.updateParentSeq(bannerSeq, file_seq)) {
@@ -64,6 +74,7 @@ public class BannerController {
 		return ResponseEntity.badRequest().body("fail");
 	}
 
+	// 관리자 기능
 	@DeleteMapping
 	@Transactional
 	public ResponseEntity<String> deleteBanner(@RequestParam String seqs) throws Exception {
@@ -87,15 +98,17 @@ public class BannerController {
 		return ResponseEntity.ok("success");
 	}
 
+	// 관리자 기능
 	// 배너와 이벤트 글 연결
-	@PutMapping()
-	public ResponseEntity<Boolean> updateBanner(@RequestParam int banner_seq, @RequestParam int event_seq) throws Exception {
-	    // 배너와 이벤트 연결 서비스 호출
-	    boolean result = bannServ.connectEvent(banner_seq, event_seq);
-	    // 성공적으로 업데이트 되었는지 여부 반환
-	    return ResponseEntity.ok(result);
+	@PutMapping
+	public ResponseEntity<Boolean> updateBanner(@RequestParam int banner_seq, @RequestParam int event_seq)
+			throws Exception {
+		// 배너와 이벤트 연결 서비스 호출
+		boolean result = bannServ.connectEvent(banner_seq, event_seq);
+		// 성공적으로 업데이트 되었는지 여부 반환
+		return ResponseEntity.ok(result);
 	}
-	
+
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> exceptionHandler(Exception e) {
 		e.printStackTrace();

@@ -18,11 +18,6 @@ public class OrderDAO {
     @Autowired
     private SqlSession mybatis;
 
-    /** 주문 목록 **/
-    public List<OrderDTO> orderList() {
-        return mybatis.selectList("Order.orderList");
-    }
-
     /** My 주문 목록 **/
     public List<OrderDTO> myOrder(int memberSeq) {
         return mybatis.selectList("Order.myOrder", memberSeq);

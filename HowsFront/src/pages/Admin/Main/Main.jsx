@@ -44,8 +44,10 @@ export const Main = () => {
             })
 
         getBestProduct('selling').then(resp => {
-            // console.log(resp)
-            setBestProducts(resp.data)
+            if (resp !== "" && resp !== undefined && resp !== null) {
+                // console.log(resp)
+                setBestProducts(resp.data)
+            }
         })
     }
 
@@ -56,7 +58,9 @@ export const Main = () => {
 
     useEffect(() => {
         getBestProduct(choice).then(resp => {
-            setBestProducts(resp.data)
+            if (resp !== "" && resp !== undefined && resp !== null) {
+                setBestProducts(resp.data)
+            }
         })
     }, [choice])
 
@@ -131,11 +135,10 @@ export const Main = () => {
                                         alt="대표 이미지"
                                     />
                                     <div
-                                        className={`${styles.info} ${
-                                            product.quantity === 0
-                                                ? styles.line
-                                                : ''
-                                        }`}
+                                        className={`${styles.info} ${product.quantity === 0
+                                            ? styles.line
+                                            : ''
+                                            }`}
                                     >
                                         <div className={styles.productTitle}>
                                             <div className={styles.name}>

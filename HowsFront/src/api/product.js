@@ -91,17 +91,17 @@ export const checkCanWriteReview = async (memberId, productSeq) => {
 export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
     return sortType === 'latest'
         ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
-              params: {
-                  page: page, // 페이지 번호 전달
-                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-              },
-          })
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            },
+        })
         : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
-              params: {
-                  page: page, // 페이지 번호 전달
-                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-              },
-          })
+            params: {
+                page: page, // 페이지 번호 전달
+                itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+            },
+        })
 }
 
 // 별점

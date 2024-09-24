@@ -48,3 +48,28 @@ api.interceptors.response.use(
     }
   }
 );
+
+axios.interceptors.response.use(
+  (response) => response, // axios 응답이 정상응답일 때는 then으로 가게 방치
+  (error) => {
+    switch (error.response.status) {
+      case 401:
+        sessionStorage.removeItem("token");
+        useAuthStore.getState().logout(); // useAuthStore에 있는 state값을 가져와서 logout 시키겠다.
+        break;
+
+      case 403:
+        sessionStorage.removeItem("token");
+        useAuthStore.getState().logout(); // useAuthStore에 있는 state값을 가져와서 logout 시키겠다.
+
+        Swal.fire({
+          icon: 'warning',
+          text: '로그인 후 이용할 수 있습니다.!!!!!!!!!!!',
+          showConfirmButton: true,
+        }).then(() => {
+          window.location.href = "/signIn";
+        })
+        break;
+    }
+  }
+);

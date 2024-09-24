@@ -4,6 +4,7 @@ import styles from './Detail.module.css'
 import { Button } from '../../../../../components/Button/Button'
 import { ScrollTop } from '../../../../../components/ScrollTop/ScrollTop'
 import { detailEvt } from '../../../../../api/event' // 이벤트 API 불러오기
+import ReactMarkdown from 'react-markdown'
 
 export const Detail = () => {
     const { event_seq } = useParams() // URL 파라미터에서 event_seq 가져오기
@@ -83,9 +84,9 @@ export const Detail = () => {
                                 </div>
                             )}
                             {/* 텍스트 출력 */}
-                            <p>
+                            <ReactMarkdown>
                                 {formatEventContents(event.event_contents).text}
-                            </p>
+                            </ReactMarkdown>
                         </div>
                     </div>
                     {/* 버튼 컴포넌트를 사용한 리턴 버튼 */}

@@ -242,6 +242,7 @@ const Faq = () => {
                                     <textarea
                                         className={styles.faqTitle}
                                         value={faq.faq_title}
+                                        onClick={e => e.stopPropagation()}
                                         onChange={e =>
                                             handleInputChange(
                                                 e,

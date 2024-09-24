@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -97,5 +98,19 @@ public class FileService {
 	// parent_seq 업데이트
 	public boolean updateParentSeq(int parentSeq, int fileSeq) {
 		return fileDAO.updateParentSeq(parentSeq, fileSeq);
+	}
+
+	// parent_seq가 0인 파일 목록 삭제
+	@Transactional
+	public void deleteFilesByNotFound() {
+		List<FileDTO> list = fileDAO.getFilesByNotFound();
+		for(FileDTO dto : list) {
+			String result = gcsFile.deleteFileGcs(dto.getFile_sysname(), dto.getFile_code());
+			if(result.equals("ok")) {
+				fileDAO.deleteFile(dto.getFile_sysname());
+			} else {
+				throw new RuntimeException("파일 삭제 실패: " + dto.getFile_sysname());
+			}
+		}
 	}
 }

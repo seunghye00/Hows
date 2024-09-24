@@ -49,4 +49,9 @@ public class FileDAO {
 		params.put("fileSeq", fileSeq);
 		return mybatis.update("File.update", params) > 0;
 	}
+
+	// parent_seq가 0인 파일 목록 조회
+	public List<FileDTO> getFilesByNotFound() {
+		return mybatis.selectList("File.getFilesByNotFound");
+	}
 }

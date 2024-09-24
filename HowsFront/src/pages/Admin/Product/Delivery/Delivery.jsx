@@ -324,7 +324,7 @@ export const Delivery = () => {
                             />
                         </div>
                         <div className={styles.cols}>배송 완료 일시</div>
-                        <div className={styles.cols}>상품명</div>
+                        <div className={styles.cols}>주문명</div>
                         <div className={styles.cols}>주문자</div>
                         <div className={styles.cols}>주문 금액</div>
                         <div className={styles.cols}>배송 현황</div>

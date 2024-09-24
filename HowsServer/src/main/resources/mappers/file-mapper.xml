@@ -36,4 +36,8 @@
 	<update id="update">
 		update files set parent_seq = #{parentSeq} where file_seq = #{fileSeq}
 	</update>
+	
+	<select id="getFilesByNotFound" resultType="com.hows.File.dto.FileDTO">
+		select * from files where parent_seq = 0
+	</select>
 </mapper>

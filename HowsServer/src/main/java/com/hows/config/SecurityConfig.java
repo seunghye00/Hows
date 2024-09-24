@@ -46,8 +46,11 @@ public class SecurityConfig {
 			    // 로그인 필요없음 - 모든 사용자 접근 가능
 //				 .requestMatchers("/**").permitAll()
 			    .requestMatchers(HttpMethod.POST, 
-			    		"/auth", 
+			    		"/auth/**", 
 			    		"/member", 
+				        "/member/checkId", 
+				        "/member/checkNickname", 
+				        "/member/checkEmail", 
 			    		"/community/{board_seq}/increment-view").permitAll()
 			    .requestMatchers(HttpMethod.GET, 
 			        "/comment/getComments", 
@@ -61,9 +64,6 @@ public class SecurityConfig {
 			        "/faq", 
 			        "/event/list", 
 			        "/event/detail/{event_seq}",
-			        "/member/checkId", 
-			        "/member/checkNickname", 
-			        "/member/checkEmail", 
 			        "/member/getFollower",
 			        "/member/getFollowing", 
 			        "/member/countFollow", 
@@ -86,14 +86,10 @@ public class SecurityConfig {
 			        "/product/getReviewListByBest/{product_seq}", 
 			        "/product/review/getRatings/{product_seq}"
 			    ).permitAll()
-//		        .requestMatchers(HttpMethod.GET, 
-//		        		"/member/getAgeGenderDistribution",
-//		        		"/product/getProductNumByCategory",
-//		        		"/product/getBestProduct/{condition}"
-//				    ).permitAll()
+
 			    // 로그인 필요
 			    .requestMatchers(
-//			    	"/banner/**",
+
 			    	"/cart/**", 
 			        "/coupon/**", 
 			        "/event/**", 

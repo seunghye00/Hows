@@ -4,7 +4,7 @@ import { Button } from '../../../../components/Button/Button'
 import { useEffect, useState } from 'react'
 import {
     categoryList,
-    productList,
+    productListByAdmin,
     deleteProducts,
     updateProductByQuantity,
 } from '../../../../api/product'
@@ -26,7 +26,7 @@ export const List = () => {
 
     useEffect(() => {
         // 컴포넌트가 처음 렌더링될 때 전체 상품 목록과 카테고리 목록을 비동기 호출
-        Promise.all([categoryList(), productList()])
+        Promise.all([categoryList(), productListByAdmin()])
             .then(([categoryData, productData]) => {
                 setCategories(categoryData.data)
                 // console.log(productData.data)

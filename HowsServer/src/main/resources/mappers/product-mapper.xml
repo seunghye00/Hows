@@ -17,6 +17,7 @@
         FROM product p 
         LEFT JOIN order_list ol <!-- 주문 리스트와 상품 조인 -->
         ON p.product_seq = ol.product_seq 
+        where quantity != 0 <!-- 품절 상품 제외 -->
         GROUP BY p.product_seq, 
                  p.product_thumbnail, 
                  p.product_title, 
@@ -40,6 +41,7 @@
 	<select id="getProducts" resultType="com.hows.product.dto.ProductDTO">
 		SELECT * 
 		FROM PRODUCT 
+		where quantity != 0 <!-- 품절 상품 제외 -->
 		ORDER BY DBMS_RANDOM.VALUE 
 	</select>
 	
@@ -48,6 +50,7 @@
 		SELECT p.product_seq, p.product_thumbnail, p.product_title, p.product_contents, p.price, p.product_category_code, COUNT(r.review_seq) AS review_count
 		FROM product p
 		LEFT JOIN review r ON p.product_seq = r.product_seq
+		where quantity != 0 <!-- 품절 상품 제외 -->
 		GROUP BY p.product_seq, p.product_thumbnail, p.product_title, p.product_contents, p.price, p.product_category_code
 		ORDER BY review_count DESC
 	</select>
@@ -63,6 +66,7 @@
 		    GROUP BY product_seq
 		  ) pl ON p.product_seq = pl.product_seq
 		  WHERE p.product_category_code = #{product_category_code}
+		  and quantity != 0 <!-- 품절 상품 제외 -->
 	</select>
 
 	<select id="getProductDetaile" parameterType="String" resultType="com.hows.product.dto.ProductDTO">
@@ -380,5 +384,10 @@
     		order by review_count desc
 		)
 		where rownum &lt;= 5
+	</select>
+	
+	<!-- 상품 전체 목록 조회 (관리자) -->
+	<select id="getProductsByAdmin" resultType="com.hows.product.dto.ProductDTO">
+		select * from product
 	</select>
 </mapper>

@@ -143,6 +143,7 @@ public class SecurityConfig {
 		        		"/order/listByStatus",
 		        		"/order/getReturnList",
 		        		"/payment/todayPaymentPrice",
+		        		"/product/getProductsByAdmin",
 		        		"/product/reportedReviews", 
 		        		"/product/reviewReport/{review_seq}",
 		        		"/product/getProductNumByCategory",

@@ -87,4 +87,9 @@ public class ProductDAO {
 	public List<ProductDTO> getBestProductByReview() {
 		return myBatis.selectList("Product.getBestProductByReview");
 	}
+
+	// 상품 전체 목록 조회 (관리자)
+	public List<ProductDTO> getProductsByAdmin() {
+		return myBatis.selectList("Product.getProductsByAdmin");
+	}
 }

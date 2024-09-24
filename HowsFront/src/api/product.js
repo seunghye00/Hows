@@ -242,7 +242,12 @@ export const categoryList = () => {
 
 // 상품 목록 요청 함수
 export const productList = () => {
-    return api.get('product')
+    return api.get('/product')
+}
+
+// 상품 목록 요청 함수 (관리자)
+export const productListByAdmin = () => {
+    return api.get('/product/getProductsByAdmin')
 }
 
 // 상품 추가 요청 함수

@@ -28,7 +28,6 @@ export const Reply = ({
     handleDeleteReply, // 삭제 함수도 props로 전달
     handleReplyToggle, // 답글 달기 토글
     activeReplySeq, // 활성화된 답글 seq
-    isOwner, // 해당 답글의 주인 여부
     editingReplySeq, // 현재 수정 중인 답글 seq
     setEditingReplySeq, // 수정 모드 설정 함수
     member_id, // 사용자 ID
@@ -41,6 +40,7 @@ export const Reply = ({
     const [isLiked, setIsLiked] = useState(replyData.isLiked) // 좋아요 상태 초기화
     const [likeCount, setLikeCount] = useState(replyData.LIKE_COUNT) // 좋아요 수 초기화
     const [charCount, setCharCount] = useState(replyData.REPLY_CONTENTS.length) // 글자수 상태
+    const isReplyOwner = isAuth && member_id === replyData?.MEMBER_ID
 
     // 수정 모드 토글 (내용 그대로 유지)
     const toggleEditMode = () => {
@@ -190,7 +190,7 @@ export const Reply = ({
                     </div>
                 </div>
                 <div className={styles.replyRight}>
-                    {isOwner ? (
+                    {isReplyOwner ? (
                         <>
                             {editingReplySeq === replyData.REPLY_SEQ ? (
                                 <>
@@ -226,7 +226,7 @@ export const Reply = ({
                         </>
                     ) : null}
                     {/* 신고하기 버튼 */}
-                    {!isOwner ? (
+                    {!isReplyOwner ? (
                         <div
                             className={styles.reportComment}
                             onClick={() =>

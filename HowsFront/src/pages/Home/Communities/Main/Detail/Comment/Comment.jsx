@@ -180,6 +180,13 @@ export const Comment = ({
     // 댓글 수정 모드 토글
     const toggleEditMode = () => {
         setIsEditing(!isEditing)
+        if (!isEditing) {
+            // 수정 모드로 진입할 때 기존 댓글 내용을 replyContent로 설정
+            setReplyContent(commentData.COMMENT_CONTENTS)
+        } else {
+            // 수정 모드에서 나갈 때 replyContent를 초기화
+            setReplyContent('')
+        }
     }
 
     // 댓글 수정 후 저장 처리
@@ -276,6 +283,8 @@ export const Comment = ({
                         <textarea
                             value={replyContent}
                             onChange={e => setReplyContent(e.target.value)} // 수정 중일 때 댓글 내용을 textarea로 표시
+                            maxLength={300} // 300글자 제한
+                            rows={3}
                         />
                     ) : (
                         commentData.COMMENT_CONTENTS // 수정 중이 아닐 때 댓글 내용 표시
@@ -393,7 +402,6 @@ export const Comment = ({
                                   editingReplySeq={editingReplySeq}
                                   setEditingReplySeq={setEditingReplySeq} // 답글 수정 전달
                                   setReplyContent={setReplyContent}
-                                  isOwner={isOwner}
                                   member_id={member_id}
                                   handleUpdateReply={handleUpdateReply} // 답글 수정 처리
                                   handleDeleteReply={handleDeleteReply} // 답글 삭제 처리

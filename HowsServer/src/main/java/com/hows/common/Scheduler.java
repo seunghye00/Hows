@@ -35,7 +35,7 @@ public class Scheduler {
 		Map<Integer, Integer> orders = new HashMap<>();
 		int bannerOrder = 1;
 
-		System.out.println("스케쥴러 실행");
+		System.out.println("Banner 스케쥴러 실행");
 
 		for (BannerDTO dto : list) {
 			Date startDate = dto.getStart_date();
@@ -60,9 +60,9 @@ public class Scheduler {
 	}
 
 	// 매일 자정 0시에 실행
-	@Scheduled(cron = "0 18 3 * * ?")
+	@Scheduled(cron = "0 0 0 * * ?")
 	public void checkFiles() {
-		System.out.println("실행");
+		System.out.println("File 스케쥴러 실행");
 		fileServ.deleteFilesByNotFound();
 	}
 }

@@ -552,7 +552,7 @@ public class CommunityController {
 		return ResponseEntity.ok(response);
 	}
 
-	// 게시물 신고 내역 조회 (관리자)
+	// 게시물 신고내역 조회 (관리자)
 	@GetMapping("/communityReport/{board_seq}")
 	public ResponseEntity<List<BoardReportDTO>> CommunityReport(@PathVariable int board_seq) throws Exception {
 		List<BoardReportDTO> boardReports = communityServ.CommunityReport(board_seq);

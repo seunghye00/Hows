@@ -23,7 +23,7 @@ ChartJS.register(
     PointElement
 )
 
-export const LineChart = ({ category }) => {
+export const LineChart = ({ category, lastSyncTime }) => {
     const [chartData, setChartData] = useState({
         labels: [], // X축 레이블
         datasets: [
@@ -92,7 +92,7 @@ export const LineChart = ({ category }) => {
             .finally(() => {
                 setLoading(false) // 로딩 완료
             })
-    }, [category])
+    }, [category, lastSyncTime])
 
     const options = {
         responsive: true,

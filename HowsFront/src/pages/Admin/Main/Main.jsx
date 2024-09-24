@@ -22,7 +22,9 @@ export const Main = () => {
     const [paymentPrice, setPaymentPrice] = useState(0)
     const [choice, setChoice] = useState('selling')
     const [bestProducts, setBestProducts] = useState([])
-    const [lastSyncTime, setLastSyncTime] = useState('') // 마지막 동기화 시간
+    const [lastSyncTime, setLastSyncTime] = useState(
+        new Date().toLocaleString()
+    ) // 마지막 동기화 시간
 
     const fetchData = () => {
         todayBoardNum()
@@ -53,8 +55,7 @@ export const Main = () => {
 
     useEffect(() => {
         fetchData()
-        setLastSyncTime(new Date().toLocaleString()) // 동기화 시간 설정
-    }, [])
+    }, [lastSyncTime])
 
     useEffect(() => {
         getBestProduct(choice).then(resp => {
@@ -69,7 +70,6 @@ export const Main = () => {
     }
 
     const handleRefresh = () => {
-        fetchData()
         setLastSyncTime(new Date().toLocaleString()) // 새로고침 시 동기화 시간 갱신
     }
 
@@ -148,10 +148,22 @@ export const Main = () => {
                                         </div>
                                         <div>\ {addCommas(product.price)}</div>
                                         <div className={styles.num}>
-                                            <span>
-                                                판매량 :{' '}
-                                                {addCommas(product.total_sales)}
-                                            </span>
+                                            {choice === 'review' ? (
+                                                <span>
+                                                    리뷰수 :{' '}
+                                                    {addCommas(
+                                                        product.review_count
+                                                    )}
+                                                </span>
+                                            ) : (
+                                                <span>
+                                                    판매량 :{' '}
+                                                    {addCommas(
+                                                        product.total_sales
+                                                    )}
+                                                </span>
+                                            )}
+
                                             <span>
                                                 남은 수량 :{' '}
                                                 {addCommas(product.quantity)}
@@ -164,12 +176,12 @@ export const Main = () => {
                     </div>
                 </div>
                 <div className={styles.rightBox}>
-                    <DoughnutChart />
+                    <DoughnutChart lastSyncTime={lastSyncTime} />
                 </div>
             </div>
             <div className={styles.row}>
                 <div className={styles.graphBox}>
-                    <BarChart />
+                    <BarChart lastSyncTime={lastSyncTime} />
                 </div>
                 <div className={styles.graphBox}>
                     <Swiper
@@ -182,16 +194,28 @@ export const Main = () => {
                         className={styles.swiper} // 스타일 클래스
                     >
                         <SwiperSlide>
-                            <LineChart category="areaType" />
+                            <LineChart
+                                category="areaType"
+                                lastSyncTime={lastSyncTime}
+                            />
                         </SwiperSlide>
                         <SwiperSlide>
-                            <LineChart category="housingType" />
+                            <LineChart
+                                category="housingType"
+                                lastSyncTime={lastSyncTime}
+                            />
                         </SwiperSlide>
                         <SwiperSlide>
-                            <LineChart category="spaceType" />
+                            <LineChart
+                                category="spaceType"
+                                lastSyncTime={lastSyncTime}
+                            />
                         </SwiperSlide>
                         <SwiperSlide>
-                            <LineChart category="color" />
+                            <LineChart
+                                category="color"
+                                lastSyncTime={lastSyncTime}
+                            />
                         </SwiperSlide>
                     </Swiper>
                 </div>

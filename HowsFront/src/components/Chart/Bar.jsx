@@ -14,7 +14,7 @@ import { getAgeGenderDistribution } from '../../api/member' // 데이터를 가�
 // ChartJS 등록
 ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend, BarElement)
 
-export const BarChart = () => {
+export const BarChart = ({ lastSyncTime }) => {
     const [chartData, setChartData] = useState({
         labels: [],
         datasets: [
@@ -80,7 +80,7 @@ export const BarChart = () => {
             .finally(() => {
                 setLoading(false) // 로딩 완료
             })
-    }, [])
+    }, [lastSyncTime])
 
     const options = {
         responsive: true,

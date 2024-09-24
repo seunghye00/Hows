@@ -74,7 +74,7 @@ export const WriteNotice = () => {
                 SwalComp({
                     type: 'success',
                     text: '공지사항이 추가되었습니다.',
-                }).then(() => navigate('/notice'))
+                }).then(() => navigate('/admin/notice'))
             })
             .catch(error => {
                 SwalComp({

@@ -67,9 +67,9 @@ public class MemberService implements UserDetailsService {
 
 		if (dto == null)
 			throw new UsernameNotFoundException("User not found");
-
+		
 		return new CustomUserDetails(dto.getMember_id(), dto.getPw(),
-				AuthorityUtils.createAuthorityList(dto.getRole_code()), dto.getMember_seq(), dto.getNickname(), dto.getMember_avatar());
+				AuthorityUtils.createAuthorityList(dto.getRole_code()), dto.getMember_seq(), dto.getNickname(), dto.getMember_avatar(), dto.getRole_code());
 	}
 
 	// 아이디 찾기

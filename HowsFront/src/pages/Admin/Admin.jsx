@@ -1,5 +1,5 @@
 import styles from './Admin.module.css'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import Title from '../../components/Title/Title'
 import { Main } from './Main/Main'
 import { Banner } from './Banner/Banner'
@@ -22,9 +22,9 @@ export const Admin = () => {
     return (
         <div className={styles.container}>
             <Routes>
-                <Route path="/admin/home" element={<Main />} />
+                <Route path="home" element={<Main />} />
                 <Route
-                    path="/admin/banner"
+                    path="banner"
                     element={
                         <>
                             <Title title={'배너 관리'} />
@@ -32,22 +32,22 @@ export const Admin = () => {
                         </>
                     }
                 />
-                <Route path="/admin/product/*" element={<Product />} />
+                <Route path="product/*" element={<Product />} />
 
-                <Route path="/admin/notice/*" element={<WriteNotice />} />
+                <Route path="notice/*" element={<WriteNotice />} />
                 <Route
-                    path="/admin/notice/modifyNotice/:notice_seq"
+                    path="notice/modifyNotice/:notice_seq"
                     element={<ModifyNotice />}
                 />
 
-                <Route path="/admin/event/*" element={<WriteEvent />} />
+                <Route path="event/*" element={<WriteEvent />} />
                 <Route
-                    path="/admin/event/modifyEvent/:event_seq"
+                    path="event/modifyEvent/:event_seq"
                     element={<ModifyEvent />}
                 />
 
                 <Route
-                    path="/member"
+                    path="member"
                     element={
                         <>
                             <Title title={'회원 관리'} />
@@ -56,7 +56,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/blacklist"
+                    path="blacklist"
                     element={
                         <>
                             <Title title={'블랙리스트 관리'} />
@@ -65,7 +65,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/community"
+                    path="community"
                     element={
                         <>
                             <Title title={'게시판 관리'} />
@@ -74,7 +74,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/comment"
+                    path="comment"
                     element={
                         <>
                             <Title title={'댓글 관리'} />
@@ -83,7 +83,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/reply"
+                    path="reply"
                     element={
                         <>
                             <Title title={'대댓글 관리'} />
@@ -92,7 +92,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/review"
+                    path="review"
                     element={
                         <>
                             <Title title={'리뷰 관리'} />
@@ -101,7 +101,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/notice"
+                    path="notice"
                     element={
                         <>
                             <Title title={'공지사항 관리'} />
@@ -110,7 +110,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/admin/notice/faq"
+                    path="notice/faq"
                     element={
                         <>
                             <Title title={'FAQ 관리'} />
@@ -119,7 +119,7 @@ export const Admin = () => {
                     }
                 />
                 <Route
-                    path="/admin/notice/event"
+                    path="notice/event"
                     element={
                         <>
                             <Title title={'이벤트 관리'} />

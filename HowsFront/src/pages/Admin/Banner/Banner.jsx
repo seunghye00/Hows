@@ -1,7 +1,7 @@
 import styles from './Banner.module.css'
 import { Button } from '../../../components/Button/Button'
 import {
-    bannerList,
+    bannerListByAdmin,
     addBanner,
     deleteBanners,
     updateBanner,
@@ -47,7 +47,7 @@ export const Banner = () => {
     const endRow = page * itemsPerPage
 
     useEffect(() => {
-        bannerList()
+        bannerListByAdmin()
             .then(resp => {
                 // console.log(resp.data)
                 const beforBanners = resp.data.map(banner => ({
@@ -164,7 +164,7 @@ export const Banner = () => {
         addBanner(formData)
             .then(resp => {
                 // console.log('업로드 성공 :', resp.data)
-                bannerList().then(resp => {
+                bannerListByAdmin().then(resp => {
                     const updatedBanners = resp.data.map(banner => ({
                         ...banner,
                         checked: false,

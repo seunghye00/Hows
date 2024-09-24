@@ -5,20 +5,19 @@ const baseUrl = `${host}/member`
 
 // 회원가입
 // ID 중복확인
-export const checkIdForSignUp = (memberId) => {
-    return axios.post(`${baseUrl}/checkId`, { member_id: memberId });
-};
+export const checkIdForSignUp = memberId => {
+    return axios.post(`${baseUrl}/checkId`, { member_id: memberId })
+}
 
 // 닉네임 중복확인
-export const checkNicknameForSignUp = (nickname) => {
-    return axios.post(`${baseUrl}/checkNickname`, { nickname: nickname });
-};
+export const checkNicknameForSignUp = nickname => {
+    return axios.post(`${baseUrl}/checkNickname`, { nickname: nickname })
+}
 
 // 이메일 중복확인
-export const checkEmailForSignUp = (email) => {
-    return axios.post(`${baseUrl}/checkEmail`, { email: email });
-};
-
+export const checkEmailForSignUp = email => {
+    return axios.post(`${baseUrl}/checkEmail`, { email: email })
+}
 
 /** 유저 정보  **/
 export const userInfo = member_id => {
@@ -162,9 +161,9 @@ export const eachFollow = (fromMemberSeq, toMemberSeq) => {
 }
 
 // 회원탈퇴
-export const deleteUser = (memberId) => {
-    return api.delete(`/member/deleteUser/${memberId}`);
-};
+export const deleteUser = memberId => {
+    return api.delete(`/member/deleteUser/${memberId}`)
+}
 
 export const adminstart = () => {
     // 여기서 밑 부터 관리자 기능!
@@ -244,5 +243,5 @@ export const modifyBlacklist = ({ member_id }) => {
 
 // 연령대별 남녀 멤버 수 조회
 export const getAgeGenderDistribution = () => {
-    return axios.get(`${baseUrl}/getAgeGenderDistribution`)
+    return api.get('/member/getAgeGenderDistribution')
 }

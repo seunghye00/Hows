@@ -27,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.hows.File.service.FileService;
 import com.hows.blacklistreason.dto.BlacklistReasonDTO;
 import com.hows.common.CustomUserDetails;
-import com.hows.community.service.CommunityService;
 import com.hows.grade.dto.GradeDTO;
 import com.hows.member.dto.MemberDTO;
 import com.hows.member.service.MemberService;
@@ -39,10 +38,9 @@ public class MemberController {
 
 	@Autowired
 	private MemberService memServ;
-    @Autowired
-    private FileService fileServ;
-    @Autowired
-    private CommunityService comServ;    
+
+	@Autowired
+    private FileService fileServ;  
 
 	@Autowired
 	private PasswordEncoder pwEncoder;

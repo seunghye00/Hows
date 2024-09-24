@@ -46,6 +46,7 @@ public class AuthController {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
 	    }
 
+	    String member_roleCode = existingUser.getMemberRoleCode();
 	    String member_id = existingUser.getUsername();
 	    int member_seq = existingUser.getMemberSeq();
 	    String nickname = existingUser.getNickname();
@@ -67,8 +68,7 @@ public class AuthController {
 	    
 	    // 로그인 성공 시 토큰 생성
 	    String token = jwt.createToken(member_id, member_seq, nickname, member_avatar);
-
-	    return ResponseEntity.ok(new SignInResponseDTO(token, member_id, member_seq, nickname, member_avatar));
+	    return ResponseEntity.ok(new SignInResponseDTO(token, member_id, member_seq, nickname, member_avatar, member_roleCode));
 	}
 
 

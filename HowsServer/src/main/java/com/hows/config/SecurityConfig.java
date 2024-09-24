@@ -9,6 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -52,7 +55,6 @@ public class SecurityConfig {
 			        "/community", 
 			        "/community/{board_seq}",
 			        "/community/images/{board_seq}",
-			        "/community/{board_seq}",
 			        "/purchaseHistory", 
 			        "/option/**", 
 			        "/banner", 
@@ -84,7 +86,11 @@ public class SecurityConfig {
 			        "/product/getReviewListByBest/{product_seq}", 
 			        "/product/review/getRatings/{product_seq}"
 			    ).permitAll()
-			    
+//		        .requestMatchers(HttpMethod.GET, 
+//		        		"/member/getAgeGenderDistribution",
+//		        		"/product/getProductNumByCategory",
+//		        		"/product/getBestProduct/{condition}"
+//				    ).permitAll()
 			    // 로그인 필요
 			    .requestMatchers(
 			    	"/banner/**",
@@ -107,7 +113,7 @@ public class SecurityConfig {
 			        "/likes/**",
 			        "/product/**"
 			    ).authenticated()
-			
+
 
 		        // 관리자 전용 기능 - R1 접근 가능
 //			    .requestMatchers("/event/**").hasRole("R1")
@@ -140,7 +146,7 @@ public class SecurityConfig {
 		        		"/comment/replyReport/{reply_seq}", 
 		        		"/product/reportedReviews", 
 		        		"/product/reviewReport/{review_seq}",
-//		        		"/product/getProductNumByCategory",
+		        		"/product/getProductNumByCategory",
 		        		"/product/getBestProduct/{condition}"
 		        		
 		        		).hasAuthority("R1")
@@ -174,7 +180,6 @@ public class SecurityConfig {
 		        		
 		        		).hasAuthority("R1")
 	        
-		        
 		        // 기타 모든 요청은 인증된 사용자만 접근 가능
 		        .anyRequest().authenticated())
 			.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class); // UsernamePasswordAuthenticationFilter 이전에 필터를 추가

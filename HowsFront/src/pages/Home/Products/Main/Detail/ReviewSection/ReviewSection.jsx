@@ -683,8 +683,22 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
 
     // 리뷰 정렬 타입 변경
     const handleChangeSortType = (sortType) => {
-        setSortType(sortType);
-        setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
+        // setSortType(sortType);
+        // setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
+
+        if (sortType === 'lowToHigh') {
+            // 별점 낮은 순으로 정렬
+            const sortedReviews = [...reviews].sort((a, b) => a.RATING - b.RATING);
+            setReviews(sortedReviews);
+        } else if (sortType === 'highToLow') {
+            // 별점 높은 순으로 정렬
+            const sortedReviews = [...reviews].sort((a, b) => b.RATING - a.RATING);
+            setReviews(sortedReviews);
+        } else {
+            // 최신순, 베스트순은 서버에서 데이터를 받아옴
+            setSortType(sortType);
+            setPage(1);  // 정렬 기준 변경 시 페이지를 1로 초기화
+        }
 
     }
 
@@ -779,8 +793,12 @@ export const ReviewSection = ({ product_seq, isAuth }) => {
                 </div>
                 <div className={styles.reviewsMain}>
                     <div className={styles.option}>
-                        <div onClick={() => handleChangeSortType('best')}>베스트순</div>
-                        <div onClick={() => handleChangeSortType('latest')}>최신순</div>
+                        <select onChange={(e) => handleChangeSortType(e.target.value)} className={styles.comboBox}>   
+                            <option value="latest">최신순</option>
+                            <option value="best">베스트순</option>
+                            <option value="lowToHigh">별점 낮은순</option>
+                            <option value="highToLow">별점 높은순</option>
+                        </select>
                     </div>
                     <div className={styles.reviewBox}>
                     {loading ? (  // 로딩 중일 때

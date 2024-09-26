@@ -9,7 +9,7 @@ import StarRating from '../../../../../components/StarRating/StarRating';
 import { useAuthStore } from '../../../../../store/store';
 import Swal from "sweetalert2";
 import { useOrderStore } from '../../../../../store/orderStore';
-import { checkLikeStatus, getReviewList , getProductDetail, getLikeCount, getRatings} from '../../../../../api/product';
+import { checkLikeStatus, getReviewList , getProductDetail, getLikeCount, getRatings, addLike, removeLike} from '../../../../../api/product';
 
 
 
@@ -106,31 +106,25 @@ export const Detail = () => {
                 setLiked(true);
                 setLikeCount(likeCount + 1); 
     
-                api.post(`/likes/insert`, {
-                    product_seq: product_seq,
-                    member_id: memberId 
-                }).then(() => { setLiked(true);
-                }).catch((error) => {
-                    console.error('좋아요 추가 실패:', error);
-                    setLiked(false);
-                    setLikeCount(likeCount - 1); // 실패 시 원래 값으로 복구
-                });
+                addLike(product_seq, memberId)
+                    .then(() => { setLiked(true);})
+                    .catch((error) => {
+                        console.error('좋아요 추가 실패:', error);
+                        setLiked(false);
+                        setLikeCount(likeCount - 1); // 실패 시 원래 값으로 복구
+                    });
             } else {
                 // 좋아요 취소 
                 setLiked(false);
                 setLikeCount(likeCount - 1); 
     
-                axios.delete(`${host}/likes/delete`, {
-                    data: {
-                        product_seq: product_seq,
-                        member_id: memberId 
-                    }
-                }).then(() => { setLiked(false); 
-                }).catch((error) => {
-                    console.error('좋아요 취소 실패:', error);
-                    setLiked(true);
-                    setLikeCount(likeCount + 1); // 실패 시 원래 값으로 복구
-                });
+                removeLike(product_seq,memberId)
+                    .then(() => { setLiked(false); 
+                    }).catch((error) => {
+                        console.error('좋아요 취소 실패:', error);
+                        setLiked(true);
+                        setLikeCount(likeCount + 1); // 실패 시 원래 값으로 복구
+                    });
             }
 
         }

@@ -59,10 +59,12 @@ public class Scheduler {
 		}
 	}
 
+	/*
 	// 매일 자정 0시에 실행
 	@Scheduled(cron = "0 0 0 * * ?")
 	public void checkFiles() {
 		System.out.println("File 스케쥴러 실행");
 		fileServ.deleteFilesByNotFound();
 	}
+	*/
 }

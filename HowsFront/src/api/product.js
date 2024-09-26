@@ -57,6 +57,52 @@ export const fetchCategories = async (
     }
 }
 
+// 리뷰 구매 상태 확인
+export const checkPurchaseStatus = async (memberId, productSeq) => {
+    try {
+        const response = await axios.get(
+            `${baseUrl}/review/checkPurchaseStatus`,
+            {
+                params: { memberId, productSeq },
+            }
+        )
+        return response.data
+    } catch (error) {
+        console.error('구매 상태 확인 오류:', error)
+        return false
+    }
+}
+
+// 리뷰 작성 가능 여부 확인
+export const checkCanWriteReview = async (memberId, productSeq) => {
+    try {
+        const response = await axios.get(`${baseUrl}/review/canWriteReview`, {
+            params: { memberId, productSeq },
+        })
+        return response.data
+    } catch (error) {
+        console.error('리뷰 작성 가능 여부 확인 오류:', error)
+        return false
+    }
+}
+
+// 리뷰 목록 요청 함수
+export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
+    return sortType === 'latest'
+        ? api.get(`product/getReviewList/${product_seq}`, {
+              params: {
+                  page: page, // 페이지 번호 전달
+                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+              },
+          })
+        : api.get(`product/getReviewListByBest/${product_seq}`, {
+              params: {
+                  page: page, // 페이지 번호 전달
+                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+              },
+          })
+}
+
 // 별점
 export const getRatings = product_seq => {
     return axios.get(`${baseUrl}/review/getRatings/${product_seq}`)

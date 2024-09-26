@@ -57,52 +57,6 @@ export const fetchCategories = async (
     }
 }
 
-// 리뷰 구매 상태 확인
-export const checkPurchaseStatus = async (memberId, productSeq) => {
-    try {
-        const response = await axios.get(
-            `${baseUrl}/review/checkPurchaseStatus`,
-            {
-                params: { memberId, productSeq },
-            }
-        )
-        return response.data
-    } catch (error) {
-        console.error('구매 상태 확인 오류:', error)
-        return false
-    }
-}
-
-// 리뷰 작성 가능 여부 확인
-export const checkCanWriteReview = async (memberId, productSeq) => {
-    try {
-        const response = await axios.get(`${baseUrl}/review/canWriteReview`, {
-            params: { memberId, productSeq },
-        })
-        return response.data
-    } catch (error) {
-        console.error('리뷰 작성 가능 여부 확인 오류:', error)
-        return false
-    }
-}
-
-// 리뷰 목록 요청 함수
-export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
-    return sortType === 'latest'
-        ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
-              params: {
-                  page: page, // 페이지 번호 전달
-                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-              },
-          })
-        : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
-              params: {
-                  page: page, // 페이지 번호 전달
-                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
-              },
-          })
-}
-
 // 별점
 export const getRatings = product_seq => {
     return axios.get(`${baseUrl}/review/getRatings/${product_seq}`)
@@ -124,7 +78,7 @@ export const getLikeCount = product_seq => {
 
 // 상품 좋아요 상태 확인
 export const checkLikeStatus = (product_seq, memberId) => {
-    return axios.get(`${likeUrl}/check`, {
+    return api.get(`${likeUrl}/check`, {
         params: {
             product_seq,
             member_id: memberId || '', // memberId가 없으면 빈 문자열 전달
@@ -152,12 +106,77 @@ export const addToCartAPI = data => {
     return api.post(`/cart`, data)
 }
 
+// 리뷰 구매 상태 확인
+export const checkPurchaseStatus = async (memberId, productSeq) => {
+    try {
+        const response = await api.get(
+            `${baseUrl}/review/checkPurchaseStatus`,
+            {
+                params: { memberId, productSeq },
+            }
+        )
+        return response.data
+    } catch (error) {
+        console.error('구매 상태 확인 오류:', error)
+        return false
+    }
+}
+
+// 리뷰 작성 가능 여부 확인
+export const checkCanWriteReview = async (memberId, productSeq) => {
+    try {
+        const response = await api.get(`${baseUrl}/review/canWriteReview`, {
+            params: { memberId, productSeq },
+        })
+        return response.data
+    } catch (error) {
+        console.error('리뷰 작성 가능 여부 확인 오류:', error)
+        return false
+    }
+}
+
+// 리뷰 목록 요청 함수
+export const getReviewList = (product_seq, page, itemsPerPage, sortType) => {
+    return sortType === 'latest'
+        ? axios.get(`${baseUrl}/getReviewList/${product_seq}`, {
+              params: {
+                  page: page, // 페이지 번호 전달
+                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+              },
+          })
+        : axios.get(`${baseUrl}/getReviewListByBest/${product_seq}`, {
+              params: {
+                  page: page, // 페이지 번호 전달
+                  itemsPerPage: itemsPerPage, // 페이지당 항목 수 전달
+              },
+          })
+}
+
+// 리뷰 등록
+export const addReview = (formData) => {
+    return api.post(`${baseUrl}/reviewAdd`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
+};
+
+// 리뷰 삭제 
+export const delReview = (review_seq) => {
+    return api.delete(`${baseUrl}/delReview/${review_seq}`);
+};
+
 // 리뷰 좋아요
 export const reviewLike = (reviewSeq, memberId) => {
     return api.post(`${likeUrl}/review/insert`, {
         review_seq: reviewSeq,
         member_id: memberId,
     })
+}
+
+// 리뷰 수정 
+export const modifyReview = (formData) => {
+    return api.post(`${baseUrl}/reviewMod`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+    });
 }
 
 // 리뷰 좋아요 취소
@@ -181,7 +200,7 @@ export const getReviewLikeCount = reviewSeq => {
 
 // 리뷰 좋아요 상태 확인
 export const checkReviewLikeStatus = (reviewSeq, memberId) => {
-    return axios.get(`${likeUrl}/review/check`, {
+    return api.get(`${likeUrl}/review/check`, {
         params: {
             review_seq: reviewSeq,
             member_id: memberId,

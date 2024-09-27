@@ -39,8 +39,6 @@ export const SignIn = () => {
             .then(resp => {
                 const data = resp.data
 
-                console.log('로그인 : ', data)
-
                 // 토큰이 없는 경우 에러 처리
                 if (!data.token) {
                     Swal.fire({
@@ -93,19 +91,22 @@ export const SignIn = () => {
             .catch(error => {
                 console.error(error)
                 // 에러 응답에 따른 처리
-                const message =
-                    error.response && error.response.data.message
-                        ? error.response.data.message
-                        : '계정이 블랙리스트로 처리되어 로그인이 불가능합니다.'
-                Swal.fire({
-                    title: '경고!',
-                    text: message,
-                    icon: 'error',
-                    confirmButtonText: '확인',
-                }).then(() => {
-                    // input 값 초기화
-                    setUser({ member_id: '', pw: '' })
-                })
+
+                if (error.response && error.response.status === 423) {
+                    Swal.fire({
+                        title: "경고!",
+                        text: "계정이 블랙리스트로 처리되어 로그인이 불가능합니다.",
+                        icon: "error",
+                        confirmButtonText: "확인",
+                    });
+                } else {
+                    Swal.fire({
+                        title: "경고!",
+                        text: "로그인에 실패하였습니다.",
+                        icon: "error",
+                        confirmButtonText: "확인",
+                    });
+                }
             })
     }
 

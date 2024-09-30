@@ -39,20 +39,6 @@ export const SignIn = () => {
             .then(resp => {
                 const data = resp.data
 
-                // 토큰이 없는 경우 에러 처리
-                if (!data.token) {
-                    Swal.fire({
-                        title: '로그인 실패',
-                        text: data.message, // 서버에서 받은 메시지 사용
-                        icon: 'error',
-                        confirmButtonText: '확인',
-                    }).then(() => {
-                        // input 값 초기화
-                        setUser({ member_id: '', pw: '' })
-                    })
-                    return // 로그인 처리 중단
-                }
-
                 // 로그인 성공 처리
                 const token = data.token // 서버 응답에서 token 분해 할당
                 const decoded = jwtDecode(token)
